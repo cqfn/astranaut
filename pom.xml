@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.cqfn</groupId>
+    <groupId>org.uast</groupId>
     <artifactId>ast-generator</artifactId>
     <version>1.0-SNAPSHOT</version>
     <developers>
@@ -21,11 +21,6 @@
             <timezone>Russia/Moscow</timezone>
         </developer>
     </developers>
-
-    <organization>
-        <name>cqfn</name>
-        <url>https://www.cqfn.org/</url>
-    </organization>
 
     <licenses>
         <license>

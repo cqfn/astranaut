@@ -1,4 +1,4 @@
-package org.cqfn.astgen;
+package org.uast.astgen;
 
 import java.util.logging.Logger;
 
