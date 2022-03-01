@@ -1,9 +1,16 @@
 package org.cqfn.astgen;
 
+import java.util.logging.Logger;
+
 /**
  * Main class.
  */
 public final class Main {
+    /**
+     * Logger.
+     */
+    private static Logger log = Logger.getLogger(Main.class.getName());
+
     /**
      * Private constructor.
      */
@@ -19,6 +26,6 @@ public final class Main {
         if (args.length == 0) {
             throw new IllegalArgumentException("No action specified.");
         }
-        System.out.println("Welcome to AST Generator project!");
+        log.fine("Welcome to AST Generator project!");
     }
 }
