@@ -5,6 +5,12 @@ package org.cqfn.astgen;
  */
 public final class Main {
     /**
+     * Private constructor.
+     */
+    private Main() {
+    }
+
+    /**
      * The main function. Parses the command line and runs actions.
      *
      * @param args the command-line arguments.

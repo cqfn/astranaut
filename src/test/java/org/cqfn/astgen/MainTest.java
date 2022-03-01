@@ -39,4 +39,16 @@ public class MainTest {
         }
         Assert.assertTrue(exceptionCaught);
     }
+
+    /**
+     * Test passing no argument to main().
+     */
+    @Test
+    public void testMain() {
+        final String[] example = {
+                "test"
+        };
+        Main.main(example);
+        Assert.assertTrue(example.length > 0);
+    }
 }
