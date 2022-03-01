@@ -81,7 +81,7 @@
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     <sourceDirectories>${project.build.sourceDirectory}</sourceDirectories>
                     <testSourceDirectories>${project.build.testSourceDirectory}</testSourceDirectories>
-                    <outputFile>/reports/checkstyle/checkstyle-result.xml</outputFile>
+                    <outputFile>${project.build.directory}/reports/checkstyle/checkstyle-result.xml</outputFile>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
                     <linkXRef>true</linkXRef>
@@ -99,12 +99,18 @@
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>3.16.0</version>
                 <configuration>
-                    <failOnViolation>true</failOnViolation>
-                    <printFailingErrors>true</printFailingErrors>
                     <rulesets>
-                        <ruleset>${project.basedir}/config/pmd/ruleset.xml</ruleset>
+                        <ruleset>/config/pmd/ruleset.xml</ruleset>
                     </rulesets>
+                    <includeResources>false</includeResources>
+                    <includeTestResources>false</includeTestResources>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <compileSourceRoots>${project.build.sourceDirectory}</compileSourceRoots>
+                    <testSourceDirectories>${project.build.testSourceDirectory}</testSourceDirectories>
+                    <targetDirectory>${project.build.directory}/reports/pmd/pmd-result.xml</targetDirectory>
                     <consoleOutput>true</consoleOutput>
+                    <failOnViolation>true</failOnViolation>
+                    <linkXRef>true</linkXRef>
                 </configuration>
                 <executions>
                     <execution>
@@ -136,7 +142,7 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
-                    <configLocation>${project.basedir}/config/checkstyle/checkstyle.xml</configLocation>
+                    <configLocation>/config/checkstyle/checkstyle.xml</configLocation>
                     <linkXRef>true</linkXRef>
                     <sourceDirectories>${project.build.sourceDirectory}</sourceDirectories>
                     <outputFile>${project.build.directory}/reports/checkstyle/checkstyle-result.xml</outputFile>
@@ -156,10 +162,10 @@
                 <version>3.16.0</version>
                 <configuration>
                     <rulesets>
-                        <ruleset>${project.basedir}/config/pmd/ruleset.xml</ruleset>
+                        <ruleset>/config/pmd/ruleset.xml</ruleset>
                     </rulesets>
                     <linkXref>true</linkXref>
-                    <compileSourceRoots>${project.basedir}/src/main/java</compileSourceRoots>
+                    <compileSourceRoots>${project.build.sourceDirectory}</compileSourceRoots>
                     <targetDirectory>${project.build.directory}/reports/pmd/pmd-result.xml</targetDirectory>
                     <includeTests>true</includeTests>
                 </configuration>
@@ -184,8 +190,9 @@
                 <version>3.3.2</version>
                 <configuration>
                     <linkXref>true</linkXref>
-                    <compileSourceRoots>${project.basedir}/src</compileSourceRoots>
+                    <compileSourceRoots>${project.build.sourceDirectory}</compileSourceRoots>
                     <targetDirectory>${project.build.directory}/reports/javadoc/javadoc-result.xml</targetDirectory>
+                    <includeTests>true</includeTests>
                 </configuration>
                 <reportSets>
                     <reportSet>
