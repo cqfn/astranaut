@@ -75,20 +75,38 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
-                    <configLocation>${user.dir}/config/checkstyle/checkstyle.xml</configLocation>
+                    <configLocation>${project.basedir}/config/checkstyle/checkstyle.xml</configLocation>
                     <includeResources>false</includeResources>
                     <includeTestResources>false</includeTestResources>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                    <includes>${user.dir}/src/main/java</includes>
+                    <sourceDirectories>${project.build.sourceDirectory}</sourceDirectories>
+                    <testSourceDirectories>${project.build.testSourceDirectory}</testSourceDirectories>
                     <outputFile>${project.build.directory}/reports/checkstyle/checkstyle-result.xml</outputFile>
-                    <consoleOutput>false</consoleOutput>
-                    <failsOnError>true</failsOnError>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>false</failsOnError>
                     <linkXRef>true</linkXRef>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>validate</id>
-                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.16.0</version>
+                <configuration>
+                    <failOnViolation>true</failOnViolation>
+                    <printFailingErrors>true</printFailingErrors>
+                    <rulesets>
+                        <ruleset>${project.basedir}/config/pmd/ruleset.xml</ruleset>
+                    </rulesets>
+                </configuration>
+                <executions>
+                    <execution>
                         <goals>
                             <goal>check</goal>
                         </goals>
@@ -105,6 +123,87 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <configLocation>${project.basedir}/config/checkstyle/checkstyle.xml</configLocation>
+                    <linkXRef>true</linkXRef>
+                    <sourceDirectories>${project.build.sourceDirectory}</sourceDirectories>
+                    <outputFile>${project.build.directory}/reports/checkstyle/checkstyle-result.xml</outputFile>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>checkstyle</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.16.0</version>
+                <configuration>
+                    <rulesets>
+                        <ruleset>${project.basedir}/config/pmd/ruleset.xml</ruleset>
+                    </rulesets>
+                    <linkXref>true</linkXref>
+                    <compileSourceRoots>${project.basedir}/src/main/java</compileSourceRoots>
+                    <targetDirectory>${project.build.directory}/reports/pmd/pmd-result.xml</targetDirectory>
+                    <includeTests>true</includeTests>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>pmd</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <inherited>false</inherited>
+                        <reports>
+                            <report>aggregate-pmd</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <linkXref>true</linkXref>
+                    <compileSourceRoots>${project.basedir}/src</compileSourceRoots>
+                    <targetDirectory>${project.build.directory}/reports/javadoc/javadoc-result.xml</targetDirectory>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>javadoc</report>
+                            <report>test-javadoc</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <inherited>false</inherited>
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
     <distributionManagement>
         <site>
             <id>localhost</id>

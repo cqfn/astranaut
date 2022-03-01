@@ -1,0 +1,77 @@
+<ruleset name="Custom Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+    Custom PMD rules to suppress irrelevant warnings.
+    In general, PMD produces a great number of false positives.
+    Therefore, we need a custom ruleset that enables relevant rules and excludes the irrelevant.
+    See details here:
+        https://pmd.github.io/latest/pmd_rules_java.html
+        https://pmd.github.io/pmd-6.29.0/pmd_userdocs_suppressing_warnings.html
+    </description>
+
+    <rule ref="category/java/bestpractices.xml" >
+        <exclude name="JUnitAssertionsShouldIncludeMessage" />
+        <exclude name="JUnitTestContainsTooManyAsserts" />
+    </rule>
+    <rule ref="category/java/codestyle.xml" >
+        <exclude name="AtLeastOneConstructor" />
+        <exclude name="CommentDefaultAccessModifier"/>
+        <exclude name="OnlyOneReturn"/>
+        <exclude name="EmptyMethodInAbstractClassShouldBeAbstract"/>
+    </rule>
+    <rule ref="category/java/codestyle.xml/ShortClassName">
+        <properties>
+            <property name="minimum" value="3" />
+        </properties>
+    </rule>
+    <rule ref="category/java/codestyle.xml/LongVariable">
+        <properties>
+            <property name="minimum" value="18" />
+        </properties>
+    </rule>
+    <rule ref="category/java/codestyle.xml/UnnecessaryLocalBeforeReturn">
+        <properties>
+            <!-- Ignore test classes that have the 'Test' Suffix -->
+            <property name="violationSuppressXPath"
+                      value="./ancestor::ClassOrInterfaceDeclaration[matches(@Image, '^.*Test$')]"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/design.xml">
+        <exclude name="LawOfDemeter" />
+    </rule>
+    <rule ref="category/java/design.xml/CyclomaticComplexity">
+        <properties>
+            <property name="methodReportLevel" value="11" />
+        </properties>
+    </rule>
+    <rule ref="category/java/documentation.xml" />
+    <rule ref="category/java/documentation.xml/CommentSize">
+        <properties>
+            <property name="maxLines" value="15" />
+            <property name="maxLineLength" value="100" />
+        </properties>
+    </rule>
+    <rule ref="category/java/errorprone.xml">
+        <exclude name="BeanMembersShouldSerialize"/>
+        <exclude name="CompareObjectsWithEquals"/>
+    </rule>
+    <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
+        <properties>
+            <!-- Ignore test classes that have the 'Test' Suffix -->
+            <property name="violationSuppressXPath"
+                      value="./ancestor::ClassOrInterfaceDeclaration[matches(@Image, '^.*Test$')]"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/errorprone.xml/AvoidLiteralsInIfCondition">
+        <properties>
+            <property name="ignoreMagicNumbers" value="-1,0,1,2,'\n'" />
+        </properties>
+    </rule>
+    <rule ref="category/java/performance.xml">
+        <exclude name="AvoidInstantiatingObjectsInLoops"/>
+    </rule>
+
+</ruleset>
