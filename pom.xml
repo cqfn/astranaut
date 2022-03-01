@@ -75,15 +75,15 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
-                    <configLocation>${project.basedir}/config/checkstyle/checkstyle.xml</configLocation>
+                    <configLocation>/config/checkstyle/checkstyle.xml</configLocation>
                     <includeResources>false</includeResources>
                     <includeTestResources>false</includeTestResources>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     <sourceDirectories>${project.build.sourceDirectory}</sourceDirectories>
                     <testSourceDirectories>${project.build.testSourceDirectory}</testSourceDirectories>
-                    <outputFile>${project.build.directory}/reports/checkstyle/checkstyle-result.xml</outputFile>
+                    <outputFile>/reports/checkstyle/checkstyle-result.xml</outputFile>
                     <consoleOutput>true</consoleOutput>
-                    <failsOnError>false</failsOnError>
+                    <failsOnError>true</failsOnError>
                     <linkXRef>true</linkXRef>
                 </configuration>
                 <executions>
@@ -104,6 +104,7 @@
                     <rulesets>
                         <ruleset>${project.basedir}/config/pmd/ruleset.xml</ruleset>
                     </rulesets>
+                    <consoleOutput>true</consoleOutput>
                 </configuration>
                 <executions>
                     <execution>
