@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test;
  * Test for {@link Main} class.
  */
 public class MainTest {
-    /**
-     * Test passing arguments to main().
-     */
+
     @Test
     public void testNoException() {
         final String[] example = {

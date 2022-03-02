@@ -22,7 +22,8 @@ public final class Main {
      *
      * @param args the command-line arguments.
      */
-    public static void main(final String... args) {
+    public static void main(final String... args){
+        int f = 90980;
         if (args.length == 0) {
             throw new IllegalArgumentException("No action specified.");
         }
