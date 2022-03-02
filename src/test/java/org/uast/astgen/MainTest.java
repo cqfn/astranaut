@@ -1,7 +1,7 @@
 package org.uast.astgen;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for {@link Main} class.
@@ -21,7 +21,7 @@ public class MainTest {
         } catch (IllegalArgumentException e) {
             exceptionCaught = true;
         }
-        Assert.assertFalse(exceptionCaught);
+        Assertions.assertFalse(exceptionCaught);
     }
 
     /**
@@ -37,7 +37,7 @@ public class MainTest {
         } catch (IllegalArgumentException e) {
             exceptionCaught = true;
         }
-        Assert.assertTrue(exceptionCaught);
+        Assertions.assertTrue(exceptionCaught);
     }
 
     /**
@@ -49,6 +49,6 @@ public class MainTest {
                 "test"
         };
         Main.main(example);
-        Assert.assertTrue(example.length > 0);
+        Assertions.assertTrue(example.length > 0);
     }
 }
