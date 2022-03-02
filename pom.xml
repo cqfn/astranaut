@@ -83,12 +83,24 @@
                         </goals>
                         <configuration>
                             <skip>false</skip>
-                            <excludes>
-                                <exclude>org.cqfn.channel.ReadFlowTest</exclude>
-                                <exclude>org.cqfn.channel.WriteSubscriberTestReadFlowTest</exclude>
-                            </excludes>
                             <testNGArtifactName>none:none</testNGArtifactName>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.qulice</groupId>
+                <artifactId>qulice-maven-plugin</artifactId>
+                <version>0.19.4</version>
+                <configuration>
+                    <license>file:${basedir}/LICENSE_header.txt</license>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -162,28 +174,5 @@
                 </executions>
             </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>com.qulice</groupId>
-                    <artifactId>qulice-maven-plugin</artifactId>
-                    <configuration>
-                        <excludes combine.children="append">
-                            <exclude>checkstyle:/src/test/resources-binary/.*</exclude>
-                        </excludes>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>com.jcabi</groupId>
-                    <artifactId>jcabi-maven-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>jcabi-versionalize-packages</id>
-                            <phase>none</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 </project>
