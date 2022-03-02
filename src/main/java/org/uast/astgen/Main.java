@@ -1,15 +1,22 @@
+/*
+ * MIT License Copyright (c) 2022 unified-ast
+ * https://github.com/unified-ast/ast-generator/blob/master/LICENSE.txt
+ */
+
 package org.uast.astgen;
 
 import java.util.logging.Logger;
 
 /**
  * Main class.
+ *
+ * @since 1.0
  */
 public final class Main {
     /**
      * Logger.
      */
-    private static Logger log = Logger.getLogger(Main.class.getName());
+    private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
     /**
      * Private constructor.
@@ -20,13 +27,12 @@ public final class Main {
     /**
      * The main function. Parses the command line and runs actions.
      *
-     * @param args the command-line arguments.
+     * @param args The command-line arguments
      */
-    public static void main(final String... args){
-        int f = 90980;
+    public static void main(final String... args) {
         if (args.length == 0) {
             throw new IllegalArgumentException("No action specified.");
         }
-        log.fine("Welcome to AST Generator project!");
+        LOG.fine("Welcome to AST Generator project!");
     }
 }

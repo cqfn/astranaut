@@ -1,3 +1,8 @@
+/*
+ * MIT License Copyright (c) 2022 unified-ast
+ * https://github.com/unified-ast/ast-generator/blob/master/LICENSE.txt
+ */
+
 package org.uast.astgen;
 
 import org.junit.jupiter.api.Assertions;
@@ -5,21 +10,30 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test for {@link Main} class.
+ *
+ * @since 1.0
  */
 public class MainTest {
+    /**
+     * Argument example.
+     */
+    private static final String ARG = "test";
 
+    /**
+     * Test passing an argument to main().
+     */
     @Test
     public void testNoException() {
         final String[] example = {
-                "test"
+            MainTest.ARG,
         };
-        boolean exceptionCaught = false;
+        boolean caught = false;
         try {
             Main.main(example);
-        } catch (IllegalArgumentException e) {
-            exceptionCaught = true;
+        } catch (final IllegalArgumentException exc) {
+            caught = true;
         }
-        Assertions.assertFalse(exceptionCaught);
+        Assertions.assertFalse(caught);
     }
 
     /**
@@ -29,13 +43,13 @@ public class MainTest {
     public void testWithException() {
         final String[] example = {
         };
-        boolean exceptionCaught = false;
+        boolean caught = false;
         try {
             Main.main(example);
-        } catch (IllegalArgumentException e) {
-            exceptionCaught = true;
+        } catch (final IllegalArgumentException exc) {
+            caught = true;
         }
-        Assertions.assertTrue(exceptionCaught);
+        Assertions.assertTrue(caught);
     }
 
     /**
@@ -44,7 +58,7 @@ public class MainTest {
     @Test
     public void testMain() {
         final String[] example = {
-                "test"
+            MainTest.ARG,
         };
         Main.main(example);
         Assertions.assertTrue(example.length > 0);
