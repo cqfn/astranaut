@@ -34,8 +34,33 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <qulice.license>${project.basedir}/LICENSE</qulice.license>
     </properties>
     <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>com.qulice</groupId>
+              <artifactId>qulice-maven-plugin</artifactId>
+              <version>0.19.4</version>
+              <configuration>
+                <license>file:${qulice.license}</license>
+                <excludes combine.children="append">
+                  <exclude>findbugs:.*</exclude>
+                  <exclude>duplicatefinder:.*</exclude>
+                  <exclude>dependencies:.*</exclude>
+                </excludes>
+              </configuration>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>check</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <artifactId>maven-install-plugin</artifactId>
@@ -207,6 +232,28 @@
             </plugin>
         </plugins>
     </reporting>
+    <profiles>
+      <profile>
+        <id>qulice</id>
+        <build>
+          <plugins>
+            <plugin>
+              <groupId>com.qulice</groupId>
+              <artifactId>qulice-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>qulice-check</id>
+                  <phase>verify</phase>
+                  <goals>
+                    <goal>check</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </build>
+      </profile>
+    </profiles>
     <distributionManagement>
         <site>
             <id>localhost</id>
