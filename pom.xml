@@ -106,7 +106,6 @@
                         <executions>
                             <execution>
                                 <id>qulice-check</id>
-                                <phase>verify</phase>
                                 <goals>
                                     <goal>check</goal>
                                 </goals>
