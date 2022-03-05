@@ -52,6 +52,9 @@
                 <version>0.19.4</version>
                 <configuration>
                     <license>file:${qulice.license}</license>
+                    <excludes>
+                        <exclude>checkstyle:/src/main/java/org/uast/astgen/Rule.java</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
