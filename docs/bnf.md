@@ -1,4 +1,4 @@
-#Extended Backus–Naur form
+# Extended Backus–Naur form
 
 capital letter = "A" | "B" | ... | "Z" ;
 
@@ -76,7 +76,7 @@ block := language descriptor, rules list ;
 
 document : rules list, { block } ;
 
-#Examples
+# Examples
 
 Class name: `Expression`
 
