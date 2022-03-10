@@ -37,10 +37,16 @@ public class Scanner {
      */
     public Token getToken() {
         char symbol = this.getChar();
-        while (symbol == ' ' || symbol == '\n' || symbol == '\r') {
+        while (Char.isSpace(symbol)) {
             symbol = this.nextChar();
         }
-        return Null.INSTANCE;
+        final Token result;
+        if (Char.isLetter(symbol)) {
+            result = this.parseIdentifier(symbol);
+        } else {
+            result = Null.INSTANCE;
+        }
+        return result;
     }
 
     /**
@@ -69,5 +75,20 @@ public class Scanner {
             }
         }
         return result;
+    }
+
+    /**
+     * Parses an identifier.
+     * @param first The first symbol
+     * @return A token
+     */
+    private Identifier parseIdentifier(final char first) {
+        final StringBuilder builder = new StringBuilder();
+        char symbol = first;
+        do {
+            builder.append(symbol);
+            symbol = this.nextChar();
+        } while (Char.isLetter(symbol) || Char.isDigit(symbol));
+        return new Identifier(builder.toString());
     }
 }

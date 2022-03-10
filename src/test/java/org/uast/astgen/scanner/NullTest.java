@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  */
 public class NullTest {
     /**
-     * Argument example.
+     * Output example.
      */
     private static final String EXPECTED = "<null>";
 
