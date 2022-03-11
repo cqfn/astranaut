@@ -115,6 +115,10 @@ public class Scanner {
             case '\"':
                 result = this.parseString();
                 break;
+            case ',':
+                this.nextChar();
+                result = Comma.INSTANCE;
+                break;
             default:
                 throw new UnknownSymbol(symbol);
         }
