@@ -7,6 +7,7 @@ package org.uast.astgen.scanner;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.uast.astgen.exceptions.ParserException;
 
 /**
  * Test for {@link Scanner} and {@link Null} class.
@@ -20,12 +21,19 @@ public class NullTest {
     private static final String EXPECTED = "<null>";
 
     /**
-     * Test passing an argument to main().
+     * Test scanner with empty string as input.
      */
     @Test
     public void emptyStringAsInput() {
         final Scanner scanner = new Scanner("");
-        final Token token = scanner.getToken();
-        Assertions.assertEquals(token.toString(), NullTest.EXPECTED);
+        boolean oops = false;
+        final Token token;
+        try {
+            token = scanner.getToken();
+            Assertions.assertEquals(token.toString(), NullTest.EXPECTED);
+        } catch (final ParserException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }

@@ -5,6 +5,8 @@
 package org.uast.astgen.scanner;
 
 import java.util.Objects;
+import org.uast.astgen.exceptions.ParserException;
+import org.uast.astgen.exceptions.UnclosedString;
 
 /**
  * Scanner that splits a rule by tokens.
@@ -34,8 +36,9 @@ public class Scanner {
     /**
      * Returns next token, extracted from the source string.
      * @return A token
+     * @throws ParserException Parser exception
      */
-    public Token getToken() {
+    public Token getToken() throws ParserException {
         char symbol = this.getChar();
         while (Char.isSpace(symbol)) {
             symbol = this.nextChar();
@@ -43,6 +46,8 @@ public class Scanner {
         final Token result;
         if (Char.isLetter(symbol)) {
             result = this.parseIdentifier(symbol);
+        } else if (symbol == '\"') {
+            result = this.parseString();
         } else {
             result = Null.INSTANCE;
         }
@@ -90,5 +95,43 @@ public class Scanner {
             symbol = this.nextChar();
         } while (Char.isLetter(symbol) || Char.isDigit(symbol));
         return new Identifier(builder.toString());
+    }
+
+    /**
+     * Parses string literal.
+     * @return A token
+     * @throws ParserException Parser exception
+     */
+    private StringToken parseString() throws ParserException {
+        final StringBuilder builder = new StringBuilder();
+        char symbol = this.nextChar();
+        while (symbol != '\"' && symbol != 0) {
+            if (symbol == '\\') {
+                symbol = this.nextChar();
+                switch (symbol) {
+                    case 'n':
+                        builder.append('\n');
+                        break;
+                    case 'r':
+                        builder.append('\r');
+                        break;
+                    case 't':
+                        builder.append('\t');
+                        break;
+                    default:
+                        builder.append(symbol);
+                        break;
+                }
+            } else {
+                builder.append(symbol);
+            }
+            symbol = this.nextChar();
+        }
+        this.nextChar();
+        final String value = builder.toString();
+        if (symbol == 0) {
+            throw new UnclosedString(value);
+        }
+        return new StringToken(value);
     }
 }

@@ -7,6 +7,7 @@ package org.uast.astgen.scanner;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.uast.astgen.exceptions.ParserException;
 
 /**
  * Test for {@link Scanner} and {@link Identifier} class.
@@ -25,15 +26,22 @@ public class IdentifierTest {
     private static final String EXPECTED = "Second_2";
 
     /**
-     * Test passing an argument to main().
+     * Test scanner with string contains two identifiers.
      */
     @Test
     public void twoIdentifiers() {
         final Scanner scanner = new Scanner(IdentifierTest.SOURCE);
-        Token token = scanner.getToken();
-        Assertions.assertInstanceOf(Identifier.class, token);
-        token = scanner.getToken();
-        Assertions.assertInstanceOf(Identifier.class, token);
-        Assertions.assertEquals(token.toString(), IdentifierTest.EXPECTED);
+        Token token = null;
+        boolean oops = false;
+        try {
+            token = scanner.getToken();
+            Assertions.assertInstanceOf(Identifier.class, token);
+            token = scanner.getToken();
+            Assertions.assertInstanceOf(Identifier.class, token);
+            Assertions.assertEquals(token.toString(), IdentifierTest.EXPECTED);
+        } catch (final ParserException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }
