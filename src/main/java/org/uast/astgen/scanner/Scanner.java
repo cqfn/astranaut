@@ -5,8 +5,10 @@
 package org.uast.astgen.scanner;
 
 import java.util.Objects;
+import org.uast.astgen.exceptions.ExpectedNumber;
 import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.exceptions.UnclosedString;
+import org.uast.astgen.exceptions.UnknownSymbol;
 
 /**
  * Scanner that splits a rule by tokens.
@@ -46,10 +48,8 @@ public class Scanner {
         final Token result;
         if (Char.isLetter(symbol)) {
             result = this.parseIdentifier(symbol);
-        } else if (symbol == '\"') {
-            result = this.parseString();
         } else {
-            result = Null.INSTANCE;
+            result = this.parseTokenByFirstSymbol(symbol);
         }
         return result;
     }
@@ -95,6 +95,49 @@ public class Scanner {
             symbol = this.nextChar();
         } while (Char.isLetter(symbol) || Char.isDigit(symbol));
         return new Identifier(builder.toString());
+    }
+
+    /**
+     * Parses a next token by first symbol.
+     * @param symbol The first symbol
+     * @return A token
+     * @throws ParserException Parser exception
+     */
+    private Token parseTokenByFirstSymbol(final char symbol) throws ParserException {
+        Token result = null;
+        switch (symbol) {
+            case 0:
+                result = Null.INSTANCE;
+                break;
+            case '#':
+                result = this.parseHoleMarker();
+                break;
+            case '\"':
+                result = this.parseString();
+                break;
+            default:
+                throw new UnknownSymbol(symbol);
+        }
+        return result;
+    }
+
+    /**
+     * Parses a hole marker.
+     * @return A token
+     * @throws ParserException Parser exception
+     */
+    private HoleMarker parseHoleMarker() throws ParserException {
+        final StringBuilder builder = new StringBuilder();
+        char symbol = this.nextChar();
+        while (symbol >= '0' && symbol <= '9') {
+            builder.append(symbol);
+            symbol = this.nextChar();
+        }
+        if (builder.length() == 0) {
+            throw ExpectedNumber.INSTANCE;
+        }
+        final int value = Integer.parseInt(builder.toString());
+        return new HoleMarker(value);
     }
 
     /**
