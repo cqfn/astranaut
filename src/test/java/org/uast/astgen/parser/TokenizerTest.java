@@ -19,7 +19,7 @@ public class TokenizerTest {
     /**
      * Source string (correct).
      */
-    private static final String CORRECT = "{aaa,[bbb123<\"ccc\">],(ddd)}";
+    private static final String CORRECT = "{aaa,[bbb123<\"ccc\">],(#456)}";
 
     /**
      * Source string (incorrect).
@@ -34,7 +34,8 @@ public class TokenizerTest {
         final Tokenizer tokenizer = new Tokenizer(TokenizerTest.CORRECT);
         boolean oops = false;
         try {
-            tokenizer.getTokens();
+            final TokenList tokens = tokenizer.getTokens();
+            Assertions.assertEquals(tokens.toString(), TokenizerTest.CORRECT);
         } catch (final ParserException ignored) {
             oops = true;
         }
@@ -45,11 +46,11 @@ public class TokenizerTest {
      * Test scanner with incorrect string literal.
      */
     @Test
-    public void incorrectString() {
-        final Scanner scanner = new Scanner(TokenizerTest.INCORRECT);
+    public void incorrectSequence() {
+        final Tokenizer tokenizer = new Tokenizer(TokenizerTest.INCORRECT);
         boolean oops = false;
         try {
-            scanner.getToken();
+            tokenizer.getTokens();
         } catch (final ParserException ignored) {
             oops = true;
         }

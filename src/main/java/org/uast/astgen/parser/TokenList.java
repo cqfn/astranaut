@@ -12,12 +12,12 @@ import org.uast.astgen.scanner.Token;
  *
  * @since 1.0
  */
-public interface TokenList extends Iterable<Token> {
+public abstract class TokenList implements Iterable<Token> {
     /**
      * Returns the size of the list.
      * @return The size
      */
-    int size();
+    public abstract int size();
 
     /**
      * Returns token by its index.
@@ -25,10 +25,19 @@ public interface TokenList extends Iterable<Token> {
      * @return A token
      * @throws IndexOutOfBoundsException If index is negative or greater than size - 1
      */
-    Token get(int index) throws IndexOutOfBoundsException;
+    public abstract Token get(int index) throws IndexOutOfBoundsException;
 
     @Override
-    default Iterator<Token> iterator() {
+    public final Iterator<Token> iterator() {
         return new TokenListIterator(this);
+    }
+
+    @Override
+    public final String toString() {
+        final StringBuilder builder = new StringBuilder();
+        for (int index = 0; index < this.size(); index = index + 1) {
+            builder.append(this.get(index).toString());
+        }
+        return builder.toString();
     }
 }

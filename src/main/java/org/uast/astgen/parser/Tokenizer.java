@@ -4,8 +4,6 @@
  */
 package org.uast.astgen.parser;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.scanner.Null;
 import org.uast.astgen.scanner.Scanner;
@@ -35,14 +33,14 @@ public class Tokenizer {
      * @return A list of tokens
      * @throws ParserException Any exception thrown by the parser
      */
-    public List<Token> getTokens() throws ParserException {
-        final List<Token> result = new ArrayList<>(16);
+    public TokenList getTokens() throws ParserException {
+        final TokenListBuilder result = new TokenListBuilder();
         final Scanner scanner = new Scanner(this.source);
         Token token = scanner.getToken();
         while (!(token instanceof Null)) {
-            result.add(token);
+            result.addToken(token);
             token = scanner.getToken();
         }
-        return result;
+        return result.createList();
     }
 }
