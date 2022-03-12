@@ -61,4 +61,13 @@ final class Char {
     static boolean isDigit(final char symbol) {
         return symbol >= '0' && symbol <= '9';
     }
+
+    /**
+     * Checks whether symbol is a bracket.
+     * @param symbol A symbol
+     * @return Result of checking
+     */
+    static boolean isBracket(final char symbol) {
+        return "{}()[]<>".indexOf(symbol) != -1;
+    }
 }

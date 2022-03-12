@@ -48,6 +48,9 @@ public class Scanner {
         final Token result;
         if (Char.isLetter(symbol)) {
             result = this.parseIdentifier(symbol);
+        } else if (Char.isBracket(symbol)) {
+            this.nextChar();
+            result = BracketFactory.INSTANCE.getObject(symbol);
         } else {
             result = this.parseTokenByFirstSymbol(symbol);
         }
