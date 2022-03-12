@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.ParserException;
 
 /**
- * Test for {@link Scanner} and {@link Identifier} class.
+ * Test for {@link Scanner} and {@link Identifier} classes.
  *
  * @since 1.0
  */

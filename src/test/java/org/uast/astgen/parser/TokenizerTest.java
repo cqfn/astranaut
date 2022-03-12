@@ -3,45 +3,38 @@
  * https://github.com/unified-ast/ast-generator/blob/master/LICENSE.txt
  */
 
-package org.uast.astgen.scanner;
+package org.uast.astgen.parser;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.ParserException;
+import org.uast.astgen.scanner.Scanner;
 
 /**
- * Test for {@link Scanner} and {@link StringToken} classes.
+ * Test for {@link Tokenizer} class.
  *
  * @since 1.0
  */
-public class StringTokenTest {
+public class TokenizerTest {
     /**
      * Source string (correct).
      */
-    private static final String CORRECT = "  \"test \\n 123\"";
-
-    /**
-     * Output example.
-     */
-    private static final String EXPECTED = "\"test \\n 123\"";
+    private static final String CORRECT = "{aaa,[bbb123<\"ccc\">],(ddd)}";
 
     /**
      * Source string (incorrect).
      */
-    private static final String INCORRECT = "  \"test";
+    private static final String INCORRECT = "example$123";
 
     /**
      * Test scanner with string literal.
      */
     @Test
-    public void correctString() {
-        final Scanner scanner = new Scanner(StringTokenTest.CORRECT);
-        Token token = null;
+    public void correctSequence() {
+        final Tokenizer tokenizer = new Tokenizer(TokenizerTest.CORRECT);
         boolean oops = false;
         try {
-            token = scanner.getToken();
-            Assertions.assertInstanceOf(StringToken.class, token);
-            Assertions.assertEquals(token.toString(), StringTokenTest.EXPECTED);
+            tokenizer.getTokens();
         } catch (final ParserException ignored) {
             oops = true;
         }
@@ -53,7 +46,7 @@ public class StringTokenTest {
      */
     @Test
     public void incorrectString() {
-        final Scanner scanner = new Scanner(StringTokenTest.INCORRECT);
+        final Scanner scanner = new Scanner(TokenizerTest.INCORRECT);
         boolean oops = false;
         try {
             scanner.getToken();

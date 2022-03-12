@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.ParserException;
 
 /**
- * Test for {@link Scanner} and {@link HoleMarker} class.
+ * Test for {@link Scanner} and {@link HoleMarker} classes.
  *
  * @since 1.0
  */

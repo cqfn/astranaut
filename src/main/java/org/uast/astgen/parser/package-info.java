@@ -4,8 +4,8 @@
  */
 
 /**
- * Scanner that splits a string that contains rule by tokens.
+ * Parser that parses token sequence and creates rule objects.
  *
  * @since 1.0
  */
-package org.uast.astgen.scanner;
+package org.uast.astgen.parser;
