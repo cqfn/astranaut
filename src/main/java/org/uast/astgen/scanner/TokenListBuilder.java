@@ -2,11 +2,10 @@
  * MIT License Copyright (c) 2022 unified-ast
  * https://github.com/unified-ast/ast-generator/blob/master/LICENSE.txt
  */
-package org.uast.astgen.parser;
+package org.uast.astgen.scanner;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.uast.astgen.scanner.Token;
 
 /**
  * The builder of list of tokens.

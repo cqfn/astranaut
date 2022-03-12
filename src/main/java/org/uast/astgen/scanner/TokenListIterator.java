@@ -2,11 +2,10 @@
  * MIT License Copyright (c) 2022 unified-ast
  * https://github.com/unified-ast/ast-generator/blob/master/LICENSE.txt
  */
-package org.uast.astgen.parser;
+package org.uast.astgen.scanner;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import org.uast.astgen.scanner.Token;
 
 /**
  * Wrapper that implements {@link Iterator} interface.

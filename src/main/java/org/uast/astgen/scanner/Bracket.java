@@ -33,4 +33,11 @@ public abstract class Bracket implements Token {
      * @return The flag
      */
     public abstract boolean isClosing();
+
+    /**
+     * Creates corresponding {@link BracketsPair} instance.
+     * @param tokens The list of tokens inside brackets pair.
+     * @return A token
+     */
+    public abstract BracketsPair createPair(TokenList tokens);
 }

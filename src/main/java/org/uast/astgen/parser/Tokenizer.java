@@ -8,6 +8,8 @@ import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.scanner.Null;
 import org.uast.astgen.scanner.Scanner;
 import org.uast.astgen.scanner.Token;
+import org.uast.astgen.scanner.TokenList;
+import org.uast.astgen.scanner.TokenListBuilder;
 
 /**
  * Class that transform string into list of tokens.

@@ -35,4 +35,9 @@ public final class OpeningCurlyBracket extends Bracket {
     public boolean isClosing() {
         return false;
     }
+
+    @Override
+    public BracketsPair createPair(final TokenList tokens) {
+        return new CurlyBracketsPair(tokens);
+    }
 }

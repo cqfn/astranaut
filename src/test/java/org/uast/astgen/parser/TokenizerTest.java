@@ -8,7 +8,7 @@ package org.uast.astgen.parser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.ParserException;
-import org.uast.astgen.scanner.Scanner;
+import org.uast.astgen.scanner.TokenList;
 
 /**
  * Test for {@link Tokenizer} class.

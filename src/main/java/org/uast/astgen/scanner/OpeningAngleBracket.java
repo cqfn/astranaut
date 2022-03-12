@@ -35,4 +35,9 @@ public final class OpeningAngleBracket extends Bracket {
     public boolean isClosing() {
         return false;
     }
+
+    @Override
+    public BracketsPair createPair(final TokenList tokens) {
+        return new AngleBracketsPair(tokens);
+    }
 }
