@@ -34,6 +34,14 @@ public class TokenListBuilder {
     }
 
     /**
+     * Checks whether the builder is empty (contains no tokens).
+     * @return The result of checking
+     */
+    public boolean isEmpty() {
+        return this.list.isEmpty();
+    }
+
+    /**
      * Creates a list of tokens.
      * @return A list of tokens
      */
