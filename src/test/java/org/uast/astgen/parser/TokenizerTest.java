@@ -27,7 +27,7 @@ public class TokenizerTest {
     private static final String INCORRECT = "example$123";
 
     /**
-     * Test scanner with string literal.
+     * Test the tokenizer with correct string.
      */
     @Test
     public void correctSequence() {
@@ -43,7 +43,7 @@ public class TokenizerTest {
     }
 
     /**
-     * Test scanner with incorrect string literal.
+     * Test the tokenizer with incorrect string.
      */
     @Test
     public void incorrectSequence() {
