@@ -59,7 +59,7 @@ public abstract class Descriptor {
         builder.append(this.getName());
         this.parametersToString(builder);
         final Data data = this.getData();
-        if (data != null) {
+        if (data.isValid()) {
             builder.append('<').append(data.toString()).append('>');
         }
         if (attribute == DescriptorAttribute.OPTIONAL) {
