@@ -16,6 +16,11 @@ import java.util.Objects;
  */
 public class DescriptorFactory {
     /**
+     * The attribute.
+     */
+    private DescriptorAttribute attribute;
+
+    /**
      * The tag.
      */
     private String tag;
@@ -40,10 +45,19 @@ public class DescriptorFactory {
      * @param name The name
      */
     public DescriptorFactory(final String name) {
+        this.attribute = DescriptorAttribute.NONE;
         this.tag = "";
         this.name = Objects.requireNonNull(name);
         this.parameters = new LinkedList<>();
         this.data = InvalidData.INSTANCE;
+    }
+
+    /**
+     * Sets the new attribute.
+     * @param value Attribute
+     */
+    public void setAttribute(final DescriptorAttribute value) {
+        this.attribute = value;
     }
 
     /**
@@ -98,6 +112,11 @@ public class DescriptorFactory {
          */
         DescriptorObject(final DescriptorFactory factory) {
             this.factory = factory;
+        }
+
+        @Override
+        public DescriptorAttribute getAttribute() {
+            return this.factory.attribute;
         }
 
         @Override

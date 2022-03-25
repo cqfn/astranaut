@@ -14,6 +14,12 @@ import java.util.List;
  */
 public abstract class Descriptor {
     /**
+     * Returns the attribute of descriptor.
+     * @return The attribute
+     */
+    public abstract DescriptorAttribute getAttribute();
+
+    /**
      * Returns tag associated with descriptor.
      * @return The tag (or empty string).
      */
@@ -40,11 +46,35 @@ public abstract class Descriptor {
     @Override
     public final String toString() {
         final StringBuilder builder = new StringBuilder();
+        final DescriptorAttribute attribute = this.getAttribute();
+        if (attribute == DescriptorAttribute.OPTIONAL) {
+            builder.append('[');
+        } else if (attribute == DescriptorAttribute.LIST) {
+            builder.append('{');
+        }
         final String tag = this.getTag();
         if (!tag.isEmpty()) {
             builder.append(tag).append('@');
         }
         builder.append(this.getName());
+        this.parametersToString(builder);
+        final Data data = this.getData();
+        if (data != null) {
+            builder.append('<').append(data.toString()).append('>');
+        }
+        if (attribute == DescriptorAttribute.OPTIONAL) {
+            builder.append(']');
+        } else if (attribute == DescriptorAttribute.LIST) {
+            builder.append('}');
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Builds parameters list as a string.
+     * @param builder String builder where to build.
+     */
+    private void parametersToString(final StringBuilder builder) {
         final List<Descriptor> parameters = this.getParameters();
         if (!parameters.isEmpty()) {
             boolean flag = false;
@@ -58,10 +88,5 @@ public abstract class Descriptor {
             }
             builder.append(')');
         }
-        final Data data = this.getData();
-        if (data != null) {
-            builder.append('<').append(data.toString()).append('>');
-        }
-        return builder.toString();
     }
 }
