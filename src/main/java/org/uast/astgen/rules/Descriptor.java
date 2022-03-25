@@ -4,9 +4,7 @@
  */
 package org.uast.astgen.rules;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Descriptor, i.e. name with tag, parameters and data.
@@ -14,46 +12,44 @@ import java.util.Objects;
  *
  * @since 1.0
  */
-public class Descriptor {
+public abstract class Descriptor {
     /**
-     * Tag.
+     * Returns tag associated with descriptor.
+     * @return The tag (or empty string).
      */
-    private final String tag;
+    public abstract String getTag();
 
     /**
-     * Name.
+     * Returns name associated with descriptor.
+     * @return The name (can't be {@code null} or empty)
      */
-    private final String name;
+    public abstract String getName();
 
     /**
-     * List of parameters.
+     * Returns list of parameters inside descriptor.
+     * @return List of parameters
      */
-    private final List<Descriptor> parameters;
+    public abstract List<Descriptor> getParameters();
 
     /**
-     * Constructor.
-     * @param tag Tag
-     * @param name Name
-     * @param parameters List of parameters
+     * Returns data associated with descriptor.
+     * @return Data
      */
-    public Descriptor(final String tag, final String name,
-        final List<Descriptor> parameters) {
-        this.tag = Objects.requireNonNull(tag);
-        this.name = Objects.requireNonNull(name);
-        this.parameters = new ArrayList<>(parameters);
-    }
+    public abstract Data getData();
 
     @Override
     public final String toString() {
         final StringBuilder builder = new StringBuilder();
-        if (!this.tag.isEmpty()) {
-            builder.append(this.tag).append('@');
+        final String tag = this.getTag();
+        if (!tag.isEmpty()) {
+            builder.append(tag).append('@');
         }
-        builder.append(this.name);
-        if (!this.parameters.isEmpty()) {
+        builder.append(this.getName());
+        final List<Descriptor> parameters = this.getParameters();
+        if (!parameters.isEmpty()) {
             boolean flag = false;
             builder.append('(');
-            for (final Descriptor parameter : this.parameters) {
+            for (final Descriptor parameter : parameters) {
                 if (flag) {
                     builder.append(", ");
                 }
@@ -61,6 +57,10 @@ public class Descriptor {
                 builder.append(parameter.toString());
             }
             builder.append(')');
+        }
+        final Data data = this.getData();
+        if (data != null) {
+            builder.append('<').append(data.toString()).append('>');
         }
         return builder.toString();
     }
