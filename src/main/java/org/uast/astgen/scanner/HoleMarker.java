@@ -5,6 +5,8 @@
 
 package org.uast.astgen.scanner;
 
+import org.uast.astgen.rules.Hole;
+
 /**
  * The hole marker (# and a number after).
  *
@@ -31,5 +33,13 @@ public class HoleMarker implements Token {
             .append('#')
             .append(this.value)
             .toString();
+    }
+
+    /**
+     * Creates a hole from this marker.
+     * @return A hole
+     */
+    public Hole createHole() {
+        return new Hole(this.value);
     }
 }
