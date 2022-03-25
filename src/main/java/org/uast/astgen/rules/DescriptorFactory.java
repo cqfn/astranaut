@@ -33,7 +33,7 @@ public class DescriptorFactory {
     /**
      * The list of parameters.
      */
-    private final List<Descriptor> parameters;
+    private final List<Parameter> parameters;
 
     /**
      * The data.
@@ -75,7 +75,7 @@ public class DescriptorFactory {
      * Adds the parameter to the parameters list.
      * @param parameter Parameter
      */
-    public void addParameter(final Descriptor parameter) {
+    public void addParameter(final Parameter parameter) {
         this.parameters.add(parameter);
     }
 
@@ -130,7 +130,7 @@ public class DescriptorFactory {
         }
 
         @Override
-        public List<Descriptor> getParameters() {
+        public List<Parameter> getParameters() {
             return Collections.unmodifiableList(this.factory.parameters);
         }
 

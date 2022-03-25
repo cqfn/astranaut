@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @since 1.0
  */
-public abstract class Descriptor {
+public abstract class Descriptor implements Parameter {
     /**
      * Returns the attribute of descriptor.
      * @return The attribute
@@ -35,7 +35,7 @@ public abstract class Descriptor {
      * Returns list of parameters inside descriptor.
      * @return List of parameters
      */
-    public abstract List<Descriptor> getParameters();
+    public abstract List<Parameter> getParameters();
 
     /**
      * Returns data associated with descriptor.
@@ -75,11 +75,11 @@ public abstract class Descriptor {
      * @param builder String builder where to build.
      */
     private void parametersToString(final StringBuilder builder) {
-        final List<Descriptor> parameters = this.getParameters();
+        final List<Parameter> parameters = this.getParameters();
         if (!parameters.isEmpty()) {
             boolean flag = false;
             builder.append('(');
-            for (final Descriptor parameter : parameters) {
+            for (final Parameter parameter : parameters) {
                 if (flag) {
                     builder.append(", ");
                 }

@@ -9,7 +9,7 @@ package org.uast.astgen.rules;
  *
  * @since 1.0
  */
-public final class Hole implements Data {
+public final class Hole implements Data, Parameter {
     /**
      * Value of the hole.
      */

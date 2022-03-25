@@ -99,7 +99,22 @@ public class DescriptorTest {
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals(
             "Addition(first@Expression, second@Expression)",
-                descriptor.toString()
+            descriptor.toString()
+        );
+    }
+
+    /**
+     * Creating element with hole as a parameter.
+     */
+    @Test
+    public void holeAsParameter() {
+        final DescriptorFactory factory = new DescriptorFactory("simpleExpression");
+        factory.addParameter(new Hole(1));
+        factory.addParameter(new Hole(2));
+        final Descriptor descriptor = factory.createDescriptor();
+        Assertions.assertEquals(
+            "simpleExpression(#1, #2)",
+            descriptor.toString()
         );
     }
 }
