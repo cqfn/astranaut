@@ -122,6 +122,10 @@ public class Scanner {
                 this.nextChar();
                 result = Comma.INSTANCE;
                 break;
+            case '@':
+                this.nextChar();
+                result = AtSign.INSTANCE;
+                break;
             default:
                 throw new UnknownSymbol(symbol);
         }
