@@ -40,6 +40,15 @@ public class DescriptorParserTest {
     }
 
     /**
+     * Test string contains tagged name.
+     */
+    @Test
+    public void taggedName() {
+        final Parameter parameter = this.extractOne("left@Expression");
+        Assertions.assertInstanceOf(Descriptor.class, parameter);
+    }
+
+    /**
      * Runs the descriptor parser with specified source.
      * @param source Source code
      * @return List of parameters

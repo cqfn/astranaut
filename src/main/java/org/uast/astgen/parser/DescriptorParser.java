@@ -4,13 +4,14 @@
  */
 package org.uast.astgen.parser;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import org.uast.astgen.exceptions.ExpectedIdentifierAfterAt;
 import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.DescriptorFactory;
 import org.uast.astgen.rules.Parameter;
+import org.uast.astgen.scanner.AtSign;
 import org.uast.astgen.scanner.Comma;
 import org.uast.astgen.scanner.HoleMarker;
 import org.uast.astgen.scanner.Identifier;
@@ -53,7 +54,7 @@ public class DescriptorParser {
             if (first instanceof HoleMarker) {
                 result.add(((HoleMarker) first).createHole());
             } else if (first instanceof Identifier) {
-                result.add(this.parseDescriptor(segment));
+                result.add(DescriptorParser.parseDescriptor(segment));
             }
         }
         return result;
@@ -66,12 +67,41 @@ public class DescriptorParser {
      * @throws ParserException If the token list cannot be parsed as a descriptor
      */
     private static Descriptor parseDescriptor(final TokenList segment) throws ParserException {
-        final Iterator<Token> iterator = segment.iterator();
-        assert iterator.hasNext();
-        final Token first = iterator.next();
+        final TokenStack stack = new TokenStack(segment.iterator());
+        assert stack.hasTokens();
+        final Token first = stack.pop();
         assert first instanceof Identifier;
         final String name = ((Identifier) first).getValue();
         final DescriptorFactory factory = new DescriptorFactory(name);
+        DescriptorParser.parseTaggedName(stack, factory);
         return factory.createDescriptor();
+    }
+
+    /**
+     * Parses tagged name.
+     * @param stack Stack containing unused tokens
+     * @param factory Descriptor factory
+     * @throws ParserException If unused tokens cannot be converted to a tagged name
+     */
+    private static void parseTaggedName(final TokenStack stack, final DescriptorFactory factory)
+        throws ParserException {
+        do {
+            if (!stack.hasTokens()) {
+                break;
+            }
+            Token token = stack.pop();
+            if (!(token instanceof AtSign)) {
+                stack.push(token);
+                break;
+            }
+            if (!stack.hasTokens()) {
+                throw ExpectedIdentifierAfterAt.INSTANCE;
+            }
+            token = stack.pop();
+            if (!(token instanceof Identifier)) {
+                throw ExpectedIdentifierAfterAt.INSTANCE;
+            }
+            factory.replaceName(((Identifier) token).getValue());
+        } while (false);
     }
 }
