@@ -12,21 +12,29 @@ package org.uast.astgen.scanner;
  */
 public final class Identifier implements Token {
     /**
-     * The data.
+     * The value.
      */
-    private final String data;
+    private final String value;
 
     /**
      * Constructor.
      *
-     * @param data The data, i.e. name of the identifier
+     * @param value The value, i.e. name of the identifier
      */
-    public Identifier(final String data) {
-        this.data = data;
+    public Identifier(final String value) {
+        this.value = value;
+    }
+
+    /**
+     * Returns the value, i.e. name of the identifier
+     * @return The value
+     */
+    public String getValue() {
+        return this.value;
     }
 
     @Override
     public String toString() {
-        return this.data;
+        return this.value;
     }
 }

@@ -4,12 +4,16 @@
  */
 package org.uast.astgen.parser;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.uast.astgen.exceptions.ParserException;
+import org.uast.astgen.rules.Descriptor;
+import org.uast.astgen.rules.DescriptorFactory;
 import org.uast.astgen.rules.Parameter;
 import org.uast.astgen.scanner.Comma;
 import org.uast.astgen.scanner.HoleMarker;
+import org.uast.astgen.scanner.Identifier;
 import org.uast.astgen.scanner.Token;
 import org.uast.astgen.scanner.TokenList;
 
@@ -48,8 +52,26 @@ public class DescriptorParser {
             final Token first = segment.get(0);
             if (first instanceof HoleMarker) {
                 result.add(((HoleMarker) first).createHole());
+            } else if (first instanceof Identifier) {
+                result.add(this.parseDescriptor(segment));
             }
         }
         return result;
+    }
+
+    /**
+     * Parses list of tokens as a descriptor.
+     * @param segment List of tokens
+     * @return A descriptor
+     * @throws ParserException If the token list cannot be parsed as a descriptor
+     */
+    private static Descriptor parseDescriptor(final TokenList segment) throws ParserException {
+        final Iterator<Token> iterator = segment.iterator();
+        assert iterator.hasNext();
+        final Token first = iterator.next();
+        assert first instanceof Identifier;
+        final String name = ((Identifier) first).getValue();
+        final DescriptorFactory factory = new DescriptorFactory(name);
+        return factory.createDescriptor();
     }
 }
