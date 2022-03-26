@@ -43,6 +43,26 @@ public abstract class Descriptor implements Parameter {
      */
     public abstract Data getData();
 
+    /**
+     * Returns the full name (i.e. tag and name).
+     * @return The name (can't be {@code null} or empty)
+     */
+    public String getFullName() {
+        final String tag = this.getTag();
+        final String name = this.getName();
+        final String result;
+        if (tag.isEmpty()) {
+            result = name;
+        } else {
+            result = new StringBuilder()
+                .append(tag)
+                .append('@')
+                .append(name)
+                .toString();
+        }
+        return result;
+    }
+
     @Override
     public final String toString() {
         final StringBuilder builder = new StringBuilder();

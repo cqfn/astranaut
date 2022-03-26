@@ -9,6 +9,9 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.uast.astgen.exceptions.EmptyDataLiteral;
+import org.uast.astgen.exceptions.ExpectedData;
+import org.uast.astgen.exceptions.ExpectedOnlyOneEntity;
 import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Hole;
@@ -20,6 +23,7 @@ import org.uast.astgen.scanner.TokenList;
  *
  * @since 1.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class DescriptorParserTest {
     /**
      * Test string contains one hole.
@@ -49,6 +53,54 @@ public class DescriptorParserTest {
     }
 
     /**
+     * Test string contains hole as a data.
+     */
+    @Test
+    public void holeAsData() {
+        final Parameter parameter = this.extractOne("literal<#1>");
+        Assertions.assertInstanceOf(Descriptor.class, parameter);
+    }
+
+    /**
+     * Test string contains string literal as a data.
+     */
+    @Test
+    public void stringData() {
+        final Parameter parameter = this.extractOne("literal<\"+\">");
+        Assertions.assertInstanceOf(Descriptor.class, parameter);
+    }
+
+    /**
+     * Test string contains empty data descriptor.
+     */
+    @Test
+    public void emptyData() {
+        final String message = this.expectError("Test<>", EmptyDataLiteral.class);
+        Assertions.assertEquals("Empty data literal: 'Test<>'", message);
+    }
+
+    /**
+     * Test string contains data descriptor with two entities.
+     */
+    @Test
+    public void twoDataEntities() {
+        final String message = this.expectError("Test<#1,#2>", ExpectedOnlyOneEntity.class);
+        Assertions.assertEquals("Expected only one entity: 'Test<#1,#2>'", message);
+    }
+
+    /**
+     * Test string contains bad data descriptor.
+     */
+    @Test
+    public void badData() {
+        final String message = this.expectError("Test<ABC>", ExpectedData.class);
+        Assertions.assertEquals(
+            "Expected a data: 'Test<#...>' or 'Test<\"...\">'",
+            message
+        );
+    }
+
+    /**
      * Runs the descriptor parser with specified source.
      * @param source Source code
      * @return List of parameters
@@ -58,7 +110,8 @@ public class DescriptorParserTest {
         List<Parameter> result = Collections.emptyList();
         boolean oops = false;
         try {
-            final TokenList tokens = tokenizer.getTokens();
+            TokenList tokens = tokenizer.getTokens();
+            tokens = new BracketsParser(tokens).parse();
             final DescriptorParser parser = new DescriptorParser(tokens);
             result = parser.parseAsParameters();
         } catch (final ParserException ignored) {
@@ -79,8 +132,7 @@ public class DescriptorParserTest {
     }
 
     /**
-     * Runs the descriptor parser with specified source
-     * and expects only one parameter.
+     * Runs the descriptor parser with specified source and expects only one parameter.
      * @param source Source code
      * @return A parameter
      */
@@ -88,5 +140,30 @@ public class DescriptorParserTest {
         final List<Parameter> list = this.run(source);
         Assertions.assertEquals(1, list.size());
         return list.get(0);
+    }
+
+    /**
+     * Runs the descriptor parser with specified source and expects an error.
+     * @param source Source code
+     * @param type Error type
+     * @param <T> Exception class
+     * @return Error message
+     */
+    private <T> String expectError(final String source, final Class<T> type) {
+        final Tokenizer tokenizer = new Tokenizer(source);
+        boolean oops = false;
+        String message = "";
+        try {
+            TokenList tokens = tokenizer.getTokens();
+            tokens = new BracketsParser(tokens).parse();
+            final DescriptorParser parser = new DescriptorParser(tokens);
+            parser.parseAsParameters();
+        } catch (final ParserException error) {
+            Assertions.assertInstanceOf(type, error);
+            oops = true;
+            message = error.getErrorMessage();
+        }
+        Assertions.assertTrue(oops);
+        return message;
     }
 }
