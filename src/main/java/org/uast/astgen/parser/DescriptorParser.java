@@ -6,7 +6,6 @@ package org.uast.astgen.parser;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import org.uast.astgen.exceptions.CantParseSequence;
 import org.uast.astgen.exceptions.EmptyDataLiteral;
 import org.uast.astgen.exceptions.ExpectedData;
