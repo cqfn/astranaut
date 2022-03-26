@@ -6,6 +6,8 @@ package org.uast.astgen.parser;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import org.uast.astgen.exceptions.CantParseSequence;
 import org.uast.astgen.exceptions.EmptyDataLiteral;
 import org.uast.astgen.exceptions.ExpectedData;
 import org.uast.astgen.exceptions.ExpectedIdentifierAfterAt;
@@ -82,6 +84,9 @@ public class DescriptorParser {
         DescriptorParser.parseTaggedName(stack, factory);
         DescriptorParser.parseParameters(stack, factory);
         DescriptorParser.parseData(stack, factory);
+        if (stack.hasTokens()) {
+            throw new CantParseSequence(segment);
+        }
         return factory.createDescriptor();
     }
 
