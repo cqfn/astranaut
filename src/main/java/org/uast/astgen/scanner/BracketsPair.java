@@ -4,6 +4,9 @@
  */
 package org.uast.astgen.scanner;
 
+import org.uast.astgen.exceptions.ParserException;
+import org.uast.astgen.rules.DescriptorAttribute;
+
 /**
  * Token that represents a pair of brackets and list of tokens between.
  *
@@ -42,6 +45,13 @@ public abstract class BracketsPair implements Token {
      * @return A symbol
      */
     public abstract char getClosingBracket();
+
+    /**
+     * Returns suitable descriptor attribute.
+     * @return Descriptor attribute.
+     * @throws ParserException If token has no suitable descriptor attribute.
+     */
+    public abstract DescriptorAttribute getDescriptorAttribute() throws ParserException;
 
     @Override
     public final String toString() {

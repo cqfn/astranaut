@@ -8,15 +8,19 @@ import java.util.LinkedList;
 import java.util.List;
 import org.uast.astgen.exceptions.CantParseSequence;
 import org.uast.astgen.exceptions.EmptyDataLiteral;
+import org.uast.astgen.exceptions.ExpectedComma;
 import org.uast.astgen.exceptions.ExpectedData;
+import org.uast.astgen.exceptions.ExpectedDescriptor;
 import org.uast.astgen.exceptions.ExpectedIdentifierAfterAt;
 import org.uast.astgen.exceptions.ExpectedOnlyOneEntity;
 import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.rules.Descriptor;
+import org.uast.astgen.rules.DescriptorAttribute;
 import org.uast.astgen.rules.DescriptorFactory;
 import org.uast.astgen.rules.Parameter;
 import org.uast.astgen.scanner.AngleBracketsPair;
 import org.uast.astgen.scanner.AtSign;
+import org.uast.astgen.scanner.BracketsPair;
 import org.uast.astgen.scanner.Comma;
 import org.uast.astgen.scanner.HoleMarker;
 import org.uast.astgen.scanner.Identifier;
@@ -30,6 +34,7 @@ import org.uast.astgen.scanner.TokenList;
  *
  * @since 1.0
  */
+@SuppressWarnings("classdataabstractioncouplingcheck")
 public class DescriptorParser {
     /**
      * The list of tokens.
@@ -61,7 +66,11 @@ public class DescriptorParser {
             if (first instanceof HoleMarker) {
                 result.add(((HoleMarker) first).createHole());
             } else if (first instanceof Identifier) {
-                result.add(DescriptorParser.parseDescriptor(segment));
+                result.add(DescriptorParser.parseDescriptor(segment, DescriptorAttribute.NONE));
+            } else if (first instanceof BracketsPair) {
+                result.add(DescriptorParser.parseOptional(segment));
+            } else {
+                throw new CantParseSequence(segment);
             }
         }
         return result;
@@ -70,16 +79,19 @@ public class DescriptorParser {
     /**
      * Parses list of tokens as a descriptor.
      * @param segment List of tokens
+     * @param attribute Descriptor attribute (optional, list)
      * @return A descriptor
      * @throws ParserException If the token list cannot be parsed as a descriptor
      */
-    private static Descriptor parseDescriptor(final TokenList segment) throws ParserException {
+    private static Descriptor parseDescriptor(final TokenList segment,
+        final DescriptorAttribute attribute) throws ParserException {
         final TokenStack stack = new TokenStack(segment.iterator());
         assert stack.hasTokens();
         final Token first = stack.pop();
         assert first instanceof Identifier;
         final String name = ((Identifier) first).getValue();
         final DescriptorFactory factory = new DescriptorFactory(name);
+        factory.setAttribute(attribute);
         DescriptorParser.parseTaggedName(stack, factory);
         DescriptorParser.parseParameters(stack, factory);
         DescriptorParser.parseData(stack, factory);
@@ -191,5 +203,31 @@ public class DescriptorParser {
         } else {
             throw new ExpectedData(factory.createDescriptor().getFullName());
         }
+    }
+
+    /**
+     * Parses list of tokens as an optional or list descriptor.
+     * @param segment List of tokens
+     * @return A descriptor
+     * @throws ParserException If the token list cannot be parsed as a descriptor
+     */
+    private static Descriptor parseOptional(final TokenList segment) throws ParserException {
+        assert segment.size() > 0;
+        final Token token = segment.get(0);
+        if (segment.size() > 1) {
+            throw new ExpectedComma(token);
+        }
+        assert token instanceof BracketsPair;
+        final BracketsPair brackets = (BracketsPair) token;
+        final TokenList children = brackets.getTokens();
+        if (children.size() == 0) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append(brackets.getOpeningBracket())
+                .append("...")
+                .append(brackets.getClosingBracket());
+            throw new ExpectedDescriptor(builder.toString());
+        }
+        final DescriptorAttribute attribute = brackets.getDescriptorAttribute();
+        return parseDescriptor(children, attribute);
     }
 }

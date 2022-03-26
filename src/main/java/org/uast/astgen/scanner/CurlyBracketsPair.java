@@ -4,6 +4,9 @@
  */
 package org.uast.astgen.scanner;
 
+import org.uast.astgen.exceptions.ParserException;
+import org.uast.astgen.rules.DescriptorAttribute;
+
 /**
  * Token that represents a pair of curly brackets and list of tokens between.
  *
@@ -27,5 +30,10 @@ public class CurlyBracketsPair extends BracketsPair {
     @Override
     public final char getClosingBracket() {
         return '}';
+    }
+
+    @Override
+    public final DescriptorAttribute getDescriptorAttribute() throws ParserException {
+        return DescriptorAttribute.LIST;
     }
 }
