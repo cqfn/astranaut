@@ -19,6 +19,7 @@ import org.uast.astgen.scanner.AtSign;
 import org.uast.astgen.scanner.Comma;
 import org.uast.astgen.scanner.HoleMarker;
 import org.uast.astgen.scanner.Identifier;
+import org.uast.astgen.scanner.RoundBracketsPair;
 import org.uast.astgen.scanner.StringToken;
 import org.uast.astgen.scanner.Token;
 import org.uast.astgen.scanner.TokenList;
@@ -79,6 +80,7 @@ public class DescriptorParser {
         final String name = ((Identifier) first).getValue();
         final DescriptorFactory factory = new DescriptorFactory(name);
         DescriptorParser.parseTaggedName(stack, factory);
+        DescriptorParser.parseParameters(stack, factory);
         DescriptorParser.parseData(stack, factory);
         return factory.createDescriptor();
     }
@@ -108,6 +110,30 @@ public class DescriptorParser {
                 throw ExpectedIdentifierAfterAt.INSTANCE;
             }
             factory.replaceName(((Identifier) token).getValue());
+        } while (false);
+    }
+
+    /**
+     * Parses parameters inside descriptor.
+     * @param stack Stack containing unused tokens
+     * @param factory Descriptor factory
+     * @throws ParserException If unused tokens cannot be converted to a data
+     */
+    private static void parseParameters(final TokenStack stack, final DescriptorFactory factory)
+        throws ParserException {
+        do {
+            if (!stack.hasTokens()) {
+                break;
+            }
+            final Token token = stack.pop();
+            if (!(token instanceof RoundBracketsPair)) {
+                stack.push(token);
+                break;
+            }
+            final TokenList children = ((RoundBracketsPair) token).getTokens();
+            final DescriptorParser parser = new DescriptorParser(children);
+            final List<Parameter> parameters = parser.parseAsParameters();
+            factory.setParameters(parameters);
         } while (false);
     }
 

@@ -80,6 +80,15 @@ public class DescriptorFactory {
     }
 
     /**
+     * Replaces all parameters.
+     * @param list The new list of parameters
+     */
+    public void setParameters(final List<Parameter> list) {
+        this.parameters.clear();
+        this.parameters.addAll(list);
+    }
+
+    /**
      * Sets the new data.
      * @param value Data
      */

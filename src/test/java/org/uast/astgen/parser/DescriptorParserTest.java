@@ -101,6 +101,26 @@ public class DescriptorParserTest {
     }
 
     /**
+     * Test string contains descriptor with two parameters.
+     */
+    @Test
+    public void twoParameters() {
+        final Parameter parameter = this.extractOne("Addition(Expression, Expression)");
+        Assertions.assertInstanceOf(Descriptor.class, parameter);
+    }
+
+    /**
+     * Test string contains descriptor with three parameters.
+     */
+    @Test
+    public void threeParameters() {
+        final Parameter parameter = this.extractOne(
+            "simpleExpression(#1, literal<\"+\">, #2)"
+        );
+        Assertions.assertInstanceOf(Descriptor.class, parameter);
+    }
+
+    /**
      * Runs the descriptor parser with specified source.
      * @param source Source code
      * @return List of parameters
