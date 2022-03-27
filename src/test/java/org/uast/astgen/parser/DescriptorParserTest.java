@@ -19,7 +19,7 @@ import org.uast.astgen.rules.Parameter;
 import org.uast.astgen.scanner.TokenList;
 
 /**
- * Test for {@link DescriptorParser} class.
+ * Test for {@link ParametersListParser} class.
  *
  * @since 1.0
  */
@@ -132,8 +132,8 @@ public class DescriptorParserTest {
         try {
             TokenList tokens = tokenizer.getTokens();
             tokens = new BracketsParser(tokens).parse();
-            final DescriptorParser parser = new DescriptorParser(tokens);
-            result = parser.parseAsParameters();
+            final ParametersListParser parser = new ParametersListParser(tokens);
+            result = parser.parse();
         } catch (final ParserException ignored) {
             oops = true;
         }
@@ -176,8 +176,8 @@ public class DescriptorParserTest {
         try {
             TokenList tokens = tokenizer.getTokens();
             tokens = new BracketsParser(tokens).parse();
-            final DescriptorParser parser = new DescriptorParser(tokens);
-            parser.parseAsParameters();
+            final ParametersListParser parser = new ParametersListParser(tokens);
+            parser.parse();
         } catch (final ParserException error) {
             Assertions.assertInstanceOf(type, error);
             oops = true;

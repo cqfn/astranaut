@@ -7,25 +7,18 @@ package org.uast.astgen.parser;
 import java.util.LinkedList;
 import java.util.List;
 import org.uast.astgen.exceptions.CantParseSequence;
-import org.uast.astgen.exceptions.EmptyDataLiteral;
 import org.uast.astgen.exceptions.ExpectedComma;
-import org.uast.astgen.exceptions.ExpectedData;
 import org.uast.astgen.exceptions.ExpectedDescriptor;
-import org.uast.astgen.exceptions.ExpectedIdentifierAfterAt;
-import org.uast.astgen.exceptions.ExpectedOnlyOneEntity;
 import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.DescriptorAttribute;
 import org.uast.astgen.rules.DescriptorFactory;
 import org.uast.astgen.rules.Parameter;
-import org.uast.astgen.scanner.AngleBracketsPair;
-import org.uast.astgen.scanner.AtSign;
 import org.uast.astgen.scanner.BracketsPair;
 import org.uast.astgen.scanner.Comma;
 import org.uast.astgen.scanner.HoleMarker;
 import org.uast.astgen.scanner.Identifier;
 import org.uast.astgen.scanner.RoundBracketsPair;
-import org.uast.astgen.scanner.StringToken;
 import org.uast.astgen.scanner.Token;
 import org.uast.astgen.scanner.TokenList;
 
@@ -34,8 +27,7 @@ import org.uast.astgen.scanner.TokenList;
  *
  * @since 1.0
  */
-@SuppressWarnings("classdataabstractioncouplingcheck")
-public class DescriptorParser {
+public class ParametersListParser {
     /**
      * The list of tokens.
      */
@@ -45,7 +37,7 @@ public class DescriptorParser {
      * Constructor.
      * @param tokens The list of tokens
      */
-    public DescriptorParser(final TokenList tokens) {
+    public ParametersListParser(final TokenList tokens) {
         this.tokens = tokens;
     }
 
@@ -55,7 +47,7 @@ public class DescriptorParser {
      * @throws ParserException If the token list cannot be parsed as a list
      *  of parameters
      */
-    public List<Parameter> parseAsParameters() throws ParserException {
+    public List<Parameter> parse() throws ParserException {
         final List<Parameter> result = new LinkedList<>();
         for (final TokenList segment
             : new Splitter(this.tokens).split(token -> token instanceof Comma)) {
@@ -66,9 +58,9 @@ public class DescriptorParser {
             if (first instanceof HoleMarker) {
                 result.add(((HoleMarker) first).createHole());
             } else if (first instanceof Identifier) {
-                result.add(DescriptorParser.parseDescriptor(segment, DescriptorAttribute.NONE));
+                result.add(ParametersListParser.parseDescriptor(segment, DescriptorAttribute.NONE));
             } else if (first instanceof BracketsPair) {
-                result.add(DescriptorParser.parseOptional(segment));
+                result.add(ParametersListParser.parseOptional(segment));
             } else {
                 throw new CantParseSequence(segment);
             }
@@ -92,41 +84,13 @@ public class DescriptorParser {
         final String name = ((Identifier) first).getValue();
         final DescriptorFactory factory = new DescriptorFactory(name);
         factory.setAttribute(attribute);
-        DescriptorParser.parseTaggedName(stack, factory);
-        DescriptorParser.parseParameters(stack, factory);
-        DescriptorParser.parseData(stack, factory);
+        new TaggedNameParser(stack, factory).parse();
+        ParametersListParser.parseParameters(stack, factory);
+        new DataParser(stack, factory).parse();
         if (stack.hasTokens()) {
             throw new CantParseSequence(segment);
         }
         return factory.createDescriptor();
-    }
-
-    /**
-     * Parses tagged name.
-     * @param stack Stack containing unused tokens
-     * @param factory Descriptor factory
-     * @throws ParserException If unused tokens cannot be converted to a tagged name
-     */
-    private static void parseTaggedName(final TokenStack stack, final DescriptorFactory factory)
-        throws ParserException {
-        do {
-            if (!stack.hasTokens()) {
-                break;
-            }
-            Token token = stack.pop();
-            if (!(token instanceof AtSign)) {
-                stack.push(token);
-                break;
-            }
-            if (!stack.hasTokens()) {
-                throw ExpectedIdentifierAfterAt.INSTANCE;
-            }
-            token = stack.pop();
-            if (!(token instanceof Identifier)) {
-                throw ExpectedIdentifierAfterAt.INSTANCE;
-            }
-            factory.replaceName(((Identifier) token).getValue());
-        } while (false);
     }
 
     /**
@@ -147,62 +111,10 @@ public class DescriptorParser {
                 break;
             }
             final TokenList children = ((RoundBracketsPair) token).getTokens();
-            final DescriptorParser parser = new DescriptorParser(children);
-            final List<Parameter> parameters = parser.parseAsParameters();
+            final ParametersListParser parser = new ParametersListParser(children);
+            final List<Parameter> parameters = parser.parse();
             factory.setParameters(parameters);
         } while (false);
-    }
-
-    /**
-     * Parses data inside descriptor.
-     * @param stack Stack containing unused tokens
-     * @param factory Descriptor factory
-     * @throws ParserException If unused tokens cannot be converted to a data
-     */
-    private static void parseData(final TokenStack stack, final DescriptorFactory factory)
-        throws ParserException {
-        do {
-            if (!stack.hasTokens()) {
-                break;
-            }
-            final Token token = stack.pop();
-            if (!(token instanceof AngleBracketsPair)) {
-                stack.push(token);
-                break;
-            }
-            final TokenList children = ((AngleBracketsPair) token).getTokens();
-            DescriptorParser.extractData(children, factory);
-        } while (false);
-    }
-
-    /**
-     * Extracts data from the list of tokens.
-     * @param tokens The list of tokens
-     * @param factory Descriptor factory
-     * @throws ParserException If unused tokens cannot be converted to a data
-     */
-    private static void extractData(final TokenList tokens, final DescriptorFactory factory)
-        throws ParserException {
-        final int count = tokens.size();
-        if (count == 0) {
-            throw new EmptyDataLiteral(factory.createDescriptor().getFullName());
-        }
-        if (count > 1) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append(factory.createDescriptor().getFullName())
-                .append('<')
-                .append(tokens.toString())
-                .append('>');
-            throw new ExpectedOnlyOneEntity(builder.toString());
-        }
-        final Token child = tokens.get(0);
-        if (child instanceof HoleMarker) {
-            factory.setData(((HoleMarker) child).createHole());
-        } else if (child instanceof StringToken) {
-            factory.setData(((StringToken) child).createStringData());
-        } else {
-            throw new ExpectedData(factory.createDescriptor().getFullName());
-        }
     }
 
     /**
