@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @since 1.0
  */
-public abstract class Descriptor implements Parameter {
+public abstract class Descriptor implements Child, Parameter {
     /**
      * Returns the attribute of descriptor.
      * @return The attribute
