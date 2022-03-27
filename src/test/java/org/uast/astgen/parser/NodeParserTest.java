@@ -56,6 +56,26 @@ public class NodeParserTest {
     }
 
     /**
+     * Test case: node with optional child.
+     */
+    @Test
+    public void optionalChild() {
+        final boolean result = this.run(
+            "VariableDeclaration <- [type@Identifier], name@Identifier, [Expression]"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: list node.
+     */
+    @Test
+    public void listNode() {
+        final boolean result = this.run("StatementList <- {Statement}");
+        Assertions.assertTrue(result);
+    }
+
+    /**
      * Runs the node parser.
      * @param source Source string
      * @return Test result ({@code true} means no exceptions)
