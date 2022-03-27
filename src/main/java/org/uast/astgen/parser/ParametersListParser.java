@@ -21,7 +21,7 @@ import org.uast.astgen.scanner.Token;
 import org.uast.astgen.scanner.TokenList;
 
 /**
- * Extracts descriptors and descriptor parameters from list of tokens.
+ * Extracts parameters (holes and descriptors) from list of tokens.
  *
  * @since 1.0
  */
