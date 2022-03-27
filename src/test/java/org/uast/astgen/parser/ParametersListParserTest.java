@@ -24,7 +24,7 @@ import org.uast.astgen.scanner.TokenList;
  * @since 1.0
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class DescriptorParserTest {
+public class ParametersListParserTest {
     /**
      * Test string contains one hole.
      */
@@ -117,6 +117,24 @@ public class DescriptorParserTest {
         final Parameter parameter = this.extractOne(
             "simpleExpression(#1, literal<\"+\">, #2)"
         );
+        Assertions.assertInstanceOf(Descriptor.class, parameter);
+    }
+
+    /**
+     * Test string contains optional descriptor.
+     */
+    @Test
+    public void optional() {
+        final Parameter parameter = this.extractOne("[Expression]");
+        Assertions.assertInstanceOf(Descriptor.class, parameter);
+    }
+
+    /**
+     * Test string contains descriptor that is a list.
+     */
+    @Test
+    public void list() {
+        final Parameter parameter = this.extractOne("{Expression}");
         Assertions.assertInstanceOf(Descriptor.class, parameter);
     }
 
