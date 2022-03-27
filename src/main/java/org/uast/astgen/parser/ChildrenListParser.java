@@ -8,7 +8,7 @@ package org.uast.astgen.parser;
 import java.util.LinkedList;
 import java.util.List;
 import org.uast.astgen.exceptions.ExpectedDescriptor;
-import org.uast.astgen.exceptions.ExpectedSimpleIdentifier;
+import org.uast.astgen.exceptions.ExpectedTaggedName;
 import org.uast.astgen.exceptions.NodeNameCapitalLetter;
 import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.rules.Child;
@@ -48,8 +48,8 @@ public class ChildrenListParser {
         checkDescriptorsList(descriptors);
         for (final Descriptor descriptor : descriptors) {
             final String name = descriptor.getName();
-            if (!checkDescriptor(descriptor)) {
-                throw new ExpectedSimpleIdentifier(name);
+            if (!descriptor.getParameters().isEmpty() || descriptor.getData().isValid()) {
+                throw new ExpectedTaggedName(name);
             }
             final char first = name.charAt(0);
             if (first >= 'a' && first <= 'z') {
@@ -70,16 +70,5 @@ public class ChildrenListParser {
         if (count == 0) {
             throw new ExpectedDescriptor("... <- ?");
         }
-    }
-
-    /**
-     * Checks the descriptor applicability.
-     * @param descriptor The descriptor
-     * @return Checking result
-     */
-    private static boolean checkDescriptor(final Descriptor descriptor) {
-        return descriptor.getTag().isEmpty()
-            && descriptor.getParameters().isEmpty()
-            && !descriptor.getData().isValid();
     }
 }

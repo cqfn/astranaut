@@ -38,7 +38,7 @@ public class NodeParser {
     public Node parse() throws ParserException {
         assert this.source.contains("<-");
         final String[] pair = this.source.split("<-");
-        if (pair.length > 1) {
+        if (pair.length > 2) {
             throw BadRuleSyntax.INSTANCE;
         }
         final String left = new NodeNameParser(pair[0]).parse();
