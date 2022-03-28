@@ -126,6 +126,10 @@ public class Scanner {
                 this.nextChar();
                 result = AtSign.INSTANCE;
                 break;
+            case '|':
+                this.nextChar();
+                result = VerticalBar.INSTANCE;
+                break;
             default:
                 throw new UnknownSymbol(symbol);
         }

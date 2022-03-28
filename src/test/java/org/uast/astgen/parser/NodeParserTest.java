@@ -7,6 +7,7 @@ package org.uast.astgen.parser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.NodeNameCapitalLetter;
+import org.uast.astgen.exceptions.OnlyOneListDescriptor;
 import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.rules.Node;
 
@@ -72,6 +73,18 @@ public class NodeParserTest {
     @Test
     public void listNode() {
         final boolean result = this.run("StatementList <- {Statement}");
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: list node and other nodes.
+     */
+    @Test
+    public void listNodeAndOthers() {
+        final boolean result = this.run(
+            "Something <- AAA, {BBB}",
+            OnlyOneListDescriptor.class
+        );
         Assertions.assertTrue(result);
     }
 
