@@ -89,6 +89,17 @@ public class NodeParserTest {
     }
 
     /**
+     * Test case: abstract node.
+     */
+    @Test
+    public void abstractNode() {
+        final boolean result = this.run(
+            "Expression <- Addition | Subtraction | Multiplication | Division"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
      * Runs the node parser.
      * @param source Source string
      * @return Test result ({@code true} means no exceptions)
