@@ -52,9 +52,6 @@
                 <version>0.19.4</version>
                 <configuration>
                     <license>file:${qulice.license}</license>
-                    <excludes>
-                        <exclude>checkstyle:/src/main/java/org/uast/astgen/Rule.java</exclude>
-                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
@@ -85,12 +82,24 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <!-- JUnit 5 requires Surefire version 2.22.0 or higher -->
+                <version>2.22.2</version>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
