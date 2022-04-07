@@ -22,12 +22,12 @@ import org.junit.jupiter.api.io.TempDir;
  */
 public class MainTest {
     /**
-     * Argument example.
+     * The generate option as an argument example.
      */
     private static final String ARG = "-g";
 
     /**
-     * Test passing an argument to main().
+     * Test passing an option to main().
      *
      * @param source A temporary file
      */
@@ -50,7 +50,7 @@ public class MainTest {
     }
 
     /**
-     * Test passing no command to main().
+     * Test passing no option to main().
      */
     @Test
     public void testWithException() {
@@ -66,7 +66,7 @@ public class MainTest {
     }
 
     /**
-     * Test passing a command with no parameter to main().
+     * Test passing an option with no parameters to main().
      */
     @Test
     public void testMain() throws IOException {

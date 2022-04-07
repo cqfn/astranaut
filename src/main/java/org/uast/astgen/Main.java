@@ -59,12 +59,12 @@ public final class Main {
      */
     public static void main(final String... args) throws IOException {
         final Main main = new Main();
-        final JCommander jct = JCommander.newBuilder()
+        final JCommander jcr = JCommander.newBuilder()
             .addObject(main)
             .build();
-        jct.parse(args);
+        jcr.parse(args);
         if (main.help) {
-            jct.usage();
+            jcr.usage();
             return;
         }
         main.run();

@@ -40,7 +40,7 @@ public class FileConverter implements IStringConverter<File> {
             message
                 .append("The parameter [")
                 .append(value)
-                .append("] should be a txt file, found: ");
+                .append("] should be a txt file");
             throw new ParameterException(message.toString());
         }
         final File file = new File(value);
