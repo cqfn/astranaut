@@ -5,8 +5,15 @@
 
 package org.uast.astgen;
 
+import com.beust.jcommander.ParameterException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Test for {@link Main} class.
@@ -17,27 +24,33 @@ public class MainTest {
     /**
      * Argument example.
      */
-    private static final String ARG = "test";
+    private static final String ARG = "-g";
 
     /**
      * Test passing an argument to main().
+     *
+     * @param source A temporary file
      */
     @Test
-    public void testNoException() {
+    public void testNoException(@TempDir final Path source) throws IOException {
+        final Path file = source.resolve("example.txt");
+        final List<String> lines = Collections.singletonList("Addition<-Expression, Expression;");
+        Files.write(file, lines);
         final String[] example = {
             MainTest.ARG,
+            file.toString(),
         };
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final IllegalArgumentException exc) {
+        } catch (final IllegalArgumentException | IOException exc) {
             caught = true;
         }
         Assertions.assertFalse(caught);
     }
 
     /**
-     * Test passing no argument to main().
+     * Test passing no command to main().
      */
     @Test
     public void testWithException() {
@@ -46,21 +59,29 @@ public class MainTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final IllegalArgumentException exc) {
+        } catch (final ParameterException | IOException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);
     }
 
     /**
-     * Test passing no argument to main().
+     * Test passing a command with no parameter to main().
      */
     @Test
-    public void testMain() {
+    public void testMain() throws IOException {
         final String[] example = {
             MainTest.ARG,
         };
-        Main.main(example);
-        Assertions.assertTrue(example.length > 0);
+        boolean caught = false;
+        String message = "";
+        try {
+            Main.main(example);
+        } catch (final ParameterException | IOException exc) {
+            caught = true;
+            message = exc.getMessage();
+        }
+        Assertions.assertTrue(caught);
+        Assertions.assertEquals("Expected a value after parameter -g", message);
     }
 }
