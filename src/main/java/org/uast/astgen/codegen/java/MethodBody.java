@@ -35,7 +35,9 @@ public final class MethodBody implements Entity {
     @Override
     public String generate(final int indent) {
         final StringBuilder builder = new StringBuilder();
-        final String[] lines = this.code.split("\n|\\{");
+        final String[] lines = this.code.replace("{", "{\n")
+            .replace("}", "\n}")
+            .split("\n");
         int offset = 0;
         for (int index = 0; index < lines.length; index = index + 1) {
             final String line = lines[index].trim();

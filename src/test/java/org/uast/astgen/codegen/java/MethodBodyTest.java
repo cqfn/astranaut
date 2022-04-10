@@ -35,4 +35,19 @@ public class MethodBodyTest {
         final String code = body.generate(1);
         Assertions.assertEquals("    int x = 2 + 3;\n    return x;\n", code);
     }
+
+    /**
+     * Testing code generation with 'if' statement.
+     */
+    @Test
+    public void ifStatement() {
+        final String expected = "if (flag) {\n    builder.append(',');\n}\n";
+        final MethodBody body = new MethodBody();
+        body.setCode("if (flag) { builder.append(','); }");
+        final String first = body.generate(0);
+        Assertions.assertEquals(expected, first);
+        body.setCode(expected);
+        final String second = body.generate(0);
+        Assertions.assertEquals(expected, second);
+    }
 }
