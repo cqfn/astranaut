@@ -19,8 +19,10 @@ public class MethodDescriptorTest {
      */
     @Test
     public void voidHeaderWithoutArgs() {
-        final MethodDescriptor descriptor = new MethodDescriptor();
-        descriptor.setBriefDescription("This method does nothing");
+        final MethodDescriptor descriptor = new MethodDescriptor(
+            "first",
+            "This method does nothing"
+        );
         final String header = descriptor.genHeader(1);
         Assertions.assertEquals(
             "    /\u002a*\n     * This method does nothing.\n     */\n",
@@ -33,8 +35,10 @@ public class MethodDescriptorTest {
      */
     @Test
     public void nonVoidHeaderWithoutArgs() {
-        final MethodDescriptor descriptor = new MethodDescriptor();
-        descriptor.setBriefDescription("Returns something");
+        final MethodDescriptor descriptor = new MethodDescriptor(
+            "second",
+            "Returns something"
+        );
         descriptor.setReturnType("String", "Something");
         final String header = descriptor.genHeader(1);
         final String expected =
@@ -47,12 +51,47 @@ public class MethodDescriptorTest {
      */
     @Test
     public void oneArgument() {
-        final MethodDescriptor descriptor = new MethodDescriptor();
-        descriptor.setBriefDescription("Calculates something");
+        final MethodDescriptor descriptor = new MethodDescriptor(
+            "third",
+            "Calculates something"
+        );
         descriptor.addArgument("int", "val", "Value");
         final String header = descriptor.genHeader(1);
         final String expected =
             "    /\u002a*\n     * Calculates something.\n     * \u0040param val Value\n     */\n";
         Assertions.assertEquals(expected, header);
+    }
+
+    /**
+     * Generating method signature for interface.
+     */
+    @Test
+    public void signatureIface() {
+        final MethodDescriptor descriptor = new MethodDescriptor(
+            "calculate",
+            "Calculates something else"
+        );
+        descriptor.addArgument("float", "num", "Number");
+        final String result = descriptor.genSignature(true);
+        final String expected = "void calculate(float num)";
+        Assertions.assertEquals(expected, result);
+    }
+
+    /**
+     * Generating method signature for method.
+     */
+    @Test
+    public void signatureMethod() {
+        final MethodDescriptor descriptor = new MethodDescriptor(
+            "max",
+            "Finds the maximum"
+        );
+        final String type = "double";
+        descriptor.setReturnType(type, "Result");
+        descriptor.addArgument(type, "aaa", "First value");
+        descriptor.addArgument(type, "bbb", "Second value");
+        final String result = descriptor.genSignature(false);
+        final String expected = "double max(final double aaa, final double bbb)";
+        Assertions.assertEquals(expected, result);
     }
 }

@@ -21,9 +21,14 @@ public final class MethodDescriptor implements Entity {
     private static final String VOID_TYPE = "void";
 
     /**
+     * The name of the method.
+     */
+    private final String name;
+
+    /**
      * The brief description.
      */
-    private String brief;
+    private final String brief;
 
     /**
      * The list of arguments.
@@ -42,29 +47,24 @@ public final class MethodDescriptor implements Entity {
 
     /**
      * Constructor.
+     * @param name The name of the method.
+     * @param brief The brief description.
      */
-    public MethodDescriptor() {
-        this.brief = "Description";
+    public MethodDescriptor(final String name, final String brief) {
+        this.name = name;
+        this.brief = brief;
         this.arguments = new LinkedList<>();
         this.rettype = MethodDescriptor.VOID_TYPE;
     }
 
     /**
-     * Sets the new description.
-     * @param str The new description
-     */
-    public void setBriefDescription(final String str) {
-        this.brief = Objects.requireNonNull(str);
-    }
-
-    /**
      * Adds the argument to the descriptor.
-     * @param type The type
-     * @param name The name
+     * @param argtype The type
+     * @param argname The name
      * @param description The descriptor
      */
-    public void addArgument(final String type, final String name, final String description) {
-        this.arguments.add(new Argument(type, name, description));
+    public void addArgument(final String argtype, final String argname, final String description) {
+        this.arguments.add(new Argument(argtype, argname, description));
     }
 
     /**
@@ -106,6 +106,29 @@ public final class MethodDescriptor implements Entity {
                 .append('\n');
         }
         builder.append(tabulation).append(" */\n");
+        return builder.toString();
+    }
+
+    /**
+     * Generates the signature of th method.
+     * @param iface Generation for interface, without 'final' qualifiers
+     * @return The signature
+     */
+    public String genSignature(final boolean iface) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(this.rettype).append(' ').append(this.name).append('(');
+        boolean flag = false;
+        for (final Argument arg : this.arguments) {
+            if (flag) {
+                builder.append(", ");
+            }
+            flag = true;
+            if (!iface) {
+                builder.append("final ");
+            }
+            builder.append(arg.getType()).append(' ').append(arg.getName());
+        }
+        builder.append(')');
         return builder.toString();
     }
 
