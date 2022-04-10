@@ -82,7 +82,7 @@ public class MainTest {
             MainTest.ARG,
             file.toString(),
             MainTest.ROOT,
-            "test/ro:ot",
+            "test/ro\0ot",
         };
         boolean caught = false;
         try {
