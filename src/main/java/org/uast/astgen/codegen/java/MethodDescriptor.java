@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.Objects;
 import org.uast.astgen.utils.StringUtils;
 
 /**
@@ -13,23 +14,49 @@ import org.uast.astgen.utils.StringUtils;
  */
 public final class MethodDescriptor implements Entity {
     /**
+     * The 'void' type.
+     */
+    private static final String VOID_TYPE = "void";
+
+    /**
      * The brief description.
      */
-    private String description;
+    private String brief;
+
+    /**
+     * The type that the method returns.
+     */
+    private String rtype;
+
+    /**
+     * Returns description.
+     */
+    private String rdescr;
 
     /**
      * Constructor.
      */
     public MethodDescriptor() {
-        this.description = "Description";
+        this.brief = "Description";
+        this.rtype = MethodDescriptor.VOID_TYPE;
     }
 
     /**
      * Sets the new description.
      * @param str The new description
      */
-    public void setDescription(final String str) {
-        this.description = str;
+    public void setBriefDescription(final String str) {
+        this.brief = Objects.requireNonNull(str);
+    }
+
+    /**
+     * Sets the return type.
+     * @param type The type name
+     * @param description The description what the method returns
+     */
+    public void setReturnType(final String type, final String description) {
+        this.rtype = Objects.requireNonNull(type);
+        this.rdescr = Objects.requireNonNull(description);
     }
 
     /**
@@ -39,15 +66,20 @@ public final class MethodDescriptor implements Entity {
      */
     public String genHeader(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
-        final StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder(32);
         builder.append(tabulation)
             .append("/**\n")
             .append(tabulation)
             .append(" * ")
-            .append(this.description)
-            .append(".\n")
-            .append(tabulation)
-            .append(" */\n");
+            .append(this.brief)
+            .append(".\n");
+        if (!MethodDescriptor.VOID_TYPE.equals(this.rtype)) {
+            builder.append(tabulation)
+                .append(" * \u0040return ")
+                .append(this.rdescr)
+                .append('\n');
+        }
+        builder.append(tabulation).append(" */\n");
         return builder.toString();
     }
 

@@ -18,13 +18,27 @@ public class MethodDescriptorTest {
      * Creating simple header.
      */
     @Test
-    public void voidHeaderWithoutMethod() {
+    public void voidHeaderWithoutArgs() {
         final MethodDescriptor descriptor = new MethodDescriptor();
-        descriptor.setDescription("This method does nothing");
+        descriptor.setBriefDescription("This method does nothing");
         final String header = descriptor.genHeader(1);
         Assertions.assertEquals(
             "    /\u002a*\n     * This method does nothing.\n     */\n",
             header
         );
+    }
+
+    /**
+     * Creating header for method that return something.
+     */
+    @Test
+    public void nonVoidHeaderWithoutArgs() {
+        final MethodDescriptor descriptor = new MethodDescriptor();
+        descriptor.setBriefDescription("Returns something");
+        descriptor.setReturnType("String", "Something");
+        final String header = descriptor.genHeader(1);
+        final String expected =
+            "    /\u002a*\n     * Returns something.\n     * \u0040return Something\n     */\n";
+        Assertions.assertEquals(expected, header);
     }
 }
