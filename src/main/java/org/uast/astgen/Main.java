@@ -15,6 +15,8 @@ import org.uast.astgen.parser.ProgramParser;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.utils.FileConverter;
 import org.uast.astgen.utils.FilesReader;
+import org.uast.astgen.utils.PackageValidator;
+import org.uast.astgen.utils.ProjectRootValidator;
 
 /**
  * Main class.
@@ -39,6 +41,30 @@ public final class Main {
     private File source;
 
     /**
+     * The root of the target project.
+     */
+    @SuppressWarnings("PMD.ImmutableField")
+    @Parameter(
+        names = { "--root", "-r" },
+        validateWith = ProjectRootValidator.class,
+        arity = 1,
+        description = "The root of the project folder where generated files are stored"
+    )
+    private String root;
+
+    /**
+     * The package of the generated file.
+     */
+    @SuppressWarnings("PMD.ImmutableField")
+    @Parameter(
+        names = { "--package", "-p" },
+        validateWith = PackageValidator.class,
+        arity = 1,
+        description = "The path to the target folder of a generated source file"
+    )
+    private String pcg;
+
+    /**
      * The help option.
      */
     @SuppressWarnings("PMD.ImmutableField")
@@ -46,10 +72,12 @@ public final class Main {
     private boolean help;
 
     /**
-     * Private constructor.
+     * Private constructor with default values.
      */
     private Main() {
         this.help = false;
+        this.root = "generated";
+        this.pcg = "org.uast";
     }
 
     /**
@@ -79,10 +107,13 @@ public final class Main {
         final ProgramParser parser = new ProgramParser(code);
         try {
             final Program program = parser.parse();
-            final StringBuilder result = new StringBuilder();
+            final StringBuilder result = new StringBuilder(50);
             result
                 .append(program.getAllRules().size())
-                .append(" rules parsed");
+                .append(" rules parsed\nproject root: ")
+                .append(this.root)
+                .append("\npackage: ")
+                .append(this.pcg);
             LOG.info(result.toString());
         } catch (final BaseException exc) {
             LOG.severe(exc.getErrorMessage());
