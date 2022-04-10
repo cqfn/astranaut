@@ -41,4 +41,18 @@ public class MethodDescriptorTest {
             "    /\u002a*\n     * Returns something.\n     * \u0040return Something\n     */\n";
         Assertions.assertEquals(expected, header);
     }
+
+    /**
+     * Creating header for method that has an argument.
+     */
+    @Test
+    public void oneArgument() {
+        final MethodDescriptor descriptor = new MethodDescriptor();
+        descriptor.setBriefDescription("Calculates something");
+        descriptor.addArgument("int", "val", "Value");
+        final String header = descriptor.genHeader(1);
+        final String expected =
+            "    /\u002a*\n     * Calculates something.\n     * \u0040param val Value\n     */\n";
+        Assertions.assertEquals(expected, header);
+    }
 }

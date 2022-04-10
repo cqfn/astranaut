@@ -4,6 +4,8 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import org.uast.astgen.utils.StringUtils;
 
@@ -24,21 +26,27 @@ public final class MethodDescriptor implements Entity {
     private String brief;
 
     /**
+     * The list of arguments.
+     */
+    private final List<Argument> arguments;
+
+    /**
      * The type that the method returns.
      */
-    private String rtype;
+    private String rettype;
 
     /**
      * Returns description.
      */
-    private String rdescr;
+    private String retdescr;
 
     /**
      * Constructor.
      */
     public MethodDescriptor() {
         this.brief = "Description";
-        this.rtype = MethodDescriptor.VOID_TYPE;
+        this.arguments = new LinkedList<>();
+        this.rettype = MethodDescriptor.VOID_TYPE;
     }
 
     /**
@@ -50,13 +58,23 @@ public final class MethodDescriptor implements Entity {
     }
 
     /**
+     * Adds the argument to the descriptor.
+     * @param type The type
+     * @param name The name
+     * @param description The descriptor
+     */
+    public void addArgument(final String type, final String name, final String description) {
+        this.arguments.add(new Argument(type, name, description));
+    }
+
+    /**
      * Sets the return type.
      * @param type The type name
      * @param description The description what the method returns
      */
     public void setReturnType(final String type, final String description) {
-        this.rtype = Objects.requireNonNull(type);
-        this.rdescr = Objects.requireNonNull(description);
+        this.rettype = Objects.requireNonNull(type);
+        this.retdescr = Objects.requireNonNull(description);
     }
 
     /**
@@ -73,10 +91,18 @@ public final class MethodDescriptor implements Entity {
             .append(" * ")
             .append(this.brief)
             .append(".\n");
-        if (!MethodDescriptor.VOID_TYPE.equals(this.rtype)) {
+        for (final Argument arg : this.arguments) {
+            builder.append(tabulation)
+                .append(" * \u0040param ")
+                .append(arg.getName())
+                .append(' ')
+                .append(arg.getDescription())
+                .append('\n');
+        }
+        if (!MethodDescriptor.VOID_TYPE.equals(this.rettype)) {
             builder.append(tabulation)
                 .append(" * \u0040return ")
-                .append(this.rdescr)
+                .append(this.retdescr)
                 .append('\n');
         }
         builder.append(tabulation).append(" */\n");
@@ -86,5 +112,62 @@ public final class MethodDescriptor implements Entity {
     @Override
     public String generate(final int indent) {
         return this.genHeader(indent);
+    }
+
+    /**
+     * The class for describing arguments of the method.
+     * @since 1.0
+     */
+    private static class Argument {
+        /**
+         * The type.
+         */
+        private final String type;
+
+        /**
+         * The name.
+         */
+        private final String name;
+
+        /**
+         * The description.
+         */
+        private final String description;
+
+        /**
+         * Constructor.
+         * @param type The type
+         * @param name The name
+         * @param description The description
+         */
+        Argument(final String type, final String name, final String description) {
+            this.type = type;
+            this.name = name;
+            this.description = description;
+        }
+
+        /**
+         * Returns the type of the argument.
+         * @return The type
+         */
+        public String getType() {
+            return this.type;
+        }
+
+        /**
+         * Returns the name of the argument.
+         * @return The name
+         */
+        public String getName() {
+            return this.name;
+        }
+
+        /**
+         * Returns the description of the argument.
+         * @return The description
+         */
+        public String getDescription() {
+            return this.description;
+        }
     }
 }
