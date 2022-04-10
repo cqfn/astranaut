@@ -12,6 +12,11 @@ package org.uast.astgen.utils;
  */
 public class StringUtils {
     /**
+     * The space ' ' symbol.
+     */
+    public static final StringUtils SPACE = new StringUtils(" ");
+
+    /**
      * Value to be processed.
      */
     private final String value;
@@ -56,6 +61,21 @@ public class StringUtils {
                     builder.append(symbol);
                     break;
             }
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Repeats the original string multiple times.
+     * @param count Number of times
+     * @return Generated string
+     */
+    public String repeat(final int count) {
+        final StringBuilder builder = new StringBuilder(this.value.length() * count);
+        int counter = count;
+        while (counter > 0) {
+            builder.append(this.value);
+            counter = counter - 1;
         }
         return builder.toString();
     }
