@@ -134,7 +134,13 @@ public final class MethodDescriptor implements Entity {
 
     @Override
     public String generate(final int indent) {
-        return this.genHeader(indent);
+        final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
+        final StringBuilder builder = new StringBuilder();
+        builder.append(this.genHeader(indent))
+            .append(tabulation)
+            .append(this.genSignature(true))
+            .append(";\n");
+        return builder.toString();
     }
 
     /**

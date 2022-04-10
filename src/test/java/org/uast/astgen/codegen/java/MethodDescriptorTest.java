@@ -94,4 +94,19 @@ public class MethodDescriptorTest {
         final String expected = "double max(final double aaa, final double bbb)";
         Assertions.assertEquals(expected, result);
     }
+
+    /**
+     * Testing the whole descriptor.
+     */
+    @Test
+    public void wholeDescriptor() {
+        final MethodDescriptor descriptor = new MethodDescriptor(
+            "panic",
+            "Kernel panic"
+        );
+        final String result = descriptor.generate(1);
+        final String expected =
+            "    /\u002a*\n     * Kernel panic.\n     */\n    void panic();\n";
+        Assertions.assertEquals(expected, result);
+    }
 }
