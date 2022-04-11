@@ -52,6 +52,22 @@ public class MethodTest {
     }
 
     /**
+     * Testing code generation for method with arguments and return value.
+     */
+    @Test
+    public void methodWithArgsAndReturn() {
+        final Method method = new Method(MethodTest.METHOD_NAME, "Finds the sum of two numbers");
+        final String type = "int";
+        method.addArgument(type, "aaa", "First number");
+        method.addArgument(type, "bbb", "Second number");
+        method.setReturnType(type, "The sum");
+        method.setCode("return aaa + bbb;");
+        final String expected = this.readTest("method_with_args_and_return.txt");
+        final String actual = method.generate(0);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    /**
      * Reads test source from the file.
      * @param name The file name
      * @return Test source
