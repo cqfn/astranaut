@@ -89,6 +89,33 @@ public class MethodTest {
     }
 
     /**
+     * Testing code generation with overridden method.
+     */
+    @Test
+    public void overriddenMethod() {
+        final Method method = new Method("toString", "Represents the object as a string");
+        method.setReturnType("String", "A string");
+        method.setCode("return \"test\";");
+        method.makeOverridden();
+        final String expected = this.readTest("overridden_method.txt");
+        final String actual = method.generate(0);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    /**
+     * Testing code generation with abstract method.
+     */
+    @Test
+    public void abstractMethod() {
+        final Method method = new Method("setData", "Associates new data with the object");
+        method.addArgument("Data", "data", "The new data");
+        method.makeAbstract();
+        final String expected = this.readTest("abstract_method.txt");
+        final String actual = method.generate(0);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    /**
      * Reads test source from the file.
      * @param name The file name
      * @return Test source

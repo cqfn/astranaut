@@ -23,9 +23,24 @@ public final class Method implements Entity {
     private final MethodBody body;
 
     /**
-     * The flag indicates that the method is not public.
+     * The flag indicates that the method is public.
      */
-    private boolean nonpublic;
+    private boolean fpublic;
+
+    /**
+     * The flag indicates that the method is private.
+     */
+    private boolean fprivate;
+
+    /**
+     * The flag indicates that the method is abstract.
+     */
+    private boolean fabstract;
+
+    /**
+     * The flag indicates that the method is overridden.
+     */
+    private boolean foverride;
 
     /**
      * Constructor.
@@ -35,6 +50,7 @@ public final class Method implements Entity {
     public Method(final String name, final String brief) {
         this.descriptor = new MethodDescriptor(name, brief);
         this.body = new MethodBody();
+        this.fpublic = true;
     }
 
     /**
@@ -65,33 +81,76 @@ public final class Method implements Entity {
     }
 
     /**
+     * Resets all flags.
+     */
+    public void resetFlags() {
+        this.fpublic = false;
+        this.fprivate = false;
+        this.fabstract = false;
+        this.foverride = false;
+    }
+
+    /**
      * Makes this method public.
      */
     public void makePublic() {
-        this.nonpublic = false;
+        this.fpublic = true;
+        this.fprivate = false;
     }
 
     /**
      * Makes this method public.
      */
     public void makePrivate() {
-        this.nonpublic = true;
+        this.resetFlags();
+        this.fprivate = true;
+    }
+
+    /**
+     * Makes this method abstract.
+     */
+    public void makeAbstract() {
+        this.resetFlags();
+        this.fpublic = true;
+        this.fabstract = true;
+    }
+
+    /**
+     * Makes this method overridden.
+     */
+    public void makeOverridden() {
+        this.resetFlags();
+        this.fpublic = true;
+        this.foverride = true;
     }
 
     @Override
     public String generate(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
-        final StringBuilder builder = new StringBuilder();
-        builder.append(this.descriptor.genHeader(indent)).append(tabulation);
-        if (this.nonpublic) {
-            builder.append("private ");
+        final StringBuilder builder = new StringBuilder(64);
+        if (this.foverride) {
+            builder.append(tabulation).append("@Override\n");
         } else {
+            builder.append(this.descriptor.genHeader(indent));
+        }
+        builder.append(tabulation);
+        if (this.fprivate) {
+            builder.append("private ");
+        } else if (this.fpublic) {
             builder.append("public ");
         }
-        final String signature = this.descriptor.genSignature(false);
-        builder.append(signature).append(" {\n");
-        final String code = this.body.generate(indent + 1);
-        builder.append(code).append(tabulation).append("}\n");
+        if (this.fabstract) {
+            builder.append("abstract ");
+        }
+        if (this.fabstract) {
+            final String signature = this.descriptor.genSignature(true);
+            builder.append(signature).append(";\n");
+        } else {
+            final String signature = this.descriptor.genSignature(false);
+            builder.append(signature).append(" {\n");
+            final String code = this.body.generate(indent + 1);
+            builder.append(code).append(tabulation).append("}\n");
+        }
         return builder.toString();
     }
 }
