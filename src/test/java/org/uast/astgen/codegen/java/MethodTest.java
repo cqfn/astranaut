@@ -17,6 +17,11 @@ import org.uast.astgen.utils.FilesReader;
  */
 public class MethodTest {
     /**
+     * Typical method name for tests.
+     */
+    private static final String METHOD_NAME = "test";
+
+    /**
      * The folder with test resources.
      */
     private static final String TESTS_PATH = "src/test/resources/codegen/java/";
@@ -26,9 +31,22 @@ public class MethodTest {
      */
     @Test
     public void simpleMethod() {
-        final Method method = new Method("test", "Prints test string");
+        final Method method = new Method(MethodTest.METHOD_NAME, "Prints test string");
         method.setCode("System.out.print(\"Ok.\");");
         final String expected = this.readTest("simple_method.txt");
+        final String actual = method.generate(0);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    /**
+     * Testing code generation with a private method.
+     */
+    @Test
+    public void simplePrivateMethod() {
+        final Method method = new Method(MethodTest.METHOD_NAME, "Prints another test string");
+        method.setCode("System.out.print(\"Hello )\");");
+        method.makePrivate();
+        final String expected = this.readTest("simple_private_method.txt");
         final String actual = method.generate(0);
         Assertions.assertEquals(expected, actual);
     }
