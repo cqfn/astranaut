@@ -3,7 +3,7 @@
  * https://github.com/unified-ast/ast-generator/blob/master/LICENSE.txt
  */
 
-package org.uast.astgen;
+package org.uast.astgen.utils;
 
 import com.beust.jcommander.ParameterException;
 import java.io.IOException;
@@ -14,71 +14,94 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.uast.astgen.Main;
 
 /**
- * Test for {@link Main} class.
+ * Test for {@link PackageValidator} class.
  *
  * @since 1.0
  */
-public class MainTest {
+public class PackageValidatorTest {
     /**
      * The generate option as an argument example.
      */
     private static final String ARG = "--generate";
 
     /**
-     * Test passing the {@code --generate} option to main().
+     * The name of the option for a package name of generated files.
+     */
+    private static final String PCG = "--package";
+
+    /**
+     * Test passing the {@code --generate} option to main()
+     * with the {@code --package} option and a valid package name
+     * as a parameter.
      * @param source A temporary directory
      */
     @Test
-    public void testNoException(@TempDir final Path source) throws IOException {
+    public void testPackageOptionNoException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
-            MainTest.ARG,
+            PackageValidatorTest.ARG,
             file.toString(),
+            PackageValidatorTest.PCG,
+            "org.uast",
         };
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final IllegalArgumentException | IOException exc) {
+        } catch (final ParameterException exc) {
             caught = true;
         }
         Assertions.assertFalse(caught);
     }
 
     /**
-     * Test passing no option to main().
+     * Test passing the {@code --generate} option to main()
+     * with the {@code --package} option and an invalid package name
+     * as a parameter.
+     * @param source A temporary directory
      */
     @Test
-    public void testWithException() {
-        final String[] example = {};
+    public void testPackageOptionWithException(@TempDir final Path source) throws IOException {
+        final Path file = this.createTempTxtFile(source);
+        final String[] example = {
+            PackageValidatorTest.ARG,
+            file.toString(),
+            PackageValidatorTest.PCG,
+            "org/uast",
+        };
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException | IOException exc) {
+        } catch (final ParameterException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);
     }
 
     /**
-     * Test passing the {@code --generate} option with no parameters to main().
+     * Test passing the {@code --generate} option to main()
+     * with the {@code --package} option having no parameter before
+     * the next option.
+     * @param source A temporary directory
      */
     @Test
-    public void testGenerateWithoutParameters() {
+    public void testPackageOptionWithoutParameter(@TempDir final Path source) throws IOException {
+        final Path file = this.createTempTxtFile(source);
         final String[] example = {
-            MainTest.ARG,
+            PackageValidatorTest.ARG,
+            file.toString(),
+            PackageValidatorTest.PCG,
+            "-r",
         };
         boolean caught = false;
-        String message = "";
         try {
             Main.main(example);
-        } catch (final ParameterException | IOException exc) {
+        } catch (final ParameterException exc) {
             caught = true;
-            message = exc.getMessage();
         }
         Assertions.assertTrue(caught);
-        Assertions.assertEquals("Expected a value after parameter --generate", message);
     }
 
     /**
