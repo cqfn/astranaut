@@ -68,6 +68,27 @@ public class MethodTest {
     }
 
     /**
+     * Testing code generation for method that contains 'if' statement.
+     */
+    @Test
+    public void methodWithIfStatement() {
+        final Method method = new Method(
+            MethodTest.METHOD_NAME,
+            "Finds the maximum of two numbers"
+        );
+        final String type = "float";
+        method.addArgument(type, "left", "Left number");
+        method.addArgument(type, "right", "Right number");
+        method.setReturnType(type, "The maximum");
+        final String code =
+            "final float ret;\nif (left > right) {ret = left;} else {ret = right;}\nreturn ret;";
+        method.setCode(code);
+        final String expected = this.readTest("method_with_if_statement.txt");
+        final String actual = method.generate(0);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    /**
      * Reads test source from the file.
      * @param name The file name
      * @return Test source
