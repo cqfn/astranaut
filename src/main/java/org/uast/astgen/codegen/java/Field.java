@@ -64,6 +64,7 @@ public final class Field implements Entity {
         this.type = type;
         this.name = name;
         this.fprivate = true;
+        this.init = "";
     }
 
     /**
@@ -140,7 +141,7 @@ public final class Field implements Entity {
             builder.append("final ");
         }
         builder.append(this.type).append(' ').append(this.name);
-        if (this.init != null) {
+        if (!this.init.isEmpty()) {
             builder.append(" = ").append(this.init);
         }
         builder.append(";\n");
