@@ -63,7 +63,7 @@ public class MethodTest {
         method.setReturnType(type, "The sum");
         method.setCode("return aaa + bbb;");
         final String expected = this.readTest("method_with_args_and_return.txt");
-        final String actual = method.generate(0);
+        final String actual = method.generate(1);
         Assertions.assertEquals(expected, actual);
     }
 
