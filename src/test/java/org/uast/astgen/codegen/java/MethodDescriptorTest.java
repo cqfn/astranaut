@@ -23,7 +23,7 @@ public class MethodDescriptorTest {
             "first",
             "This method does nothing"
         );
-        final String header = descriptor.genHeader(1);
+        final String header = descriptor.generateHeader(1);
         Assertions.assertEquals(
             "    /\u002a*\n     * This method does nothing.\n     */\n",
             header
@@ -40,7 +40,7 @@ public class MethodDescriptorTest {
             "Returns something"
         );
         descriptor.setReturnType("String", "Something");
-        final String header = descriptor.genHeader(1);
+        final String header = descriptor.generateHeader(1);
         final String expected =
             "    /\u002a*\n     * Returns something.\n     * \u0040return Something\n     */\n";
         Assertions.assertEquals(expected, header);
@@ -56,7 +56,7 @@ public class MethodDescriptorTest {
             "Calculates something"
         );
         descriptor.addArgument("int", "val", "Value");
-        final String header = descriptor.genHeader(1);
+        final String header = descriptor.generateHeader(1);
         final String expected =
             "    /\u002a*\n     * Calculates something.\n     * \u0040param val Value\n     */\n";
         Assertions.assertEquals(expected, header);
@@ -72,7 +72,7 @@ public class MethodDescriptorTest {
             "Calculates something else"
         );
         descriptor.addArgument("float", "num", "Number");
-        final String result = descriptor.genSignature(true);
+        final String result = descriptor.generateSignature(true);
         final String expected = "void calculate(float num)";
         Assertions.assertEquals(expected, result);
     }
@@ -90,7 +90,7 @@ public class MethodDescriptorTest {
         descriptor.setReturnType(type, "Result");
         descriptor.addArgument(type, "aaa", "First value");
         descriptor.addArgument(type, "bbb", "Second value");
-        final String result = descriptor.genSignature(false);
+        final String result = descriptor.generateSignature(false);
         final String expected = "double max(final double aaa, final double bbb)";
         Assertions.assertEquals(expected, result);
     }

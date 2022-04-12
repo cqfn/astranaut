@@ -131,7 +131,7 @@ public final class Method implements Entity {
         if (this.foverride) {
             builder.append(tabulation).append("@Override\n");
         } else {
-            builder.append(this.descriptor.genHeader(indent));
+            builder.append(this.descriptor.generateHeader(indent));
         }
         builder.append(tabulation);
         if (this.fprivate) {
@@ -143,10 +143,10 @@ public final class Method implements Entity {
             builder.append("abstract ");
         }
         if (this.fabstract) {
-            final String signature = this.descriptor.genSignature(true);
+            final String signature = this.descriptor.generateSignature(true);
             builder.append(signature).append(";\n");
         } else {
-            final String signature = this.descriptor.genSignature(false);
+            final String signature = this.descriptor.generateSignature(false);
             builder.append(signature).append(" {\n");
             final String code = this.body.generate(indent + 1);
             builder.append(code).append(tabulation).append("}\n");

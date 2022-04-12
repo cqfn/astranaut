@@ -82,7 +82,7 @@ public final class MethodDescriptor implements Entity {
      * @param indent Indentation from the beginning of the line
      * @return JavaDoc header
      */
-    public String genHeader(final int indent) {
+    public String generateHeader(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
         final StringBuilder builder = new StringBuilder(32);
         builder.append(tabulation)
@@ -114,7 +114,7 @@ public final class MethodDescriptor implements Entity {
      * @param iface Generation for interface, without 'final' qualifiers
      * @return The signature
      */
-    public String genSignature(final boolean iface) {
+    public String generateSignature(final boolean iface) {
         final StringBuilder builder = new StringBuilder();
         builder.append(this.rettype).append(' ').append(this.name).append('(');
         boolean flag = false;
@@ -136,9 +136,9 @@ public final class MethodDescriptor implements Entity {
     public String generate(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
         final StringBuilder builder = new StringBuilder();
-        builder.append(this.genHeader(indent))
+        builder.append(this.generateHeader(indent))
             .append(tabulation)
-            .append(this.genSignature(true))
+            .append(this.generateSignature(true))
             .append(";\n");
         return builder.toString();
     }

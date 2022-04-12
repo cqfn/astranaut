@@ -5,6 +5,8 @@
 package org.uast.astgen.codegen.java;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.uast.astgen.utils.StringUtils;
@@ -14,6 +16,7 @@ import org.uast.astgen.utils.StringUtils;
  *
  * @since 1.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public final class Klass implements Entity {
     /**
      * The brief description.
@@ -51,6 +54,16 @@ public final class Klass implements Entity {
     private final String name;
 
     /**
+     * The name of the parent class.
+     */
+    private String parent;
+
+    /**
+     * List of implemented interfaces.
+     */
+    private List<String> interfaces;
+
+    /**
      * The list of fields.
      */
     private final List<Field> fields;
@@ -70,6 +83,8 @@ public final class Klass implements Entity {
         this.version = "1.0";
         this.fpublic = true;
         this.name = name;
+        this.parent = "";
+        this.interfaces = Collections.emptyList();
         this.fields = new ArrayList<>(0);
         this.methods = new ArrayList<>(0);
     }
@@ -80,6 +95,22 @@ public final class Klass implements Entity {
      */
     public void setVersion(final String str) {
         this.version = Objects.requireNonNull(str);
+    }
+
+    /**
+     * Sets the parent class name.
+     * @param str The parent class name
+     */
+    public void setParenClass(final String str) {
+        this.parent = Objects.requireNonNull(str);
+    }
+
+    /**
+     * Set the list of interface names, that the class implements.
+     * @param list The list of interface names
+     */
+    public void setInterfaces(final String... list) {
+        this.interfaces = Arrays.asList(list);
     }
 
     /**
@@ -142,6 +173,35 @@ public final class Klass implements Entity {
     public String generate(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
         final StringBuilder builder = new StringBuilder(128);
+        this.generateHeader(builder, indent);
+        builder.append(tabulation);
+        if (this.fprivate) {
+            builder.append("private ");
+        } else if (this.fpublic) {
+            builder.append("public ");
+        }
+        if (this.fstatic) {
+            builder.append("static ");
+        }
+        if (this.ffinal) {
+            builder.append("final ");
+        }
+        builder.append("class ").append(this.name);
+        this.generateParents(builder);
+        builder.append(" {\n");
+        final boolean flag = this.generateFields(builder, false, indent + 1);
+        this.generateMethods(builder, flag, indent + 1);
+        builder.append(tabulation).append("}\n");
+        return builder.toString();
+    }
+
+    /**
+     * Generates the class header.
+     * @param builder String builder where to generate
+     * @param indent Indentation
+     */
+    private void generateHeader(final StringBuilder builder, final int indent) {
+        final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
         builder.append(tabulation)
             .append("/**\n")
             .append(tabulation)
@@ -155,30 +215,28 @@ public final class Klass implements Entity {
             .append(this.version)
             .append('\n')
             .append(tabulation)
-            .append(" */\n")
-            .append(tabulation);
-        if (this.fprivate) {
-            builder.append("private ");
-        } else if (this.fpublic) {
-            builder.append("public ");
+            .append(" */\n");
+    }
+
+    /**
+     * Generates parents list (what the class extends and implements).
+     * @param builder String builder where to generate
+     */
+    private void generateParents(final StringBuilder builder) {
+        if (!this.parent.isEmpty()) {
+            builder.append(" extends").append(this.name);
         }
-        if (this.fstatic) {
-            builder.append("static ");
-        }
-        if (this.ffinal) {
-            builder.append("final ");
-        }
-        builder.append("class ").append(this.name).append(" {\n");
-        boolean flag = this.generateFields(builder, false, indent + 1);
-        for (final Method method : this.methods) {
-            if (flag) {
-                builder.append('\n');
+        if (!this.interfaces.isEmpty()) {
+            builder.append(" implements ");
+            boolean comma = false;
+            for (final String iface : this.interfaces) {
+                if (comma) {
+                    builder.append(", ");
+                }
+                comma = true;
+                builder.append(iface);
             }
-            flag = true;
-            builder.append(method.generate(indent + 1));
         }
-        builder.append(tabulation).append("}\n");
-        return builder.toString();
     }
 
     /**
@@ -200,6 +258,29 @@ public final class Klass implements Entity {
             }
             flag = true;
             builder.append(field.generate(indent));
+        }
+        return flag;
+    }
+
+    /**
+     * Generated source code for methods.
+     * @param builder String builder where to generate
+     * @param separator Flg that indicated that need to add empty lune after previous entity
+     * @param indent Indentation
+     * @return New separator flag
+     */
+    private boolean generateMethods(
+        final StringBuilder builder,
+        final boolean separator,
+        final int indent
+    ) {
+        boolean flag = separator;
+        for (final Method method : this.methods) {
+            if (flag) {
+                builder.append('\n');
+            }
+            flag = true;
+            builder.append(method.generate(indent));
         }
         return flag;
     }

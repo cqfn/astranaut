@@ -46,6 +46,8 @@ public class ClassTest {
     @Disabled
     public void addition() {
         final Klass klass = new Klass("Node that describes the 'Addition' type", "Addition");
+        klass.makeFinal();
+        klass.setInterfaces("BinaryExpression");
         final String expected = this.readTest("addition.txt");
         final String actual = klass.generate(0);
         Assertions.assertEquals(expected, actual);
