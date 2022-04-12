@@ -99,7 +99,7 @@ public final class Method implements Entity {
     }
 
     /**
-     * Makes this method public.
+     * Makes this method private.
      */
     public void makePrivate() {
         this.resetFlags();
