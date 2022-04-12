@@ -7,6 +7,7 @@ package org.uast.astgen.codegen.java;
 
 import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.uast.astgen.utils.FilesReader;
 
@@ -34,6 +35,18 @@ public class ClassTest {
         final Klass klass = new Klass("Test class with one method", ClassTest.CLASS_NAME);
         klass.addMethod(this.createPublicMethod());
         final String expected = this.readTest("public_class_with_one_method.txt");
+        final String actual = klass.generate(0);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    /**
+     * Creating the whole 'real' class.
+     */
+    @Test
+    @Disabled
+    public void addition() {
+        final Klass klass = new Klass("Node that describes the 'Addition' type", "Addition");
+        final String expected = this.readTest("addition.txt");
         final String actual = klass.generate(0);
         Assertions.assertEquals(expected, actual);
     }
