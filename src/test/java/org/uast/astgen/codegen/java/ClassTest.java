@@ -28,6 +28,11 @@ public class ClassTest {
     private static final String TESTS_PATH = "src/test/resources/codegen/java/";
 
     /**
+     * The 'Expression' string.
+     */
+    private static final String STR_EXPRESSION = "Expression";
+
+    /**
      * Generating a public class with one method.
      */
     @Test
@@ -48,6 +53,27 @@ public class ClassTest {
         final Klass klass = new Klass("Node that describes the 'Addition' type", "Addition");
         klass.makeFinal();
         klass.setInterfaces("BinaryExpression");
+        final Field type = new Field("The type", "Type", "TYPE");
+        type.makePublic();
+        type.makeStaticFinal();
+        type.setInitExpr("new TypeImpl()");
+        klass.addField(type);
+        final Field fragment = new Field(
+            "The fragment associated with the node",
+            "Fragment",
+            "fragment"
+        );
+        klass.addField(fragment);
+        final Field children = new Field("List  of child nodes", "List<Node>", "children");
+        klass.addField(children);
+        final Field left = new Field("Node with the 'left' tag", ClassTest.STR_EXPRESSION, "left");
+        klass.addField(left);
+        final Field right = new Field(
+            "Node with the 'right' tag",
+            ClassTest.STR_EXPRESSION,
+            "right"
+        );
+        klass.addField(right);
         final String expected = this.readTest("addition.txt");
         final String actual = klass.generate(0);
         Assertions.assertEquals(expected, actual);
