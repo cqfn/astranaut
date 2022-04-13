@@ -43,14 +43,25 @@ public final class Method implements Entity {
     private boolean foverride;
 
     /**
+     * Main constructor.
+     * @param brief The brief description.
+     * @param name The name of the method.
+     * @param foverride Flag indicates that the method is overridden
+     */
+    private Method(final String brief, final String name, final boolean foverride) {
+        this.descriptor = new MethodDescriptor(brief, name);
+        this.body = new MethodBody();
+        this.fpublic = true;
+        this.foverride = foverride;
+    }
+
+    /**
      * Constructor.
      * @param brief The brief description.
      * @param name The name of the method.
      */
     public Method(final String brief, final String name) {
-        this.descriptor = new MethodDescriptor(brief, name);
-        this.body = new MethodBody();
-        this.fpublic = true;
+        this(brief, name, false);
     }
 
     /**
@@ -58,8 +69,7 @@ public final class Method implements Entity {
      * @param name The name of the method.
      */
     public Method(final String name) {
-        this("", name);
-        this.foverride = true;
+        this("", name, true);
     }
 
     /**
@@ -91,7 +101,7 @@ public final class Method implements Entity {
     }
 
     /**
-     * Sets the return type (without description)
+     * Sets the return type (without description).
      * @param type The type name
      */
     public void setReturnType(final String type) {

@@ -43,6 +43,16 @@ public class ClassTest {
     private static final String STR_INT = "int";
 
     /**
+     * The 'Type' string.
+     */
+    private static final String STR_TYPE = "Type";
+
+    /**
+     * The 'Expression' string.
+     */
+    private static final String STR_FRAGMENT = "Fragment";
+
+    /**
      * Generating a public class with one method.
      */
     @Test
@@ -71,6 +81,7 @@ public class ClassTest {
         ctor.makePrivate();
         klass.addConstructor(ctor);
         this.createMethods(klass);
+        this.createMoreMethods(klass);
         final String expected = this.readTest("addition.txt");
         final String actual = klass.generate(0);
         Assertions.assertEquals(expected, actual);
@@ -91,14 +102,14 @@ public class ClassTest {
      * @param klass The object where to create
      */
     private void createFields(final Klass klass) {
-        final Field type = new Field("The type", "Type", "TYPE");
+        final Field type = new Field("The type", ClassTest.STR_TYPE, "TYPE");
         type.makePublic();
         type.makeStaticFinal();
         type.setInitExpr("new TypeImpl()");
         klass.addField(type);
         final Field fragment = new Field(
             "The fragment associated with the node",
-            "Fragment",
+            ClassTest.STR_FRAGMENT,
             "fragment"
         );
         klass.addField(fragment);
@@ -120,11 +131,11 @@ public class ClassTest {
      */
     private void createMethods(final Klass klass) {
         final Method fragment = new Method("getFragment");
-        fragment.setReturnType("Fragment");
+        fragment.setReturnType(ClassTest.STR_FRAGMENT);
         fragment.setCode("return this.fragment;");
         klass.addMethod(fragment);
         final Method type = new Method("getType");
-        type.setReturnType("Type");
+        type.setReturnType(ClassTest.STR_TYPE);
         type.setCode("return Addition.TYPE;");
         klass.addMethod(type);
         final Method data = new Method("getData");
@@ -135,17 +146,24 @@ public class ClassTest {
         childcnt.setReturnType(ClassTest.STR_INT);
         childcnt.setCode("return 2;");
         klass.addMethod(childcnt);
+    }
+
+    /**
+     * Creates methods for the 'real' class.
+     * @param klass The object where to create
+     */
+    private void createMoreMethods(final Klass klass) {
         final Method child = new Method("getChild");
         child.addArgument(ClassTest.STR_INT, "index");
         child.setReturnType("Node");
         child.setCode("return this.children.get(index);");
         klass.addMethod(child);
         final Method left = new Method("getLeft");
-        left.setReturnType(STR_EXPRESSION);
+        left.setReturnType(ClassTest.STR_EXPRESSION);
         left.setCode("return this.left;");
         klass.addMethod(left);
         final Method right = new Method("getRight");
-        right.setReturnType(STR_EXPRESSION);
+        right.setReturnType(ClassTest.STR_EXPRESSION);
         right.setCode("return this.right;");
         klass.addMethod(right);
     }
