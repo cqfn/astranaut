@@ -86,7 +86,7 @@ public class License {
         for (final String line : lines) {
             builder.append(" * ").append(line).append('\n');
         }
-        builder.append(" */\n");
+        builder.append(" */\n\n");
         this.data = builder.toString();
     }
 }
