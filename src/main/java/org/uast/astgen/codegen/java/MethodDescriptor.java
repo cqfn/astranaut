@@ -47,10 +47,10 @@ public final class MethodDescriptor implements Entity {
 
     /**
      * Constructor.
-     * @param name The name of the method.
      * @param brief The brief description.
+     * @param name The name of the method.
      */
-    public MethodDescriptor(final String name, final String brief) {
+    public MethodDescriptor(final String brief, final String name) {
         this.name = name;
         this.brief = brief;
         this.arguments = new LinkedList<>();

@@ -44,11 +44,11 @@ public final class Method implements Entity {
 
     /**
      * Constructor.
-     * @param name The name of the method.
      * @param brief The brief description.
+     * @param name The name of the method.
      */
-    public Method(final String name, final String brief) {
-        this.descriptor = new MethodDescriptor(name, brief);
+    public Method(final String brief, final String name) {
+        this.descriptor = new MethodDescriptor(brief, name);
         this.body = new MethodBody();
         this.fpublic = true;
     }

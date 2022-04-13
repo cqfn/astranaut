@@ -84,7 +84,7 @@ public class ClassTest {
      * @return Method
      */
     private Method createPublicMethod() {
-        final Method method = new Method("doSomething", "This method does something");
+        final Method method = new Method("This method does something", "doSomething");
         method.setCode("System.out.print(\"it works!\");");
         return method;
     }

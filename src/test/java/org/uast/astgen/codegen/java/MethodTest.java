@@ -31,7 +31,7 @@ public class MethodTest {
      */
     @Test
     public void simpleMethod() {
-        final Method method = new Method(MethodTest.METHOD_NAME, "Prints test string");
+        final Method method = new Method("Prints test string", MethodTest.METHOD_NAME);
         method.setCode("System.out.print(\"Ok.\");");
         final String expected = this.readTest("simple_method.txt");
         final String actual = method.generate(0);
@@ -43,7 +43,7 @@ public class MethodTest {
      */
     @Test
     public void simplePrivateMethod() {
-        final Method method = new Method(MethodTest.METHOD_NAME, "Prints another test string");
+        final Method method = new Method("Prints another test string", MethodTest.METHOD_NAME);
         method.setCode("System.out.print(\"Hello )\");");
         method.makePrivate();
         final String expected = this.readTest("simple_private_method.txt");
@@ -56,7 +56,7 @@ public class MethodTest {
      */
     @Test
     public void methodWithArgsAndReturn() {
-        final Method method = new Method(MethodTest.METHOD_NAME, "Finds the sum of two numbers");
+        final Method method = new Method("Finds the sum of two numbers", MethodTest.METHOD_NAME);
         final String type = "int";
         method.addArgument(type, "aaa", "First number");
         method.addArgument(type, "bbb", "Second number");
@@ -73,8 +73,8 @@ public class MethodTest {
     @Test
     public void methodWithIfStatement() {
         final Method method = new Method(
-            MethodTest.METHOD_NAME,
-            "Finds the maximum of two numbers"
+            "Finds the maximum of two numbers",
+            MethodTest.METHOD_NAME
         );
         final String type = "float";
         method.addArgument(type, "left", "Left number");
@@ -93,7 +93,7 @@ public class MethodTest {
      */
     @Test
     public void overriddenMethod() {
-        final Method method = new Method("toString", "Represents the object as a string");
+        final Method method = new Method("Represents the object as a string", "toString");
         method.setReturnType("String", "A string");
         method.setCode("return \"test\";");
         method.makeOverridden();
@@ -107,7 +107,7 @@ public class MethodTest {
      */
     @Test
     public void abstractMethod() {
-        final Method method = new Method("setData", "Associates new data with the object");
+        final Method method = new Method("Associates new data with the object", "setData");
         method.addArgument("Data", "data", "The new data");
         method.makeAbstract();
         final String expected = this.readTest("abstract_method.txt");

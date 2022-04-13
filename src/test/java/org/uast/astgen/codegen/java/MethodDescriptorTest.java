@@ -20,8 +20,8 @@ public class MethodDescriptorTest {
     @Test
     public void voidHeaderWithoutArgs() {
         final MethodDescriptor descriptor = new MethodDescriptor(
-            "first",
-            "This method does nothing"
+            "This method does nothing",
+            "first"
         );
         final String header = descriptor.generateHeader(1);
         Assertions.assertEquals(
@@ -36,8 +36,8 @@ public class MethodDescriptorTest {
     @Test
     public void nonVoidHeaderWithoutArgs() {
         final MethodDescriptor descriptor = new MethodDescriptor(
-            "second",
-            "Returns something"
+            "Returns something",
+            "second"
         );
         descriptor.setReturnType("String", "Something");
         final String header = descriptor.generateHeader(1);
@@ -52,8 +52,8 @@ public class MethodDescriptorTest {
     @Test
     public void oneArgument() {
         final MethodDescriptor descriptor = new MethodDescriptor(
-            "third",
-            "Calculates something"
+            "Calculates something",
+            "third"
         );
         descriptor.addArgument("int", "val", "Value");
         final String header = descriptor.generateHeader(1);
@@ -68,8 +68,8 @@ public class MethodDescriptorTest {
     @Test
     public void signatureIface() {
         final MethodDescriptor descriptor = new MethodDescriptor(
-            "calculate",
-            "Calculates something else"
+            "Calculates something else",
+            "calculate"
         );
         descriptor.addArgument("float", "num", "Number");
         final String result = descriptor.generateSignature(true);
@@ -83,8 +83,8 @@ public class MethodDescriptorTest {
     @Test
     public void signatureMethod() {
         final MethodDescriptor descriptor = new MethodDescriptor(
-            "max",
-            "Finds the maximum"
+            "Finds the maximum",
+            "max"
         );
         final String type = "double";
         descriptor.setReturnType(type, "Result");
@@ -101,8 +101,8 @@ public class MethodDescriptorTest {
     @Test
     public void wholeDescriptor() {
         final MethodDescriptor descriptor = new MethodDescriptor(
-            "panic",
-            "Kernel panic"
+            "Kernel panic",
+            "panic"
         );
         final String result = descriptor.generate(1);
         final String expected =
