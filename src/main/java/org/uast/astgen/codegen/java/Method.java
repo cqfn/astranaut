@@ -54,7 +54,16 @@ public final class Method implements Entity {
     }
 
     /**
-     * Adds the argument to the descriptor.
+     * Constructor (for overridden methods).
+     * @param name The name of the method.
+     */
+    public Method(final String name) {
+        this("", name);
+        this.foverride = true;
+    }
+
+    /**
+     * Adds the argument to the method.
      * @param type The type
      * @param name The name
      * @param description The brief description
@@ -64,12 +73,29 @@ public final class Method implements Entity {
     }
 
     /**
+     * Adds the argument to the method, without description.
+     * @param type The type
+     * @param name The name
+     */
+    public void addArgument(final String type, final String name) {
+        this.descriptor.addArgument(type, name, "");
+    }
+
+    /**
      * Sets the return type.
      * @param type The type name
      * @param description The description what the method returns
      */
     public void setReturnType(final String type, final String description) {
         this.descriptor.setReturnType(type, description);
+    }
+
+    /**
+     * Sets the return type (without description)
+     * @param type The type name
+     */
+    public void setReturnType(final String type) {
+        this.descriptor.setReturnType(type, "");
     }
 
     /**

@@ -38,6 +38,11 @@ public class ClassTest {
     private static final String STR_EXPRESSION = "Expression";
 
     /**
+     * The 'int' string.
+     */
+    private static final String STR_INT = "int";
+
+    /**
      * Generating a public class with one method.
      */
     @Test
@@ -65,6 +70,7 @@ public class ClassTest {
         final Constructor ctor = new Constructor(ClassTest.STR_ADDITION);
         ctor.makePrivate();
         klass.addConstructor(ctor);
+        this.createMethods(klass);
         final String expected = this.readTest("addition.txt");
         final String actual = klass.generate(0);
         Assertions.assertEquals(expected, actual);
@@ -106,6 +112,42 @@ public class ClassTest {
             "right"
         );
         klass.addField(right);
+    }
+
+    /**
+     * Creates methods for the 'real' class.
+     * @param klass The object where to create
+     */
+    private void createMethods(final Klass klass) {
+        final Method fragment = new Method("getFragment");
+        fragment.setReturnType("Fragment");
+        fragment.setCode("return this.fragment;");
+        klass.addMethod(fragment);
+        final Method type = new Method("getType");
+        type.setReturnType("Type");
+        type.setCode("return Addition.TYPE;");
+        klass.addMethod(type);
+        final Method data = new Method("getData");
+        data.setReturnType("String");
+        data.setCode("return \"\";");
+        klass.addMethod(data);
+        final Method childcnt = new Method("getChildCount");
+        childcnt.setReturnType(ClassTest.STR_INT);
+        childcnt.setCode("return 2;");
+        klass.addMethod(childcnt);
+        final Method child = new Method("getChild");
+        child.addArgument(ClassTest.STR_INT, "index");
+        child.setReturnType("Node");
+        child.setCode("return this.children.get(index);");
+        klass.addMethod(child);
+        final Method left = new Method("getLeft");
+        left.setReturnType(STR_EXPRESSION);
+        left.setCode("return this.left;");
+        klass.addMethod(left);
+        final Method right = new Method("getRight");
+        right.setReturnType(STR_EXPRESSION);
+        right.setCode("return this.right;");
+        klass.addMethod(right);
     }
 
     /**
