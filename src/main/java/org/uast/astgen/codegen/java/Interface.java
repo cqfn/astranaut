@@ -16,7 +16,7 @@ import org.uast.astgen.utils.StringUtils;
  *
  * @since 1.0
  */
-public final class Interface implements Entity {
+public final class Interface implements Entity, Type {
     /**
      * The brief description.
      */
@@ -80,6 +80,16 @@ public final class Interface implements Entity {
     }
 
     @Override
+    public String getBrief() {
+        return this.brief;
+    }
+
+    @Override
+    public String getVersion() {
+        return this.version;
+    }
+
+    @Override
     public String generate(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
         final StringBuilder builder = new StringBuilder(128);
@@ -90,29 +100,6 @@ public final class Interface implements Entity {
         this.generateMethods(builder, indent + 1);
         builder.append(tabulation).append("}\n");
         return builder.toString();
-    }
-
-    /**
-     * Generates the class header.
-     * @param builder String builder where to generate
-     * @param indent Indentation
-     */
-    private void generateHeader(final StringBuilder builder, final int indent) {
-        final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
-        builder.append(tabulation)
-            .append("/**\n")
-            .append(tabulation)
-            .append(" * ")
-            .append(this.brief)
-            .append(".\n")
-            .append(tabulation)
-            .append(" *\n")
-            .append(tabulation)
-            .append(" * @since ")
-            .append(this.version)
-            .append('\n')
-            .append(tabulation)
-            .append(" */\n");
     }
 
     /**
