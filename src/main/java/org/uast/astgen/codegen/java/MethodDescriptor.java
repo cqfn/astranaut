@@ -119,7 +119,7 @@ public final class MethodDescriptor implements Entity {
     }
 
     /**
-     * Generates the signature of th method.
+     * Generates the signature of the method.
      * @param iface Generation for interface, without 'final' qualifiers
      * @return The signature
      */

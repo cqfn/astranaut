@@ -259,7 +259,7 @@ public final class Klass implements Type {
     /**
      * Generated source code for fields.
      * @param builder String builder where to generate
-     * @param separator Flag that indicated that need to add empty lune after previous entity
+     * @param separator Flag that indicated that need to add empty line after previous entity
      * @param indent Indentation
      * @return New separator flag
      */
@@ -282,7 +282,7 @@ public final class Klass implements Type {
     /**
      * Generated source code for constructors.
      * @param builder String builder where to generate
-     * @param separator Flag that indicated that need to add empty lune after previous entity
+     * @param separator Flag that indicated that need to add empty line after previous entity
      * @param indent Indentation
      * @return New separator flag
      */
@@ -305,7 +305,7 @@ public final class Klass implements Type {
     /**
      * Generated source code for methods.
      * @param builder String builder where to generate
-     * @param separator Flag that indicated that need to add empty lune after previous entity
+     * @param separator Flag that indicated that need to add empty line after previous entity
      * @param indent Indentation
      * @return New separator flag
      */
@@ -328,7 +328,7 @@ public final class Klass implements Type {
     /**
      * Generated source code for inner classes.
      * @param builder String builder where to generate
-     * @param separator Flag that indicated that need to add empty lune after previous entity
+     * @param separator Flag that indicated that need to add empty line after previous entity
      * @param indent Indentation
      * @return New separator flag
      */
