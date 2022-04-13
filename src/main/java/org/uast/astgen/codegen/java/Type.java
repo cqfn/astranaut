@@ -11,7 +11,7 @@ import org.uast.astgen.utils.StringUtils;
  *
  * @since 1.0
  */
-public interface Type {
+public interface Type extends Entity {
     /**
      * Returns brief description of the type.
      * @return The description

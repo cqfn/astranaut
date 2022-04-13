@@ -16,7 +16,7 @@ import org.uast.astgen.utils.StringUtils;
  *
  * @since 1.0
  */
-public final class Interface implements Entity, Type {
+public final class Interface implements Type {
     /**
      * The brief description.
      */

@@ -12,7 +12,7 @@ import java.util.TreeSet;
  *
  * @since 1.0
  */
-public final class Imports implements Entity {
+public final class Imports {
     /**
      * The set of imports.
      */
@@ -41,14 +41,14 @@ public final class Imports implements Entity {
         return !this.set.isEmpty();
     }
 
-    @Override
-    public String generate(final int indent) {
-        if (indent != 0) {
-            throw new IllegalArgumentException();
-        }
+    /**
+     * Generates source code from the set.
+     * @return Source code
+     */
+    public String generate() {
         final StringBuilder builder = new StringBuilder();
         for (final String item : this.set) {
-            builder.append(item).append('\n');
+            builder.append("import ").append(item).append(";\n");
         }
         builder.append('\n');
         return builder.toString();

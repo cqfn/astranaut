@@ -17,7 +17,7 @@ import org.uast.astgen.utils.StringUtils;
  * @since 1.0
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public final class Klass implements Entity, Type {
+public final class Klass implements Type {
     /**
      * The brief description.
      */
