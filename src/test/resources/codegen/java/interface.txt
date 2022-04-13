@@ -1,0 +1,12 @@
+/**
+ * DSL rule.
+ *
+ * @since 1.0
+ */
+public interface Rule {
+    /**
+     * Generates source code from the rule.
+     * @param opt The options set
+     */
+    void generate(Options opt);
+}
