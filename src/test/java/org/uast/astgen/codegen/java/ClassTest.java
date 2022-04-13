@@ -7,7 +7,6 @@ package org.uast.astgen.codegen.java;
 
 import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.uast.astgen.utils.FilesReader;
 
@@ -26,6 +25,11 @@ public class ClassTest {
      * The folder with test resources.
      */
     private static final String TESTS_PATH = "src/test/resources/codegen/java/";
+
+    /**
+     * The 'String' string.
+     */
+    private static final String STR_STRING = "String";
 
     /**
      * The 'Addition' string.
@@ -68,7 +72,6 @@ public class ClassTest {
      * Creating the whole 'real' class.
      */
     @Test
-    @Disabled
     public void addition() {
         final Klass klass = new Klass(
             "Node that describes the 'Addition' type",
@@ -82,6 +85,7 @@ public class ClassTest {
         klass.addConstructor(ctor);
         this.createMethods(klass);
         this.createMoreMethods(klass);
+        this.createInnerClass(klass);
         final String expected = this.readTest("addition.txt");
         final String actual = klass.generate(0);
         Assertions.assertEquals(expected, actual);
@@ -139,7 +143,7 @@ public class ClassTest {
         type.setCode("return Addition.TYPE;");
         klass.addMethod(type);
         final Method data = new Method("getData");
-        data.setReturnType("String");
+        data.setReturnType(ClassTest.STR_STRING);
         data.setCode("return \"\";");
         klass.addMethod(data);
         final Method childcnt = new Method("getChildCount");
@@ -166,6 +170,68 @@ public class ClassTest {
         right.setReturnType(ClassTest.STR_EXPRESSION);
         right.setCode("return this.right;");
         klass.addMethod(right);
+    }
+
+    /**
+     * Creates inner class for the 'real' class.
+     * @param klass The object where to create
+     */
+    private void createInnerClass(final Klass klass) {
+        final Klass inner = new Klass(
+            "Type descriptor of the 'Addition' node",
+            "TypeImpl"
+        );
+        inner.setInterfaces(ClassTest.STR_TYPE);
+        inner.makePrivate();
+        inner.makeStatic();
+        klass.addClass(inner);
+        this.createFieldsInner(inner);
+        this.createComplexField(inner);
+    }
+
+    /**
+     * Creates fields for the inner class of the 'real' class.
+     * @param inner The object where to create
+     */
+    private void createFieldsInner(final Klass inner) {
+        final Field name = new Field("The name", ClassTest.STR_STRING, "NAME");
+        name.makePrivate();
+        name.makeStaticFinal();
+        name.setInitExpr("\"Addition\"");
+        inner.addField(name);
+        final Field binexpr = new Field(
+            "The 'BinaryExpression' string",
+            ClassTest.STR_STRING,
+            "BINARY_EXPRESSION"
+        );
+        binexpr.makePrivate();
+        binexpr.makeStaticFinal();
+        binexpr.setInitExpr("\"BinaryExpression\"");
+        inner.addField(binexpr);
+        final Field expression = new Field(
+            "The 'Expression' string",
+            ClassTest.STR_STRING,
+            "EXPRESSION"
+        );
+        expression.makePrivate();
+        expression.makeStaticFinal();
+        expression.setInitExpr("\"Expression\"");
+        inner.addField(expression);
+    }
+
+    /**
+     * Creates a field with complex initialization.
+     * @param klass The object where to create
+     */
+    private void createComplexField(final Klass klass) {
+        final Field field = new Field("Hierarchy", "List<String>", "HIERARCHY");
+        field.makePrivate();
+        field.makeStaticFinal();
+        klass.addField(field);
+        final String list = "TypeImpl.NAME, TypeImpl.BINARY_EXPRESSION, TypeImpl.EXPRESSION";
+        final String init =
+            String.format("Collections.unmodifiableList(Arrays.asList(%s))", list);
+        field.setInitExpr(init);
     }
 
     /**

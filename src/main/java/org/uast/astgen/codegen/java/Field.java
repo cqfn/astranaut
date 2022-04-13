@@ -14,6 +14,11 @@ import org.uast.astgen.utils.StringUtils;
  */
 public final class Field implements Entity {
     /**
+     * End of line string constant.
+     */
+    private static final String EOL = ";\n";
+
+    /**
      * The brief description.
      */
     private final String brief;
@@ -127,24 +132,61 @@ public final class Field implements Entity {
             .append(this.brief)
             .append(".\n")
             .append(tabulation)
-            .append(" */\n")
-            .append(tabulation);
+            .append(" */\n");
+        final StringBuilder declaration = new StringBuilder().append(tabulation);
         if (this.fprivate) {
-            builder.append("private ");
+            declaration.append("private ");
         } else if (this.fpublic) {
-            builder.append("public ");
+            declaration.append("public ");
         }
         if (this.fstatic) {
-            builder.append("static ");
+            declaration.append("static ");
         }
         if (this.ffinal) {
-            builder.append("final ");
+            declaration.append("final ");
         }
-        builder.append(this.type).append(' ').append(this.name);
+        declaration.append(this.type).append(' ').append(this.name);
+        final StringBuilder copy = new StringBuilder(declaration.toString());
         if (!this.init.isEmpty()) {
-            builder.append(" = ").append(this.init);
+            declaration.append(" = ").append(this.init);
         }
-        builder.append(";\n");
+        declaration.append(Field.EOL);
+        String result = declaration.toString();
+        if (result.length() > Entity.MAX_LINE_LENGTH) {
+            this.generateInit(copy, indent + 1);
+            result = copy.toString();
+        }
+        builder.append(result);
         return builder.toString();
+    }
+
+    /**
+     * Generates init expression (case if it takes more than one line).
+     * @param builder Where to generate
+     * @param indent Indentation
+     */
+    private void generateInit(final StringBuilder builder, final int indent) {
+        builder.append(" =");
+        final String[] lines = this.init.replace("(", "(\n")
+            .replace(")", "\n)")
+            .replace(",", ",\n")
+            .split("\n");
+        int offset = 0;
+        for (int index = 0; index < lines.length; index = index + 1) {
+            final String line = lines[index].trim();
+            if (line.isEmpty()) {
+                continue;
+            }
+            if (line.charAt(0) == ')') {
+                offset = offset - 1;
+            }
+            builder.append('\n')
+                .append(StringUtils.SPACE.repeat((indent + offset) * Entity.TAB_SIZE))
+                .append(line);
+            if (line.endsWith("(")) {
+                offset = offset + 1;
+            }
+        }
+        builder.append(Field.EOL);
     }
 }

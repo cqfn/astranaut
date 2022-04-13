@@ -16,6 +16,11 @@ public interface Entity {
     int TAB_SIZE = 4;
 
     /**
+     * The maximum line length.
+     */
+    int MAX_LINE_LENGTH = 100;
+
+    /**
      * Generates source code.
      * @param indent Indentation from the beginning of the line
      * @return Java source code

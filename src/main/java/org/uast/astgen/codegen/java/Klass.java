@@ -69,7 +69,7 @@ public final class Klass implements Entity {
     private final List<Field> fields;
 
     /**
-     * The list of constructor.
+     * The list of constructors.
      */
     private final List<Constructor> constructors;
 
@@ -77,6 +77,11 @@ public final class Klass implements Entity {
      * The list of methods.
      */
     private final List<Method> methods;
+
+    /**
+     * The list of inner classes.
+     */
+    private final List<Klass> classes;
 
     /**
      * Constructor.
@@ -93,6 +98,7 @@ public final class Klass implements Entity {
         this.fields = new ArrayList<>(0);
         this.constructors = new ArrayList<>(0);
         this.methods = new ArrayList<>(0);
+        this.classes = new ArrayList<>(0);
     }
 
     /**
@@ -183,6 +189,14 @@ public final class Klass implements Entity {
         this.methods.add(method);
     }
 
+    /**
+     * Adds the inner class to the class.
+     * @param klass The inner class
+     */
+    public void addClass(final Klass klass) {
+        this.classes.add(klass);
+    }
+
     @Override
     public String generate(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
@@ -205,7 +219,8 @@ public final class Klass implements Entity {
         builder.append(" {\n");
         boolean flag = this.generateFields(builder, false, indent + 1);
         flag = this.generateConstructors(builder, flag, indent + 1);
-        this.generateMethods(builder, flag, indent + 1);
+        flag = this.generateMethods(builder, flag, indent + 1);
+        this.generateInnerClasses(builder, flag, indent + 1);
         builder.append(tabulation).append("}\n");
         return builder.toString();
     }
@@ -257,7 +272,7 @@ public final class Klass implements Entity {
     /**
      * Generated source code for fields.
      * @param builder String builder where to generate
-     * @param separator Flg that indicated that need to add empty lune after previous entity
+     * @param separator Flag that indicated that need to add empty lune after previous entity
      * @param indent Indentation
      * @return New separator flag
      */
@@ -280,7 +295,7 @@ public final class Klass implements Entity {
     /**
      * Generated source code for constructors.
      * @param builder String builder where to generate
-     * @param separator Flg that indicated that need to add empty lune after previous entity
+     * @param separator Flag that indicated that need to add empty lune after previous entity
      * @param indent Indentation
      * @return New separator flag
      */
@@ -303,7 +318,7 @@ public final class Klass implements Entity {
     /**
      * Generated source code for methods.
      * @param builder String builder where to generate
-     * @param separator Flg that indicated that need to add empty lune after previous entity
+     * @param separator Flag that indicated that need to add empty lune after previous entity
      * @param indent Indentation
      * @return New separator flag
      */
@@ -319,6 +334,29 @@ public final class Klass implements Entity {
             }
             flag = true;
             builder.append(method.generate(indent));
+        }
+        return flag;
+    }
+
+    /**
+     * Generated source code for inner classes.
+     * @param builder String builder where to generate
+     * @param separator Flag that indicated that need to add empty lune after previous entity
+     * @param indent Indentation
+     * @return New separator flag
+     */
+    private boolean generateInnerClasses(
+        final StringBuilder builder,
+        final boolean separator,
+        final int indent
+    ) {
+        boolean flag = separator;
+        for (final Klass klass : this.classes) {
+            if (flag) {
+                builder.append('\n');
+            }
+            flag = true;
+            builder.append(klass.generate(indent));
         }
         return flag;
     }
