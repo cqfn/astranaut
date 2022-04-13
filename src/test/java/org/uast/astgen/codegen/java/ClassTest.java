@@ -28,6 +28,11 @@ public class ClassTest {
     private static final String TESTS_PATH = "src/test/resources/codegen/java/";
 
     /**
+     * The 'Addition' string.
+     */
+    private static final String STR_ADDITION = "Addition";
+
+    /**
      * The 'Expression' string.
      */
     private static final String STR_EXPRESSION = "Expression";
@@ -50,30 +55,16 @@ public class ClassTest {
     @Test
     @Disabled
     public void addition() {
-        final Klass klass = new Klass("Node that describes the 'Addition' type", "Addition");
+        final Klass klass = new Klass(
+            "Node that describes the 'Addition' type",
+            ClassTest.STR_ADDITION
+        );
         klass.makeFinal();
         klass.setInterfaces("BinaryExpression");
-        final Field type = new Field("The type", "Type", "TYPE");
-        type.makePublic();
-        type.makeStaticFinal();
-        type.setInitExpr("new TypeImpl()");
-        klass.addField(type);
-        final Field fragment = new Field(
-            "The fragment associated with the node",
-            "Fragment",
-            "fragment"
-        );
-        klass.addField(fragment);
-        final Field children = new Field("List  of child nodes", "List<Node>", "children");
-        klass.addField(children);
-        final Field left = new Field("Node with the 'left' tag", ClassTest.STR_EXPRESSION, "left");
-        klass.addField(left);
-        final Field right = new Field(
-            "Node with the 'right' tag",
-            ClassTest.STR_EXPRESSION,
-            "right"
-        );
-        klass.addField(right);
+        this.createFields(klass);
+        final Constructor ctor = new Constructor(ClassTest.STR_ADDITION);
+        ctor.makePrivate();
+        klass.addConstructor(ctor);
         final String expected = this.readTest("addition.txt");
         final String actual = klass.generate(0);
         Assertions.assertEquals(expected, actual);
@@ -87,6 +78,34 @@ public class ClassTest {
         final Method method = new Method("This method does something", "doSomething");
         method.setCode("System.out.print(\"it works!\");");
         return method;
+    }
+
+    /**
+     * Creates fields for the 'real' class.
+     * @param klass The object where to create
+     */
+    private void createFields(final Klass klass) {
+        final Field type = new Field("The type", "Type", "TYPE");
+        type.makePublic();
+        type.makeStaticFinal();
+        type.setInitExpr("new TypeImpl()");
+        klass.addField(type);
+        final Field fragment = new Field(
+            "The fragment associated with the node",
+            "Fragment",
+            "fragment"
+        );
+        klass.addField(fragment);
+        final Field children = new Field("List of child nodes", "List<Node>", "children");
+        klass.addField(children);
+        final Field left = new Field("Node with the 'left' tag", ClassTest.STR_EXPRESSION, "left");
+        klass.addField(left);
+        final Field right = new Field(
+            "Node with the 'right' tag",
+            ClassTest.STR_EXPRESSION,
+            "right"
+        );
+        klass.addField(right);
     }
 
     /**

@@ -30,7 +30,7 @@ public final class Addition implements BinaryExpression {
     private Expression right;
 
     /**
-     * Private constructor.
+     * Constructor.
      */
     private Addition() {
     }

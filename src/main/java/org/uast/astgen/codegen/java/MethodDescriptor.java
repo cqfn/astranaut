@@ -78,6 +78,15 @@ public final class MethodDescriptor implements Entity {
     }
 
     /**
+     * Removed return type (for constructors).
+     * @return The descriptor itself
+     */
+    public MethodDescriptor removeReturnType() {
+        this.rettype = "";
+        return this;
+    }
+
+    /**
      * Generates JavaDoc header.
      * @param indent Indentation from the beginning of the line
      * @return JavaDoc header
@@ -99,7 +108,7 @@ public final class MethodDescriptor implements Entity {
                 .append(arg.getDescription())
                 .append('\n');
         }
-        if (!MethodDescriptor.VOID_TYPE.equals(this.rettype)) {
+        if (!this.rettype.isEmpty() && !MethodDescriptor.VOID_TYPE.equals(this.rettype)) {
             builder.append(tabulation)
                 .append(" * \u0040return ")
                 .append(this.retdescr)
@@ -116,7 +125,10 @@ public final class MethodDescriptor implements Entity {
      */
     public String generateSignature(final boolean iface) {
         final StringBuilder builder = new StringBuilder();
-        builder.append(this.rettype).append(' ').append(this.name).append('(');
+        if (!this.rettype.isEmpty()) {
+            builder.append(this.rettype).append(' ');
+        }
+        builder.append(this.name).append('(');
         boolean flag = false;
         for (final Argument arg : this.arguments) {
             if (flag) {

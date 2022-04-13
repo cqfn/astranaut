@@ -57,7 +57,7 @@ public final class Method implements Entity {
      * Adds the argument to the descriptor.
      * @param type The type
      * @param name The name
-     * @param description The descriptor
+     * @param description The brief description
      */
     public void addArgument(final String type, final String name, final String description) {
         this.descriptor.addArgument(type, name, description);
@@ -140,11 +140,8 @@ public final class Method implements Entity {
             builder.append("public ");
         }
         if (this.fabstract) {
-            builder.append("abstract ");
-        }
-        if (this.fabstract) {
             final String signature = this.descriptor.generateSignature(true);
-            builder.append(signature).append(";\n");
+            builder.append("abstract ").append(signature).append(";\n");
         } else {
             final String signature = this.descriptor.generateSignature(false);
             builder.append(signature).append(" {\n");

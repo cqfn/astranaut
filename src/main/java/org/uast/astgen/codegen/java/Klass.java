@@ -69,6 +69,11 @@ public final class Klass implements Entity {
     private final List<Field> fields;
 
     /**
+     * The list of constructor.
+     */
+    private final List<Constructor> constructors;
+
+    /**
      * The list of methods.
      */
     private final List<Method> methods;
@@ -86,6 +91,7 @@ public final class Klass implements Entity {
         this.parent = "";
         this.interfaces = Collections.emptyList();
         this.fields = new ArrayList<>(0);
+        this.constructors = new ArrayList<>(0);
         this.methods = new ArrayList<>(0);
     }
 
@@ -162,6 +168,14 @@ public final class Klass implements Entity {
     }
 
     /**
+     * Adds the constructor to the class.
+     * @param constructor The constructor
+     */
+    public void addConstructor(final Constructor constructor) {
+        this.constructors.add(constructor);
+    }
+
+    /**
      * Adds the method to the class.
      * @param method The method
      */
@@ -189,7 +203,8 @@ public final class Klass implements Entity {
         builder.append("class ").append(this.name);
         this.generateParents(builder);
         builder.append(" {\n");
-        final boolean flag = this.generateFields(builder, false, indent + 1);
+        boolean flag = this.generateFields(builder, false, indent + 1);
+        flag = this.generateConstructors(builder, flag, indent + 1);
         this.generateMethods(builder, flag, indent + 1);
         builder.append(tabulation).append("}\n");
         return builder.toString();
@@ -258,6 +273,29 @@ public final class Klass implements Entity {
             }
             flag = true;
             builder.append(field.generate(indent));
+        }
+        return flag;
+    }
+
+    /**
+     * Generated source code for constructors.
+     * @param builder String builder where to generate
+     * @param separator Flg that indicated that need to add empty lune after previous entity
+     * @param indent Indentation
+     * @return New separator flag
+     */
+    private boolean generateConstructors(
+        final StringBuilder builder,
+        final boolean separator,
+        final int indent
+    ) {
+        boolean flag = separator;
+        for (final Constructor constructor : this.constructors) {
+            if (flag) {
+                builder.append('\n');
+            }
+            flag = true;
+            builder.append(constructor.generate(indent));
         }
         return flag;
     }
