@@ -5,6 +5,7 @@
 package org.uast.astgen.rules;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Descriptor, i.e. name with tag, parameters and data.
@@ -60,7 +61,17 @@ public abstract class Descriptor implements Child, Parameter {
         if (result.isEmpty()) {
             result = this.getLabel();
         }
-        return result;
+        return result.toLowerCase(Locale.ENGLISH);
+    }
+
+    /**
+     * Returns tag associated with descriptor, started from capital letter.
+     * @return The tag
+     */
+    public String getTagCapital() {
+        final String tag = this.getTag();
+        return new StringBuilder().append(tag.substring(0, 1).toUpperCase(Locale.ENGLISH))
+            .append(tag.substring(1)).toString();
     }
 
     /**

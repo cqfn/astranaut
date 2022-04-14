@@ -107,6 +107,16 @@ public final class Addition implements Node {
          */
         private Fragment fragment = EmptyFragment.INSTANCE;
 
+        /**
+         * Node with the 'left' tag.
+         */
+        private Expression left;
+
+        /**
+         * Node with the 'right' tag.
+         */
+        private Expression right;
+
         @Override
         public void setFragment(final Fragment obj) {
             this.fragment = obj;
@@ -115,6 +125,22 @@ public final class Addition implements Node {
         @Override
         public boolean setData(final String str) {
             return str.isEmpty();
+        }
+
+        /**
+         * Sets the node with the 'left' tag.
+         * @param node The node
+         */
+        public void setLeft(final Expression node) {
+            this.left = node;
+        }
+
+        /**
+         * Sets the node with the 'right' tag.
+         * @param node The node
+         */
+        public void setRight(final Expression node) {
+            this.right = node;
         }
     }
 }

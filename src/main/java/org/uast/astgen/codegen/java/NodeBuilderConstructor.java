@@ -4,6 +4,8 @@
  */
 package org.uast.astgen.codegen.java;
 
+import org.uast.astgen.rules.Child;
+import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Node;
 
 /**
@@ -31,6 +33,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
     public void construct() {
         this.fillFragment();
         this.fillData();
+        this.fillChildren();
     }
 
     /**
@@ -63,5 +66,36 @@ final class NodeBuilderConstructor extends NodeConstructor {
         setter.setReturnType("boolean");
         setter.setCode("return str.isEmpty();");
         klass.addMethod(setter);
+    }
+
+    /**
+     * Fills in everything related to the child nodes.
+     */
+    private void fillChildren() {
+        final Klass klass = this.getKlass();
+        int index = 0;
+        for (final Child child : this.getRule().getComposition()) {
+            assert child instanceof Descriptor;
+            final Descriptor descriptor = (Descriptor) child;
+            final String brief;
+            final String tag = descriptor.getTag();
+            final String type = descriptor.getName();
+            final String variable = descriptor.getVariableName();
+            if (tag.isEmpty()) {
+                brief = String.format("Node %d", index);
+            } else {
+                brief = String.format("Node with the '%s' tag", tag);
+                final Method setter = new Method(
+                    String.format("Sets the node with the '%s' tag", tag),
+                    String.format("set%s", descriptor.getTagCapital())
+                );
+                setter.addArgument(type, "node", "The node");
+                setter.setCode(String.format("this.%s = node;", variable));
+                klass.addMethod(setter);
+            }
+            final Field field = new Field(brief, type, variable);
+            klass.addField(field);
+            index = index + 1;
+        }
     }
 }
