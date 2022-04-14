@@ -13,7 +13,7 @@ import org.uast.astgen.rules.Statement;
  *
  * @since 1.0
  */
-public class NodeGenerator {
+public final class NodeGenerator {
     /**
      * The license.
      */

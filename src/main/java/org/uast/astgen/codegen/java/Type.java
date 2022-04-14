@@ -25,6 +25,12 @@ public interface Type extends Entity {
     String getVersion();
 
     /**
+     * Specifies the version of the implementation.
+     * @param version The version
+     */
+    void setVersion(String version);
+
+    /**
      * Generates the type header.
      * @param builder String builder where to generate
      * @param indent Indentation

@@ -102,14 +102,6 @@ public final class Klass implements Type {
     }
 
     /**
-     * Specifies the class version.
-     * @param str The version
-     */
-    public void setVersion(final String str) {
-        this.version = Objects.requireNonNull(str);
-    }
-
-    /**
      * Sets the parent class name.
      * @param str The parent class name
      */
@@ -205,6 +197,11 @@ public final class Klass implements Type {
     @Override
     public String getVersion() {
         return this.version;
+    }
+
+    @Override
+    public void setVersion(final String str) {
+        this.version = Objects.requireNonNull(str);
     }
 
     @Override

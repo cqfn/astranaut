@@ -12,7 +12,7 @@ import org.uast.astgen.utils.FilesReader;
  *
  * @since 1.0
  */
-public class License {
+public final class License {
     /**
      * The file name.
      */

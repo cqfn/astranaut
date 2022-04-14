@@ -56,14 +56,6 @@ public final class Interface implements Type {
     }
 
     /**
-     * Specifies the interface version.
-     * @param str The version
-     */
-    public void setVersion(final String str) {
-        this.version = Objects.requireNonNull(str);
-    }
-
-    /**
      * Set the list of interface names, that the interface extends.
      * @param list The list of interface names
      */
@@ -87,6 +79,11 @@ public final class Interface implements Type {
     @Override
     public String getVersion() {
         return this.version;
+    }
+
+    @Override
+    public void setVersion(final String str) {
+        this.version = Objects.requireNonNull(str);
     }
 
     @Override

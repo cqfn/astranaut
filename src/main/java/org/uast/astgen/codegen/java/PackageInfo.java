@@ -11,7 +11,7 @@ import java.util.Objects;
  *
  * @since 1.0
  */
-public class PackageInfo {
+public final class PackageInfo implements JavaFile {
     /**
      * The license.
      */
@@ -45,18 +45,12 @@ public class PackageInfo {
         this.pkg = pkg;
     }
 
-    /**
-     * Specifies the version.
-     * @param str The version
-     */
+    @Override
     public void setVersion(final String str) {
         this.version = Objects.requireNonNull(str);
     }
 
-    /**
-     * Generates source code.
-     * @return Source code
-     */
+    @Override
     public String generate() {
         final StringBuilder builder = new StringBuilder();
         if (this.license.isValid()) {

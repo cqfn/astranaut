@@ -11,7 +11,7 @@ import java.util.Objects;
  *
  * @since 1.0
  */
-public class CompilationUnit {
+public final class CompilationUnit implements JavaFile {
     /**
      * The license.
      */
@@ -53,10 +53,12 @@ public class CompilationUnit {
         this.imports.addItem(item);
     }
 
-    /**
-     * Generates source code.
-     * @return Source code
-     */
+    @Override
+    public void setVersion(final String version) {
+        this.type.setVersion(version);
+    }
+
+    @Override
     public String generate() {
         final StringBuilder builder = new StringBuilder(256);
         if (this.license.isValid()) {
