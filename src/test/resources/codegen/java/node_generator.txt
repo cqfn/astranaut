@@ -43,9 +43,24 @@ public final class Addition implements Node {
          */
         private static final String ADDITION = "Addition";
 
+        /**
+         * Hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Collections.unmodifiableList(
+                Arrays.asList(
+                    TypeImpl.ADDITION
+                )
+            );
+
         @Override
         public String getName() {
             return TypeImpl.ADDITION;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return TypeImpl.HIERARCHY;
         }
     }
 }

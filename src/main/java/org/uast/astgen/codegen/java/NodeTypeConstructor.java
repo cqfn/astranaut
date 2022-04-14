@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.List;
 import org.uast.astgen.rules.Node;
 
 /**
@@ -12,6 +13,11 @@ import org.uast.astgen.rules.Node;
  * @since 1.0
  */
 final class NodeTypeConstructor extends NodeConstructor {
+    /**
+     * The 'List&lt;String&gt;' type.
+     */
+    private static final String LIST_STRING = "List<String>";
+
     /**
      * Static string generator to avoid Qulice error messages.
      */
@@ -36,5 +42,34 @@ final class NodeTypeConstructor extends NodeConstructor {
         name.setReturnType("String");
         name.setCode(String.format("return %s;", this.ssg.getFieldName(rule.getType())));
         klass.addMethod(name);
+        this.fillHierarchy();
+    }
+
+    /**
+     * Fills in everything related to the hierarchy.
+     */
+    private void fillHierarchy() {
+        final Klass klass = this.getKlass();
+        final List<String> hierarchy = this.getEnv().getHierarchy(this.getRule().getType());
+        final StringBuilder init  = new StringBuilder(128);
+        init.append("Collections.unmodifiableList(Arrays.asList(");
+        boolean flag = false;
+        for (final String item : hierarchy) {
+            if (flag) {
+                init.append(", ");
+            }
+            flag = true;
+            init.append(this.ssg.getFieldName(item));
+        }
+        init.append("))");
+        final Field field = new Field("Hierarchy", NodeTypeConstructor.LIST_STRING, "HIERARCHY");
+        field.makePrivate();
+        field.makeStaticFinal();
+        field.setInitExpr(init.toString());
+        klass.addField(field);
+        final Method getter = new Method("getHierarchy");
+        getter.setReturnType(NodeTypeConstructor.LIST_STRING);
+        getter.setCode("return TypeImpl.HIERARCHY;");
+        klass.addMethod(getter);
     }
 }
