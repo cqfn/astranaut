@@ -26,6 +26,13 @@ public abstract class Descriptor implements Child, Parameter {
     public abstract String getTag();
 
     /**
+     * Returns the label associated with descriptor.
+     * The label cannot be an empty string and can be used as a variable name.
+     * @return The label
+     */
+    public abstract String getLabel();
+
+    /**
      * Returns name associated with descriptor.
      * @return The name (can't be {@code null} or empty)
      */
@@ -42,6 +49,19 @@ public abstract class Descriptor implements Child, Parameter {
      * @return Data
      */
     public abstract Data getData();
+
+    /**
+     * Returns the name of the variable to which the node corresponding
+     * to this descriptor can be written.
+     * @return Variable name
+     */
+    public String getVariableName() {
+        String result = this.getTag();
+        if (result.isEmpty()) {
+            result = this.getLabel();
+        }
+        return result;
+    }
 
     /**
      * Returns the full name (i.e. tag and name).

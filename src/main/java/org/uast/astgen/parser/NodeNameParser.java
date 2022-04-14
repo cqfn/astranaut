@@ -42,7 +42,8 @@ public class NodeNameParser {
     public String parse() throws ParserException {
         TokenList tokens = new Tokenizer(this.source).getTokens();
         tokens = new BracketsParser(tokens).parse();
-        final List<Descriptor> descriptors = new DescriptorsListParser(tokens).parse();
+        final List<Descriptor> descriptors =
+            new DescriptorsListParser(tokens).parse();
         checkDescriptorsList(descriptors);
         final Descriptor descriptor = descriptors.get(0);
         final String name = descriptor.getName();

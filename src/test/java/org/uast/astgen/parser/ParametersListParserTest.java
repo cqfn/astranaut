@@ -150,7 +150,10 @@ public class ParametersListParserTest {
         try {
             TokenList tokens = tokenizer.getTokens();
             tokens = new BracketsParser(tokens).parse();
-            final ParametersListParser parser = new ParametersListParser(tokens);
+            final ParametersListParser parser = new ParametersListParser(
+                tokens,
+                new LabelFactory()
+            );
             result = parser.parse();
         } catch (final ParserException ignored) {
             oops = true;
@@ -194,7 +197,10 @@ public class ParametersListParserTest {
         try {
             TokenList tokens = tokenizer.getTokens();
             tokens = new BracketsParser(tokens).parse();
-            final ParametersListParser parser = new ParametersListParser(tokens);
+            final ParametersListParser parser = new ParametersListParser(
+                tokens,
+                new LabelFactory()
+            );
             parser.parse();
         } catch (final ParserException error) {
             Assertions.assertInstanceOf(type, error);

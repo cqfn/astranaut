@@ -42,7 +42,8 @@ public class NonAbstractNodeParser {
      * @throws ParserException If the list of tokens can't be parsed as a children list.
      */
     public List<Child> parse() throws ParserException {
-        final List<Descriptor> descriptors = new DescriptorsListParser(this.tokens).parse();
+        final List<Descriptor> descriptors =
+            new DescriptorsListParser(this.tokens, new LabelFactory()).parse();
         checkListNonAbstract(descriptors);
         final List<Child> result = new LinkedList<>();
         for (final Descriptor descriptor : descriptors) {

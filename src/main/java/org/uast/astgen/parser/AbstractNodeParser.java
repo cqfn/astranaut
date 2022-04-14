@@ -50,7 +50,8 @@ public class AbstractNodeParser {
     public List<Child> parse() throws ParserException {
         final List<Descriptor> composition = new LinkedList<>();
         for (final TokenList segment : this.segments) {
-            final List<Descriptor> descriptors = new DescriptorsListParser(segment).parse();
+            final List<Descriptor> descriptors =
+                new DescriptorsListParser(segment, new LabelFactory()).parse();
             checkListAbstract(descriptors);
             composition.add(descriptors.get(0));
         }

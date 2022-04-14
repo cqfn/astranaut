@@ -25,11 +25,26 @@ public class DescriptorsListParser {
     private final TokenList tokens;
 
     /**
+     * The label factory.
+     */
+    private final LabelFactory labels;
+
+    /**
+     * Constructor.
+     * @param tokens The list of tokens
+     * @param labels The label factory
+     */
+    public DescriptorsListParser(final TokenList tokens, final LabelFactory labels) {
+        this.tokens = tokens;
+        this.labels = labels;
+    }
+
+    /**
      * Constructor.
      * @param tokens The list of tokens
      */
     public DescriptorsListParser(final TokenList tokens) {
-        this.tokens = tokens;
+        this(tokens, new LabelFactory());
     }
 
     /**
@@ -39,7 +54,8 @@ public class DescriptorsListParser {
      *  of descriptors
      */
     public List<Descriptor> parse() throws ParserException {
-        final List<Parameter> parameters = new ParametersListParser(this.tokens).parse();
+        final List<Parameter> parameters =
+            new ParametersListParser(this.tokens, this.labels).parse();
         final List<Descriptor> result = new LinkedList<>();
         for (final Parameter parameter : parameters) {
             if (parameter instanceof Descriptor) {
