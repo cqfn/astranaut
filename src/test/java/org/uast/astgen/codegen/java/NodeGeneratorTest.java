@@ -34,10 +34,23 @@ public class NodeGeneratorTest {
     @SuppressWarnings("PMD.CloseResource")
     public void testNodeGeneration() {
         final License license = new License("LICENSE_header.txt");
-        final NodeGenerator generator = new NodeGenerator(
-            license,
-            "org.uast.example"
-        );
+        final Environment env = new Environment() {
+            @Override
+            public License getLicense() {
+                return license;
+            }
+
+            @Override
+            public String getRootPackage() {
+                return "org.uast.example";
+            }
+
+            @Override
+            public String getBasePackage() {
+                return "org.uast.uast.base";
+            }
+        };
+        final NodeGenerator generator = new NodeGenerator(env);
         final Statement<Node> statement = this.createStatement();
         final String actual = generator.generate(statement);
         final String expected = this.readTest("node_generator.txt");

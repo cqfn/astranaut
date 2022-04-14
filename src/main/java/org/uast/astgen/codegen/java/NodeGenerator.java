@@ -15,23 +15,16 @@ import org.uast.astgen.rules.Statement;
  */
 public final class NodeGenerator {
     /**
-     * The license.
+     * The environment.
      */
-    private final License license;
-
-    /**
-     * The root package name.
-     */
-    private final String root;
+    private final Environment env;
 
     /**
      * Constructor.
-     * @param license The license
-     * @param pkg The root package name
+     * @param env The environment required for generation.
      */
-    public NodeGenerator(final License license, final String pkg) {
-        this.license = license;
-        this.root = pkg;
+    public NodeGenerator(final Environment env) {
+        this.env = env;
     }
 
     /**
@@ -41,11 +34,12 @@ public final class NodeGenerator {
      */
     public String generate(final Statement<Node> statement) {
         final String language = statement.getLanguage();
+        final String root = this.env.getRootPackage();
         final String pkg;
         if (language.isEmpty()) {
-            pkg = this.root.concat(".green");
+            pkg = root.concat(".green");
         } else {
-            pkg = this.root.concat(language.toLowerCase(Locale.ENGLISH));
+            pkg = root.concat(language.toLowerCase(Locale.ENGLISH));
         }
         final Node rule = statement.getRule();
         final String type = rule.getType();
@@ -55,7 +49,7 @@ public final class NodeGenerator {
         );
         klass.makeFinal();
         klass.setInterfaces("Node");
-        final CompilationUnit unit = new CompilationUnit(this.license, pkg, klass);
+        final CompilationUnit unit = new CompilationUnit(this.env.getLicense(), pkg, klass);
         return unit.generate();
     }
 }
