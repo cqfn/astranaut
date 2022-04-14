@@ -102,6 +102,14 @@ public final class Klass implements Type {
     }
 
     /**
+     * Returns the class name.
+     * @return The name
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
      * Sets the parent class name.
      * @param str The parent class name
      */

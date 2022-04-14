@@ -15,11 +15,6 @@ import org.uast.astgen.rules.Statement;
  */
 public final class NodeGenerator {
     /**
-     * The 'Type' string.
-     */
-    private static final String STR_TYPE = "Type";
-
-    /**
      * The environment.
      */
     private final Environment env;
@@ -33,11 +28,11 @@ public final class NodeGenerator {
     }
 
     /**
-     * Generates Java source code.
+     * Generates Java compilation unit that contains source code for rules that describe nodes.
      * @param statement DSL statement
-     * @return Source code
+     * @return Compilation unit
      */
-    public String generate(final Statement<Node> statement) {
+    public CompilationUnit generate(final Statement<Node> statement) {
         final String language = statement.getLanguage();
         final String root = this.env.getRootPackage();
         final String pkg;
@@ -54,10 +49,10 @@ public final class NodeGenerator {
         );
         klass.makeFinal();
         klass.setInterfaces("Node");
-        NodeGenerator.fillClass(rule, klass);
+        new NodeClassConstructor(this.env, rule, klass).run();
         final CompilationUnit unit = new CompilationUnit(this.env.getLicense(), pkg, klass);
         this.generateImports(unit);
-        return unit.generate();
+        return unit;
     }
 
     /**
@@ -76,32 +71,5 @@ public final class NodeGenerator {
         unit.addImport(base.concat(".Fragment"));
         unit.addImport(base.concat(".Node"));
         unit.addImport(base.concat(".Type"));
-    }
-
-    /**
-     * Fills the class content.
-     * @param rule The rule
-     * @param klass The class in which to generate
-     */
-    private static void fillClass(final Node rule, final Klass klass) {
-        NodeGenerator.fillType(rule, klass);
-    }
-
-    /**
-     * Fills in everything related to the type.
-     * @param rule The rule
-     * @param klass The class in which to generate
-     */
-    private static void fillType(final Node rule, final Klass klass) {
-        final Field field = new Field("The type", NodeGenerator.STR_TYPE, "TYPE");
-        field.makePublic();
-        field.makeStaticFinal();
-        field.setInitExpr("new TypeImpl()");
-        klass.addField(field);
-        final Method getter = new Method("getType");
-        getter.makeOverridden();
-        getter.setReturnType(NodeGenerator.STR_TYPE);
-        getter.setCode(String.format("return %s.TYPE;", rule.getType()));
-        klass.addMethod(getter);
     }
 }

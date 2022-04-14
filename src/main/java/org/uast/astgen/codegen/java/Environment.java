@@ -4,6 +4,8 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.List;
+
 /**
  * Environment required for generation.
  *
@@ -27,4 +29,11 @@ public interface Environment {
      * @return The package name
      */
     String getBasePackage();
+
+    /**
+     * Returns node hierarchy (waiting for PWC).
+     * @param name Node name
+     * @return Node hierarchy
+     */
+    List<String> getHierarchy(String name);
 }

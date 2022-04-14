@@ -73,6 +73,14 @@ public final class Field implements Entity {
     }
 
     /**
+     * Returns the field name.
+     * @return The name
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
      * Resets all flags.
      */
     public void resetFlags() {

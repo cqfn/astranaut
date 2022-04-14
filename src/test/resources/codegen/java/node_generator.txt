@@ -31,4 +31,21 @@ public final class Addition implements Node {
     public Type getType() {
         return Addition.TYPE;
     }
+
+    /**
+     * Type descriptor of the 'Addition' node.
+     *
+     * @since 1.0
+     */
+    private static class TypeImpl implements Type {
+        /**
+         * The 'Addition' string.
+         */
+        private static final String ADDITION = "Addition";
+
+        @Override
+        public String getName() {
+            return TypeImpl.ADDITION;
+        }
+    }
 }
