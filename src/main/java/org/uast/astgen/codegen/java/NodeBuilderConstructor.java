@@ -30,6 +30,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
     @Override
     public void construct() {
         this.fillFragment();
+        this.fillData();
     }
 
     /**
@@ -37,7 +38,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
      */
     private void fillFragment() {
         final Klass klass = this.getKlass();
-        Field field = new Field(
+        final Field field = new Field(
             "The fragment associated with the node",
             NodeBuilderConstructor.STR_FRAGMENT,
             "fragment"
@@ -48,6 +49,19 @@ final class NodeBuilderConstructor extends NodeConstructor {
         setter.makeOverridden();
         setter.addArgument(NodeBuilderConstructor.STR_FRAGMENT, "obj");
         setter.setCode("this.fragment = obj;");
+        klass.addMethod(setter);
+    }
+
+    /**
+     * Fills in everything related to the data.
+     */
+    private void fillData() {
+        final Klass klass = this.getKlass();
+        final Method setter = new Method("setData");
+        setter.makeOverridden();
+        setter.addArgument("String", "str");
+        setter.setReturnType("boolean");
+        setter.setCode("return str.isEmpty();");
         klass.addMethod(setter);
     }
 }

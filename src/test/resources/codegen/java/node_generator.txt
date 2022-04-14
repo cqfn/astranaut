@@ -111,5 +111,10 @@ public final class Addition implements Node {
         public void setFragment(final Fragment obj) {
             this.fragment = obj;
         }
+
+        @Override
+        public boolean setData(final String str) {
+            return str.isEmpty();
+        }
     }
 }
