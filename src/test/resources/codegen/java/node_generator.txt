@@ -22,4 +22,13 @@ import org.uast.uast.base.Type;
  * @since 1.0
  */
 public final class Addition implements Node {
+    /**
+     * The type.
+     */
+    public static final Type TYPE = new TypeImpl();
+
+    @Override
+    public Type getType() {
+        return Addition.TYPE;
+    }
 }
