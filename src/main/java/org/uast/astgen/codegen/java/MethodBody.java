@@ -40,14 +40,19 @@ public final class MethodBody implements Entity {
             .split("\n");
         int offset = 0;
         for (int index = 0; index < lines.length; index = index + 1) {
-            final String line = lines[index].trim();
+            String line = lines[index];
+            int gap = 0;
+            if (line.startsWith("\t")) {
+                gap = 1;
+            }
+            line = line.trim();
             if (line.isEmpty()) {
                 continue;
             }
             if (line.charAt(0) == '}') {
                 offset = offset - 1;
             }
-            builder.append(StringUtils.SPACE.repeat((indent + offset) * Entity.TAB_SIZE))
+            builder.append(StringUtils.SPACE.repeat((indent + offset + gap) * Entity.TAB_SIZE))
                 .append(line)
                 .append('\n');
             if (line.endsWith("{")) {

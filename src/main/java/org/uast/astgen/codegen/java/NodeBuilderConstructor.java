@@ -7,6 +7,7 @@ package org.uast.astgen.codegen.java;
 import java.util.List;
 import org.uast.astgen.rules.Child;
 import org.uast.astgen.rules.Descriptor;
+import org.uast.astgen.rules.DescriptorAttribute;
 import org.uast.astgen.rules.Node;
 
 /**
@@ -15,6 +16,11 @@ import org.uast.astgen.rules.Node;
  * @since 1.0
  */
 final class NodeBuilderConstructor extends NodeConstructor {
+    /**
+     * The 'boolean' string.
+     */
+    private static final String STR_BOOLEAN = "boolean";
+
     /**
      * The 'Fragment' string.
      */
@@ -36,6 +42,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
         this.fillData();
         this.fillChildren();
         this.createSetterChildrenList();
+        this.createValidator();
     }
 
     /**
@@ -65,7 +72,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
         final Method setter = new Method("setData");
         setter.makeOverridden();
         setter.addArgument("String", "str");
-        setter.setReturnType("boolean");
+        setter.setReturnType(NodeBuilderConstructor.STR_BOOLEAN);
         setter.setCode("return str.isEmpty();");
         klass.addMethod(setter);
     }
@@ -136,6 +143,37 @@ final class NodeBuilderConstructor extends NodeConstructor {
             index = index + 1;
         }
         code.append("}\nreturn result;");
+        method.setCode(code.toString());
+        this.getKlass().addMethod(method);
+    }
+
+    /**
+     * Creates the method 'isValid'.
+     */
+    private void createValidator() {
+        final Method method = new Method("isValid");
+        method.makeOverridden();
+        method.setReturnType(NodeBuilderConstructor.STR_BOOLEAN);
+        final StringBuilder code = new StringBuilder(64);
+        code.append("return ");
+        boolean flag = false;
+        for (final Child child : this.getRule().getComposition()) {
+            assert child instanceof Descriptor;
+            final Descriptor descriptor = (Descriptor) child;
+            if (descriptor.getAttribute() != DescriptorAttribute.OPTIONAL) {
+                if (flag) {
+                    code.append("\n\t&& ");
+                }
+                code.append("this.")
+                    .append(descriptor.getVariableName())
+                    .append(" != null");
+                flag = true;
+            }
+        }
+        if (!flag) {
+            code.append("true");
+        }
+        code.append(";\n");
         method.setCode(code.toString());
         this.getKlass().addMethod(method);
     }

@@ -154,5 +154,11 @@ public final class Addition implements Node {
             }
             return result;
         }
+
+        @Override
+        public boolean isValid() {
+            return this.left != null
+                && this.right != null;
+        }
     }
 }
