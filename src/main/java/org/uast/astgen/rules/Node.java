@@ -33,6 +33,22 @@ public class Node implements Rule {
         this.composition = composition;
     }
 
+    /**
+     * Return left part of the node.
+     * @return The type name
+     */
+    public String getType() {
+        return this.type;
+    }
+
+    /**
+     * Returns right part of the node.
+     * @return The composition.
+     */
+    public List<Child> getComposition() {
+        return this.composition;
+    }
+
     @Override
     public final String toString() {
         final StringBuilder builder = new StringBuilder();

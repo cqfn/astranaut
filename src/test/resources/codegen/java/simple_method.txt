@@ -1,0 +1,6 @@
+/**
+ * Prints test string.
+ */
+public void test() {
+    System.out.print("Ok.");
+}

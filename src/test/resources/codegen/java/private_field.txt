@@ -1,0 +1,4 @@
+    /**
+     * The fragment.
+     */
+    private Fragment fragment;

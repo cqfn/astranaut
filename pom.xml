@@ -52,6 +52,12 @@
                 <version>0.19.4</version>
                 <configuration>
                     <license>file:${qulice.license}</license>
+                    <excludes combine.children="append">
+                        <exclude>checkstyle:/src/test/resources/.*</exclude>
+                        <exclude>pmd:/src/test/resources/.*</exclude>
+                        <exclude>dependencies:/src/test/resources/.*</exclude>
+                        <exclude>duplicatefinder:/src/test/resources/.*</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>

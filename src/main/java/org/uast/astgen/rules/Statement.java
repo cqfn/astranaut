@@ -54,4 +54,20 @@ public class Statement<T extends Rule> {
     public Statement<Rule> toRuleStmt() {
         return new Statement<Rule>(this.rule, this.language);
     }
+
+    /**
+     * Returns the rule.
+     * @return The rule
+     */
+    public T getRule() {
+        return this.rule;
+    }
+
+    /**
+     * Returns the programming language for which the rule is applied.
+     * @return The language name
+     */
+    public String getLanguage() {
+        return this.language;
+    }
 }
