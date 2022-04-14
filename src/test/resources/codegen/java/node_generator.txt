@@ -95,4 +95,21 @@ public final class Addition implements Node {
             return new Constructor();
         }
     }
+
+    /**
+     * Class for 'Addition' node construction.
+     *
+     * @since 1.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * The fragment associated with the node.
+         */
+        private Fragment fragment = EmptyFragment.INSTANCE;
+
+        @Override
+        public void setFragment(final Fragment obj) {
+            this.fragment = obj;
+        }
+    }
 }

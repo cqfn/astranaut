@@ -30,6 +30,7 @@ final class NodeClassConstructor extends NodeConstructor {
     @Override
     public void construct() {
         this.fillType();
+        this.fillBuilder();
     }
 
     /**
@@ -57,5 +58,23 @@ final class NodeClassConstructor extends NodeConstructor {
         subclass.setInterfaces(NodeClassConstructor.STR_TYPE);
         klass.addClass(subclass);
         new NodeTypeConstructor(this.getEnv(), rule, subclass).run();
+    }
+
+    /**
+     * Fills in everything related to the builder.
+     */
+    private void fillBuilder() {
+        final Klass klass = this.getKlass();
+        final Node rule = this.getRule();
+        final Klass subclass = new Klass(
+            String.format("Class for '%s' node construction", rule.getType()),
+            "Constructor"
+        );
+        subclass.makePublic();
+        subclass.makeStatic();
+        subclass.makeFinal();
+        subclass.setInterfaces("Builder");
+        klass.addClass(subclass);
+        new NodeBuilderConstructor(this.getEnv(), rule, subclass).run();
     }
 }
