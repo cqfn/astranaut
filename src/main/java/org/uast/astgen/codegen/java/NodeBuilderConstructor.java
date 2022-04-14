@@ -27,6 +27,16 @@ final class NodeBuilderConstructor extends NodeConstructor {
     private static final String STR_FRAGMENT = "Fragment";
 
     /**
+     * The 'this.' string.
+     */
+    private static final String STR_THIS = "this.";
+
+    /**
+     * The ';\n' string.
+     */
+    private static final String STR_SEMICOLON = ";\n";
+
+    /**
      * Constructor.
      * @param env The environment
      * @param rule The rule
@@ -43,6 +53,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
         this.fillChildren();
         this.createSetterChildrenList();
         this.createValidator();
+        this.createCreator();
     }
 
     /**
@@ -130,7 +141,6 @@ final class NodeBuilderConstructor extends NodeConstructor {
         code.append(first).append(second).append(third).append("if result { \n");
         int index = 0;
         for (final Child child : this.getRule().getComposition()) {
-            assert child instanceof Descriptor;
             final Descriptor descriptor = (Descriptor) child;
             code.append(
                 String.format(
@@ -158,13 +168,12 @@ final class NodeBuilderConstructor extends NodeConstructor {
         code.append("return ");
         boolean flag = false;
         for (final Child child : this.getRule().getComposition()) {
-            assert child instanceof Descriptor;
             final Descriptor descriptor = (Descriptor) child;
             if (descriptor.getAttribute() != DescriptorAttribute.OPTIONAL) {
                 if (flag) {
                     code.append("\n\t&& ");
                 }
-                code.append("this.")
+                code.append(NodeBuilderConstructor.STR_THIS)
                     .append(descriptor.getVariableName())
                     .append(" != null");
                 flag = true;
@@ -173,8 +182,54 @@ final class NodeBuilderConstructor extends NodeConstructor {
         if (!flag) {
             code.append("true");
         }
-        code.append(";\n");
+        code.append(NodeBuilderConstructor.STR_SEMICOLON);
         method.setCode(code.toString());
         this.getKlass().addMethod(method);
+    }
+
+    /**
+     * Creates the method 'createNode'.
+     */
+    private void createCreator() {
+        final Method method = new Method("createNode");
+        method.makeOverridden();
+        method.setReturnType(this.getRule().getType());
+        method.setCode(this.prepareCreatorCode());
+        this.getKlass().addMethod(method);
+    }
+
+    /**
+     * Prepared code for the 'createNode' method.
+     * @return Source code
+     */
+    private String prepareCreatorCode() {
+        final String type = this.getRule().getType();
+        final String first = "if (!this.isValid()) { throw new IllegalStateException(); }\n";
+        final String second = String.format(
+            "final %s node = new %s();\n",
+            type,
+            type
+        );
+        final String third = "node.fragment = this.fragment;\n";
+        final StringBuilder fourth = new StringBuilder(64);
+        final StringBuilder fifth = new StringBuilder(128);
+        fourth.append("node.children = Arrays.asList(");
+        boolean flag = false;
+        for (final Child child : this.getRule().getComposition()) {
+            final Descriptor descriptor = (Descriptor) child;
+            final String var = descriptor.getVariableName();
+            if (flag) {
+                fourth.append(", ");
+            }
+            flag = true;
+            fourth.append(NodeBuilderConstructor.STR_THIS).append(var);
+            fifth.append("node.").append(var).append(" = this.").append(var)
+                .append(NodeBuilderConstructor.STR_SEMICOLON);
+        }
+        fourth.append(");\n");
+        final StringBuilder code = new StringBuilder(256);
+        code.append(first).append(second).append(third).append(fourth).append(fifth)
+            .append("return node;\n");
+        return code.toString();
     }
 }

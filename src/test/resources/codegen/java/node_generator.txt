@@ -160,5 +160,18 @@ public final class Addition implements Node {
             return this.left != null
                 && this.right != null;
         }
+
+        @Override
+        public Addition createNode() {
+            if (!this.isValid()) {
+                throw new IllegalStateException();
+            }
+            final Addition node = new Addition();
+            node.fragment = this.fragment;
+            node.children = Arrays.asList(this.left, this.right);
+            node.left = this.left;
+            node.right = this.right;
+            return node;
+        }
     }
 }
