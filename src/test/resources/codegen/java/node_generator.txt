@@ -44,6 +44,28 @@ public final class Addition implements Node {
         private static final String ADDITION = "Addition";
 
         /**
+         * The 'Expression' string.
+         */
+        private static final String EXPRESSION = "Expression";
+
+        /**
+         * The list of child types.
+         */
+        private static final List<ChildDescriptor> CHILDREN =
+            Collections.unmodifiableList(
+                Arrays.asList(
+                    new ChildDescriptor(
+                        TypeImpl.EXPRESSION,
+                        false
+                    ),
+                    new ChildDescriptor(
+                        TypeImpl.EXPRESSION,
+                        false
+                    )
+                )
+            );
+
+        /**
          * Hierarchy.
          */
         private static final List<String> HIERARCHY =
@@ -59,8 +81,18 @@ public final class Addition implements Node {
         }
 
         @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return TypeImpl.CHILDREN;
+        }
+
+        @Override
         public List<String> getHierarchy() {
             return TypeImpl.HIERARCHY;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Constructor();
         }
     }
 }
