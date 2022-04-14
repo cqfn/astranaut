@@ -23,6 +23,7 @@ import org.uast.astgen.utils.ProjectRootValidator;
  *
  * @since 1.0
  */
+@SuppressWarnings("PMD.ImmutableField")
 public final class Main {
     /**
      * The logger.
@@ -43,7 +44,6 @@ public final class Main {
     /**
      * The root of the target project.
      */
-    @SuppressWarnings("PMD.ImmutableField")
     @Parameter(
         names = { "--root", "-r" },
         validateWith = ProjectRootValidator.class,
@@ -55,7 +55,6 @@ public final class Main {
     /**
      * The package of the generated file.
      */
-    @SuppressWarnings("PMD.ImmutableField")
     @Parameter(
         names = { "--package", "-p" },
         validateWith = PackageValidator.class,
@@ -67,7 +66,6 @@ public final class Main {
     /**
      * The help option.
      */
-    @SuppressWarnings("PMD.ImmutableField")
     @Parameter(names = "--help", help = true)
     private boolean help;
 
