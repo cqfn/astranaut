@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.List;
 import org.uast.astgen.rules.Child;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Node;
@@ -34,6 +35,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
         this.fillFragment();
         this.fillData();
         this.fillChildren();
+        this.createSetterChildrenList();
     }
 
     /**
@@ -97,5 +99,44 @@ final class NodeBuilderConstructor extends NodeConstructor {
             klass.addField(field);
             index = index + 1;
         }
+    }
+
+    /**
+     * Creates the method 'setChildrenList'.
+     */
+    private void createSetterChildrenList() {
+        final Node rule = this.getRule();
+        final List<Child> composition = rule.getComposition();
+        final Method method = new Method("setChildrenList");
+        method.makeOverridden();
+        method.addArgument("List<Node>", "list");
+        final StringBuilder code = new StringBuilder(256);
+        final String first = String.format(
+            "final Node[] mapping = new Node[%d];\n",
+            composition.size()
+        );
+        final String second = String.format(
+            "final ChildrenMapper mapper = new ChildrenMapper(%s.TYPE.getChildTypes());\n",
+            rule.getType()
+        );
+        final String third = "final boolean result = mapper.map(mapping, list);\n";
+        code.append(first).append(second).append(third).append("if result { \n");
+        int index = 0;
+        for (final Child child : this.getRule().getComposition()) {
+            assert child instanceof Descriptor;
+            final Descriptor descriptor = (Descriptor) child;
+            code.append(
+                String.format(
+                    "this.%s = (%s) mapping[%d];\n",
+                    descriptor.getVariableName(),
+                    descriptor.getName(),
+                    index
+                )
+            );
+            index = index + 1;
+        }
+        code.append("}\nreturn result;");
+        method.setCode(code.toString());
+        this.getKlass().addMethod(method);
     }
 }
