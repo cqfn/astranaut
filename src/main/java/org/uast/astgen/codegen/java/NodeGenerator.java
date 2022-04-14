@@ -50,6 +50,25 @@ public final class NodeGenerator {
         klass.makeFinal();
         klass.setInterfaces("Node");
         final CompilationUnit unit = new CompilationUnit(this.env.getLicense(), pkg, klass);
+        this.generateImports(unit);
         return unit.generate();
+    }
+
+    /**
+     * Generates imports block.
+     * @param unit The compilation unit
+     */
+    private void generateImports(final CompilationUnit unit) {
+        unit.addImport("java.util.Arrays");
+        unit.addImport("java.util.Collections");
+        unit.addImport("java.util.List");
+        final String base = this.env.getBasePackage();
+        unit.addImport(base.concat(".Builder"));
+        unit.addImport(base.concat(".ChildDescriptor"));
+        unit.addImport(base.concat(".ChildrenMapper"));
+        unit.addImport(base.concat(".EmptyFragment"));
+        unit.addImport(base.concat(".Fragment"));
+        unit.addImport(base.concat(".Node"));
+        unit.addImport(base.concat(".Type"));
     }
 }

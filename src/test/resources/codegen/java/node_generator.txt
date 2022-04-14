@@ -5,6 +5,17 @@
 
 package org.uast.example.green;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import org.uast.uast.base.Builder;
+import org.uast.uast.base.ChildDescriptor;
+import org.uast.uast.base.ChildrenMapper;
+import org.uast.uast.base.EmptyFragment;
+import org.uast.uast.base.Fragment;
+import org.uast.uast.base.Node;
+import org.uast.uast.base.Type;
+
 /**
  * Node that describes the 'Addition' type.
  *
