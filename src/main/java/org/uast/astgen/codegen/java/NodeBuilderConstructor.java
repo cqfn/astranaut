@@ -128,6 +128,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
         final Method method = new Method("setChildrenList");
         method.makeOverridden();
         method.addArgument("List<Node>", "list");
+        method.setReturnType(NodeBuilderConstructor.STR_BOOLEAN);
         final StringBuilder code = new StringBuilder(256);
         final String first = String.format(
             "final Node[] mapping = new Node[%d];\n",
@@ -138,7 +139,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
             rule.getType()
         );
         final String third = "final boolean result = mapper.map(mapping, list);\n";
-        code.append(first).append(second).append(third).append("if result { \n");
+        code.append(first).append(second).append(third).append("if (result) { \n");
         int index = 0;
         for (final Child child : this.getRule().getComposition()) {
             final Descriptor descriptor = (Descriptor) child;

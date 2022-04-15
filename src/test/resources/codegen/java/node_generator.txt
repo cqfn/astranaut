@@ -211,11 +211,11 @@ public final class Addition implements Node {
         }
 
         @Override
-        public void setChildrenList(final List<Node> list) {
+        public boolean setChildrenList(final List<Node> list) {
             final Node[] mapping = new Node[2];
             final ChildrenMapper mapper = new ChildrenMapper(Addition.TYPE.getChildTypes());
             final boolean result = mapper.map(mapping, list);
-            if result {
+            if (result) {
                 this.left = (Expression) mapping[0];
                 this.right = (Expression) mapping[1];
             }
