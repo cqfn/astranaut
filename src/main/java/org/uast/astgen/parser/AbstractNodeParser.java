@@ -86,7 +86,7 @@ public class AbstractNodeParser {
             || !descriptor.getParameters().isEmpty()
             || descriptor.getData().isValid()
         ) {
-            throw new ExpectedSimpleIdentifier(descriptor.getName());
+            throw new ExpectedSimpleIdentifier(descriptor.getType());
         }
     }
 }

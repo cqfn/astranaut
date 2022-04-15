@@ -37,6 +37,14 @@ public interface Environment {
     String getBasePackage();
 
     /**
+     * Returns the "test" flag.
+     * The flag means that no files will be written to the file system. The program
+     * will only check the structure of the DSL and the possibility of generating files.
+     * @return The flag
+     */
+    boolean isTestMode();
+
+    /**
      * Returns node hierarchy (waiting for PWC).
      * @param name Node name
      * @return Node hierarchy

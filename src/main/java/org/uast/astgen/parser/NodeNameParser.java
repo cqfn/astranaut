@@ -46,7 +46,7 @@ public class NodeNameParser {
             new DescriptorsListParser(tokens).parse();
         checkDescriptorsList(descriptors);
         final Descriptor descriptor = descriptors.get(0);
-        final String name = descriptor.getName();
+        final String name = descriptor.getType();
         if (!checkDescriptor(descriptor)) {
             throw new ExpectedSimpleIdentifier(name);
         }

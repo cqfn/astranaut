@@ -46,7 +46,7 @@ public class DescriptorTest {
             DescriptorTest.LABEL,
             "left"
         );
-        factory.replaceName(DescriptorTest.NAME);
+        factory.replaceType(DescriptorTest.NAME);
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals("left@Expression", descriptor.toString());
     }
@@ -117,10 +117,10 @@ public class DescriptorTest {
             "Addition"
         );
         final DescriptorFactory left = new DescriptorFactory("beta", "first");
-        left.replaceName(DescriptorTest.NAME);
+        left.replaceType(DescriptorTest.NAME);
         factory.addParameter(left.createDescriptor());
         final DescriptorFactory right = new DescriptorFactory("gamma", "second");
-        right.replaceName(DescriptorTest.NAME);
+        right.replaceType(DescriptorTest.NAME);
         factory.addParameter(right.createDescriptor());
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals(

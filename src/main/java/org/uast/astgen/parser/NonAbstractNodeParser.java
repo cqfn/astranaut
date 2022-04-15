@@ -47,7 +47,7 @@ public class NonAbstractNodeParser {
         checkListNonAbstract(descriptors);
         final List<Child> result = new LinkedList<>();
         for (final Descriptor descriptor : descriptors) {
-            final String name = descriptor.getName();
+            final String name = descriptor.getType();
             if (!descriptor.getParameters().isEmpty() || descriptor.getData().isValid()) {
                 throw new ExpectedTaggedName(name);
             }

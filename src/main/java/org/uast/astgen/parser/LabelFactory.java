@@ -19,26 +19,26 @@ public class LabelFactory {
      */
     private static final List<String> LIST =
         Arrays.asList(
-            "alpha",
-            "beta",
-            "gamma",
-            "delta",
-            "epsilon",
-            "zeta",
-            "eta",
-            "theta",
-            "iota",
-            "kappa",
-            "lambda",
-            "omicron",
-            "rho",
-            "sigma",
-            "tau",
-            "upsilon",
-            "phi",
-            "chi",
-            "psi",
-            "omega"
+            "first",
+            "second",
+            "third",
+            "fourth",
+            "fifth",
+            "sixth",
+            "seventh",
+            "eighth",
+            "ninth",
+            "tenth",
+            "eleventh",
+            "twelfth",
+            "thirteenth",
+            "fourteenth",
+            "fifteenth",
+            "sixteenth",
+            "seventeenth",
+            "eighteenth",
+            "nineteenth",
+            "twentieth"
         );
 
     /**

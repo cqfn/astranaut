@@ -17,12 +17,12 @@ import org.uast.astgen.rules.Node;
  */
 final class NodeTypeConstructor extends NodeConstructor {
     /**
-     * The 'List&lt;String&gt;' type.
+     * The {@code List<String>} type.
      */
     private static final String LIST_STRING = "List<String>";
 
     /**
-     * The 'List&lt;ChildDescriptor&gt;' type.
+     * The {@code List<ChildDescriptor>} type.
      */
     private static final String LIST_CHILD = "List<ChildDescriptor>";
 
@@ -86,7 +86,7 @@ final class NodeTypeConstructor extends NodeConstructor {
     }
 
     /**
-     * Creates 'List&lt;ChildDescriptor&gt;' CHILDREN structure.
+     * Creates {@code List<ChildDescriptor>} CHILDREN structure.
      */
     private void createChildrenField() {
         final Klass klass = this.getKlass();
@@ -105,7 +105,7 @@ final class NodeTypeConstructor extends NodeConstructor {
                 optional = true;
             }
             init.append("new ChildDescriptor(")
-                .append(this.ssg.getFieldName(descriptor.getName()))
+                .append(this.ssg.getFieldName(descriptor.getType()))
                 .append(NodeTypeConstructor.SEPARATOR)
                 .append(optional)
                 .append(')');

@@ -74,10 +74,12 @@ public class ProgramGenerator {
             }
             final String code = unit.generate();
             final String filename = this.getFilePath(stmt.getLanguage(), rule.getType());
-            final FilesWriter writer = new FilesWriter(filename);
-            final boolean result = writer.writeStringNoExcept(code);
-            if (!result) {
-                throw new CouldNotWriteFile(filename);
+            if (!this.env.isTestMode()) {
+                final FilesWriter writer = new FilesWriter(filename);
+                final boolean result = writer.writeStringNoExcept(code);
+                if (!result) {
+                    throw new CouldNotWriteFile(filename);
+                }
             }
         }
     }

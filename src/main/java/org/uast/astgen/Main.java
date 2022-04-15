@@ -102,6 +102,15 @@ public final class Main {
     private String version;
 
     /**
+     * Test mode.
+     */
+    @Parameter(
+        names = "--test",
+        description = "Test mode (no files will be written to the file system)"
+    )
+    private boolean test;
+
+    /**
      * The help option.
      */
     @Parameter(names = "--help", help = true)
@@ -190,6 +199,11 @@ public final class Main {
         @Override
         public String getBasePackage() {
             return Main.this.basepkg;
+        }
+
+        @Override
+        public boolean isTestMode() {
+            return Main.this.test;
         }
 
         @Override

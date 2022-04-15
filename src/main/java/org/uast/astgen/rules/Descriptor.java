@@ -34,10 +34,10 @@ public abstract class Descriptor implements Child, Parameter {
     public abstract String getLabel();
 
     /**
-     * Returns name associated with descriptor.
+     * Returns type associated with descriptor.
      * @return The name (can't be {@code null} or empty)
      */
-    public abstract String getName();
+    public abstract String getType();
 
     /**
      * Returns list of parameters inside descriptor.
@@ -80,7 +80,7 @@ public abstract class Descriptor implements Child, Parameter {
      */
     public String getFullName() {
         final String tag = this.getTag();
-        final String name = this.getName();
+        final String name = this.getType();
         final String result;
         if (tag.isEmpty()) {
             result = name;
@@ -107,7 +107,7 @@ public abstract class Descriptor implements Child, Parameter {
         if (!tag.isEmpty()) {
             builder.append(tag).append('@');
         }
-        builder.append(this.getName());
+        builder.append(this.getType());
         this.parametersToString(builder);
         final Data data = this.getData();
         if (data.isValid()) {

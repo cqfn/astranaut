@@ -123,6 +123,11 @@ public class NodeGeneratorTest {
         }
 
         @Override
+        public boolean isTestMode() {
+            return false;
+        }
+
+        @Override
         public List<String> getHierarchy(final String name) {
             return Collections.singletonList(name);
         }

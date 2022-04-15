@@ -99,7 +99,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
             final Descriptor descriptor = (Descriptor) child;
             final String brief;
             final String tag = descriptor.getTag();
-            final String type = descriptor.getName();
+            final String type = descriptor.getType();
             final String variable = descriptor.getVariableName();
             if (tag.isEmpty()) {
                 brief = String.format("Node %d", index);
@@ -147,7 +147,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
                 String.format(
                     "this.%s = (%s) mapping[%d];\n",
                     descriptor.getVariableName(),
-                    descriptor.getName(),
+                    descriptor.getType(),
                     index
                 )
             );

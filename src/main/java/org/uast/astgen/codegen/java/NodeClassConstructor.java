@@ -167,7 +167,7 @@ final class NodeClassConstructor extends NodeConstructor {
             final Descriptor descriptor = (Descriptor) child;
             final String tag = descriptor.getTag();
             if (!tag.isEmpty()) {
-                final String type = descriptor.getName();
+                final String type = descriptor.getType();
                 final String var = descriptor.getVariableName();
                 final Field field = new Field(
                     String.format("Child with the '%s' tag", tag),
