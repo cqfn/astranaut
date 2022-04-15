@@ -13,9 +13,4 @@ package org.uast.astgen.rules;
 public interface Rule {
     @Override
     String toString();
-
-    /**
-     * Generates source code from this rule.
-     */
-    void generate();
 }

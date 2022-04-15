@@ -9,7 +9,12 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
+import org.uast.astgen.codegen.java.Environment;
+import org.uast.astgen.codegen.java.License;
+import org.uast.astgen.codegen.java.ProgramGenerator;
 import org.uast.astgen.exceptions.BaseException;
 import org.uast.astgen.parser.ProgramParser;
 import org.uast.astgen.rules.Program;
@@ -29,6 +34,11 @@ public final class Main {
      * The logger.
      */
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
+
+    /**
+     * The license.
+     */
+    private static final License LICENSE = new License("LICENSE_header.txt");
 
     /**
      * The source file.
@@ -105,16 +115,38 @@ public final class Main {
         final ProgramParser parser = new ProgramParser(code);
         try {
             final Program program = parser.parse();
-            final StringBuilder result = new StringBuilder(50);
-            result
-                .append(program.getAllRules().size())
-                .append(" rules parsed\nproject root: ")
-                .append(this.root)
-                .append("\npackage: ")
-                .append(this.pcg);
-            LOG.info(result.toString());
+            final Environment env = new EnvironmentImpl();
+            final ProgramGenerator generator = new ProgramGenerator(this.root, program, env);
+            generator.generate();
         } catch (final BaseException exc) {
             LOG.severe(exc.getErrorMessage());
+        }
+    }
+
+    /**
+     * Environment implementation.
+     *
+     * @since 1.0
+     */
+    private class EnvironmentImpl implements Environment {
+        @Override
+        public License getLicense() {
+            return Main.LICENSE;
+        }
+
+        @Override
+        public String getRootPackage() {
+            return Main.this.pcg;
+        }
+
+        @Override
+        public String getBasePackage() {
+            return "org.uast.uast.base";
+        }
+
+        @Override
+        public List<String> getHierarchy(final String name) {
+            return Collections.singletonList(name);
         }
     }
 }

@@ -65,7 +65,7 @@ public class Node implements Rule {
     }
 
     /**
-     * Checks if a node has at least one optional child.
+     * Checks if the node has at least one optional child.
      * @return Checking result
      */
     public boolean hasOptionalChild() {
@@ -80,8 +80,22 @@ public class Node implements Rule {
         return result;
     }
 
-    @Override
-    public final void generate() {
-        throw new IllegalStateException();
+    /**
+     * Checks if the node is ordinary, i.e. not abstract and not a list.
+     * @return Checking result
+     */
+    public boolean isOrdinary() {
+        boolean result = true;
+        for (final Child child : this.composition) {
+            if (!(child instanceof Descriptor)) {
+                result = false;
+                break;
+            }
+            if (((Descriptor) child).getAttribute() == DescriptorAttribute.LIST) {
+                result = false;
+                break;
+            }
+        }
+        return result;
     }
 }
