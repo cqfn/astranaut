@@ -39,10 +39,13 @@ public class ProgramParser {
         final StatementParser parser = new StatementParser(program);
         int number = 1;
         for (final String line : lines) {
-            try {
-                parser.parse(line);
-            } catch (final ParserException error) {
-                throw new ExceptionWithLineNumber(error, number);
+            final String dsl = line.trim();
+            if (!dsl.isEmpty()) {
+                try {
+                    parser.parse(dsl);
+                } catch (final ParserException error) {
+                    throw new ExceptionWithLineNumber(error, number);
+                }
             }
             number = number + 1;
         }
