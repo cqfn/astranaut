@@ -108,6 +108,11 @@ public class NodeGeneratorTest {
         }
 
         @Override
+        public String getVersion() {
+            return "1.0";
+        }
+
+        @Override
         public String getRootPackage() {
             return "org.uast.example";
         }

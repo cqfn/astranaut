@@ -92,6 +92,16 @@ public final class Main {
     private String basepkg;
 
     /**
+     * Specify the version of the implementation.
+     */
+    @Parameter(
+        names = { "--version", "-v" },
+        arity = 1,
+        description = "Specify the version of the implementation"
+    )
+    private String version;
+
+    /**
      * The help option.
      */
     @Parameter(names = "--help", help = true)
@@ -106,6 +116,7 @@ public final class Main {
         this.path = "generated";
         this.rootpkg = "org.uast";
         this.basepkg = "org.uast.uast.base";
+        this.version = "";
     }
 
     /**
@@ -164,6 +175,11 @@ public final class Main {
         @Override
         public License getLicense() {
             return this.license;
+        }
+
+        @Override
+        public String getVersion() {
+            return Main.this.version;
         }
 
         @Override

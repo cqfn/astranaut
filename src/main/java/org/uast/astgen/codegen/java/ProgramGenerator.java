@@ -60,6 +60,7 @@ public class ProgramGenerator {
      */
     private void generateNodes() throws GeneratorException {
         final NodeGenerator nodegen = new NodeGenerator(this.env);
+        final String version = this.env.getVersion();
         for (final Statement<Node> stmt : this.program.getNodes()) {
             final Node rule = stmt.getRule();
             final CompilationUnit unit;
@@ -68,8 +69,11 @@ public class ProgramGenerator {
             } else {
                 throw new IllegalStateException();
             }
-            final String filename = this.getFilePath(stmt.getLanguage(), rule.getType());
+            if (!version.isEmpty()) {
+                unit.setVersion(version);
+            }
             final String code = unit.generate();
+            final String filename = this.getFilePath(stmt.getLanguage(), rule.getType());
             final FilesWriter writer = new FilesWriter(filename);
             final boolean result = writer.writeStringNoExcept(code);
             if (!result) {

@@ -19,6 +19,12 @@ public interface Environment {
     License getLicense();
 
     /**
+     * Returns version of the implementation.
+     * @return The version
+     */
+    String getVersion();
+
+    /**
      * Returns the name of the package being created.
      * @return The package name
      */
