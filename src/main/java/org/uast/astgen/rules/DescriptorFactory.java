@@ -26,9 +26,14 @@ public class DescriptorFactory {
     private String tag;
 
     /**
-     * The name.
+     * The label.
      */
-    private String name;
+    private final String label;
+
+    /**
+     * The type.
+     */
+    private String type;
 
     /**
      * The list of parameters.
@@ -42,12 +47,14 @@ public class DescriptorFactory {
 
     /**
      * Constructor.
-     * @param name The name
+     * @param label The label
+     * @param type The name
      */
-    public DescriptorFactory(final String name) {
+    public DescriptorFactory(final String label, final String type) {
         this.attribute = DescriptorAttribute.NONE;
         this.tag = "";
-        this.name = Objects.requireNonNull(name);
+        this.label = label;
+        this.type = Objects.requireNonNull(type);
         this.parameters = new LinkedList<>();
         this.data = InvalidData.INSTANCE;
     }
@@ -61,14 +68,14 @@ public class DescriptorFactory {
     }
 
     /**
-     * Sets the new name.
+     * Sets the new type.
      * @param value The new name
      */
-    public void replaceName(final String value) {
+    public void replaceType(final String value) {
         if (this.tag.isEmpty()) {
-            this.tag = this.name;
+            this.tag = this.type;
         }
-        this.name = value;
+        this.type = value;
     }
 
     /**
@@ -134,8 +141,13 @@ public class DescriptorFactory {
         }
 
         @Override
-        public String getName() {
-            return this.factory.name;
+        public String getLabel() {
+            return this.factory.label;
+        }
+
+        @Override
+        public String getType() {
+            return this.factory.type;
         }
 
         @Override

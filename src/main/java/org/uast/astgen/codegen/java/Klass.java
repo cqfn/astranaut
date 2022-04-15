@@ -102,6 +102,14 @@ public final class Klass implements Type {
     }
 
     /**
+     * Returns the class name.
+     * @return The name
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
      * Sets the parent class name.
      * @param str The parent class name
      */
@@ -267,6 +275,19 @@ public final class Klass implements Type {
     ) {
         boolean flag = separator;
         for (final Field field : this.fields) {
+            if (!field.isStatic()) {
+                continue;
+            }
+            if (flag) {
+                builder.append('\n');
+            }
+            flag = true;
+            builder.append(field.generate(indent));
+        }
+        for (final Field field : this.fields) {
+            if (field.isStatic()) {
+                continue;
+            }
             if (flag) {
                 builder.append('\n');
             }

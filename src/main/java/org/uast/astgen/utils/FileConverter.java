@@ -69,7 +69,7 @@ public class FileConverter implements IStringConverter<File> {
             .map(f -> f.substring(value.lastIndexOf('.') + 1));
         boolean valid = false;
         if (ext.isPresent()) {
-            valid = "txt".equals(ext.get());
+            valid = "txt".equals(ext.get()) || "dsl".equals(ext.get());
         }
         return valid;
     }

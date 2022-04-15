@@ -15,37 +15,31 @@ import org.uast.astgen.rules.Statement;
  */
 public final class NodeGenerator {
     /**
-     * The license.
+     * The environment.
      */
-    private final License license;
-
-    /**
-     * The root package name.
-     */
-    private final String root;
+    private final Environment env;
 
     /**
      * Constructor.
-     * @param license The license
-     * @param pkg The root package name
+     * @param env The environment required for generation.
      */
-    public NodeGenerator(final License license, final String pkg) {
-        this.license = license;
-        this.root = pkg;
+    public NodeGenerator(final Environment env) {
+        this.env = env;
     }
 
     /**
-     * Generates Java source code.
+     * Generates Java compilation unit that contains source code for rules that describe nodes.
      * @param statement DSL statement
-     * @return Source code
+     * @return Compilation unit
      */
-    public String generate(final Statement<Node> statement) {
+    public CompilationUnit generate(final Statement<Node> statement) {
         final String language = statement.getLanguage();
+        final String root = this.env.getRootPackage();
         final String pkg;
         if (language.isEmpty()) {
-            pkg = this.root.concat(".green");
+            pkg = root.concat(".green");
         } else {
-            pkg = this.root.concat(language.toLowerCase(Locale.ENGLISH));
+            pkg = root.concat(language.toLowerCase(Locale.ENGLISH));
         }
         final Node rule = statement.getRule();
         final String type = rule.getType();
@@ -55,7 +49,27 @@ public final class NodeGenerator {
         );
         klass.makeFinal();
         klass.setInterfaces("Node");
-        final CompilationUnit unit = new CompilationUnit(this.license, pkg, klass);
-        return unit.generate();
+        new NodeClassConstructor(this.env, rule, klass).run();
+        final CompilationUnit unit = new CompilationUnit(this.env.getLicense(), pkg, klass);
+        this.generateImports(unit);
+        return unit;
+    }
+
+    /**
+     * Generates imports block.
+     * @param unit The compilation unit
+     */
+    private void generateImports(final CompilationUnit unit) {
+        unit.addImport("java.util.Arrays");
+        unit.addImport("java.util.Collections");
+        unit.addImport("java.util.List");
+        final String base = this.env.getBasePackage();
+        unit.addImport(base.concat(".Builder"));
+        unit.addImport(base.concat(".ChildDescriptor"));
+        unit.addImport(base.concat(".ChildrenMapper"));
+        unit.addImport(base.concat(".EmptyFragment"));
+        unit.addImport(base.concat(".Fragment"));
+        unit.addImport(base.concat(".Node"));
+        unit.addImport(base.concat(".Type"));
     }
 }

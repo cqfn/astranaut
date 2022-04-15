@@ -20,11 +20,19 @@ public class DescriptorTest {
     private static final String NAME = "Expression";
 
     /**
+     * Test name.
+     */
+    private static final String LABEL = "alpha";
+
+    /**
      * Testing factory with simple name.
      */
     @Test
     public void simpleName() {
-        final DescriptorFactory factory = new DescriptorFactory(DescriptorTest.NAME);
+        final DescriptorFactory factory = new DescriptorFactory(
+            DescriptorTest.LABEL,
+            DescriptorTest.NAME
+        );
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals(DescriptorTest.NAME, descriptor.toString());
     }
@@ -34,8 +42,11 @@ public class DescriptorTest {
      */
     @Test
     public void taggedName() {
-        final DescriptorFactory factory = new DescriptorFactory("left");
-        factory.replaceName(DescriptorTest.NAME);
+        final DescriptorFactory factory = new DescriptorFactory(
+            DescriptorTest.LABEL,
+            "left"
+        );
+        factory.replaceType(DescriptorTest.NAME);
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals("left@Expression", descriptor.toString());
     }
@@ -45,7 +56,10 @@ public class DescriptorTest {
      */
     @Test
     public void stringData() {
-        final DescriptorFactory factory = new DescriptorFactory("literal");
+        final DescriptorFactory factory = new DescriptorFactory(
+            DescriptorTest.LABEL,
+            "literal"
+        );
         factory.setData(new StringData("+"));
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals("literal<\"+\">", descriptor.toString());
@@ -56,7 +70,10 @@ public class DescriptorTest {
      */
     @Test
     public void hole() {
-        final DescriptorFactory factory = new DescriptorFactory("numericLiteral");
+        final DescriptorFactory factory = new DescriptorFactory(
+            DescriptorTest.LABEL,
+            "numericLiteral"
+        );
         factory.setData(new Hole(1));
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals("numericLiteral<#1>", descriptor.toString());
@@ -67,7 +84,10 @@ public class DescriptorTest {
      */
     @Test
     public void optional() {
-        final DescriptorFactory factory = new DescriptorFactory(DescriptorTest.NAME);
+        final DescriptorFactory factory = new DescriptorFactory(
+            DescriptorTest.LABEL,
+            DescriptorTest.NAME
+        );
         factory.setAttribute(DescriptorAttribute.OPTIONAL);
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals("[Expression]", descriptor.toString());
@@ -78,7 +98,10 @@ public class DescriptorTest {
      */
     @Test
     public void list() {
-        final DescriptorFactory factory = new DescriptorFactory(DescriptorTest.NAME);
+        final DescriptorFactory factory = new DescriptorFactory(
+            DescriptorTest.LABEL,
+            DescriptorTest.NAME
+        );
         factory.setAttribute(DescriptorAttribute.LIST);
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals("{Expression}", descriptor.toString());
@@ -89,12 +112,15 @@ public class DescriptorTest {
      */
     @Test
     public void twoParameters() {
-        final DescriptorFactory factory = new DescriptorFactory("Addition");
-        final DescriptorFactory left = new DescriptorFactory("first");
-        left.replaceName(DescriptorTest.NAME);
+        final DescriptorFactory factory = new DescriptorFactory(
+            DescriptorTest.LABEL,
+            "Addition"
+        );
+        final DescriptorFactory left = new DescriptorFactory("beta", "first");
+        left.replaceType(DescriptorTest.NAME);
         factory.addParameter(left.createDescriptor());
-        final DescriptorFactory right = new DescriptorFactory("second");
-        right.replaceName(DescriptorTest.NAME);
+        final DescriptorFactory right = new DescriptorFactory("gamma", "second");
+        right.replaceType(DescriptorTest.NAME);
         factory.addParameter(right.createDescriptor());
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals(
@@ -108,7 +134,10 @@ public class DescriptorTest {
      */
     @Test
     public void holeAsParameter() {
-        final DescriptorFactory factory = new DescriptorFactory("simpleExpression");
+        final DescriptorFactory factory = new DescriptorFactory(
+            DescriptorTest.LABEL,
+            "simpleExpression"
+        );
         factory.addParameter(new Hole(1));
         factory.addParameter(new Hole(2));
         final Descriptor descriptor = factory.createDescriptor();

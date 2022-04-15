@@ -30,7 +30,12 @@ public class ProjectRootValidatorTest {
     /**
      * The name of the option for a root of the target project.
      */
-    private static final String ROOT = "--root";
+    private static final String ROOT = "--output";
+
+    /**
+     * The test option as an argument example.
+     */
+    private static final String TEST = "--test";
 
     /**
      * Test passing the {@code --generate} option to main()
@@ -46,6 +51,7 @@ public class ProjectRootValidatorTest {
             file.toString(),
             ProjectRootValidatorTest.ROOT,
             "test/root",
+            ProjectRootValidatorTest.TEST,
         };
         boolean caught = false;
         try {
@@ -94,6 +100,7 @@ public class ProjectRootValidatorTest {
             file.toString(),
             ProjectRootValidatorTest.ROOT,
             source.toString(),
+            ProjectRootValidatorTest.TEST,
         };
         boolean caught = false;
         try {

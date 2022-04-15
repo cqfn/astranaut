@@ -27,6 +27,11 @@ public class MainTest {
     private static final String ARG = "--generate";
 
     /**
+     * The test option as an argument example.
+     */
+    private static final String TEST = "--test";
+
+    /**
      * Test passing the {@code --generate} option to main().
      * @param source A temporary directory
      */
@@ -36,6 +41,7 @@ public class MainTest {
         final String[] example = {
             MainTest.ARG,
             file.toString(),
+            MainTest.TEST,
         };
         boolean caught = false;
         try {

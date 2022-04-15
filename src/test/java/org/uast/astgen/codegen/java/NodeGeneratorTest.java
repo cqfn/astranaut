@@ -6,6 +6,7 @@
 package org.uast.astgen.codegen.java;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,13 +34,10 @@ public class NodeGeneratorTest {
     @Test
     @SuppressWarnings("PMD.CloseResource")
     public void testNodeGeneration() {
-        final License license = new License("LICENSE_header.txt");
-        final NodeGenerator generator = new NodeGenerator(
-            license,
-            "org.uast.example"
-        );
+        final Environment env = new TestEnvironment();
+        final NodeGenerator generator = new NodeGenerator(env);
         final Statement<Node> statement = this.createStatement();
-        final String actual = generator.generate(statement);
+        final String actual = generator.generate(statement).generate();
         final String expected = this.readTest("node_generator.txt");
         Assertions.assertEquals(expected, actual);
     }
@@ -84,5 +82,54 @@ public class NodeGeneratorTest {
         }
         Assertions.assertFalse(oops);
         return result;
+    }
+
+    /**
+     * Environment for test purposes.
+     *
+     * @since 1.0
+     */
+    private static final class TestEnvironment implements Environment {
+        /**
+         * The license.
+         */
+        private final License license;
+
+        /**
+         * Constructor.
+         */
+        TestEnvironment() {
+            this.license = new License("LICENSE_header.txt");
+        }
+
+        @Override
+        public License getLicense() {
+            return this.license;
+        }
+
+        @Override
+        public String getVersion() {
+            return "1.0";
+        }
+
+        @Override
+        public String getRootPackage() {
+            return "org.uast.example";
+        }
+
+        @Override
+        public String getBasePackage() {
+            return "org.uast.uast.base";
+        }
+
+        @Override
+        public boolean isTestMode() {
+            return false;
+        }
+
+        @Override
+        public List<String> getHierarchy(final String name) {
+            return Collections.singletonList(name);
+        }
     }
 }
