@@ -20,6 +20,7 @@ import org.uast.astgen.parser.ProgramParser;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.utils.FileConverter;
 import org.uast.astgen.utils.FilesReader;
+import org.uast.astgen.utils.LicenseValidator;
 import org.uast.astgen.utils.PackageValidator;
 import org.uast.astgen.utils.ProjectRootValidator;
 
@@ -36,11 +37,6 @@ public final class Main {
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
     /**
-     * The license.
-     */
-    private static final License LICENSE = new License("LICENSE_header.txt");
-
-    /**
      * The source file.
      */
     @Parameter(
@@ -50,6 +46,17 @@ public final class Main {
         description = "Txt file with DSL descriptions"
     )
     private File source;
+
+    /**
+     * The name of file that contains license header.
+     */
+    @Parameter(
+        names = { "--license", "-l" },
+        validateWith = LicenseValidator.class,
+        arity = 1,
+        description = "The name of file that contain license header"
+    )
+    private String license;
 
     /**
      * The root of the target project.
@@ -84,6 +91,7 @@ public final class Main {
      */
     private Main() {
         this.help = false;
+        this.license = "LICENSE_header.txt";
         this.root = "generated";
         this.pcg = "org.uast";
     }
@@ -129,9 +137,21 @@ public final class Main {
      * @since 1.0
      */
     private class EnvironmentImpl implements Environment {
+        /**
+         * The license.
+         */
+        private final License license;
+
+        /**
+         * Constructor.
+         */
+        EnvironmentImpl() {
+            this.license = new License(Main.this.license);
+        }
+
         @Override
         public License getLicense() {
-            return Main.LICENSE;
+            return this.license;
         }
 
         @Override
