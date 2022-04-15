@@ -30,7 +30,7 @@ public class ProjectRootValidatorTest {
     /**
      * The name of the option for a root of the target project.
      */
-    private static final String ROOT = "--root";
+    private static final String ROOT = "--output";
 
     /**
      * Test passing the {@code --generate} option to main()

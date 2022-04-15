@@ -43,7 +43,7 @@ public final class Main {
         names = { "--generate", "-g" },
         converter = FileConverter.class,
         required = true,
-        description = "Txt file with DSL descriptions"
+        description = "Text file with DSL descriptions"
     )
     private File source;
 
@@ -62,12 +62,12 @@ public final class Main {
      * The root of the target project.
      */
     @Parameter(
-        names = { "--root", "-r" },
+        names = { "--output", "-o" },
         validateWith = ProjectRootValidator.class,
         arity = 1,
-        description = "The root of the project folder where generated files are stored"
+        description = "Output path, i.e. the folder where generated files are stored"
     )
-    private String root;
+    private String path;
 
     /**
      * The package of the generated file.
@@ -76,9 +76,20 @@ public final class Main {
         names = { "--package", "-p" },
         validateWith = PackageValidator.class,
         arity = 1,
-        description = "The path to the target folder of a generated source file"
+        description = "Name of the package of generated files"
     )
-    private String pcg;
+    private String rootpkg;
+
+    /**
+     * The name of the package that contains the 'Node' base interface.
+     */
+    @Parameter(
+        names = { "--base", "-b" },
+        validateWith = PackageValidator.class,
+        arity = 1,
+        description = "The name of the package that contains the 'Node' base interface"
+    )
+    private String basepkg;
 
     /**
      * The help option.
@@ -92,8 +103,9 @@ public final class Main {
     private Main() {
         this.help = false;
         this.license = "LICENSE_header.txt";
-        this.root = "generated";
-        this.pcg = "org.uast";
+        this.path = "generated";
+        this.rootpkg = "org.uast";
+        this.basepkg = "org.uast.uast.base";
     }
 
     /**
@@ -124,7 +136,7 @@ public final class Main {
         try {
             final Program program = parser.parse();
             final Environment env = new EnvironmentImpl();
-            final ProgramGenerator generator = new ProgramGenerator(this.root, program, env);
+            final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
             generator.generate();
         } catch (final BaseException exc) {
             LOG.severe(exc.getErrorMessage());
@@ -156,12 +168,12 @@ public final class Main {
 
         @Override
         public String getRootPackage() {
-            return Main.this.pcg;
+            return Main.this.rootpkg;
         }
 
         @Override
         public String getBasePackage() {
-            return "org.uast.uast.base";
+            return Main.this.basepkg;
         }
 
         @Override
