@@ -18,6 +18,11 @@ final class NodeClassConstructor extends NodeConstructor {
     private static final String STR_TYPE = "Type";
 
     /**
+     * The 'Fragment' string.
+     */
+    private static final String STR_FRAGMENT = "Fragment";
+
+    /**
      * Constructor.
      * @param env The environment
      * @param rule The rule
@@ -31,6 +36,7 @@ final class NodeClassConstructor extends NodeConstructor {
     public void construct() {
         this.fillType();
         this.fillBuilder();
+        this.fillFragment();
     }
 
     /**
@@ -76,5 +82,23 @@ final class NodeClassConstructor extends NodeConstructor {
         subclass.setInterfaces("Builder");
         klass.addClass(subclass);
         new NodeBuilderConstructor(this.getEnv(), rule, subclass).run();
+    }
+
+    /**
+     * Fills everything that is associated with a fragment.
+     */
+    private void fillFragment() {
+        final Klass klass = this.getKlass();
+        final Field field = new Field(
+            "The fragment associated with the node",
+            NodeClassConstructor.STR_FRAGMENT,
+            "fragment"
+        );
+        klass.addField(field);
+        final Method getter = new Method("getFragment");
+        getter.makeOverridden();
+        getter.setReturnType(NodeClassConstructor.STR_FRAGMENT);
+        getter.setCode("return this.fragment;");
+        klass.addMethod(getter);
     }
 }

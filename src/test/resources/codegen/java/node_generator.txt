@@ -27,9 +27,19 @@ public final class Addition implements Node {
      */
     public static final Type TYPE = new TypeImpl();
 
+    /**
+     * The fragment associated with the node.
+     */
+    private Fragment fragment;
+
     @Override
     public Type getType() {
         return Addition.TYPE;
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
     }
 
     /**
