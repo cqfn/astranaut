@@ -32,6 +32,22 @@ public final class Addition implements Node {
      */
     private Fragment fragment;
 
+    /**
+     * Child with the 'left' tag.
+     */
+    private Expression left;
+
+    /**
+     * Child with the 'right' tag.
+     */
+    private Expression right;
+
+    /**
+     * Constructor.
+     */
+    private Addition() {
+    }
+
     @Override
     public Type getType() {
         return Addition.TYPE;
@@ -40,6 +56,22 @@ public final class Addition implements Node {
     @Override
     public Fragment getFragment() {
         return this.fragment;
+    }
+
+    /**
+     * Returns the child with the 'left' tag.
+     * @return The node
+     */
+    public Expression getLeft() {
+        return this.left;
+    }
+
+    /**
+     * Returns the child with the 'right' tag.
+     * @return The node
+     */
+    public Expression getRight() {
+        return this.right;
     }
 
     /**

@@ -4,6 +4,8 @@
  */
 package org.uast.astgen.codegen.java;
 
+import org.uast.astgen.rules.Child;
+import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Node;
 
 /**
@@ -34,9 +36,13 @@ final class NodeClassConstructor extends NodeConstructor {
 
     @Override
     public void construct() {
+        final Constructor ctor = new Constructor(this.getRule().getType());
+        ctor.makePrivate();
+        this.getKlass().addConstructor(ctor);
         this.fillType();
         this.fillBuilder();
         this.fillFragment();
+        this.createTaggedFields();
     }
 
     /**
@@ -100,5 +106,33 @@ final class NodeClassConstructor extends NodeConstructor {
         getter.setReturnType(NodeClassConstructor.STR_FRAGMENT);
         getter.setCode("return this.fragment;");
         klass.addMethod(getter);
+    }
+
+    /**
+     * Creates fields for tagged nodes and getters for them.
+     */
+    private void createTaggedFields() {
+        final Klass klass = this.getKlass();
+        for (final Child child : this.getRule().getComposition()) {
+            final Descriptor descriptor = (Descriptor) child;
+            final String tag = descriptor.getTag();
+            if (!tag.isEmpty()) {
+                final String type = descriptor.getName();
+                final String var = descriptor.getVariableName();
+                final Field field = new Field(
+                    String.format("Child with the '%s' tag", tag),
+                    type,
+                    var
+                );
+                klass.addField(field);
+                final Method getter = new Method(
+                    String.format("Returns the child with the '%s' tag", tag),
+                    String.format("get%s", descriptor.getTagCapital())
+                );
+                getter.setReturnType(type, "The node");
+                getter.setCode(String.format("return this.%s;", var));
+                klass.addMethod(getter);
+            }
+        }
     }
 }
