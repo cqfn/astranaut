@@ -81,6 +81,14 @@ public final class Field implements Entity {
     }
 
     /**
+     * Return the flag indicates that the field is static.
+     * @return The flag
+     */
+    public boolean isStatic() {
+        return this.fstatic;
+    }
+
+    /**
      * Resets all flags.
      */
     public void resetFlags() {

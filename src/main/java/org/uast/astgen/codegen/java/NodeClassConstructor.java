@@ -25,6 +25,11 @@ final class NodeClassConstructor extends NodeConstructor {
     private static final String STR_FRAGMENT = "Fragment";
 
     /**
+     * The 'int' string.
+     */
+    private static final String STR_INT = "int";
+
+    /**
      * Constructor.
      * @param env The environment
      * @param rule The rule
@@ -42,6 +47,8 @@ final class NodeClassConstructor extends NodeConstructor {
         this.fillType();
         this.fillBuilder();
         this.fillFragment();
+        this.createCommonFields();
+        this.createGetter();
         this.createTaggedFields();
     }
 
@@ -106,6 +113,49 @@ final class NodeClassConstructor extends NodeConstructor {
         getter.setReturnType(NodeClassConstructor.STR_FRAGMENT);
         getter.setCode("return this.fragment;");
         klass.addMethod(getter);
+    }
+
+    /**
+     * Creates, common fields and getters for them.
+     */
+    private void createCommonFields() {
+        final Klass klass = this.getKlass();
+        final Node rule = this.getRule();
+        final Method data = new Method("getData");
+        data.makeOverridden();
+        data.setReturnType("String");
+        data.setCode("return \"\";");
+        klass.addMethod(data);
+        klass.addField(new Field("List of child nodes", "List<Node>", "children"));
+        final Method count = new Method("getChildCount");
+        count.makeOverridden();
+        count.setReturnType(NodeClassConstructor.STR_INT);
+        if (rule.hasOptionalChild()) {
+            count.setCode("return this.children.size();");
+        } else {
+            final Field num = new Field(
+                "The number of children",
+                NodeClassConstructor.STR_INT,
+                "CHILD_COUNT"
+            );
+            num.makeStaticFinal();
+            num.setInitExpr(String.valueOf(rule.getComposition().size()));
+            klass.addField(num);
+            count.setCode(String.format("return %s.CHILD_COUNT;", rule.getType()));
+        }
+        klass.addMethod(count);
+    }
+
+    /**
+     * Creates the method 'getChild'.
+     */
+    private void createGetter() {
+        final Method getter = new Method("getChild");
+        getter.makeOverridden();
+        getter.addArgument(NodeClassConstructor.STR_INT, "index");
+        getter.setReturnType("Node");
+        getter.setCode("return this.children.get(index);");
+        this.getKlass().addMethod(getter);
     }
 
     /**

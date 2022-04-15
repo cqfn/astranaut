@@ -64,6 +64,22 @@ public class Node implements Rule {
         return builder.toString();
     }
 
+    /**
+     * Checks if a node has at least one optional child.
+     * @return Checking result
+     */
+    public boolean hasOptionalChild() {
+        boolean result = false;
+        for (final Child child : this.composition) {
+            if (child instanceof Descriptor
+                && ((Descriptor) child).getAttribute() == DescriptorAttribute.OPTIONAL) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
     @Override
     public final void generate() {
         throw new IllegalStateException();

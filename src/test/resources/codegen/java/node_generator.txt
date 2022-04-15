@@ -28,9 +28,19 @@ public final class Addition implements Node {
     public static final Type TYPE = new TypeImpl();
 
     /**
+     * The number of children.
+     */
+    private static final int CHILD_COUNT = 2;
+
+    /**
      * The fragment associated with the node.
      */
     private Fragment fragment;
+
+    /**
+     * List of child nodes.
+     */
+    private List<Node> children;
 
     /**
      * Child with the 'left' tag.
@@ -56,6 +66,21 @@ public final class Addition implements Node {
     @Override
     public Fragment getFragment() {
         return this.fragment;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return Addition.CHILD_COUNT;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
     }
 
     /**

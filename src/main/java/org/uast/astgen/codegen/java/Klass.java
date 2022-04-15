@@ -275,6 +275,19 @@ public final class Klass implements Type {
     ) {
         boolean flag = separator;
         for (final Field field : this.fields) {
+            if (!field.isStatic()) {
+                continue;
+            }
+            if (flag) {
+                builder.append('\n');
+            }
+            flag = true;
+            builder.append(field.generate(indent));
+        }
+        for (final Field field : this.fields) {
+            if (field.isStatic()) {
+                continue;
+            }
             if (flag) {
                 builder.append('\n');
             }
