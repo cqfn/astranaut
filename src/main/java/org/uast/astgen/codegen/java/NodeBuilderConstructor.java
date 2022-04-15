@@ -224,8 +224,10 @@ final class NodeBuilderConstructor extends NodeConstructor {
             }
             flag = true;
             fourth.append(NodeBuilderConstructor.STR_THIS).append(var);
-            fifth.append("node.").append(var).append(" = this.").append(var)
-                .append(NodeBuilderConstructor.STR_SEMICOLON);
+            if (!descriptor.getTag().isEmpty()) {
+                fifth.append("node.").append(var).append(" = this.").append(var)
+                    .append(NodeBuilderConstructor.STR_SEMICOLON);
+            }
         }
         fourth.append(");\n");
         final StringBuilder code = new StringBuilder(256);
