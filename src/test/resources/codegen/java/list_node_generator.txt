@@ -141,5 +141,55 @@ public final class ExpressionList implements Node {
      * @since 1.0
      */
     public static final class Constructor implements Builder {
+        /**
+         * The fragment associated with the node.
+         */
+        private Fragment fragment = EmptyFragment.INSTANCE;
+
+        /**
+         * List of child nodes.
+         */
+        private List<Expression> children = Collections.emptyList();
+
+        @Override
+        public void setFragment(final Fragment obj) {
+            this.fragment = obj;
+        }
+
+        @Override
+        public boolean setData(final String str) {
+            return str.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            boolean result = true;
+            final List<Expression> clarified = new ArrayList<>(list.size());
+            for (final Node node : list) {
+                if (node instanceof Expression) {
+                    clarified.add((Expression) node);
+                } else {
+                    result = false;
+                    break;
+                }
+            }
+            if (result) {
+                this.children = Collections.unmodifiableList(clarified);
+            }
+            return result;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public ExpressionList createNode() {
+            final ExpressionList node = new ExpressionList();
+            node.fragment = this.fragment;
+            node.children = this.children;
+            return node;
+        }
     }
 }

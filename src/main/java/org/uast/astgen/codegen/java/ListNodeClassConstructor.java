@@ -52,7 +52,8 @@ final class ListNodeClassConstructor extends NodeConstructor {
      * Fills in everything related to the builder.
      */
     private void fillBuilder() {
-        this.createBuilderClass();
+        final Klass subclass = this.createBuilderClass();
+        new ListNodeBuilderConstructor(this.getEnv(), this.getRule(), subclass).run();
     }
 
     /**

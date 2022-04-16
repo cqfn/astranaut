@@ -39,6 +39,11 @@ abstract class NodeConstructor {
     private static final String STR_INT = "int";
 
     /**
+     * The 'int' string.
+     */
+    private static final String STR_BOOLEAN = "boolean";
+
+    /**
      * The {@code List<String>} type.
      */
     private static final String LIST_STRING = "List<String>";
@@ -252,5 +257,17 @@ abstract class NodeConstructor {
         getter.setReturnType(NodeConstructor.LIST_STRING);
         getter.setCode("return TypeImpl.HIERARCHY;");
         this.klass.addMethod(getter);
+    }
+
+    /**
+     * Creates a setter that does not accept any data.
+     */
+    protected void createNoDataSetter() {
+        final Method setter = new Method("setData");
+        setter.makeOverridden();
+        setter.addArgument("String", "str");
+        setter.setReturnType(NodeConstructor.STR_BOOLEAN);
+        setter.setCode("return str.isEmpty();");
+        this.klass.addMethod(setter);
     }
 }

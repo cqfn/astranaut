@@ -11,7 +11,7 @@ import org.uast.astgen.rules.DescriptorAttribute;
 import org.uast.astgen.rules.Node;
 
 /**
- * Generates builder subclass source code for rules that describe nodes.
+ * Generates builder subclass source code for rules that describe ordinary nodes.
  *
  * @since 1.0
  */
@@ -44,24 +44,11 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
     @Override
     public void construct() {
         this.createFragmentWithSetter();
-        this.fillData();
+        this.createNoDataSetter();
         this.fillChildren();
         this.createSetterChildrenList();
         this.createValidator();
         this.createCreator();
-    }
-
-    /**
-     * Fills in everything related to the data.
-     */
-    private void fillData() {
-        final Klass klass = this.getKlass();
-        final Method setter = new Method("setData");
-        setter.makeOverridden();
-        setter.addArgument("String", "str");
-        setter.setReturnType(OrdinaryNodeBuilderConstructor.STR_BOOLEAN);
-        setter.setCode("return str.isEmpty();");
-        klass.addMethod(setter);
     }
 
     /**
