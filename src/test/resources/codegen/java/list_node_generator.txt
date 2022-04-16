@@ -22,4 +22,74 @@ import org.uast.uast.base.Type;
  * @since 1.0
  */
 public final class ExpressionList implements Node {
+    /**
+     * The type.
+     */
+    public static final Type TYPE = new TypeImpl();
+
+    /**
+     * The fragment associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * List of child nodes.
+     */
+    private List<Expression> children;
+
+    /**
+     * Constructor.
+     */
+    private ExpressionList() {
+    }
+
+    @Override
+    public Type getType() {
+        return ExpressionList.TYPE;
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return this.children.size();
+    }
+
+    /**
+     * Return a child node with 'Expression' type by its index.
+     * @param index Child index
+     * @return A node
+     */
+    public Expression getExpression(final int index) {
+        return this.children.get(index);
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
+    }
+
+    /**
+     * Type descriptor of the 'ExpressionList' node.
+     *
+     * @since 1.0
+     */
+    private static class TypeImpl implements Type {
+    }
+
+    /**
+     * Class for 'ExpressionList' node construction.
+     *
+     * @since 1.0
+     */
+    public static final class Constructor implements Builder {
+    }
 }

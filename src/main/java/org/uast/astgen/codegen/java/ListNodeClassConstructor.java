@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Node;
 
 /**
@@ -59,6 +60,8 @@ final class ListNodeClassConstructor extends NodeConstructor {
     private void createCommonFields() {
         final Klass klass = this.getKlass();
         final Node rule = this.getRule();
+        final Descriptor descriptor = (Descriptor) rule.getComposition().get(0);
+        final String type = descriptor.getType();
         final Method data = new Method("getData");
         data.makeOverridden();
         data.setReturnType("String");
@@ -67,26 +70,22 @@ final class ListNodeClassConstructor extends NodeConstructor {
         klass.addField(
             new Field(
                 "List of child nodes",
-                String.format("List<%s>", rule.getType()),
+                String.format("List<%s>", type),
                 "children"
             )
         );
         final Method count = new Method("getChildCount");
         count.makeOverridden();
         count.setReturnType(ListNodeClassConstructor.STR_INT);
-        if (rule.hasOptionalChild()) {
-            count.setCode("return this.children.size();");
-        } else {
-            final Field num = new Field(
-                "The number of children",
-                ListNodeClassConstructor.STR_INT,
-                "CHILD_COUNT"
-            );
-            num.makeStaticFinal();
-            num.setInitExpr(String.valueOf(rule.getComposition().size()));
-            klass.addField(num);
-            count.setCode(String.format("return %s.CHILD_COUNT;", rule.getType()));
-        }
+        count.setCode("return this.children.size();");
         klass.addMethod(count);
+        final Method getter = new Method(
+            String.format("Return a child node with '%s' type by its index", type),
+            String.format("get%s", type)
+        );
+        getter.addArgument(ListNodeClassConstructor.STR_INT, "index", "Child index");
+        getter.setReturnType(type, "A node");
+        getter.setCode("return this.children.get(index);");
+        klass.addMethod(getter);
     }
 }
