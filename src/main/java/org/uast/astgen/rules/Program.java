@@ -16,6 +16,7 @@ import java.util.TreeSet;
  *
  * @since 1.0
  */
+@SuppressWarnings("PMD.CloseResource")
 public class Program {
     /**
      * All rules.
@@ -65,7 +66,7 @@ public class Program {
      * @return The set of names
      */
     public Set<String> getNamesOfAllLanguages() {
-        Set<String> result = new TreeSet<>();
+        final Set<String> result = new TreeSet<>();
         for (final Statement<Rule> statement : this.all) {
             final String language = statement.getLanguage();
             if (!language.isEmpty()) {

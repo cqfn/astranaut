@@ -6,9 +6,6 @@ package org.uast.astgen.codegen.java;
 
 import java.io.File;
 import java.util.Locale;
-import java.util.Set;
-
-import org.uast.astgen.exceptions.BaseException;
 import org.uast.astgen.exceptions.CouldNotWriteFile;
 import org.uast.astgen.exceptions.GeneratorException;
 import org.uast.astgen.rules.Node;
@@ -73,7 +70,7 @@ public final class ProgramGenerator {
             "This package contains unified nodes",
             ProgramGenerator.GREEN
         );
-        for (final String language : program.getNamesOfAllLanguages()) {
+        for (final String language : this.program.getNamesOfAllLanguages()) {
             this.generatePackage(
                 String.format(
                     "This package contains nodes that describe the %s%s programming language",
@@ -89,9 +86,11 @@ public final class ProgramGenerator {
      * Generates 'package-info.java' file for one language.
      * @param brief Brief description
      * @param language Language name
+     * @throws GeneratorException When can't generate
      */
-    private void generatePackage(String brief, String language) throws GeneratorException {
-        PackageInfo info = new PackageInfo(
+    private void generatePackage(final String brief, final String language)
+        throws GeneratorException {
+        final PackageInfo info = new PackageInfo(
             this.env.getLicense(),
             brief,
             String.format("%s.%s", this.env.getRootPackage(), language)
