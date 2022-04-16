@@ -8,6 +8,8 @@ package org.uast.astgen.rules;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * The set of DSL rules with addition data.
@@ -56,5 +58,20 @@ public class Program {
     public void addNodeStmt(final Statement<Node> statement) {
         this.all.add(statement.toRuleStmt());
         this.nodes.add(statement);
+    }
+
+    /**
+     * Returns the names of all languages described in the DSL program.
+     * @return The set of names
+     */
+    public Set<String> getNamesOfAllLanguages() {
+        Set<String> result = new TreeSet<>();
+        for (final Statement<Rule> statement : this.all) {
+            final String language = statement.getLanguage();
+            if (!language.isEmpty()) {
+                result.add(language);
+            }
+        }
+        return result;
     }
 }

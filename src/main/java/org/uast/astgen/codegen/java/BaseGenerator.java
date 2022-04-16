@@ -50,7 +50,7 @@ abstract class BaseGenerator {
         if (language.isEmpty()) {
             pkg = root.concat(".green");
         } else {
-            pkg = root.concat(language.toLowerCase(Locale.ENGLISH));
+            pkg = String.format("%s.%s", root, language.toLowerCase(Locale.ENGLISH));
         }
         return pkg;
     }
