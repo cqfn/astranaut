@@ -44,7 +44,8 @@ final class ListNodeClassConstructor extends NodeConstructor {
      * Fills in everything related to the type.
      */
     private void fillType() {
-        this.createTypeClass();
+        final Klass subclass = this.createTypeClass();
+        new ListNodeTypeConstructor(this.getEnv(), this.getRule(), subclass).run();
     }
 
     /**

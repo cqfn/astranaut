@@ -4,7 +4,6 @@
  */
 package org.uast.astgen.codegen.java;
 
-import java.util.List;
 import org.uast.astgen.rules.Child;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.DescriptorAttribute;
@@ -16,11 +15,6 @@ import org.uast.astgen.rules.Node;
  * @since 1.0
  */
 final class OrdinaryNodeTypeConstructor extends NodeConstructor {
-    /**
-     * The {@code List<String>} type.
-     */
-    private static final String LIST_STRING = "List<String>";
-
     /**
      * The {@code List<ChildDescriptor>} type.
      */
@@ -66,7 +60,7 @@ final class OrdinaryNodeTypeConstructor extends NodeConstructor {
         name.setCode(String.format("return %s;", this.ssg.getFieldName(rule.getType())));
         klass.addMethod(name);
         this.fillChildTypes();
-        this.fillHierarchy();
+        this.fillHierarchy(this.ssg);
         final Method builder = new Method("createBuilder");
         builder.setReturnType("Builder");
         builder.setCode("return new Constructor();");
@@ -120,37 +114,5 @@ final class OrdinaryNodeTypeConstructor extends NodeConstructor {
         field.makeStaticFinal();
         field.setInitExpr(init.toString());
         klass.addField(field);
-    }
-
-    /**
-     * Fills in everything related to the hierarchy.
-     */
-    private void fillHierarchy() {
-        final Klass klass = this.getKlass();
-        final List<String> hierarchy = this.getEnv().getHierarchy(this.getRule().getType());
-        final StringBuilder init  = new StringBuilder(128);
-        init.append(OrdinaryNodeTypeConstructor.LIST_BEGIN);
-        boolean flag = false;
-        for (final String item : hierarchy) {
-            if (flag) {
-                init.append(OrdinaryNodeTypeConstructor.SEPARATOR);
-            }
-            flag = true;
-            init.append(this.ssg.getFieldName(item));
-        }
-        init.append(OrdinaryNodeTypeConstructor.LIST_END);
-        final Field field = new Field(
-            "Hierarchy",
-            OrdinaryNodeTypeConstructor.LIST_STRING,
-            "HIERARCHY"
-        );
-        field.makePrivate();
-        field.makeStaticFinal();
-        field.setInitExpr(init.toString());
-        klass.addField(field);
-        final Method getter = new Method("getHierarchy");
-        getter.setReturnType(OrdinaryNodeTypeConstructor.LIST_STRING);
-        getter.setCode("return TypeImpl.HIERARCHY;");
-        klass.addMethod(getter);
     }
 }

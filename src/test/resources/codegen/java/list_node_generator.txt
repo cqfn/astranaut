@@ -83,6 +83,56 @@ public final class ExpressionList implements Node {
      * @since 1.0
      */
     private static class TypeImpl implements Type {
+        /**
+         * The 'ExpressionList' string.
+         */
+        private static final String EXPRESSION_LIST = "ExpressionList";
+
+        /**
+         * The 'Expression' string.
+         */
+        private static final String EXPRESSION = "Expression";
+
+        /**
+         * The list of child types.
+         */
+        private static final List<ChildDescriptor> CHILDREN =
+            Collections.singletonList(
+                new ChildDescriptor(
+                    TypeImpl.EXPRESSION,
+                    false
+                )
+            );
+
+        /**
+         * Hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Collections.unmodifiableList(
+                Arrays.asList(
+                    TypeImpl.EXPRESSION_LIST
+                )
+            );
+
+        @Override
+        public String getName() {
+            return TypeImpl.EXPRESSION_LIST;
+        }
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return TypeImpl.CHILDREN;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return TypeImpl.HIERARCHY;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Constructor();
+        }
     }
 
     /**

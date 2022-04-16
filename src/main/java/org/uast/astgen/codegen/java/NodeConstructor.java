@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.List;
 import org.uast.astgen.rules.Node;
 
 /**
@@ -36,6 +37,26 @@ abstract class NodeConstructor {
      * The 'int' string.
      */
     private static final String STR_INT = "int";
+
+    /**
+     * The {@code List<String>} type.
+     */
+    private static final String LIST_STRING = "List<String>";
+
+    /**
+     * The start of unmodifiable list declaration.
+     */
+    private static final String LIST_BEGIN = "Collections.unmodifiableList(Arrays.asList(";
+
+    /**
+     * The end of unmodifiable list declaration.
+     */
+    private static final String LIST_END = "))";
+
+    /**
+     * The list separator.
+     */
+    private static final String SEPARATOR = ", ";
 
     /**
      * The environment.
@@ -199,5 +220,37 @@ abstract class NodeConstructor {
         subclass.setInterfaces("Builder");
         this.klass.addClass(subclass);
         return subclass;
+    }
+
+    /**
+     * Fills in everything related to the hierarchy.
+     * @param ssg Static string constructor
+     */
+    protected void fillHierarchy(final StaticStringGenerator ssg) {
+        final List<String> hierarchy = this.getEnv().getHierarchy(this.getRule().getType());
+        final StringBuilder init  = new StringBuilder(128);
+        init.append(NodeConstructor.LIST_BEGIN);
+        boolean separator = false;
+        for (final String item : hierarchy) {
+            if (separator) {
+                init.append(NodeConstructor.SEPARATOR);
+            }
+            separator = true;
+            init.append(ssg.getFieldName(item));
+        }
+        init.append(NodeConstructor.LIST_END);
+        final Field field = new Field(
+            "Hierarchy",
+            NodeConstructor.LIST_STRING,
+            "HIERARCHY"
+        );
+        field.makePrivate();
+        field.makeStaticFinal();
+        field.setInitExpr(init.toString());
+        this.klass.addField(field);
+        final Method getter = new Method("getHierarchy");
+        getter.setReturnType(NodeConstructor.LIST_STRING);
+        getter.setCode("return TypeImpl.HIERARCHY;");
+        this.klass.addMethod(getter);
     }
 }
