@@ -15,7 +15,7 @@ import java.util.TreeMap;
  *
  * @since 1.0
  */
-public class StaticStringGenerator {
+final class StaticStringGenerator {
     /**
      * Maximum length of field name.
      */
@@ -35,7 +35,7 @@ public class StaticStringGenerator {
      * Constructor.
      * @param klass The class where to create static fields
      */
-    public StaticStringGenerator(final Klass klass) {
+    StaticStringGenerator(final Klass klass) {
         this.map = new TreeMap<>();
         this.klass = klass;
     }

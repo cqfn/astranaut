@@ -35,9 +35,9 @@ public class NodeGeneratorTest {
     @SuppressWarnings("PMD.CloseResource")
     public void testNodeGeneration() {
         final Environment env = new TestEnvironment();
-        final NodeGenerator generator = new NodeGenerator(env);
         final Statement<Node> statement = this.createStatement();
-        final String actual = generator.generate(statement).generate();
+        final NodeGenerator generator = new NodeGenerator(env, statement);
+        final String actual = generator.generate().generate();
         final String expected = this.readTest("node_generator.txt");
         Assertions.assertEquals(expected, actual);
     }

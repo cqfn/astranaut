@@ -18,7 +18,7 @@ import org.uast.astgen.utils.FilesWriter;
  * @since 1.0
  */
 @SuppressWarnings("PMD.CloseResource")
-public class ProgramGenerator {
+public final class ProgramGenerator {
     /**
      * The path where to generate.
      */
@@ -59,13 +59,12 @@ public class ProgramGenerator {
      * @throws GeneratorException When can't generate
      */
     private void generateNodes() throws GeneratorException {
-        final NodeGenerator nodegen = new NodeGenerator(this.env);
         final String version = this.env.getVersion();
         for (final Statement<Node> stmt : this.program.getNodes()) {
             final Node rule = stmt.getRule();
             final CompilationUnit unit;
             if (rule.isOrdinary()) {
-                unit = nodegen.generate(stmt);
+                unit = new NodeGenerator(this.env, stmt).generate();
             } else {
                 throw new IllegalStateException();
             }

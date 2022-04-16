@@ -11,7 +11,7 @@ import org.uast.astgen.rules.Node;
  *
  * @since 1.0
  */
-public abstract class NodeConstructor {
+abstract class NodeConstructor {
     /**
      * The environment.
      */

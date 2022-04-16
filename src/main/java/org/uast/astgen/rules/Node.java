@@ -98,4 +98,12 @@ public class Node implements Rule {
         }
         return result;
     }
+
+    /**
+     * Checks if the node is abstract.
+     * @return Checking result
+     */
+    public boolean isAbstract() {
+        return this.composition.size() == 1 && this.composition.get(0) instanceof Disjunction;
+    }
 }
