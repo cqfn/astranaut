@@ -4,16 +4,14 @@
  */
 package org.uast.astgen.codegen.java;
 
-import org.uast.astgen.rules.Child;
-import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Node;
 
 /**
- * Generates class source code for rules that describe ordinary nodes.
+ * Generates class source code for rules that describe list nodes.
  *
  * @since 1.0
  */
-final class OrdinaryNodeClassConstructor extends NodeConstructor {
+final class ListNodeClassConstructor extends NodeConstructor {
     /**
      * The 'int' string.
      */
@@ -25,7 +23,7 @@ final class OrdinaryNodeClassConstructor extends NodeConstructor {
      * @param rule The rule
      * @param klass The class to be filled
      */
-    OrdinaryNodeClassConstructor(final Environment env, final Node rule, final Klass klass) {
+    ListNodeClassConstructor(final Environment env, final Node rule, final Klass klass) {
         super(env, rule, klass);
     }
 
@@ -39,23 +37,20 @@ final class OrdinaryNodeClassConstructor extends NodeConstructor {
         this.createFragmentWithGetter();
         this.createCommonFields();
         this.createChildrenGetter();
-        this.createTaggedFields();
     }
 
     /**
      * Fills in everything related to the type.
      */
     private void fillType() {
-        final Klass subclass = this.createTypeClass();
-        new OrdinaryNodeTypeConstructor(this.getEnv(), this.getRule(), subclass).run();
+        this.createTypeClass();
     }
 
     /**
      * Fills in everything related to the builder.
      */
     private void fillBuilder() {
-        final Klass subclass = this.createBuilderClass();
-        new OrdinaryNodeBuilderConstructor(this.getEnv(), this.getRule(), subclass).run();
+        this.createBuilderClass();
     }
 
     /**
@@ -69,16 +64,22 @@ final class OrdinaryNodeClassConstructor extends NodeConstructor {
         data.setReturnType("String");
         data.setCode("return \"\";");
         klass.addMethod(data);
-        klass.addField(new Field("List of child nodes", "List<Node>", "children"));
+        klass.addField(
+            new Field(
+                "List of child nodes",
+                String.format("List<%s>", rule.getType()),
+                "children"
+            )
+        );
         final Method count = new Method("getChildCount");
         count.makeOverridden();
-        count.setReturnType(OrdinaryNodeClassConstructor.STR_INT);
+        count.setReturnType(ListNodeClassConstructor.STR_INT);
         if (rule.hasOptionalChild()) {
             count.setCode("return this.children.size();");
         } else {
             final Field num = new Field(
                 "The number of children",
-                OrdinaryNodeClassConstructor.STR_INT,
+                ListNodeClassConstructor.STR_INT,
                 "CHILD_COUNT"
             );
             num.makeStaticFinal();
@@ -87,33 +88,5 @@ final class OrdinaryNodeClassConstructor extends NodeConstructor {
             count.setCode(String.format("return %s.CHILD_COUNT;", rule.getType()));
         }
         klass.addMethod(count);
-    }
-
-    /**
-     * Creates fields for tagged nodes and getters for them.
-     */
-    private void createTaggedFields() {
-        final Klass klass = this.getKlass();
-        for (final Child child : this.getRule().getComposition()) {
-            final Descriptor descriptor = (Descriptor) child;
-            final String tag = descriptor.getTag();
-            if (!tag.isEmpty()) {
-                final String type = descriptor.getType();
-                final String var = descriptor.getVariableName();
-                final Field field = new Field(
-                    String.format("Child with the '%s' tag", tag),
-                    type,
-                    var
-                );
-                klass.addField(field);
-                final Method getter = new Method(
-                    String.format("Returns the child with the '%s' tag", tag),
-                    String.format("get%s", descriptor.getTagCapital())
-                );
-                getter.setReturnType(type, "The node");
-                getter.setCode(String.format("return this.%s;", var));
-                klass.addMethod(getter);
-            }
-        }
     }
 }

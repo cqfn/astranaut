@@ -8,6 +8,7 @@ package org.uast.astgen.codegen.java;
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.BaseException;
 import org.uast.astgen.parser.ProgramParser;
@@ -31,6 +32,7 @@ public class ListNodeGeneratorTest {
      * Testing source code generation for rules that describe nodes.
      */
     @Test
+    @Disabled
     @SuppressWarnings("PMD.CloseResource")
     public void testNodeGeneration() {
         final Environment env = new TestEnvironment();

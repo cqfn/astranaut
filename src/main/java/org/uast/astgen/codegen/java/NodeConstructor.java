@@ -13,6 +13,31 @@ import org.uast.astgen.rules.Node;
  */
 abstract class NodeConstructor {
     /**
+     * The 'Fragment' string.
+     */
+    private static final String STR_FRAG_TYPE = "Fragment";
+
+    /**
+     * The 'fragment' string.
+     */
+    private static final String STR_FRAG_VAR = "fragment";
+
+    /**
+     * The 'The fragment associated with the node' string.
+     */
+    private static final String STR_FRAG_BRIEF = "The fragment associated with the node";
+
+    /**
+     * The 'Type' string.
+     */
+    private static final String STR_TYPE = "Type";
+
+    /**
+     * The 'int' string.
+     */
+    private static final String STR_INT = "int";
+
+    /**
      * The environment.
      */
     private final Environment env;
@@ -84,4 +109,95 @@ abstract class NodeConstructor {
      * Constructs the class that describe node.
      */
     protected abstract void construct();
+
+    /**
+     * Creates a field with the 'Fragment' type and getter for it.
+     */
+    protected void createFragmentWithGetter() {
+        final Field field = new Field(
+            NodeConstructor.STR_FRAG_BRIEF,
+            NodeConstructor.STR_FRAG_TYPE,
+            NodeConstructor.STR_FRAG_VAR
+        );
+        this.klass.addField(field);
+        final Method getter = new Method("getFragment");
+        getter.makeOverridden();
+        getter.setReturnType(NodeConstructor.STR_FRAG_TYPE);
+        getter.setCode("return this.fragment;");
+        this.klass.addMethod(getter);
+    }
+
+    /**
+     * Creates a field with the 'Fragment' type and setter for it.
+     */
+    protected void createFragmentWithSetter() {
+        final Field field = new Field(
+            NodeConstructor.STR_FRAG_BRIEF,
+            NodeConstructor.STR_FRAG_TYPE,
+            NodeConstructor.STR_FRAG_VAR
+        );
+        field.setInitExpr("EmptyFragment.INSTANCE");
+        this.klass.addField(field);
+        final Method setter = new Method("setFragment");
+        setter.makeOverridden();
+        setter.addArgument(NodeConstructor.STR_FRAG_TYPE, "obj");
+        setter.setCode("this.fragment = obj;");
+        this.klass.addMethod(setter);
+    }
+
+    /**
+     * Creates the method 'getChild'.
+     */
+    protected void createChildrenGetter() {
+        final Method getter = new Method("getChild");
+        getter.makeOverridden();
+        getter.addArgument(NodeConstructor.STR_INT, "index");
+        getter.setReturnType("Node");
+        getter.setCode("return this.children.get(index);");
+        this.klass.addMethod(getter);
+    }
+
+    /**
+     * Creates a class that implements the node type interface, as well as a static field
+     * with an object of this class and a method to get this object.
+     * @return The empty class constructor to be filled
+     */
+    protected Klass createTypeClass() {
+        final Field field = new Field("The type", NodeConstructor.STR_TYPE, "TYPE");
+        field.makePublic();
+        field.makeStaticFinal();
+        field.setInitExpr("new TypeImpl()");
+        this.klass.addField(field);
+        final Method getter = new Method("getType");
+        getter.makeOverridden();
+        getter.setReturnType(NodeConstructor.STR_TYPE);
+        getter.setCode(String.format("return %s.TYPE;", this.rule.getType()));
+        this.klass.addMethod(getter);
+        final Klass subclass = new Klass(
+            String.format("Type descriptor of the '%s' node", this.rule.getType()),
+            "TypeImpl"
+        );
+        subclass.makePrivate();
+        subclass.makeStatic();
+        subclass.setInterfaces(NodeConstructor.STR_TYPE);
+        this.klass.addClass(subclass);
+        return subclass;
+    }
+
+    /**
+     * Creates a class that implements the node builder interface.
+     * @return The empty class constructor to be filled
+     */
+    protected Klass createBuilderClass() {
+        final Klass subclass = new Klass(
+            String.format("Class for '%s' node construction", this.rule.getType()),
+            "Constructor"
+        );
+        subclass.makePublic();
+        subclass.makeStatic();
+        subclass.makeFinal();
+        subclass.setInterfaces("Builder");
+        this.klass.addClass(subclass);
+        return subclass;
+    }
 }

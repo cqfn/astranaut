@@ -33,6 +33,7 @@ final class ListNodeGenerator extends BaseNodeGenerator {
         final Environment env = this.getEnv();
         final Node rule = this.statement.getRule();
         final Klass klass = this.createClass(rule);
+        new ListNodeClassConstructor(env, rule, klass).run();
         final String pkg = this.getPackageName(this.statement.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
         this.generateImports(unit);

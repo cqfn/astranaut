@@ -22,11 +22,6 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
     private static final String STR_BOOLEAN = "boolean";
 
     /**
-     * The 'Fragment' string.
-     */
-    private static final String STR_FRAGMENT = "Fragment";
-
-    /**
      * The 'this.' string.
      */
     private static final String STR_THIS = "this.";
@@ -48,31 +43,12 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
 
     @Override
     public void construct() {
-        this.fillFragment();
+        this.createFragmentWithSetter();
         this.fillData();
         this.fillChildren();
         this.createSetterChildrenList();
         this.createValidator();
         this.createCreator();
-    }
-
-    /**
-     * Fills in everything related to the fragment.
-     */
-    private void fillFragment() {
-        final Klass klass = this.getKlass();
-        final Field field = new Field(
-            "The fragment associated with the node",
-            OrdinaryNodeBuilderConstructor.STR_FRAGMENT,
-            "fragment"
-        );
-        field.setInitExpr("EmptyFragment.INSTANCE");
-        klass.addField(field);
-        final Method setter = new Method("setFragment");
-        setter.makeOverridden();
-        setter.addArgument(OrdinaryNodeBuilderConstructor.STR_FRAGMENT, "obj");
-        setter.setCode("this.fragment = obj;");
-        klass.addMethod(setter);
     }
 
     /**
