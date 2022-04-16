@@ -65,6 +65,8 @@ public final class ProgramGenerator {
             final CompilationUnit unit;
             if (rule.isOrdinary()) {
                 unit = new NodeGenerator(this.env, stmt).generate();
+            } else if (rule.isAbstract()) {
+                unit = new AbstractNodeGenerator(this.env, stmt).generate();
             } else {
                 throw new IllegalStateException();
             }
