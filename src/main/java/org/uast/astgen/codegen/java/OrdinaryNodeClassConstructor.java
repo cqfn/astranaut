@@ -9,11 +9,11 @@ import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Node;
 
 /**
- * Generates class source code for rules that describe nodes.
+ * Generates class source code for rules that describe ordinary nodes.
  *
  * @since 1.0
  */
-final class NodeClassConstructor extends NodeConstructor {
+final class OrdinaryNodeClassConstructor extends NodeConstructor {
     /**
      * The 'Type' string.
      */
@@ -35,7 +35,7 @@ final class NodeClassConstructor extends NodeConstructor {
      * @param rule The rule
      * @param klass The class to be filled
      */
-    NodeClassConstructor(final Environment env, final Node rule, final Klass klass) {
+    OrdinaryNodeClassConstructor(final Environment env, final Node rule, final Klass klass) {
         super(env, rule, klass);
     }
 
@@ -56,7 +56,7 @@ final class NodeClassConstructor extends NodeConstructor {
      * Fills in everything related to the type.
      */
     private void fillType() {
-        final Field field = new Field("The type", NodeClassConstructor.STR_TYPE, "TYPE");
+        final Field field = new Field("The type", OrdinaryNodeClassConstructor.STR_TYPE, "TYPE");
         final Klass klass = this.getKlass();
         final Node rule = this.getRule();
         field.makePublic();
@@ -65,7 +65,7 @@ final class NodeClassConstructor extends NodeConstructor {
         klass.addField(field);
         final Method getter = new Method("getType");
         getter.makeOverridden();
-        getter.setReturnType(NodeClassConstructor.STR_TYPE);
+        getter.setReturnType(OrdinaryNodeClassConstructor.STR_TYPE);
         getter.setCode(String.format("return %s.TYPE;", rule.getType()));
         klass.addMethod(getter);
         final Klass subclass = new Klass(
@@ -74,9 +74,9 @@ final class NodeClassConstructor extends NodeConstructor {
         );
         subclass.makePrivate();
         subclass.makeStatic();
-        subclass.setInterfaces(NodeClassConstructor.STR_TYPE);
+        subclass.setInterfaces(OrdinaryNodeClassConstructor.STR_TYPE);
         klass.addClass(subclass);
-        new NodeTypeConstructor(this.getEnv(), rule, subclass).run();
+        new OrdinaryNodeTypeConstructor(this.getEnv(), rule, subclass).run();
     }
 
     /**
@@ -94,7 +94,7 @@ final class NodeClassConstructor extends NodeConstructor {
         subclass.makeFinal();
         subclass.setInterfaces("Builder");
         klass.addClass(subclass);
-        new NodeBuilderConstructor(this.getEnv(), rule, subclass).run();
+        new OrdinaryNodeBuilderConstructor(this.getEnv(), rule, subclass).run();
     }
 
     /**
@@ -104,13 +104,13 @@ final class NodeClassConstructor extends NodeConstructor {
         final Klass klass = this.getKlass();
         final Field field = new Field(
             "The fragment associated with the node",
-            NodeClassConstructor.STR_FRAGMENT,
+            OrdinaryNodeClassConstructor.STR_FRAGMENT,
             "fragment"
         );
         klass.addField(field);
         final Method getter = new Method("getFragment");
         getter.makeOverridden();
-        getter.setReturnType(NodeClassConstructor.STR_FRAGMENT);
+        getter.setReturnType(OrdinaryNodeClassConstructor.STR_FRAGMENT);
         getter.setCode("return this.fragment;");
         klass.addMethod(getter);
     }
@@ -129,13 +129,13 @@ final class NodeClassConstructor extends NodeConstructor {
         klass.addField(new Field("List of child nodes", "List<Node>", "children"));
         final Method count = new Method("getChildCount");
         count.makeOverridden();
-        count.setReturnType(NodeClassConstructor.STR_INT);
+        count.setReturnType(OrdinaryNodeClassConstructor.STR_INT);
         if (rule.hasOptionalChild()) {
             count.setCode("return this.children.size();");
         } else {
             final Field num = new Field(
                 "The number of children",
-                NodeClassConstructor.STR_INT,
+                OrdinaryNodeClassConstructor.STR_INT,
                 "CHILD_COUNT"
             );
             num.makeStaticFinal();
@@ -152,7 +152,7 @@ final class NodeClassConstructor extends NodeConstructor {
     private void createGetter() {
         final Method getter = new Method("getChild");
         getter.makeOverridden();
-        getter.addArgument(NodeClassConstructor.STR_INT, "index");
+        getter.addArgument(OrdinaryNodeClassConstructor.STR_INT, "index");
         getter.setReturnType("Node");
         getter.setCode("return this.children.get(index);");
         this.getKlass().addMethod(getter);

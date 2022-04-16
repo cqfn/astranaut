@@ -11,11 +11,11 @@ import org.uast.astgen.rules.DescriptorAttribute;
 import org.uast.astgen.rules.Node;
 
 /**
- * Generates type subclass source code for rules that describe nodes.
+ * Generates type subclass source code for rules that describe ordinary nodes.
  *
  * @since 1.0
  */
-final class NodeTypeConstructor extends NodeConstructor {
+final class OrdinaryNodeTypeConstructor extends NodeConstructor {
     /**
      * The {@code List<String>} type.
      */
@@ -52,7 +52,7 @@ final class NodeTypeConstructor extends NodeConstructor {
      * @param rule The rule
      * @param klass The class to be filled
      */
-    NodeTypeConstructor(final Environment env, final Node rule, final Klass klass) {
+    OrdinaryNodeTypeConstructor(final Environment env, final Node rule, final Klass klass) {
         super(env, rule, klass);
         this.ssg = new StaticStringGenerator(klass);
     }
@@ -80,7 +80,7 @@ final class NodeTypeConstructor extends NodeConstructor {
         final Klass klass = this.getKlass();
         this.createChildrenField();
         final Method getter = new Method("getChildTypes");
-        getter.setReturnType(NodeTypeConstructor.LIST_CHILD);
+        getter.setReturnType(OrdinaryNodeTypeConstructor.LIST_CHILD);
         getter.setCode("return TypeImpl.CHILDREN;");
         klass.addMethod(getter);
     }
@@ -91,13 +91,13 @@ final class NodeTypeConstructor extends NodeConstructor {
     private void createChildrenField() {
         final Klass klass = this.getKlass();
         final StringBuilder init = new StringBuilder(128);
-        init.append(NodeTypeConstructor.LIST_BEGIN);
+        init.append(OrdinaryNodeTypeConstructor.LIST_BEGIN);
         boolean flag = false;
         for (final Child child : this.getRule().getComposition()) {
             assert child instanceof Descriptor;
             final Descriptor descriptor = (Descriptor) child;
             if (flag) {
-                init.append(NodeTypeConstructor.SEPARATOR);
+                init.append(OrdinaryNodeTypeConstructor.SEPARATOR);
             }
             flag = true;
             boolean optional = false;
@@ -106,14 +106,14 @@ final class NodeTypeConstructor extends NodeConstructor {
             }
             init.append("new ChildDescriptor(")
                 .append(this.ssg.getFieldName(descriptor.getType()))
-                .append(NodeTypeConstructor.SEPARATOR)
+                .append(OrdinaryNodeTypeConstructor.SEPARATOR)
                 .append(optional)
                 .append(')');
         }
-        init.append(NodeTypeConstructor.LIST_END);
+        init.append(OrdinaryNodeTypeConstructor.LIST_END);
         final Field field = new Field(
             "The list of child types",
-            NodeTypeConstructor.LIST_CHILD,
+            OrdinaryNodeTypeConstructor.LIST_CHILD,
             "CHILDREN"
         );
         field.makePrivate();
@@ -129,23 +129,27 @@ final class NodeTypeConstructor extends NodeConstructor {
         final Klass klass = this.getKlass();
         final List<String> hierarchy = this.getEnv().getHierarchy(this.getRule().getType());
         final StringBuilder init  = new StringBuilder(128);
-        init.append(NodeTypeConstructor.LIST_BEGIN);
+        init.append(OrdinaryNodeTypeConstructor.LIST_BEGIN);
         boolean flag = false;
         for (final String item : hierarchy) {
             if (flag) {
-                init.append(NodeTypeConstructor.SEPARATOR);
+                init.append(OrdinaryNodeTypeConstructor.SEPARATOR);
             }
             flag = true;
             init.append(this.ssg.getFieldName(item));
         }
-        init.append(NodeTypeConstructor.LIST_END);
-        final Field field = new Field("Hierarchy", NodeTypeConstructor.LIST_STRING, "HIERARCHY");
+        init.append(OrdinaryNodeTypeConstructor.LIST_END);
+        final Field field = new Field(
+            "Hierarchy",
+            OrdinaryNodeTypeConstructor.LIST_STRING,
+            "HIERARCHY"
+        );
         field.makePrivate();
         field.makeStaticFinal();
         field.setInitExpr(init.toString());
         klass.addField(field);
         final Method getter = new Method("getHierarchy");
-        getter.setReturnType(NodeTypeConstructor.LIST_STRING);
+        getter.setReturnType(OrdinaryNodeTypeConstructor.LIST_STRING);
         getter.setCode("return TypeImpl.HIERARCHY;");
         klass.addMethod(getter);
     }

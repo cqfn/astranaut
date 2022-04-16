@@ -114,7 +114,7 @@ public final class ProgramGenerator {
             final Node rule = stmt.getRule();
             final CompilationUnit unit;
             if (rule.isOrdinary()) {
-                unit = new NodeGenerator(this.env, stmt).generate();
+                unit = new OrdinaryNodeGenerator(this.env, stmt).generate();
             } else if (rule.isAbstract()) {
                 unit = new AbstractNodeGenerator(this.env, stmt).generate();
             } else {

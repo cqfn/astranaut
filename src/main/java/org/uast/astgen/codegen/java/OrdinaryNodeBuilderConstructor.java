@@ -15,7 +15,7 @@ import org.uast.astgen.rules.Node;
  *
  * @since 1.0
  */
-final class NodeBuilderConstructor extends NodeConstructor {
+final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
     /**
      * The 'boolean' string.
      */
@@ -42,7 +42,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
      * @param rule The rule
      * @param klass The class to be filled
      */
-    NodeBuilderConstructor(final Environment env, final Node rule, final Klass klass) {
+    OrdinaryNodeBuilderConstructor(final Environment env, final Node rule, final Klass klass) {
         super(env, rule, klass);
     }
 
@@ -63,14 +63,14 @@ final class NodeBuilderConstructor extends NodeConstructor {
         final Klass klass = this.getKlass();
         final Field field = new Field(
             "The fragment associated with the node",
-            NodeBuilderConstructor.STR_FRAGMENT,
+            OrdinaryNodeBuilderConstructor.STR_FRAGMENT,
             "fragment"
         );
         field.setInitExpr("EmptyFragment.INSTANCE");
         klass.addField(field);
         final Method setter = new Method("setFragment");
         setter.makeOverridden();
-        setter.addArgument(NodeBuilderConstructor.STR_FRAGMENT, "obj");
+        setter.addArgument(OrdinaryNodeBuilderConstructor.STR_FRAGMENT, "obj");
         setter.setCode("this.fragment = obj;");
         klass.addMethod(setter);
     }
@@ -83,7 +83,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
         final Method setter = new Method("setData");
         setter.makeOverridden();
         setter.addArgument("String", "str");
-        setter.setReturnType(NodeBuilderConstructor.STR_BOOLEAN);
+        setter.setReturnType(OrdinaryNodeBuilderConstructor.STR_BOOLEAN);
         setter.setCode("return str.isEmpty();");
         klass.addMethod(setter);
     }
@@ -128,7 +128,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
         final Method method = new Method("setChildrenList");
         method.makeOverridden();
         method.addArgument("List<Node>", "list");
-        method.setReturnType(NodeBuilderConstructor.STR_BOOLEAN);
+        method.setReturnType(OrdinaryNodeBuilderConstructor.STR_BOOLEAN);
         final StringBuilder code = new StringBuilder(256);
         final String first = String.format(
             "final Node[] mapping = new Node[%d];\n",
@@ -164,7 +164,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
     private void createValidator() {
         final Method method = new Method("isValid");
         method.makeOverridden();
-        method.setReturnType(NodeBuilderConstructor.STR_BOOLEAN);
+        method.setReturnType(OrdinaryNodeBuilderConstructor.STR_BOOLEAN);
         final StringBuilder code = new StringBuilder(64);
         code.append("return ");
         boolean flag = false;
@@ -174,7 +174,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
                 if (flag) {
                     code.append("\n\t&& ");
                 }
-                code.append(NodeBuilderConstructor.STR_THIS)
+                code.append(OrdinaryNodeBuilderConstructor.STR_THIS)
                     .append(descriptor.getVariableName())
                     .append(" != null");
                 flag = true;
@@ -183,7 +183,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
         if (!flag) {
             code.append("true");
         }
-        code.append(NodeBuilderConstructor.STR_SEMICOLON);
+        code.append(OrdinaryNodeBuilderConstructor.STR_SEMICOLON);
         method.setCode(code.toString());
         this.getKlass().addMethod(method);
     }
@@ -223,10 +223,10 @@ final class NodeBuilderConstructor extends NodeConstructor {
                 fourth.append(", ");
             }
             flag = true;
-            fourth.append(NodeBuilderConstructor.STR_THIS).append(var);
+            fourth.append(OrdinaryNodeBuilderConstructor.STR_THIS).append(var);
             if (!descriptor.getTag().isEmpty()) {
                 fifth.append("node.").append(var).append(" = this.").append(var)
-                    .append(NodeBuilderConstructor.STR_SEMICOLON);
+                    .append(OrdinaryNodeBuilderConstructor.STR_SEMICOLON);
             }
         }
         fourth.append(");\n");

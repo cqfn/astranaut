@@ -8,11 +8,11 @@ import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Statement;
 
 /**
- * Generates source code for rules that describe nodes.
+ * Generates source code for rules that describe ordinary nodes.
  *
  * @since 1.0
  */
-final class NodeGenerator extends BaseGenerator {
+final class OrdinaryNodeGenerator extends BaseNodeGenerator {
     /**
      * The DSL statement.
      */
@@ -23,7 +23,7 @@ final class NodeGenerator extends BaseGenerator {
      * @param env The environment required for generation.
      * @param statement The DSL statement
      */
-    NodeGenerator(final Environment env, final Statement<Node> statement) {
+    OrdinaryNodeGenerator(final Environment env, final Statement<Node> statement) {
         super(env);
         this.statement = statement;
     }
@@ -32,14 +32,8 @@ final class NodeGenerator extends BaseGenerator {
     public CompilationUnit generate() {
         final Environment env = this.getEnv();
         final Node rule = this.statement.getRule();
-        final String type = rule.getType();
-        final Klass klass = new Klass(
-            String.format("Node that describes the '%s' type", type),
-            type
-        );
-        klass.makeFinal();
-        klass.setInterfaces("Node");
-        new NodeClassConstructor(env, rule, klass).run();
+        final Klass klass = this.createClass(rule);
+        new OrdinaryNodeClassConstructor(env, rule, klass).run();
         final String pkg = this.getPackageName(this.statement.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
         this.generateImports(unit);

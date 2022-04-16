@@ -18,11 +18,11 @@ import org.uast.astgen.rules.Statement;
 import org.uast.astgen.utils.FilesReader;
 
 /**
- * Tests for {@link NodeGenerator} class.
+ * Tests for {@link OrdinaryNodeGenerator} class.
  *
  * @since 1.0
  */
-public class NodeGeneratorTest {
+public class OrdinaryNodeGeneratorTest {
     /**
      * The folder with test resources.
      */
@@ -36,7 +36,7 @@ public class NodeGeneratorTest {
     public void testNodeGeneration() {
         final Environment env = new TestEnvironment();
         final Statement<Node> statement = this.createStatement();
-        final NodeGenerator generator = new NodeGenerator(env, statement);
+        final OrdinaryNodeGenerator generator = new OrdinaryNodeGenerator(env, statement);
         final String actual = generator.generate().generate();
         final String expected = this.readTest("node_generator.txt");
         Assertions.assertEquals(expected, actual);
@@ -75,7 +75,7 @@ public class NodeGeneratorTest {
         String result = "";
         boolean oops = false;
         try {
-            result = new FilesReader(NodeGeneratorTest.TESTS_PATH.concat(name))
+            result = new FilesReader(OrdinaryNodeGeneratorTest.TESTS_PATH.concat(name))
                 .readAsString();
         } catch (final IOException ignored) {
             oops = true;
