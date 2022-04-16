@@ -117,6 +117,8 @@ public final class ProgramGenerator {
                 unit = new OrdinaryNodeGenerator(this.env, stmt).generate();
             } else if (rule.isAbstract()) {
                 unit = new AbstractNodeGenerator(this.env, stmt).generate();
+            } else if (rule.isList()) {
+                unit = new ListNodeGenerator(this.env, stmt).generate();
             } else {
                 throw new IllegalStateException();
             }
