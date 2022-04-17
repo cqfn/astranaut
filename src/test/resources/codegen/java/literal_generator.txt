@@ -73,6 +73,40 @@ public final class IntegerLiteral implements Node {
      * @since 1.0
      */
     private static class TypeImpl implements Type {
+        /**
+         * The 'IntegerLiteral' string.
+         */
+        private static final String INTEGER_LITERAL = "IntegerLiteral";
+
+        /**
+         * Hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Collections.unmodifiableList(
+                Arrays.asList(
+                    TypeImpl.INTEGER_LITERAL
+                )
+            );
+
+        @Override
+        public String getName() {
+            return TypeImpl.INTEGER_LITERAL;
+        }
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return TypeImpl.HIERARCHY;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Constructor();
+        }
     }
 
     /**

@@ -42,7 +42,8 @@ final class LiteralClassConstructor extends LiteralConstructor {
      * Fills in everything related to the type.
      */
     private void fillType() {
-        this.createTypeClass();
+        final Klass subtype = this.createTypeClass();
+        new LiteralTypeConstructor(this.getEnv(), this.getRule(), subtype).run();
     }
 
     /**
