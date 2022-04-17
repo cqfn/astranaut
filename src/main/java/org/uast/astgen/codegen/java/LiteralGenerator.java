@@ -4,44 +4,48 @@
  */
 package org.uast.astgen.codegen.java;
 
-import java.util.Locale;
-import org.uast.astgen.rules.Node;
+import org.uast.astgen.rules.Literal;
 import org.uast.astgen.rules.Statement;
 
 /**
- * Generates source code for rules that describe nodes.
+ * Generates source code for rules that describe literals.
  *
  * @since 1.0
  */
-public final class NodeGenerator {
+final class LiteralGenerator extends BaseGenerator {
     /**
-     * The environment.
+     * The DSL statement.
      */
-    private final Environment env;
+    private final Statement<Literal> statement;
 
     /**
      * Constructor.
      * @param env The environment required for generation.
+     * @param statement The DSL statement
      */
-    public NodeGenerator(final Environment env) {
-        this.env = env;
+    LiteralGenerator(final Environment env, final Statement<Literal> statement) {
+        super(env);
+        this.statement = statement;
+    }
+
+    @Override
+    public CompilationUnit generate() {
+        final Environment env = this.getEnv();
+        final Literal rule = this.statement.getRule();
+        final Klass klass = LiteralGenerator.createClass(rule);
+        new LiteralClassConstructor(env, rule, klass).run();
+        final String pkg = this.getPackageName(this.statement.getLanguage());
+        final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
+        this.generateImports(unit);
+        return unit;
     }
 
     /**
-     * Generates Java compilation unit that contains source code for rules that describe nodes.
-     * @param statement DSL statement
-     * @return Compilation unit
+     * Creates class for node construction.
+     * @param rule The rule
+     * @return The class constructor
      */
-    public CompilationUnit generate(final Statement<Node> statement) {
-        final String language = statement.getLanguage();
-        final String root = this.env.getRootPackage();
-        final String pkg;
-        if (language.isEmpty()) {
-            pkg = root.concat(".green");
-        } else {
-            pkg = root.concat(language.toLowerCase(Locale.ENGLISH));
-        }
-        final Node rule = statement.getRule();
+    private static Klass createClass(final Literal rule) {
         final String type = rule.getType();
         final Klass klass = new Klass(
             String.format("Node that describes the '%s' type", type),
@@ -49,10 +53,7 @@ public final class NodeGenerator {
         );
         klass.makeFinal();
         klass.setInterfaces("Node");
-        new NodeClassConstructor(this.env, rule, klass).run();
-        final CompilationUnit unit = new CompilationUnit(this.env.getLicense(), pkg, klass);
-        this.generateImports(unit);
-        return unit;
+        return klass;
     }
 
     /**
@@ -63,10 +64,9 @@ public final class NodeGenerator {
         unit.addImport("java.util.Arrays");
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
-        final String base = this.env.getBasePackage();
+        final String base = this.getEnv().getBasePackage();
         unit.addImport(base.concat(".Builder"));
         unit.addImport(base.concat(".ChildDescriptor"));
-        unit.addImport(base.concat(".ChildrenMapper"));
         unit.addImport(base.concat(".EmptyFragment"));
         unit.addImport(base.concat(".Fragment"));
         unit.addImport(base.concat(".Node"));

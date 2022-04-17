@@ -9,21 +9,11 @@ import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Node;
 
 /**
- * Generates class source code for rules that describe nodes.
+ * Generates class source code for rules that describe ordinary nodes.
  *
  * @since 1.0
  */
-final class NodeClassConstructor extends NodeConstructor {
-    /**
-     * The 'Type' string.
-     */
-    private static final String STR_TYPE = "Type";
-
-    /**
-     * The 'Fragment' string.
-     */
-    private static final String STR_FRAGMENT = "Fragment";
-
+final class OrdinaryNodeClassConstructor extends NodeConstructor {
     /**
      * The 'int' string.
      */
@@ -35,7 +25,7 @@ final class NodeClassConstructor extends NodeConstructor {
      * @param rule The rule
      * @param klass The class to be filled
      */
-    NodeClassConstructor(final Environment env, final Node rule, final Klass klass) {
+    OrdinaryNodeClassConstructor(final Environment env, final Node rule, final Klass klass) {
         super(env, rule, klass);
     }
 
@@ -46,9 +36,9 @@ final class NodeClassConstructor extends NodeConstructor {
         this.getKlass().addConstructor(ctor);
         this.fillType();
         this.fillBuilder();
-        this.fillFragment();
+        this.createFragmentWithGetter();
         this.createCommonFields();
-        this.createGetter();
+        this.createChildrenGetter();
         this.createTaggedFields();
     }
 
@@ -56,63 +46,16 @@ final class NodeClassConstructor extends NodeConstructor {
      * Fills in everything related to the type.
      */
     private void fillType() {
-        final Field field = new Field("The type", NodeClassConstructor.STR_TYPE, "TYPE");
-        final Klass klass = this.getKlass();
-        final Node rule = this.getRule();
-        field.makePublic();
-        field.makeStaticFinal();
-        field.setInitExpr("new TypeImpl()");
-        klass.addField(field);
-        final Method getter = new Method("getType");
-        getter.makeOverridden();
-        getter.setReturnType(NodeClassConstructor.STR_TYPE);
-        getter.setCode(String.format("return %s.TYPE;", rule.getType()));
-        klass.addMethod(getter);
-        final Klass subclass = new Klass(
-            String.format("Type descriptor of the '%s' node", rule.getType()),
-            "TypeImpl"
-        );
-        subclass.makePrivate();
-        subclass.makeStatic();
-        subclass.setInterfaces(NodeClassConstructor.STR_TYPE);
-        klass.addClass(subclass);
-        new NodeTypeConstructor(this.getEnv(), rule, subclass).run();
+        final Klass subclass = this.createTypeClass();
+        new OrdinaryNodeTypeConstructor(this.getEnv(), this.getRule(), subclass).run();
     }
 
     /**
      * Fills in everything related to the builder.
      */
     private void fillBuilder() {
-        final Klass klass = this.getKlass();
-        final Node rule = this.getRule();
-        final Klass subclass = new Klass(
-            String.format("Class for '%s' node construction", rule.getType()),
-            "Constructor"
-        );
-        subclass.makePublic();
-        subclass.makeStatic();
-        subclass.makeFinal();
-        subclass.setInterfaces("Builder");
-        klass.addClass(subclass);
-        new NodeBuilderConstructor(this.getEnv(), rule, subclass).run();
-    }
-
-    /**
-     * Fills everything that is associated with a fragment.
-     */
-    private void fillFragment() {
-        final Klass klass = this.getKlass();
-        final Field field = new Field(
-            "The fragment associated with the node",
-            NodeClassConstructor.STR_FRAGMENT,
-            "fragment"
-        );
-        klass.addField(field);
-        final Method getter = new Method("getFragment");
-        getter.makeOverridden();
-        getter.setReturnType(NodeClassConstructor.STR_FRAGMENT);
-        getter.setCode("return this.fragment;");
-        klass.addMethod(getter);
+        final Klass subclass = this.createBuilderClass();
+        new OrdinaryNodeBuilderConstructor(this.getEnv(), this.getRule(), subclass).run();
     }
 
     /**
@@ -129,13 +72,13 @@ final class NodeClassConstructor extends NodeConstructor {
         klass.addField(new Field("List of child nodes", "List<Node>", "children"));
         final Method count = new Method("getChildCount");
         count.makeOverridden();
-        count.setReturnType(NodeClassConstructor.STR_INT);
+        count.setReturnType(OrdinaryNodeClassConstructor.STR_INT);
         if (rule.hasOptionalChild()) {
             count.setCode("return this.children.size();");
         } else {
             final Field num = new Field(
                 "The number of children",
-                NodeClassConstructor.STR_INT,
+                OrdinaryNodeClassConstructor.STR_INT,
                 "CHILD_COUNT"
             );
             num.makeStaticFinal();
@@ -144,18 +87,6 @@ final class NodeClassConstructor extends NodeConstructor {
             count.setCode(String.format("return %s.CHILD_COUNT;", rule.getType()));
         }
         klass.addMethod(count);
-    }
-
-    /**
-     * Creates the method 'getChild'.
-     */
-    private void createGetter() {
-        final Method getter = new Method("getChild");
-        getter.makeOverridden();
-        getter.addArgument(NodeClassConstructor.STR_INT, "index");
-        getter.setReturnType("Node");
-        getter.setCode("return this.children.get(index);");
-        this.getKlass().addMethod(getter);
     }
 
     /**

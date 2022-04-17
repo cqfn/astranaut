@@ -159,7 +159,7 @@ public final class Main {
             final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
             generator.generate();
         } catch (final BaseException exc) {
-            LOG.severe(exc.getErrorMessage());
+            LOG.severe(String.format("%s, %s", exc.getInitiator(), exc.getErrorMessage()));
         }
     }
 

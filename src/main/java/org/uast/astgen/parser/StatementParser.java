@@ -7,6 +7,7 @@ package org.uast.astgen.parser;
 
 import org.uast.astgen.exceptions.BadRuleSyntax;
 import org.uast.astgen.exceptions.ParserException;
+import org.uast.astgen.rules.Literal;
 import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.rules.Statement;
@@ -62,8 +63,13 @@ public class StatementParser {
      */
     protected void parseDsl(final String source) throws ParserException {
         if (source.contains("<-")) {
-            final Node node = new NodeParser(source).parse();
-            this.program.addNodeStmt(new Statement<Node>(node, this.language));
+            if (source.contains("$")) {
+                final Literal literal = new LiteralParser(source).parse();
+                this.program.addLiteralStmt(new Statement<Literal>(literal, this.language));
+            } else {
+                final Node node = new NodeParser(source).parse();
+                this.program.addNodeStmt(new Statement<Node>(node, this.language));
+            }
         } else {
             throw BadRuleSyntax.INSTANCE;
         }
