@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.BaseException;
+import org.uast.astgen.rules.Literal;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.rules.Rule;
 import org.uast.astgen.rules.Statement;
@@ -65,5 +66,28 @@ public class ProgramParserTest {
             oops = true;
         }
         Assertions.assertTrue(oops);
+    }
+
+    /**
+     * Test parsed literal.
+     */
+    @Test
+    public void parseLiteral() {
+        boolean oops = false;
+        final String source =
+            "IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$;";
+        final ProgramParser parser = new ProgramParser(source);
+        try {
+            final Program program = parser.parse();
+            final List<Statement<Literal>> list = program.getLiterals();
+            Assertions.assertEquals(1, list.size());
+            Assertions.assertEquals(
+                "green: IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$",
+                list.get(0).toString()
+            );
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }
