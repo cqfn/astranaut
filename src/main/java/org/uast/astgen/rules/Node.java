@@ -101,6 +101,19 @@ public class Node implements Rule {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        final Node node;
+        boolean equal = false;
+        if (obj instanceof Node) {
+            node = (Node) obj;
+            if (this.type.equals(node.getType())) {
+                equal = true;
+            }
+        }
+        return equal;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(this.type);
     }
