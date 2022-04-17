@@ -5,18 +5,15 @@
 
 package org.uast.astgen.codegen.java;
 
+import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.BaseException;
 import org.uast.astgen.parser.ProgramParser;
 import org.uast.astgen.rules.Literal;
-import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.rules.Statement;
 import org.uast.astgen.utils.FilesReader;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Tests for {@link OrdinaryNodeGenerator} class.
@@ -54,7 +51,7 @@ public class LiteralGeneratorTest {
         final ProgramParser parser = new ProgramParser(source);
         try {
             final Program program = parser.parse();
-            if (!program.getLiterals().isEmpty()){
+            if (!program.getLiterals().isEmpty()) {
                 return program.getLiterals().get(0);
             }
         } catch (final BaseException ignored) {
