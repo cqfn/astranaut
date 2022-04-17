@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.Locale;
 import org.uast.astgen.exceptions.CouldNotWriteFile;
 import org.uast.astgen.exceptions.GeneratorException;
+import org.uast.astgen.rules.Literal;
 import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.rules.Statement;
@@ -59,6 +60,7 @@ public final class ProgramGenerator {
     public void generate() throws GeneratorException {
         this.generatePackages();
         this.generateNodes();
+        this.generateLiterals();
     }
 
     /**
@@ -122,6 +124,24 @@ public final class ProgramGenerator {
             } else {
                 throw new IllegalStateException();
             }
+            if (!version.isEmpty()) {
+                unit.setVersion(version);
+            }
+            final String code = unit.generate();
+            final String filename = this.getFilePath(stmt.getLanguage(), rule.getType());
+            this.createFile(filename, code);
+        }
+    }
+
+    /**
+     * Generates source code for literals.
+     * @throws GeneratorException When can't generate
+     */
+    private void generateLiterals() throws GeneratorException {
+        final String version = this.env.getVersion();
+        for (final Statement<Literal> stmt : this.program.getLiterals()) {
+            final Literal rule = stmt.getRule();
+            final CompilationUnit unit = new LiteralGenerator(this.env, stmt).generate();
             if (!version.isEmpty()) {
                 unit.setVersion(version);
             }

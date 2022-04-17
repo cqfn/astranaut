@@ -1,5 +1,5 @@
-IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$, $NumberFormatException$
-StringLiteral <- $String$, $#$, $#$
+IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$, $NumberFormatException$;
+StringLiteral <- $String$, $#$, $#$;
 
 Addition <- left@Expression, right@Expression;
 Subtraction <- left@Expression, right@Expression;
