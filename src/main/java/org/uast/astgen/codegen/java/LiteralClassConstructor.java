@@ -50,7 +50,8 @@ final class LiteralClassConstructor extends LiteralConstructor {
      * Fills in everything related to the builder.
      */
     private void fillBuilder() {
-        this.createBuilderClass();
+        final Klass subtype = this.createBuilderClass();
+        new LiteralBuilderConstructor(this.getEnv(), this.getRule(), subtype).run();
     }
 
     /**

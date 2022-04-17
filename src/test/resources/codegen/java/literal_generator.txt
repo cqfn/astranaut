@@ -115,5 +115,54 @@ public final class IntegerLiteral implements Node {
      * @since 1.0
      */
     public static final class Constructor implements Builder {
+        /**
+         * The fragment associated with the node.
+         */
+        private Fragment fragment = EmptyFragment.INSTANCE;
+
+        /**
+         * The flag indicating that the builder has been initialized.
+         */
+        private boolean initialized;
+
+        /**
+         * The data.
+         */
+        private int data;
+
+        @Override
+        public void setFragment(final Fragment obj) {
+            this.fragment = obj;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            boolean success = true;
+            try {
+                this.data = Integer.parseInt(value);
+                this.initialized = true;
+            } catch (final Exception ignored) {
+                success = false;
+            }
+            return success;
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return this.initialized;
+        }
+
+        @Override
+        public IntegerLiteral createNode() {
+            final IntegerLiteral node = new IntegerLiteral();
+            node.fragment = this.fragment;
+            node.data = this.data;
+            return node;
+        }
     }
 }
