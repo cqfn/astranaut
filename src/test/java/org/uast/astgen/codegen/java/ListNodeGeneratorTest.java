@@ -6,7 +6,6 @@
 package org.uast.astgen.codegen.java;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,11 +17,11 @@ import org.uast.astgen.rules.Statement;
 import org.uast.astgen.utils.FilesReader;
 
 /**
- * Tests for {@link NodeGenerator} class.
+ * Tests for {@link ListNodeGenerator} class.
  *
  * @since 1.0
  */
-public class NodeGeneratorTest {
+public class ListNodeGeneratorTest {
     /**
      * The folder with test resources.
      */
@@ -35,10 +34,10 @@ public class NodeGeneratorTest {
     @SuppressWarnings("PMD.CloseResource")
     public void testNodeGeneration() {
         final Environment env = new TestEnvironment();
-        final NodeGenerator generator = new NodeGenerator(env);
         final Statement<Node> statement = this.createStatement();
-        final String actual = generator.generate(statement).generate();
-        final String expected = this.readTest("node_generator.txt");
+        final ListNodeGenerator generator = new ListNodeGenerator(env, statement);
+        final String actual = generator.generate().generate();
+        final String expected = this.readTest("list_node_generator.txt");
         Assertions.assertEquals(expected, actual);
     }
 
@@ -49,13 +48,13 @@ public class NodeGeneratorTest {
     private Statement<Node> createStatement() {
         boolean oops = false;
         final String source =
-            "Addition <- left@Expression, right@Expression;\nExpression <- Addition | Subtraction";
+            "ExpressionList <- {Expression}; Expression <- Addition | Subtraction";
         final ProgramParser parser = new ProgramParser(source);
         try {
             final Program program = parser.parse();
             final List<Statement<Node>> list = program.getNodes();
             for (final Statement<Node> statement : list) {
-                if (statement.getRule().getType().equals("Addition")) {
+                if (statement.getRule().getType().equals("ExpressionList")) {
                     return statement;
                 }
             }
@@ -75,61 +74,12 @@ public class NodeGeneratorTest {
         String result = "";
         boolean oops = false;
         try {
-            result = new FilesReader(NodeGeneratorTest.TESTS_PATH.concat(name))
+            result = new FilesReader(ListNodeGeneratorTest.TESTS_PATH.concat(name))
                 .readAsString();
         } catch (final IOException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
         return result;
-    }
-
-    /**
-     * Environment for test purposes.
-     *
-     * @since 1.0
-     */
-    private static final class TestEnvironment implements Environment {
-        /**
-         * The license.
-         */
-        private final License license;
-
-        /**
-         * Constructor.
-         */
-        TestEnvironment() {
-            this.license = new License("LICENSE_header.txt");
-        }
-
-        @Override
-        public License getLicense() {
-            return this.license;
-        }
-
-        @Override
-        public String getVersion() {
-            return "1.0";
-        }
-
-        @Override
-        public String getRootPackage() {
-            return "org.uast.example";
-        }
-
-        @Override
-        public String getBasePackage() {
-            return "org.uast.uast.base";
-        }
-
-        @Override
-        public boolean isTestMode() {
-            return false;
-        }
-
-        @Override
-        public List<String> getHierarchy(final String name) {
-            return Collections.singletonList(name);
-        }
     }
 }

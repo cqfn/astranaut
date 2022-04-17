@@ -24,7 +24,7 @@ public class TokenizerTest {
     /**
      * Source string (incorrect).
      */
-    private static final String INCORRECT = "example$123";
+    private static final String INCORRECT = "example^123";
 
     /**
      * Test the tokenizer with correct string.

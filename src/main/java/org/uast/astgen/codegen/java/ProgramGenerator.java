@@ -5,8 +5,10 @@
 package org.uast.astgen.codegen.java;
 
 import java.io.File;
+import java.util.Locale;
 import org.uast.astgen.exceptions.CouldNotWriteFile;
 import org.uast.astgen.exceptions.GeneratorException;
+import org.uast.astgen.rules.Literal;
 import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.rules.Statement;
@@ -18,7 +20,12 @@ import org.uast.astgen.utils.FilesWriter;
  * @since 1.0
  */
 @SuppressWarnings("PMD.CloseResource")
-public class ProgramGenerator {
+public final class ProgramGenerator {
+    /**
+     * The 'green' package name.
+     */
+    private static final String GREEN = "green";
+
     /**
      * The path where to generate.
      */
@@ -51,7 +58,52 @@ public class ProgramGenerator {
      * @throws GeneratorException When can't generate
      */
     public void generate() throws GeneratorException {
+        this.generatePackages();
         this.generateNodes();
+        this.generateLiterals();
+    }
+
+    /**
+     * Generates 'package-info.java' files.
+     * @throws GeneratorException When can't generate
+     */
+    private void generatePackages() throws GeneratorException {
+        this.generatePackage(
+            "This package contains unified nodes",
+            ProgramGenerator.GREEN
+        );
+        for (final String language : this.program.getNamesOfAllLanguages()) {
+            this.generatePackage(
+                String.format(
+                    "This package contains nodes that describe the %s%s programming language",
+                    language.substring(0, 1).toUpperCase(Locale.ENGLISH),
+                    language.substring(1)
+                ),
+                language.toLowerCase(Locale.ENGLISH)
+            );
+        }
+    }
+
+    /**
+     * Generates 'package-info.java' file for one language.
+     * @param brief Brief description
+     * @param language Language name
+     * @throws GeneratorException When can't generate
+     */
+    private void generatePackage(final String brief, final String language)
+        throws GeneratorException {
+        final PackageInfo info = new PackageInfo(
+            this.env.getLicense(),
+            brief,
+            String.format("%s.%s", this.env.getRootPackage(), language)
+        );
+        final String version = this.env.getVersion();
+        if (!version.isEmpty()) {
+            info.setVersion(version);
+        }
+        final String code = info.generate();
+        final String filename = this.getFilePath(language, "package-info");
+        this.createFile(filename, code);
     }
 
     /**
@@ -59,13 +111,16 @@ public class ProgramGenerator {
      * @throws GeneratorException When can't generate
      */
     private void generateNodes() throws GeneratorException {
-        final NodeGenerator nodegen = new NodeGenerator(this.env);
         final String version = this.env.getVersion();
         for (final Statement<Node> stmt : this.program.getNodes()) {
             final Node rule = stmt.getRule();
             final CompilationUnit unit;
             if (rule.isOrdinary()) {
-                unit = nodegen.generate(stmt);
+                unit = new OrdinaryNodeGenerator(this.env, stmt).generate();
+            } else if (rule.isAbstract()) {
+                unit = new AbstractNodeGenerator(this.env, stmt).generate();
+            } else if (rule.isList()) {
+                unit = new ListNodeGenerator(this.env, stmt).generate();
             } else {
                 throw new IllegalStateException();
             }
@@ -74,13 +129,25 @@ public class ProgramGenerator {
             }
             final String code = unit.generate();
             final String filename = this.getFilePath(stmt.getLanguage(), rule.getType());
-            if (!this.env.isTestMode()) {
-                final FilesWriter writer = new FilesWriter(filename);
-                final boolean result = writer.writeStringNoExcept(code);
-                if (!result) {
-                    throw new CouldNotWriteFile(filename);
-                }
+            this.createFile(filename, code);
+        }
+    }
+
+    /**
+     * Generates source code for literals.
+     * @throws GeneratorException When can't generate
+     */
+    private void generateLiterals() throws GeneratorException {
+        final String version = this.env.getVersion();
+        for (final Statement<Literal> stmt : this.program.getLiterals()) {
+            final Literal rule = stmt.getRule();
+            final CompilationUnit unit = new LiteralGenerator(this.env, stmt).generate();
+            if (!version.isEmpty()) {
+                unit.setVersion(version);
             }
+            final String code = unit.generate();
+            final String filename = this.getFilePath(stmt.getLanguage(), rule.getType());
+            this.createFile(filename, code);
         }
     }
 
@@ -93,7 +160,7 @@ public class ProgramGenerator {
     private String getFilePath(final String language, final String name) {
         final String subfolder;
         if (language.isEmpty()) {
-            subfolder = "green";
+            subfolder = ProgramGenerator.GREEN;
         } else {
             subfolder = language;
         }
@@ -107,5 +174,21 @@ public class ProgramGenerator {
             File.separatorChar,
             name
         );
+    }
+
+    /**
+     * Writes a file to a file system.
+     * @param filename The file name
+     * @param code The file content
+     * @throws GeneratorException In case if could not create
+     */
+    private void createFile(final String filename, final String code) throws GeneratorException {
+        if (!this.env.isTestMode()) {
+            final FilesWriter writer = new FilesWriter(filename);
+            final boolean result = writer.writeStringNoExcept(code);
+            if (!result) {
+                throw new CouldNotWriteFile(filename);
+            }
+        }
     }
 }

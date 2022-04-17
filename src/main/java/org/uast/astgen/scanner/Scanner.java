@@ -7,6 +7,7 @@ package org.uast.astgen.scanner;
 import java.util.Objects;
 import org.uast.astgen.exceptions.ExpectedNumber;
 import org.uast.astgen.exceptions.ParserException;
+import org.uast.astgen.exceptions.UnclosedNativeCode;
 import org.uast.astgen.exceptions.UnclosedString;
 import org.uast.astgen.exceptions.UnknownSymbol;
 
@@ -118,6 +119,9 @@ public class Scanner {
             case '\"':
                 result = this.parseString();
                 break;
+            case '$':
+                result = this.parseNativeCode();
+                break;
             case ',':
                 this.nextChar();
                 result = Comma.INSTANCE;
@@ -191,5 +195,24 @@ public class Scanner {
             throw new UnclosedString(value);
         }
         return new StringToken(value);
+    }
+
+    /**
+     * Parses native code token.
+     * @return A token
+     * @throws ParserException Parser exception
+     */
+    private NativeCode parseNativeCode() throws ParserException {
+        final StringBuilder builder = new StringBuilder();
+        char symbol = this.nextChar();
+        while (symbol != '$') {
+            if (symbol == 0) {
+                throw new UnclosedNativeCode(builder.toString());
+            }
+            builder.append(symbol);
+            symbol = this.nextChar();
+        }
+        this.nextChar();
+        return new NativeCode(builder.toString());
     }
 }

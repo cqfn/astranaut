@@ -1,0 +1,47 @@
+/*
+ * MIT License Copyright (c) 2022 unified-ast
+ * https://github.com/unified-ast/ast-generator/blob/master/LICENSE.txt
+ */
+
+package org.uast.astgen.scanner;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.uast.astgen.exceptions.ParserException;
+
+/**
+ * Test for {@link Scanner} and {@link NativeCode} classes.
+ *
+ * @since 1.0
+ */
+public class NativeCodeTest {
+    /**
+     * Source string.
+     */
+    private static final String SOURCE = "first $String.valueOf(#)$";
+
+    /**
+     * Output example.
+     */
+    private static final String EXPECTED = "$String.valueOf(#)$";
+
+    /**
+     * Test scanner with string contains two identifiers.
+     */
+    @Test
+    public void nativeCode() {
+        final Scanner scanner = new Scanner(NativeCodeTest.SOURCE);
+        Token token = null;
+        boolean oops = false;
+        try {
+            token = scanner.getToken();
+            Assertions.assertInstanceOf(Identifier.class, token);
+            token = scanner.getToken();
+            Assertions.assertInstanceOf(NativeCode.class, token);
+            Assertions.assertEquals(token.toString(), NativeCodeTest.EXPECTED);
+        } catch (final ParserException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+}

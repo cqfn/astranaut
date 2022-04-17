@@ -98,4 +98,28 @@ public class Node implements Rule {
         }
         return result;
     }
+
+    /**
+     * Checks if the node is abstract.
+     * @return Checking result
+     */
+    public boolean isAbstract() {
+        return this.composition.size() == 1 && this.composition.get(0) instanceof Disjunction;
+    }
+
+    /**
+     * Checks if the node is list.
+     * @return Checking result
+     */
+    public boolean isList() {
+        boolean result = false;
+        if (this.composition.size() == 1) {
+            final Child child = this.composition.get(0);
+            if (child instanceof Descriptor
+                && ((Descriptor) child).getAttribute() == DescriptorAttribute.LIST) {
+                result = true;
+            }
+        }
+        return result;
+    }
 }

@@ -11,20 +11,15 @@ import org.uast.astgen.rules.DescriptorAttribute;
 import org.uast.astgen.rules.Node;
 
 /**
- * Generates builder subclass source code for rules that describe nodes.
+ * Generates builder subclass source code for rules that describe ordinary nodes.
  *
  * @since 1.0
  */
-final class NodeBuilderConstructor extends NodeConstructor {
+final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
     /**
      * The 'boolean' string.
      */
     private static final String STR_BOOLEAN = "boolean";
-
-    /**
-     * The 'Fragment' string.
-     */
-    private static final String STR_FRAGMENT = "Fragment";
 
     /**
      * The 'this.' string.
@@ -42,50 +37,18 @@ final class NodeBuilderConstructor extends NodeConstructor {
      * @param rule The rule
      * @param klass The class to be filled
      */
-    NodeBuilderConstructor(final Environment env, final Node rule, final Klass klass) {
+    OrdinaryNodeBuilderConstructor(final Environment env, final Node rule, final Klass klass) {
         super(env, rule, klass);
     }
 
     @Override
     public void construct() {
-        this.fillFragment();
-        this.fillData();
+        this.createFragmentWithSetter();
+        this.createNoDataSetter();
         this.fillChildren();
         this.createSetterChildrenList();
         this.createValidator();
         this.createCreator();
-    }
-
-    /**
-     * Fills in everything related to the fragment.
-     */
-    private void fillFragment() {
-        final Klass klass = this.getKlass();
-        final Field field = new Field(
-            "The fragment associated with the node",
-            NodeBuilderConstructor.STR_FRAGMENT,
-            "fragment"
-        );
-        field.setInitExpr("EmptyFragment.INSTANCE");
-        klass.addField(field);
-        final Method setter = new Method("setFragment");
-        setter.makeOverridden();
-        setter.addArgument(NodeBuilderConstructor.STR_FRAGMENT, "obj");
-        setter.setCode("this.fragment = obj;");
-        klass.addMethod(setter);
-    }
-
-    /**
-     * Fills in everything related to the data.
-     */
-    private void fillData() {
-        final Klass klass = this.getKlass();
-        final Method setter = new Method("setData");
-        setter.makeOverridden();
-        setter.addArgument("String", "str");
-        setter.setReturnType(NodeBuilderConstructor.STR_BOOLEAN);
-        setter.setCode("return str.isEmpty();");
-        klass.addMethod(setter);
     }
 
     /**
@@ -128,7 +91,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
         final Method method = new Method("setChildrenList");
         method.makeOverridden();
         method.addArgument("List<Node>", "list");
-        method.setReturnType(NodeBuilderConstructor.STR_BOOLEAN);
+        method.setReturnType(OrdinaryNodeBuilderConstructor.STR_BOOLEAN);
         final StringBuilder code = new StringBuilder(256);
         final String first = String.format(
             "final Node[] mapping = new Node[%d];\n",
@@ -164,7 +127,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
     private void createValidator() {
         final Method method = new Method("isValid");
         method.makeOverridden();
-        method.setReturnType(NodeBuilderConstructor.STR_BOOLEAN);
+        method.setReturnType(OrdinaryNodeBuilderConstructor.STR_BOOLEAN);
         final StringBuilder code = new StringBuilder(64);
         code.append("return ");
         boolean flag = false;
@@ -174,7 +137,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
                 if (flag) {
                     code.append("\n\t&& ");
                 }
-                code.append(NodeBuilderConstructor.STR_THIS)
+                code.append(OrdinaryNodeBuilderConstructor.STR_THIS)
                     .append(descriptor.getVariableName())
                     .append(" != null");
                 flag = true;
@@ -183,7 +146,7 @@ final class NodeBuilderConstructor extends NodeConstructor {
         if (!flag) {
             code.append("true");
         }
-        code.append(NodeBuilderConstructor.STR_SEMICOLON);
+        code.append(OrdinaryNodeBuilderConstructor.STR_SEMICOLON);
         method.setCode(code.toString());
         this.getKlass().addMethod(method);
     }
@@ -223,9 +186,11 @@ final class NodeBuilderConstructor extends NodeConstructor {
                 fourth.append(", ");
             }
             flag = true;
-            fourth.append(NodeBuilderConstructor.STR_THIS).append(var);
-            fifth.append("node.").append(var).append(" = this.").append(var)
-                .append(NodeBuilderConstructor.STR_SEMICOLON);
+            fourth.append(OrdinaryNodeBuilderConstructor.STR_THIS).append(var);
+            if (!descriptor.getTag().isEmpty()) {
+                fifth.append("node.").append(var).append(" = this.").append(var)
+                    .append(OrdinaryNodeBuilderConstructor.STR_SEMICOLON);
+            }
         }
         fourth.append(");\n");
         final StringBuilder code = new StringBuilder(256);
