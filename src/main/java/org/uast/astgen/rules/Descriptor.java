@@ -5,6 +5,7 @@
 package org.uast.astgen.rules;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Descriptor, i.e. name with tag, parameters and data.
@@ -26,10 +27,17 @@ public abstract class Descriptor implements Child, Parameter {
     public abstract String getTag();
 
     /**
-     * Returns name associated with descriptor.
+     * Returns the label associated with descriptor.
+     * The label cannot be an empty string and can be used as a variable name.
+     * @return The label
+     */
+    public abstract String getLabel();
+
+    /**
+     * Returns type associated with descriptor.
      * @return The name (can't be {@code null} or empty)
      */
-    public abstract String getName();
+    public abstract String getType();
 
     /**
      * Returns list of parameters inside descriptor.
@@ -44,12 +52,35 @@ public abstract class Descriptor implements Child, Parameter {
     public abstract Data getData();
 
     /**
+     * Returns the name of the variable to which the node corresponding
+     * to this descriptor can be written.
+     * @return Variable name
+     */
+    public String getVariableName() {
+        String result = this.getTag();
+        if (result.isEmpty()) {
+            result = this.getLabel();
+        }
+        return result.toLowerCase(Locale.ENGLISH);
+    }
+
+    /**
+     * Returns tag associated with descriptor, started from capital letter.
+     * @return The tag
+     */
+    public String getTagCapital() {
+        final String tag = this.getTag();
+        return new StringBuilder().append(tag.substring(0, 1).toUpperCase(Locale.ENGLISH))
+            .append(tag.substring(1)).toString();
+    }
+
+    /**
      * Returns the full name (i.e. tag and name).
      * @return The name (can't be {@code null} or empty)
      */
     public String getFullName() {
         final String tag = this.getTag();
-        final String name = this.getName();
+        final String name = this.getType();
         final String result;
         if (tag.isEmpty()) {
             result = name;
@@ -76,7 +107,7 @@ public abstract class Descriptor implements Child, Parameter {
         if (!tag.isEmpty()) {
             builder.append(tag).append('@');
         }
-        builder.append(this.getName());
+        builder.append(this.getType());
         this.parametersToString(builder);
         final Data data = this.getData();
         if (data.isValid()) {

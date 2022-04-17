@@ -29,6 +29,11 @@ public class DescriptorParser {
     private final TokenList segment;
 
     /**
+     * The label factory.
+     */
+    private final LabelFactory labels;
+
+    /**
      * Flag that indicates that the parser has worked.
      */
     private boolean flag;
@@ -41,9 +46,11 @@ public class DescriptorParser {
     /**
      * Constructor.
      * @param segment The list of tokens
+     * @param labels The label factory
      */
-    public DescriptorParser(final TokenList segment) {
+    public DescriptorParser(final TokenList segment, final LabelFactory labels) {
         this.segment = segment;
+        this.labels = labels;
         this.flag = false;
         this.stack = new TokenStack(segment.iterator());
     }
@@ -63,7 +70,7 @@ public class DescriptorParser {
         final Token first = this.stack.pop();
         assert first instanceof Identifier;
         final String name = ((Identifier) first).getValue();
-        final DescriptorFactory factory = new DescriptorFactory(name);
+        final DescriptorFactory factory = new DescriptorFactory(this.labels.getLabel(), name);
         factory.setAttribute(attribute);
         new TaggedNameParser(this.stack, factory).parse();
         this.parseParameters(factory);
@@ -91,7 +98,7 @@ public class DescriptorParser {
                 break;
             }
             final TokenList children = ((RoundBracketsPair) token).getTokens();
-            final ParametersListParser parser = new ParametersListParser(children);
+            final ParametersListParser parser = new ParametersListParser(children, this.labels);
             final List<Parameter> parameters = parser.parse();
             factory.setParameters(parameters);
         } while (false);

@@ -32,11 +32,18 @@ public class ParametersListParser {
     private final TokenList tokens;
 
     /**
+     * The label factory.
+     */
+    private final LabelFactory labels;
+
+    /**
      * Constructor.
      * @param tokens The list of tokens
+     * @param labels The label factory
      */
-    public ParametersListParser(final TokenList tokens) {
+    public ParametersListParser(final TokenList tokens, final LabelFactory labels) {
         this.tokens = tokens;
+        this.labels = labels;
     }
 
     /**
@@ -56,9 +63,11 @@ public class ParametersListParser {
             if (first instanceof HoleMarker) {
                 result.add(((HoleMarker) first).createHole());
             } else if (first instanceof Identifier) {
-                result.add(new DescriptorParser(segment).parse(DescriptorAttribute.NONE));
+                result.add(
+                    new DescriptorParser(segment, this.labels).parse(DescriptorAttribute.NONE)
+                );
             } else if (first instanceof BracketsPair) {
-                result.add(ParametersListParser.parseOptional(segment));
+                result.add(this.parseOptional(segment));
             } else {
                 throw new CantParseSequence(segment);
             }
@@ -72,7 +81,7 @@ public class ParametersListParser {
      * @return A descriptor
      * @throws ParserException If the token list cannot be parsed as a descriptor
      */
-    private static Descriptor parseOptional(final TokenList segment) throws ParserException {
+    private Descriptor parseOptional(final TokenList segment) throws ParserException {
         assert segment.size() > 0;
         final Token token = segment.get(0);
         if (segment.size() > 1) {
@@ -89,6 +98,6 @@ public class ParametersListParser {
             throw new ExpectedDescriptor(builder.toString());
         }
         final DescriptorAttribute attribute = brackets.getDescriptorAttribute();
-        return new DescriptorParser(children).parse(attribute);
+        return new DescriptorParser(children, this.labels).parse(attribute);
     }
 }

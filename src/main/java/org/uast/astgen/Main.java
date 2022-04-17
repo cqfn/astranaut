@@ -9,12 +9,18 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
+import org.uast.astgen.codegen.java.Environment;
+import org.uast.astgen.codegen.java.License;
+import org.uast.astgen.codegen.java.ProgramGenerator;
 import org.uast.astgen.exceptions.BaseException;
 import org.uast.astgen.parser.ProgramParser;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.utils.FileConverter;
 import org.uast.astgen.utils.FilesReader;
+import org.uast.astgen.utils.LicenseValidator;
 import org.uast.astgen.utils.PackageValidator;
 import org.uast.astgen.utils.ProjectRootValidator;
 
@@ -23,6 +29,7 @@ import org.uast.astgen.utils.ProjectRootValidator;
  *
  * @since 1.0
  */
+@SuppressWarnings("PMD.ImmutableField")
 public final class Main {
     /**
      * The logger.
@@ -36,38 +43,76 @@ public final class Main {
         names = { "--generate", "-g" },
         converter = FileConverter.class,
         required = true,
-        description = "Txt file with DSL descriptions"
+        description = "Text file with DSL descriptions"
     )
     private File source;
 
     /**
+     * The name of file that contains license header.
+     */
+    @Parameter(
+        names = { "--license", "-l" },
+        validateWith = LicenseValidator.class,
+        arity = 1,
+        description = "The name of file that contain license header"
+    )
+    private String license;
+
+    /**
      * The root of the target project.
      */
-    @SuppressWarnings("PMD.ImmutableField")
     @Parameter(
-        names = { "--root", "-r" },
+        names = { "--output", "-o" },
         validateWith = ProjectRootValidator.class,
         arity = 1,
-        description = "The root of the project folder where generated files are stored"
+        description = "Output path, i.e. the folder where generated files are stored"
     )
-    private String root;
+    private String path;
 
     /**
      * The package of the generated file.
      */
-    @SuppressWarnings("PMD.ImmutableField")
     @Parameter(
         names = { "--package", "-p" },
         validateWith = PackageValidator.class,
         arity = 1,
-        description = "The path to the target folder of a generated source file"
+        description = "Name of the package of generated files"
     )
-    private String pcg;
+    private String rootpkg;
+
+    /**
+     * The name of the package that contains the 'Node' base interface.
+     */
+    @Parameter(
+        names = { "--base", "-b" },
+        validateWith = PackageValidator.class,
+        arity = 1,
+        description = "The name of the package that contains the 'Node' base interface"
+    )
+    private String basepkg;
+
+    /**
+     * Specify the version of the implementation.
+     */
+    @Parameter(
+        names = { "--version", "-v" },
+        arity = 1,
+        description = "Specify the version of the implementation"
+    )
+    private String version;
+
+    /**
+     * Test mode.
+     */
+    @Parameter(
+        names = "--test",
+        description = "Test mode (no files will be written to the file system)"
+    )
+    private boolean test;
 
     /**
      * The help option.
      */
-    @SuppressWarnings("PMD.ImmutableField")
     @Parameter(names = "--help", help = true)
     private boolean help;
 
@@ -76,8 +121,11 @@ public final class Main {
      */
     private Main() {
         this.help = false;
-        this.root = "generated";
-        this.pcg = "org.uast";
+        this.license = "LICENSE_header.txt";
+        this.path = "generated";
+        this.rootpkg = "org.uast";
+        this.basepkg = "org.uast.uast.base";
+        this.version = "";
     }
 
     /**
@@ -107,16 +155,60 @@ public final class Main {
         final ProgramParser parser = new ProgramParser(code);
         try {
             final Program program = parser.parse();
-            final StringBuilder result = new StringBuilder(50);
-            result
-                .append(program.getAllRules().size())
-                .append(" rules parsed\nproject root: ")
-                .append(this.root)
-                .append("\npackage: ")
-                .append(this.pcg);
-            LOG.info(result.toString());
+            final Environment env = new EnvironmentImpl();
+            final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
+            generator.generate();
         } catch (final BaseException exc) {
             LOG.severe(exc.getErrorMessage());
+        }
+    }
+
+    /**
+     * Environment implementation.
+     *
+     * @since 1.0
+     */
+    private class EnvironmentImpl implements Environment {
+        /**
+         * The license.
+         */
+        private final License license;
+
+        /**
+         * Constructor.
+         */
+        EnvironmentImpl() {
+            this.license = new License(Main.this.license);
+        }
+
+        @Override
+        public License getLicense() {
+            return this.license;
+        }
+
+        @Override
+        public String getVersion() {
+            return Main.this.version;
+        }
+
+        @Override
+        public String getRootPackage() {
+            return Main.this.rootpkg;
+        }
+
+        @Override
+        public String getBasePackage() {
+            return Main.this.basepkg;
+        }
+
+        @Override
+        public boolean isTestMode() {
+            return Main.this.test;
+        }
+
+        @Override
+        public List<String> getHierarchy(final String name) {
+            return Collections.singletonList(name);
         }
     }
 }

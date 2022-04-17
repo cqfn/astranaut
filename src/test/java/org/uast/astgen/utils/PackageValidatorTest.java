@@ -28,6 +28,11 @@ public class PackageValidatorTest {
     private static final String ARG = "--generate";
 
     /**
+     * The test option as an argument example.
+     */
+    private static final String TEST = "--test";
+
+    /**
      * The name of the option for a package name of generated files.
      */
     private static final String PCG = "--package";
@@ -46,6 +51,7 @@ public class PackageValidatorTest {
             file.toString(),
             PackageValidatorTest.PCG,
             "org.uast",
+            PackageValidatorTest.TEST,
         };
         boolean caught = false;
         try {

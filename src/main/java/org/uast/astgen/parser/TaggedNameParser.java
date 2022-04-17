@@ -61,7 +61,7 @@ public class TaggedNameParser {
             if (!(token instanceof Identifier)) {
                 throw ExpectedIdentifierAfterAt.INSTANCE;
             }
-            this.factory.replaceName(((Identifier) token).getValue());
+            this.factory.replaceType(((Identifier) token).getValue());
         }
     }
 
