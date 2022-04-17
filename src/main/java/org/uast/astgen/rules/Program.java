@@ -29,11 +29,17 @@ public class Program {
     private final List<Statement<Node>> nodes;
 
     /**
+     * Node descriptors.
+     */
+    private final List<Statement<Literal>> literals;
+
+    /**
      * Constructor.
      */
     public Program() {
         this.all = new LinkedList<>();
         this.nodes = new LinkedList<>();
+        this.literals = new LinkedList<>();
     }
 
     /**
@@ -53,12 +59,29 @@ public class Program {
     }
 
     /**
+     * Returns list of literal descriptors with addition data.
+     * @return Literal descriptors.
+     */
+    public List<Statement<Literal>> getLiterals() {
+        return Collections.unmodifiableList(this.literals);
+    }
+
+    /**
      * Adds node descriptor with addition data.
      * @param statement The node descriptor
      */
     public void addNodeStmt(final Statement<Node> statement) {
         this.all.add(statement.toRuleStmt());
         this.nodes.add(statement);
+    }
+
+    /**
+     * Adds literal descriptor with addition data.
+     * @param statement The literal descriptor
+     */
+    public void addLiteralStmt(final Statement<Literal> statement) {
+        this.all.add(statement.toRuleStmt());
+        this.literals.add(statement);
     }
 
     /**
