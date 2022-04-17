@@ -54,7 +54,7 @@ public final class IntegerLiteral implements Node {
 
     @Override
     public String getData() {
-        return String.valueOf(this.value);
+        return String.valueOf(this.data);
     }
 
     @Override

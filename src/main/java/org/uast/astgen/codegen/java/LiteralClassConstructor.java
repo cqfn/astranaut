@@ -67,7 +67,7 @@ final class LiteralClassConstructor extends LiteralConstructor {
         data.setCode(
             String.format(
                 "return %s;",
-                rule.getStringifier().replace("#", "this.value")
+                rule.getStringifier().replace("#", "this.data")
             )
         );
         klass.addMethod(data);
