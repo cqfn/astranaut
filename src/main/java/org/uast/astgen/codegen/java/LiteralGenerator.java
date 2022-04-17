@@ -33,6 +33,7 @@ final class LiteralGenerator extends BaseGenerator {
         final Environment env = this.getEnv();
         final Literal rule = this.statement.getRule();
         final Klass klass = LiteralGenerator.createClass(rule);
+        new LiteralClassConstructor(env, rule, klass).run();
         final String pkg = this.getPackageName(this.statement.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
         this.generateImports(unit);

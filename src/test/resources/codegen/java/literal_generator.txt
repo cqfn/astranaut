@@ -21,4 +21,65 @@ import org.uast.uast.base.Type;
  * @since 1.0
  */
 public final class IntegerLiteral implements Node {
+    /**
+     * The type.
+     */
+    public static final Type TYPE = new TypeImpl();
+
+    /**
+     * The fragment associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * The data.
+     */
+    private int data;
+
+    /**
+     * Constructor.
+     */
+    private IntegerLiteral() {
+    }
+
+    @Override
+    public Type getType() {
+        return IntegerLiteral.TYPE;
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public String getData() {
+        return String.valueOf(this.value);
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    /**
+     * Type descriptor of the 'IntegerLiteral' node.
+     *
+     * @since 1.0
+     */
+    private static class TypeImpl implements Type {
+    }
+
+    /**
+     * Class for 'IntegerLiteral' node construction.
+     *
+     * @since 1.0
+     */
+    public static final class Constructor implements Builder {
+    }
 }

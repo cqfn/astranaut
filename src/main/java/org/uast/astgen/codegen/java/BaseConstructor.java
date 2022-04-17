@@ -7,7 +7,7 @@ package org.uast.astgen.codegen.java;
 import java.util.List;
 
 /**
- * Constructs classes, fields and methods for rules that describe nodes.
+ * Constructs classes, fields and methods for rules.
  *
  * @since 1.0
  */
