@@ -7,6 +7,8 @@ package org.uast.astgen.analyzer;
 
 import org.uast.astgen.exceptions.ExpectedOnlyOneEntity;
 import org.uast.astgen.rules.*;
+import org.uast.astgen.scanner.Token;
+import sun.security.krb5.internal.crypto.Des;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,20 +35,38 @@ public class Analyzer {
     private final HashMap<String, Result> info;
 
     /**
+     * Stack to save nodes to be analyzed.
+     */
+    private final Stack<String> stack;
+
+    /**
      * Constructor.
      * @param descriptors The node descriptors
      * @param language The programming language
      */
     public Analyzer(final List<Statement<Node>> descriptors, final String language) throws ExpectedOnlyOneEntity {
-        this.nodes = Collections.unmodifiableList(getNodes(descriptors, language));
+        this.nodes = Collections.unmodifiableList(getRelatedNodes(descriptors, language));
         this.language = language;
         this.info = new HashMap<>();
+        this.stack = new Stack<>();
     }
 
-    private List<Node> getNodes(
+    /**
+     * Retrieves the list of nodes related to the selected language and green nodes
+     * and checks for redundant nodes.
+     * @param descriptors The node descriptors
+     * @param language The programming language
+     */
+    private List<Node> getRelatedNodes(
             final List<Statement<Node>> descriptors,
             final String language) throws ExpectedOnlyOneEntity {
-        final List<Statement<Node>> related = getRelatedDescriptors(descriptors, language);
+        final List<Statement<Node>> related =
+            descriptors.stream()
+                .filter(
+                    node -> language.equals(node.getLanguage()) ||
+                        "".equals(node.getLanguage())
+                )
+                .collect(Collectors.toList());
         final List<Node> nodes = new ArrayList<>();
         for (final Statement<Node> descriptor : related) {
             final Node node = descriptor.getRule();
@@ -57,25 +77,7 @@ public class Analyzer {
     }
 
     /**
-     * Retrieves the list of nodes related to the selected language
-     * and green nodes.
-     * @param descriptors The node descriptors
-     * @param language The programming language
-     */
-    private List<Statement<Node>> getRelatedDescriptors(
-        final List<Statement<Node>> descriptors,
-        final String language) {
-        return descriptors.stream()
-            .filter(
-                node -> language.equals(node.getLanguage()) ||
-                "green".equals(node.getLanguage())
-            )
-            .collect(Collectors.toList());
-    }
-
-    /**
      * Sorts the list of nodes by their depth in inheritance.
-     *
      * @param descriptors The node descriptors
      */
     private List<Node> sortNodes(
@@ -87,6 +89,8 @@ public class Analyzer {
             for (final Child child : composition) {
                 if (child instanceof Disjunction) {
                     final List<Descriptor> desc = ((Disjunction) child).getDescriptors();
+                } else {
+
                 }
             }
         }
@@ -94,7 +98,18 @@ public class Analyzer {
     }
 
     private HashMap<Node, Integer> countDepth() {
-        return new HashMap<Node, Integer>();
+        final HashMap<Node, Integer> depth = new HashMap<>();
+        for (final Node node : nodes) {
+            final List<Child> composition = node.getComposition();
+            for (final Child child : composition) {
+                if (child instanceof Disjunction) {
+                    final List<Descriptor> desc = ((Disjunction) child).getDescriptors();
+                } else if (child instanceof Descriptor) {
+                    depth.put(node, 1);
+                }
+            }
+        }
+        return depth;
     }
 
     private static void checkDuplicateNodes(
@@ -115,7 +130,23 @@ public class Analyzer {
         }
     }
 
-
+    private static void checkDuplicateInheritance(
+            final Child child,
+            final Set<String> types
+    ) throws ExpectedOnlyOneEntity {
+        final List<Descriptor> descriptors = ((Disjunction) child).getDescriptors();
+        for (final Descriptor descriptor : descriptors) {
+            if (types.contains(descriptor.getType())) {
+                throw new ExpectedOnlyOneEntity(
+                    new StringBuilder()
+                        .append(descriptor)
+                        .append(" should inherit an abstract node once")
+                        .toString()
+                );
+            }
+            types.add(descriptor.getType());
+        }
+    }
 
     /**
      * The hierarchy of names of groups the node type belongs to.
@@ -130,14 +161,73 @@ public class Analyzer {
         return hierarchy;
     }
 
+    public void analyze() throws ExpectedOnlyOneEntity {
+        //final HashMap<Node, Integer> depth = new HashMap<>();
+        initialProcess();
+        for (final Node node : nodes) {
+            if (!info.containsKey(node.getType())) {
+                processAbstractNode(node);
+            }
+        }
+    }
+
+    private void processAbstractNode(final Node node) {
+        final Result result = new Result(node);
+        final List<Child> composition = node.getComposition();
+        for (final Child child : composition) {
+            if (child instanceof Disjunction) {
+                final List<Descriptor> descriptors = ((Disjunction) child).getDescriptors();
+                for (final Descriptor descriptor : descriptors) {
+//                    if (!info.containsKey(descriptor.getType())) {
+//                        stack.push(descriptor.getType());
+//                    }
+                    processNode(descriptor.getType(), Collections.singletonList(node.getType()));
+                }
+            }
+        }
+        info.put(node.getType(), result);
+    }
+
+    private void processNode(final String type, final List<String> parents) {
+        if (info.containsKey(type)) {
+            final Result result = info.get(type);
+            result.addParents(parents);
+        } else {
+
+        }
+    }
+
+    private void initialProcess() throws ExpectedOnlyOneEntity {
+        final Set<String> types = new HashSet<>();
+        for (final Node node : nodes) {
+            final List<Child> composition = node.getComposition();
+            for (final Child child : composition) {
+                if (child instanceof Disjunction) {
+                    checkDuplicateInheritance(child, types);
+                } else if (child instanceof Descriptor) {
+                    final Descriptor descriptor = (Descriptor) child;
+                    final Result result = new Result(node);
+                    result.addTaggedChild(
+                        descriptor.getTag(),
+                        descriptor.getType()
+                    );
+                    info.put(node.getType(), result);
+                }
+            }
+        }
+    }
+
     public static class Result {
+        private final Node node;
+
         private final List<String> hierarchy;
 
         private final List<TaggedName> tags;
 
-        public Result(final String name) {
+        public Result(final Node node) {
+            this.node = node;
             this.hierarchy = new LinkedList<>();
-            this.hierarchy.add(name);
+            this.hierarchy.add(node.getType());
             this.tags = new LinkedList<>();
         }
 
@@ -145,12 +235,24 @@ public class Analyzer {
             hierarchy.add(name);
         }
 
+        public void addParents(List<String> names) {
+            hierarchy.addAll(names);
+        }
+
+        public void addTaggedChild(final String tag, final String type) {
+            tags.add(new TaggedName(tag, type));
+        }
+
         public List<String> getHierarchy() {
             return this.hierarchy;
         }
 
-        public List<TaggedName> getTags() {
+        public List<TaggedName> getChildTags() {
             return this.tags;
+        }
+
+        public Node getNode() {
+            return this.node;
         }
     }
 
