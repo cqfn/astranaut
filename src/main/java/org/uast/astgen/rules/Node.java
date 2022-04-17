@@ -6,6 +6,7 @@
 package org.uast.astgen.rules;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A rule that describes node.
@@ -67,5 +68,10 @@ public class Node implements Rule {
     @Override
     public final void generate() {
         throw new IllegalStateException();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.type);
     }
 }

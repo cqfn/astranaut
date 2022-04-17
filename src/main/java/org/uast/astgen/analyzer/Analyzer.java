@@ -8,10 +8,7 @@ package org.uast.astgen.analyzer;
 import org.uast.astgen.exceptions.ExpectedOnlyOneEntity;
 import org.uast.astgen.rules.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -40,16 +37,23 @@ public class Analyzer {
      * @param descriptors The node descriptors
      * @param language The programming language
      */
-    public Analyzer(final List<Statement<Node>> descriptors, final String language) {
-        final List<Statement<Node>> related = getRelatedNodes(descriptors, language);
-        final List<Node> nodes = getNodes(related);
-        this.nodes = sortNodes(related);
+    public Analyzer(final List<Statement<Node>> descriptors, final String language) throws ExpectedOnlyOneEntity {
+        this.nodes = Collections.unmodifiableList(getNodes(descriptors, language));
         this.language = language;
         this.info = new HashMap<>();
     }
 
-    private List<Node> getNodes(List<Statement<Node>> related) {
-        return new ArrayList<>();
+    private List<Node> getNodes(
+            final List<Statement<Node>> descriptors,
+            final String language) throws ExpectedOnlyOneEntity {
+        final List<Statement<Node>> related = getRelatedDescriptors(descriptors, language);
+        final List<Node> nodes = new ArrayList<>();
+        for (final Statement<Node> descriptor : related) {
+            final Node node = descriptor.getRule();
+            nodes.add(node);
+        }
+        checkDuplicateNodes(nodes);
+        return nodes;
     }
 
     /**
@@ -58,7 +62,7 @@ public class Analyzer {
      * @param descriptors The node descriptors
      * @param language The programming language
      */
-    private List<Statement<Node>> getRelatedNodes(
+    private List<Statement<Node>> getRelatedDescriptors(
         final List<Statement<Node>> descriptors,
         final String language) {
         return descriptors.stream()
@@ -93,35 +97,37 @@ public class Analyzer {
         return new HashMap<Node, Integer>();
     }
 
-    private boolean isUniqueInDSL(final Statement<Node> statement) throws ExpectedOnlyOneEntity {
-        final String name = statement.getRule().getType();
-        List<Node> nodes =
-            this.nodes.stream()
-                .filter(node -> name.equals(statement.getRule().getType()))
-                .collect(Collectors.toList());
-        if (nodes.size() > 1) {
+    private static void checkDuplicateNodes(
+            final List<Node> nodes
+        ) throws ExpectedOnlyOneEntity {
+        Set<Node> duplicates =
+            nodes.stream()
+            .filter(node ->
+                Collections.frequency(nodes, node) > 1)
+            .collect(Collectors.toSet());
+        for (final Node node : duplicates) {
             throw new ExpectedOnlyOneEntity(
                 new StringBuilder()
-                    .append(name)
+                    .append(node.getType())
                     .append(" <- ...")
                     .toString()
             );
         }
-        return true;
     }
 
 
 
     /**
      * The hierarchy of names of groups the node type belongs to.
-     * @param name The name of the node
-     * @return The list of type names
+     * @param type The type of the node
+     * @return The list of type names, cannot be {@code null}
      */
-    public List<String> getHierarchy(final String name) throws ExpectedOnlyOneEntity {
-        if (info.containsKey(name)) {
-            return info.get(name).getHierarchy();
+    public List<String> getHierarchy(final String type) {
+        List<String> hierarchy = new ArrayList<>();
+        if (info.containsKey(type)) {
+            hierarchy =  info.get(type).getHierarchy();
         }
-        return null;
+        return hierarchy;
     }
 
     public static class Result {
