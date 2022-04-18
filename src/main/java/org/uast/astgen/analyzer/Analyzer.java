@@ -5,19 +5,30 @@
 
 package org.uast.astgen.analyzer;
 
-import org.uast.astgen.exceptions.ExpectedOnlyOneEntity;
-import org.uast.astgen.rules.*;
-import org.uast.astgen.scanner.Token;
-import sun.security.krb5.internal.crypto.Des;
-
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Stack;
 import java.util.stream.Collectors;
+import org.uast.astgen.exceptions.ExpectedOnlyOneEntity;
+import org.uast.astgen.rules.Child;
+import org.uast.astgen.rules.Descriptor;
+import org.uast.astgen.rules.Disjunction;
+import org.uast.astgen.rules.Node;
+import org.uast.astgen.rules.Statement;
 
 /**
  * Analyzes nodes hierarchy described with DSL.
  *
  * @since 1.0
  */
+@SuppressWarnings("PMD.CloseResource")
 public class Analyzer {
     /**
      * Nodes related to current programming language and green nodes.
@@ -32,10 +43,10 @@ public class Analyzer {
     /**
      * Mappings between a node type and a result of its analysis.
      */
-    private final HashMap<String, Result> info;
+    private final Map<String, Result> info;
 
     /**
-     * Stack to save nodes to be analyzed.
+     * Stack to save nodes with tagged types to be analyzed.
      */
     private final Stack<String> stack;
 
@@ -43,82 +54,103 @@ public class Analyzer {
      * Constructor.
      * @param descriptors The node descriptors
      * @param language The programming language
+     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     *  contain duplications
      */
-    public Analyzer(final List<Statement<Node>> descriptors, final String language) throws ExpectedOnlyOneEntity {
-        this.nodes = Collections.unmodifiableList(getRelatedNodes(descriptors, language));
+    public Analyzer(
+        final List<Statement<Node>> descriptors,
+        final String language) throws ExpectedOnlyOneEntity {
         this.language = language;
+        this.nodes = Collections.unmodifiableList(this.getRelatedNodes(descriptors));
         this.info = new HashMap<>();
         this.stack = new Stack<>();
     }
 
     /**
-     * Retrieves the list of nodes related to the selected language and green nodes
-     * and checks for redundant nodes.
-     * @param descriptors The node descriptors
-     * @param language The programming language
+     * The hierarchy of names of groups the node type belongs to.
+     * @param type The type of the node
+     * @return The list of type names, cannot be {@code null}
      */
-    private List<Node> getRelatedNodes(
-            final List<Statement<Node>> descriptors,
-            final String language) throws ExpectedOnlyOneEntity {
-        final List<Statement<Node>> related =
-            descriptors.stream()
-                .filter(
-                    node -> language.equals(node.getLanguage()) ||
-                        "".equals(node.getLanguage())
-                )
-                .collect(Collectors.toList());
-        final List<Node> nodes = new ArrayList<>();
-        for (final Statement<Node> descriptor : related) {
-            final Node node = descriptor.getRule();
-            nodes.add(node);
+    public List<String> getHierarchy(final String type) {
+        List<String> hierarchy = new LinkedList<>();
+        if (this.info.containsKey(type)) {
+            hierarchy = this.info.get(type).getHierarchy();
         }
-        checkDuplicateNodes(nodes);
-        return nodes;
+        return hierarchy;
     }
 
     /**
-     * Sorts the list of nodes by their depth in inheritance.
-     * @param descriptors The node descriptors
+     * The list of tagged names which the provided node has.
+     * @param type The type of the node
+     * @return The list of tagged names, cannot be {@code null}
      */
-    private List<Node> sortNodes(
-        final List<Statement<Node>> descriptors) {
-        final HashMap<Node, Integer> depth = countDepth();
-        for (final Statement<Node> descriptor : descriptors) {
-            final Node parent = descriptor.getRule();
-            final List<Child> composition = parent.getComposition();
-            for (final Child child : composition) {
-                if (child instanceof Disjunction) {
-                    final List<Descriptor> desc = ((Disjunction) child).getDescriptors();
-                } else {
-
-                }
-            }
+    public List<TaggedName> getTags(final String type) {
+        List<TaggedName> tags = new LinkedList<>();
+        if (this.info.containsKey(type)) {
+            tags = this.info.get(type).getTaggedNames();
         }
-        return new ArrayList<>();
+        return tags;
     }
 
-    private HashMap<Node, Integer> countDepth() {
-        final HashMap<Node, Integer> depth = new HashMap<>();
-        for (final Node node : nodes) {
-            final List<Child> composition = node.getComposition();
-            for (final Child child : composition) {
-                if (child instanceof Disjunction) {
-                    final List<Descriptor> desc = ((Disjunction) child).getDescriptors();
-                } else if (child instanceof Descriptor) {
-                    depth.put(node, 1);
-                }
+    /**
+     * Conducts analysis of the provided node set.
+     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     *  contain duplications
+     */
+    public void analyze() throws ExpectedOnlyOneEntity {
+        this.initialProcess();
+        for (final Node node : this.nodes) {
+            if (node.isAbstract() && !this.info.containsKey(node.getType())) {
+                this.processAbstractNode(node, new LinkedList<>());
             }
         }
-        return depth;
     }
 
+    /**
+     * Returns the programming language for which the rule is applied.
+     * @return The language name
+     */
+    public String getLanguage() {
+        return this.language;
+    }
+
+    /**
+     * Retrieves the list of nodes related to the selected language and green nodes,
+     * and checks for redundant nodes.
+     * @param descriptors The node descriptors
+     * @return The list of nodes
+     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     *  contain duplications
+     */
+    private List<Node> getRelatedNodes(
+        final List<Statement<Node>> descriptors) throws ExpectedOnlyOneEntity {
+        final List<Statement<Node>> statements =
+            descriptors.stream()
+                .filter(
+                    node -> this.language.equals(node.getLanguage())
+                    || "".equals(node.getLanguage())
+                )
+                .collect(Collectors.toList());
+        final List<Node> related = new LinkedList<>();
+        for (final Statement<Node> descriptor : statements) {
+            final Node node = descriptor.getRule();
+            related.add(node);
+        }
+        checkDuplicateNodes(related);
+        return related;
+    }
+
+    /**
+     * Checks of provided list of nodes contains duplicates.
+     * @param related The list of related nodes
+     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     *  contain duplications
+     */
     private static void checkDuplicateNodes(
-            final List<Node> nodes
-        ) throws ExpectedOnlyOneEntity {
-        Set<Node> duplicates =
-            nodes.stream()
-            .filter(node ->
-                Collections.frequency(nodes, node) > 1)
+        final List<Node> related) throws ExpectedOnlyOneEntity {
+        final Set<Node> duplicates =
+            related.stream()
+            .filter(node -> Collections.frequency(related, node) > 1)
             .collect(Collectors.toSet());
         for (final Node node : duplicates) {
             throw new ExpectedOnlyOneEntity(
@@ -130,10 +162,17 @@ public class Analyzer {
         }
     }
 
+    /**
+     * Checks if child nodes in the right rule part of abstract nodes
+     * inherit only one ancestor.
+     * @param child The child node
+     * @param types The list of already processed child types
+     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     *  contain duplications
+     */
     private static void checkDuplicateInheritance(
-            final Child child,
-            final Set<String> types
-    ) throws ExpectedOnlyOneEntity {
+        final Child child,
+        final Set<String> types) throws ExpectedOnlyOneEntity {
         final List<Descriptor> descriptors = ((Disjunction) child).getDescriptors();
         for (final Descriptor descriptor : descriptors) {
             if (types.contains(descriptor.getType())) {
@@ -149,126 +188,341 @@ public class Analyzer {
     }
 
     /**
-     * The hierarchy of names of groups the node type belongs to.
-     * @param type The type of the node
-     * @return The list of type names, cannot be {@code null}
+     * Processes an abstract node:
+     * - creates result entity;
+     * - updates hierarchy for descendant nodes;
+     * - iterates over descriptors to process them firstly and find descendants with tags;
+     * - excludes not described nodes from processing;
+     * - processes nodes with common tags;
+     * - saves the result.
+     * @param node The abstract node
+     * @param ancestors The list of ancestor node types
      */
-    public List<String> getHierarchy(final String type) {
-        List<String> hierarchy = new ArrayList<>();
-        if (info.containsKey(type)) {
-            hierarchy =  info.get(type).getHierarchy();
-        }
-        return hierarchy;
-    }
-
-    public void analyze() throws ExpectedOnlyOneEntity {
-        //final HashMap<Node, Integer> depth = new HashMap<>();
-        initialProcess();
-        for (final Node node : nodes) {
-            if (!info.containsKey(node.getType())) {
-                processAbstractNode(node);
+    private void processAbstractNode(final Node node, final List<String> ancestors) {
+        final List<String> hierarchy = new LinkedList<>();
+        hierarchy.add(node.getType());
+        final Result result = new Result(hierarchy);
+        result.addAncestors(ancestors);
+        final Child child = node.getComposition().get(0);
+        final List<Descriptor> descriptors = ((Disjunction) child).getDescriptors();
+        ((LinkedList) ancestors).addFirst(node.getType());
+        int empty = 0;
+        for (final Descriptor descriptor : descriptors) {
+            final String type = descriptor.getType();
+            this.processNode(type, ancestors);
+            if (this.info.get(type).equals(NullResult.INSTANCE)) {
+                empty += 1;
             }
         }
+        ((LinkedList) ancestors).removeFirst();
+        if (!this.stack.empty()) {
+            this.findCommonTags(descriptors.size() - empty, result);
+            if (result.containsTags()) {
+                this.stack.push(node.getType());
+            }
+        }
+        this.info.put(node.getType(), result);
     }
 
-    private void processAbstractNode(final Node node) {
-        final Result result = new Result(node);
-        final List<Child> composition = node.getComposition();
-        for (final Child child : composition) {
-            if (child instanceof Disjunction) {
-                final List<Descriptor> descriptors = ((Disjunction) child).getDescriptors();
-                for (final Descriptor descriptor : descriptors) {
-//                    if (!info.containsKey(descriptor.getType())) {
-//                        stack.push(descriptor.getType());
-//                    }
-                    processNode(descriptor.getType(), Collections.singletonList(node.getType()));
+    /**
+     * Finds common tags of an abstract node and its descendants:
+     * - iterates over nodes in stack to collect common tagged names;
+     * - if processed nodes count equals descendants size, update
+     *  {@code overridden} fields and add tags to the ancestor.
+     * @param count The count of described descendant nodes
+     * @param ancestor The result of ancestor analysis
+     */
+    private void findCommonTags(final int count, final Result ancestor) {
+        final Set<String> descendants = new HashSet<>();
+        final Set<TaggedName> common = new HashSet<>();
+        int idx = 0;
+        while (!this.stack.empty() && idx < count) {
+            idx += 1;
+            final String node = this.stack.pop();
+            final Result result = this.info.get(node);
+            final List<TaggedName> names = result.getTaggedNames();
+            for (final TaggedName name : names) {
+                if (idx == 1) {
+                    common.add(name);
+                    descendants.add(node);
+                    continue;
                 }
+                if (!common.contains(name)) {
+                    common.remove(name);
+                    continue;
+                }
+                descendants.add(node);
             }
         }
-        info.put(node.getType(), result);
-    }
-
-    private void processNode(final String type, final List<String> parents) {
-        if (info.containsKey(type)) {
-            final Result result = info.get(type);
-            result.addParents(parents);
-        } else {
-
+        if (count == idx) {
+            for (final String descendant : descendants) {
+                final Result result = this.info.get(descendant);
+                result.setOverriddenTags(common);
+            }
+            for (final TaggedName name : common) {
+                ancestor.addTaggedName(name.getTag(), name.getType());
+            }
         }
     }
 
+    /**
+     * Processes the node:
+     * - updates the already processed nodes results;
+     * - pushes nodes with tagged names to the stack;
+     * - finds a not processed node from the list and processes it if;
+     *  it is abstract;
+     * - ignores a not described node, but prints warning about it.
+     *  {@code overridden} fields and add tags to the ancestor
+     * @param type The node type
+     * @param ancestors The list of ancestor node types
+     */
+    private void processNode(final String type, final List<String> ancestors) {
+        if (this.info.containsKey(type)) {
+            final Result result = this.info.get(type);
+            result.addAncestors(ancestors);
+            if (result.containsTags()) {
+                this.stack.push(type);
+            }
+        } else {
+            final Optional<Node> optional =
+                this.nodes.stream()
+                .filter(item -> type.equals(item.getType()))
+                .findFirst();
+            if (optional.isPresent() && optional.get().isAbstract()) {
+                this.processAbstractNode(optional.get(), ancestors);
+            } else {
+                this.info.put(type, NullResult.INSTANCE);
+            }
+        }
+    }
+
+    /**
+     * Conducts initial processing of input list of nodes:
+     * - checks that abstract node descendants inherit only once;
+     * - processes ordinary nodes (with children).
+     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     *  contain duplications
+     */
     private void initialProcess() throws ExpectedOnlyOneEntity {
         final Set<String> types = new HashSet<>();
-        for (final Node node : nodes) {
-            final List<Child> composition = node.getComposition();
-            for (final Child child : composition) {
-                if (child instanceof Disjunction) {
-                    checkDuplicateInheritance(child, types);
-                } else if (child instanceof Descriptor) {
-                    final Descriptor descriptor = (Descriptor) child;
-                    final Result result = new Result(node);
-                    result.addTaggedChild(
-                        descriptor.getTag(),
-                        descriptor.getType()
-                    );
-                    info.put(node.getType(), result);
-                }
+        for (final Node node : this.nodes) {
+            if (node.isAbstract()) {
+                checkDuplicateInheritance(node.getComposition().get(0), types);
+            }
+            if (node.isOrdinary()) {
+                this.processOrdinaryNode(node);
             }
         }
     }
 
-    public static class Result {
-        private final Node node;
+    /**
+     * Conducts initial processing of ordinary nodes:
+     * - creates the result entity;
+     * - adds tagged names of children to result.
+     * @param node The ordinary node
+     */
+    private void processOrdinaryNode(final Node node) {
+        final List<String> hierarchy = new LinkedList<>();
+        hierarchy.add(node.getType());
+        final Result result = new Result(hierarchy);
+        final List<Child> composition = node.getComposition();
+        for (final Child child : composition) {
+            final Descriptor descriptor = (Descriptor) child;
+            if (!descriptor.getTag().isEmpty()) {
+                result.addTaggedName(
+                    descriptor.getTag(),
+                    descriptor.getType()
+                );
+            }
+        }
+        this.info.put(node.getType(), result);
+    }
 
+    /**
+     * The class to store the result of analysis.
+     * @since 1.0
+     */
+    private static class Result {
+        /**
+         * The node hierarchy (its type and types of its ancestors)
+         * sorted by increasing depth of inheritance.
+         */
         private final List<String> hierarchy;
 
+        /**
+         * The list of tagged names.
+         */
         private final List<TaggedName> tags;
 
-        public Result(final Node node) {
-            this.node = node;
-            this.hierarchy = new LinkedList<>();
-            this.hierarchy.add(node.getType());
+        /**
+         * Constructor.
+         * @param hierarchy The hierarchy list
+         */
+        Result(final List<String> hierarchy) {
+            this.hierarchy = hierarchy;
             this.tags = new LinkedList<>();
         }
 
-        public void addParent(final String name) {
-            hierarchy.add(name);
+        /**
+         * Adds ancestor types to the hierarchy.
+         * @param names The list of ancestor type names
+         */
+        public void addAncestors(final List<String> names) {
+            this.hierarchy.addAll(names);
         }
 
-        public void addParents(List<String> names) {
-            hierarchy.addAll(names);
+        /**
+         * Adds a tagged type name.
+         * @param tag The tag
+         * @param type The type
+         */
+        public void addTaggedName(final String tag, final String type) {
+            this.tags.add(new TaggedName(tag, type));
         }
 
-        public void addTaggedChild(final String tag, final String type) {
-            tags.add(new TaggedName(tag, type));
-        }
-
+        /**
+         * Returns the hierarchy of the node.
+         * @return The list of types
+         */
         public List<String> getHierarchy() {
             return this.hierarchy;
         }
 
-        public List<TaggedName> getChildTags() {
+        /**
+         * Returns the hierarchy of the node.
+         * @return The list of types
+         */
+        public List<TaggedName> getTaggedNames() {
             return this.tags;
         }
 
-        public Node getNode() {
-            return this.node;
+        /**
+         * Checks if the node contains tagged names.
+         * @return Checking result
+         */
+        public boolean containsTags() {
+            return !this.tags.isEmpty();
+        }
+
+        /**
+         * Sets the {@code true} value to the {@code overridden} property of
+         * the tagged names.
+         * @param common The common tagged names
+         */
+        public void setOverriddenTags(final Set<TaggedName> common) {
+            for (final TaggedName ancestor : common) {
+                final int idx = this.tags.indexOf(ancestor);
+                final TaggedName local = this.tags.get(idx);
+                local.makeOverridden();
+            }
         }
     }
 
-    private static class TaggedName {
-        final String tag;
-        final String type;
-        boolean overridden;
+    /**
+     * The null results that is added to nodes that are not described in rules.
+     *
+     * @since 1.0
+     */
+    private static final class NullResult extends Result {
+        /**
+         * The instance.
+         */
+        public static final Result INSTANCE = new NullResult();
 
-        public TaggedName(final String tag, final String type) {
+        /**
+         * Constructor.
+         */
+        NullResult() {
+            super(new LinkedList<>());
+        }
+    }
+
+    /**
+     * The class to store tagged names.
+     *
+     * @since 1.0
+     */
+    private static class TaggedName {
+        /**
+         * The tag.
+         */
+        private final String tag;
+
+        /**
+         * The type.
+         */
+        private final String type;
+
+        /**
+         * The flag indicates that the tag is overridden.
+         */
+        private boolean overridden;
+
+        /**
+         * Constructor.
+         * @param tag The tag
+         * @param type The type
+         */
+        TaggedName(final String tag, final String type) {
             this.tag = tag;
             this.type = type;
             this.overridden = false;
         }
 
-        public void setOverridden() {
+        /**
+         * Makes the tagged name overridden.
+         */
+        public void makeOverridden() {
             this.overridden = true;
+        }
+
+        /**
+         * Returns the tag.
+         * @return The tag
+         */
+        public String getTag() {
+            return this.tag;
+        }
+
+        /**
+         * Returns the type.
+         * @return The type
+         */
+        public String getType() {
+            return this.type;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder();
+            builder
+                .append('{')
+                .append(this.tag)
+                .append(", ")
+                .append(this.type)
+                .append(", ")
+                .append(this.overridden)
+                .append('}');
+            return builder.toString();
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            final TaggedName name;
+            boolean equal = false;
+            if (obj instanceof TaggedName) {
+                name = (TaggedName) obj;
+                if (this.type.equals(name.getType())
+                    && this.tag.equals(name.getTag())) {
+                    equal = true;
+                }
+            }
+            return equal;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.tag + this.type);
         }
     }
 }

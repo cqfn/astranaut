@@ -101,7 +101,7 @@ public class Node implements Rule {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(final Object obj) {
         final Node node;
         boolean equal = false;
         if (obj instanceof Node) {
@@ -114,7 +114,7 @@ public class Node implements Rule {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(this.type);
     }
 
