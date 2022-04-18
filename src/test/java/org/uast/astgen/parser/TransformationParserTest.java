@@ -6,50 +6,53 @@ package org.uast.astgen.parser;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.uast.astgen.exceptions.ExpectedThreeOrFourParameters;
 import org.uast.astgen.exceptions.ParserException;
-import org.uast.astgen.rules.Literal;
+import org.uast.astgen.exceptions.UnknownSymbol;
+import org.uast.astgen.rules.Transformation;
 
 /**
- * Test for {@link LiteralParser} class.
+ * Test for {@link TransformationParser} class.
  *
  * @since 1.0
  */
-public class LiteralParserTest {
+public class TransformationParserTest {
     /**
-     * Valid source code.
-     */
-    private static final String SOURCE =
-        "IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$";
-
-    /**
-     * Test case: integer literal.
+     * Test case: simple transformation.
      */
     @Test
-    public void integerLiteral() {
-        final boolean result = this.run(LiteralParserTest.SOURCE);
+    public void simpleTransformation() {
+        final boolean result = this.run("A -> B");
         Assertions.assertTrue(result);
     }
 
     /**
-     * Test case: integer literal with exception.
+     * Test case: complex transformation.
      */
     @Test
-    public void integerLiteralWithException() {
-        final boolean result =
-            this.run(LiteralParserTest.SOURCE.concat(", $NumberFormatException$"));
-        Assertions.assertTrue(result);
-    }
-
-    /**
-     * Test case: wrong declaration.
-     */
-    @Test
-    public void wrongDeclaration() {
+    public void complexTransformation() {
         final boolean result = this.run(
-            "IntegerLiteral <- $int$",
-            ExpectedThreeOrFourParameters.class
+            "singleExpression(identifier(literal<#13>)) -> Variable(#13)"
         );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: more complex transformation.
+     */
+    @Test
+    public void moreComplexTransformation() {
+        final boolean result = this.run(
+            "singleExpression(#1, literal<\"+\">, #2) -> Addition(#1, #2)"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: DSL line with exception.
+     */
+    @Test
+    public void wrongSyntax() {
+        final boolean result = this.run("A -> 123", UnknownSymbol.class);
         Assertions.assertTrue(result);
     }
 
@@ -61,8 +64,8 @@ public class LiteralParserTest {
     private boolean run(final String source) {
         boolean oops = false;
         try {
-            final Literal literal = new LiteralParser(source).parse();
-            final String text = literal.toString();
+            final Transformation rule = new TransformationParser(source).parse();
+            final String text = rule.toString();
             Assertions.assertEquals(source, text);
         } catch (final ParserException ignored) {
             oops = true;
@@ -80,7 +83,7 @@ public class LiteralParserTest {
     private <T> boolean run(final String source, final Class<T> type) {
         boolean oops = false;
         try {
-            new LiteralParser(source).parse();
+            new TransformationParser(source).parse();
         } catch (final ParserException error) {
             Assertions.assertInstanceOf(type, error);
             oops = true;

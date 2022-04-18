@@ -34,12 +34,18 @@ public class Program {
     private final List<Statement<Literal>> literals;
 
     /**
+     * Node descriptors.
+     */
+    private final List<Statement<Transformation>> transforms;
+
+    /**
      * Constructor.
      */
     public Program() {
         this.all = new LinkedList<>();
         this.nodes = new LinkedList<>();
         this.literals = new LinkedList<>();
+        this.transforms = new LinkedList<>();
     }
 
     /**
@@ -67,6 +73,14 @@ public class Program {
     }
 
     /**
+     * Returns list of transformation descriptors with addition data.
+     * @return Transformation descriptors.
+     */
+    public List<Statement<Transformation>> getTransformations() {
+        return Collections.unmodifiableList(this.transforms);
+    }
+
+    /**
      * Adds node descriptor with addition data.
      * @param statement The node descriptor
      */
@@ -82,6 +96,15 @@ public class Program {
     public void addLiteralStmt(final Statement<Literal> statement) {
         this.all.add(statement.toRuleStmt());
         this.literals.add(statement);
+    }
+
+    /**
+     * Adds transformation descriptor with addition data.
+     * @param statement The literal descriptor
+     */
+    public void addTransformStmt(final Statement<Transformation> statement) {
+        this.all.add(statement.toRuleStmt());
+        this.transforms.add(statement);
     }
 
     /**
