@@ -1,0 +1,5 @@
+A <- left@E, right@E;
+E <- B | V;
+F <- left@E, right@E;
+B <- A | F;
+V <- M, T, D;
