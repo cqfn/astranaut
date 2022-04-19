@@ -16,7 +16,7 @@ import org.uast.astgen.rules.Statement;
 import org.uast.astgen.utils.FilesReader;
 
 /**
- * Tests for {@link OrdinaryNodeGenerator} class.
+ * Tests for {@link LiteralGenerator} class.
  *
  * @since 1.0
  */
@@ -27,7 +27,7 @@ public class LiteralGeneratorTest {
     private static final String TESTS_PATH = "src/test/resources/codegen/java/";
 
     /**
-     * Testing source code generation for rules that describe nodes.
+     * Testing source code generation for rules that describe literals.
      */
     @Test
     @SuppressWarnings("PMD.CloseResource")
