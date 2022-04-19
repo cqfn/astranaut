@@ -8,6 +8,7 @@ package org.uast.astgen.analyzer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,16 @@ public class Analyzer {
             tags = this.info.get(type).getTaggedNames();
         }
         return tags;
+    }
+
+    /**
+     * The list of node types that should be added to an import block
+     *  of the specified node.
+     * @param type The type of the node
+     * @return The list of type names, cannot be {@code null}
+     */
+    public Set<String> getImports(final String type) {
+        return this.storage.getNodesToBeImported(type);
     }
 
     /**
@@ -369,6 +380,43 @@ public class Analyzer {
          */
         public String getLanguage() {
             return this.language;
+        }
+
+        /**
+         * Returns types of nodes which should be imported into the generated class
+         * of the specified node.
+         * @param type The node type
+         * @return The list of node types
+         */
+        public Set<String> getNodesToBeImported(final String type) {
+            final Set<String> imports = new LinkedHashSet<>();
+            final Optional<Node> optional =
+                this.specific.stream()
+                .filter(item -> type.equals(item.getType()))
+                .findFirst();
+            if (optional.isPresent() && optional.get().isOrdinary()) {
+                final Node node = optional.get();
+                final List<Child> children = node.getComposition();
+                for (final Child child : children) {
+                    final Descriptor descriptor = (Descriptor) child;
+                    final String name = descriptor.getType();
+                    if (!this.isInSpecificNodes(name)) {
+                        imports.add(name);
+                    }
+                }
+            }
+            return imports;
+        }
+
+        /**
+         * Checks if the specified node is in the list of
+         * language-specific nodes.
+         * @param type The node type
+         * @return Checking result
+         */
+        private boolean isInSpecificNodes(final String type) {
+            return this.specific.stream()
+                .anyMatch(item -> type.equals(item.getType()));
         }
 
         /**
