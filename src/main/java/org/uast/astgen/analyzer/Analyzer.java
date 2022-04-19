@@ -400,7 +400,7 @@ public class Analyzer {
                 for (final Child child : children) {
                     final Descriptor descriptor = (Descriptor) child;
                     final String name = descriptor.getType();
-                    if (!this.isInSpecificNodes(name)) {
+                    if (!this.isInSpecificNodes(name) && this.isInGreenNodes(name)) {
                         imports.add(name);
                     }
                 }
@@ -416,6 +416,17 @@ public class Analyzer {
          */
         private boolean isInSpecificNodes(final String type) {
             return this.specific.stream()
+                .anyMatch(item -> type.equals(item.getType()));
+        }
+
+        /**
+         * Checks if the specified node is in the list of
+         * green nodes.
+         * @param type The node type
+         * @return Checking result
+         */
+        private boolean isInGreenNodes(final String type) {
+            return this.green.stream()
                 .anyMatch(item -> type.equals(item.getType()));
         }
 

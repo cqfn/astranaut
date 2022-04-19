@@ -1,6 +1,7 @@
 A <- E, E;
 C <- E, E;
 B <- A | C;
+E <- F, F;
 
 java:
 D <- E, E;
