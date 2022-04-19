@@ -13,6 +13,11 @@ import org.uast.astgen.utils.StringUtils;
  */
 public final class Method implements Entity {
     /**
+     * The beginning of the method body.
+     */
+    private static final String BODY_BEGIN = " {\n";
+
+    /**
      * The descriptor.
      */
     private final MethodDescriptor descriptor;
@@ -163,27 +168,45 @@ public final class Method implements Entity {
     @Override
     public String generate(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
-        final StringBuilder builder = new StringBuilder(64);
+        final StringBuilder header = new StringBuilder(64);
         if (this.foverride) {
-            builder.append(tabulation).append("@Override\n");
+            header.append(tabulation).append("@Override\n");
         } else {
-            builder.append(this.descriptor.generateHeader(indent));
+            header.append(this.descriptor.generateHeader(indent));
         }
-        builder.append(tabulation);
+        return header.toString().concat(this.generateCodeBlock(tabulation, indent));
+    }
+
+    /**
+     * Generates code block, i.e. signature and body.
+     * @param tabulation Calculated tabulation
+     * @param indent Current indentation
+     * @return Source code
+     */
+    private String generateCodeBlock(final String tabulation, final int indent) {
+        StringBuilder block = new StringBuilder();
+        block.append(tabulation);
         if (this.fprivate) {
-            builder.append("private ");
+            block.append("private ");
         } else if (this.fpublic) {
-            builder.append("public ");
+            block.append("public ");
         }
         if (this.fabstract) {
             final String signature = this.descriptor.generateSignature(true);
-            builder.append("abstract ").append(signature).append(";\n");
+            block.append("abstract ").append(signature).append(";\n");
         } else {
-            final String signature = this.descriptor.generateSignature(false);
-            builder.append(signature).append(" {\n");
+            String signature = this.descriptor.generateSignature(false);
+            final StringBuilder copy = new StringBuilder(block.toString());
+            block.append(signature).append(Method.BODY_BEGIN);
+            if (block.toString().length() >= Entity.MAX_LINE_LENGTH) {
+                block = copy;
+                final String offset = StringUtils.SPACE.repeat((indent + 1) * Entity.TAB_SIZE);
+                signature = this.descriptor.generateLongSignature().replace("\t", offset);
+                block.append(signature).append(Method.BODY_BEGIN);
+            }
             final String code = this.body.generate(indent + 1);
-            builder.append(code).append(tabulation).append("}\n");
+            block.append(code).append(tabulation).append("}\n");
         }
-        return builder.toString();
+        return block.toString();
     }
 }

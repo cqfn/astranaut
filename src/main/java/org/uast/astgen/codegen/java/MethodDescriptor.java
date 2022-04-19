@@ -144,6 +144,28 @@ public final class MethodDescriptor implements Entity {
         return builder.toString();
     }
 
+    /**
+     * Generates the signature of the method, where each argument on separate line.
+     * @return The signature
+     */
+    public String generateLongSignature() {
+        final StringBuilder builder = new StringBuilder();
+        if (!this.rettype.isEmpty()) {
+            builder.append(this.rettype).append(' ');
+        }
+        builder.append(this.name).append('(');
+        boolean flag = false;
+        for (final Argument arg : this.arguments) {
+            if (flag) {
+                builder.append(",\n\t");
+            }
+            flag = true;
+            builder.append(arg.getType()).append(' ').append(arg.getName());
+        }
+        builder.append(')');
+        return builder.toString();
+    }
+
     @Override
     public String generate(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);

@@ -212,6 +212,24 @@ public final class Klass implements Type {
         this.version = Objects.requireNonNull(str);
     }
 
+    /**
+     * Makes this class a singleton.
+     */
+    public void makeSingleton() {
+        String type = this.name;
+        if (this.parent.isEmpty() && this.interfaces.size() == 1) {
+            type = this.interfaces.get(0);
+        }
+        final Field field = new Field("The instance", type, "INSTANCE");
+        field.makePublic();
+        field.makeStaticFinal();
+        field.setInitExpr(String.format("new %s()", this.name));
+        this.addField(field);
+        final Constructor ctor = new Constructor(this.name);
+        ctor.makePrivate();
+        this.addConstructor(ctor);
+    }
+
     @Override
     public String generate(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
