@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
-import org.uast.astgen.exceptions.ExpectedOnlyOneEntity;
+import org.uast.astgen.exceptions.DuplicateRule;
 import org.uast.astgen.rules.Child;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Disjunction;
@@ -54,12 +54,12 @@ public class Analyzer {
      * Constructor.
      * @param descriptors The node descriptors
      * @param language The programming language
-     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     * @throws DuplicateRule exception if nodes described in rules
      *  contain duplications
      */
     public Analyzer(
         final List<Statement<Node>> descriptors,
-        final String language) throws ExpectedOnlyOneEntity {
+        final String language) throws DuplicateRule {
         this.language = language;
         this.nodes = Collections.unmodifiableList(this.getRelatedNodes(descriptors));
         this.info = new HashMap<>();
@@ -94,10 +94,10 @@ public class Analyzer {
 
     /**
      * Conducts analysis of the provided node set.
-     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     * @throws DuplicateRule exception if nodes described in rules
      *  contain duplications
      */
-    public void analyze() throws ExpectedOnlyOneEntity {
+    public void analyze() throws DuplicateRule {
         this.initialProcess();
         for (final Node node : this.nodes) {
             if (node.isAbstract() && !this.info.containsKey(node.getType())) {
@@ -119,11 +119,11 @@ public class Analyzer {
      * and checks for redundant nodes.
      * @param descriptors The node descriptors
      * @return The list of nodes
-     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     * @throws DuplicateRule exception if nodes described in rules
      *  contain duplications
      */
     private List<Node> getRelatedNodes(
-        final List<Statement<Node>> descriptors) throws ExpectedOnlyOneEntity {
+        final List<Statement<Node>> descriptors) throws DuplicateRule {
         final List<Statement<Node>> statements =
             descriptors.stream()
                 .filter(
@@ -143,20 +143,20 @@ public class Analyzer {
     /**
      * Checks of provided list of nodes contains duplicates.
      * @param related The list of related nodes
-     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     * @throws DuplicateRule exception if nodes described in rules
      *  contain duplications
      */
     private static void checkDuplicateNodes(
-        final List<Node> related) throws ExpectedOnlyOneEntity {
+        final List<Node> related) throws DuplicateRule {
         final Set<Node> duplicates =
             related.stream()
             .filter(node -> Collections.frequency(related, node) > 1)
             .collect(Collectors.toSet());
         for (final Node node : duplicates) {
-            throw new ExpectedOnlyOneEntity(
+            throw new DuplicateRule(
                 new StringBuilder()
                     .append(node.getType())
-                    .append(" <- ...")
+                    .append(" description appears several times (should once)")
                     .toString()
             );
         }
@@ -167,19 +167,19 @@ public class Analyzer {
      * inherit only one ancestor.
      * @param child The child node
      * @param types The list of already processed child types
-     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     * @throws DuplicateRule exception if nodes described in rules
      *  contain duplications
      */
     private static void checkDuplicateInheritance(
         final Child child,
-        final Set<String> types) throws ExpectedOnlyOneEntity {
+        final Set<String> types) throws DuplicateRule {
         final List<Descriptor> descriptors = ((Disjunction) child).getDescriptors();
         for (final Descriptor descriptor : descriptors) {
             if (types.contains(descriptor.getType())) {
-                throw new ExpectedOnlyOneEntity(
+                throw new DuplicateRule(
                     new StringBuilder()
                         .append(descriptor)
-                        .append(" should inherit an abstract node once")
+                        .append(" inherits an abstract node several times (should once)")
                         .toString()
                 );
             }
@@ -300,10 +300,10 @@ public class Analyzer {
      * Conducts initial processing of input list of nodes:
      * - checks that abstract node descendants inherit only once;
      * - processes ordinary nodes (with children).
-     * @throws ExpectedOnlyOneEntity exception if nodes described in rules
+     * @throws DuplicateRule exception if nodes described in rules
      *  contain duplications
      */
-    private void initialProcess() throws ExpectedOnlyOneEntity {
+    private void initialProcess() throws DuplicateRule {
         final Set<String> types = new HashSet<>();
         for (final Node node : this.nodes) {
             if (node.isAbstract()) {
