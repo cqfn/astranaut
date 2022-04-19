@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.BaseException;
+import org.uast.astgen.exceptions.DuplicateRule;
 import org.uast.astgen.parser.ProgramParser;
 import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Program;
@@ -85,6 +86,7 @@ public class AnalyzerTest {
             final List<Statement<Node>> nodes = program.getNodes();
             final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
             analyzer.analyze();
+            Assertions.assertEquals(AnalyzerTest.JAVA_LANGUAGE, analyzer.getLanguage());
             final List<String> etype = Collections.singletonList(AnalyzerTest.E_TYPE);
             Assertions.assertEquals(etype, analyzer.getHierarchy(AnalyzerTest.E_TYPE));
             final List<String> btype = Arrays.asList(
@@ -234,6 +236,51 @@ public class AnalyzerTest {
             list,
             analyzer.getTags(AnalyzerTest.G_TYPE).toString()
         );
+    }
+
+    /**
+     * Test analysis of DSL rules which contain duplicated rules for one node.
+     */
+    @Test
+    public void testDslWithDuplicatedRulesForNode() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("duplicated_rule_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Statement<Node>> nodes = program.getNodes();
+            try {
+                final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+                analyzer.analyze();
+            } catch (final DuplicateRule exception) {
+                oops = true;
+            }
+        } catch (final BaseException ignored) {
+        }
+        Assertions.assertTrue(oops);
+    }
+
+    /**
+     * Test analysis of DSL rules which contain a node that inherits several abstract
+     * nodes.
+     */
+    @Test
+    public void testDslWithDuplicatedInheritance() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("duplicated_inheritance_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Statement<Node>> nodes = program.getNodes();
+            try {
+                final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+                analyzer.analyze();
+            } catch (final DuplicateRule exception) {
+                oops = true;
+            }
+        } catch (final BaseException ignored) {
+        }
+        Assertions.assertTrue(oops);
     }
 
     /**

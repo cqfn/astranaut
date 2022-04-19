@@ -1,0 +1,3 @@
+A <- left@E, right@E;
+E <- B | V;
+A <- one@E, two@E;
