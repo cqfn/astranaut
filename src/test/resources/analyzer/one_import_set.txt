@@ -1,0 +1,6 @@
+A <- E, E;
+C <- E, E;
+B <- A | C;
+
+java:
+D <- E, E;

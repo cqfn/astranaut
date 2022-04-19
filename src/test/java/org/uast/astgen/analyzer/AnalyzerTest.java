@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.BaseException;
@@ -281,6 +282,72 @@ public class AnalyzerTest {
         } catch (final BaseException ignored) {
         }
         Assertions.assertTrue(oops);
+    }
+
+    /**
+     * Test finding one node that should be imported to the generated class
+     * of the specified node.
+     */
+    @Test
+    public void testFindingOneNodeToBeImported() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("one_import_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Statement<Node>> nodes = program.getNodes();
+            final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+            analyzer.analyze();
+            final Set<String> imports = analyzer.getImports(AnalyzerTest.D_TYPE);
+            Assertions.assertEquals("[E]", imports.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test finding several nodes that should be imported to the generated class
+     * of the specified node.
+     */
+    @Test
+    public void testFindingSeveralNodesToBeImported() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("several_imports_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Statement<Node>> nodes = program.getNodes();
+            final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+            analyzer.analyze();
+            final Set<String> imports = analyzer.getImports(AnalyzerTest.D_TYPE);
+            Assertions.assertEquals("[E, B]", imports.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test finding no nodes that should be imported to the generated class
+     * of the specified node.
+     */
+    @Test
+    public void testFindingNoNodesToBeImported() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("no_imports_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Statement<Node>> nodes = program.getNodes();
+            final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+            analyzer.analyze();
+            final Set<String> imports = analyzer.getImports(AnalyzerTest.D_TYPE);
+            Assertions.assertEquals("[]", imports.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 
     /**
