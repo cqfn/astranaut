@@ -6,6 +6,7 @@
 package org.uast.astgen.rules;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A rule that describes node.
@@ -97,6 +98,24 @@ public class Node implements Rule {
             }
         }
         return result;
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        final Node node;
+        boolean equal = false;
+        if (obj instanceof Node) {
+            node = (Node) obj;
+            if (this.type.equals(node.getType())) {
+                equal = true;
+            }
+        }
+        return equal;
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hash(this.type);
     }
 
     /**

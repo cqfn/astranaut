@@ -1,0 +1,8 @@
+A <- B | C;
+B <- E | F;
+C <- G | H;
+E <- D | K;
+F <- a@A, e@E;
+G <- a@A, e@E;
+H <- a@A, E;
+D <- a@A, e@E;
