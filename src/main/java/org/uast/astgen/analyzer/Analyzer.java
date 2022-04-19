@@ -150,7 +150,7 @@ public class Analyzer {
         result.addAncestors(ancestors);
         final Child child = node.getComposition().get(0);
         final List<Descriptor> descriptors = ((Disjunction) child).getDescriptors();
-        ((LinkedList) ancestors).addFirst(node.getType());
+        ((LinkedList<String>) ancestors).addFirst(node.getType());
         int empty = 0;
         for (final Descriptor descriptor : descriptors) {
             final String type = descriptor.getType();
@@ -159,7 +159,7 @@ public class Analyzer {
                 empty += 1;
             }
         }
-        ((LinkedList) ancestors).removeFirst();
+        ((LinkedList<String>) ancestors).removeFirst();
         if (!this.stack.empty()) {
             this.findCommonTags(descriptors.size() - empty, result);
             if (result.containsTags()) {
