@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.uast.astgen.exceptions.DuplicateRule;
 import org.uast.astgen.rules.Child;
@@ -30,6 +31,11 @@ import org.uast.astgen.rules.Statement;
  */
 @SuppressWarnings("PMD.CloseResource")
 public class Analyzer {
+    /**
+     * The logger.
+     */
+    private static final Logger LOG = Logger.getLogger(Analyzer.class.getName());
+
     /**
      * Nodes related to current programming language and green nodes.
      */
@@ -292,6 +298,12 @@ public class Analyzer {
                 this.processAbstractNode(optional.get(), ancestors);
             } else {
                 this.info.put(type, NullResult.INSTANCE);
+                final StringBuilder builder = new StringBuilder(70);
+                builder
+                    .append("The node ")
+                    .append(type)
+                    .append(" was not described in DSL rules. It will be ignored during analysis!");
+                LOG.info(builder.toString());
             }
         }
     }
