@@ -31,21 +31,33 @@ public class MatcherGeneratorTest {
     private static final String TESTS_PATH = "src/test/resources/codegen/java/";
 
     /**
-     * Testing source code generation for rules that describe nodes.
+     * Testing simple case.
      */
     @Test
-    public void testMatcherGeneration() {
-        final boolean result = this.testing("statement", "matcher_generator.txt");
-        Assertions.assertTrue(result);
+    public void testSimpleCase() {
+        final int result = this.testing("statement", "matcher_generator_simple.txt");
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
+     * Testing case: descriptor with one child.
+     */
+    @Test
+    public void testDescriptorWithOneChild() {
+        final int result = this.testing(
+            "singleExpression(literal())",
+            "matcher_generator_1_child.txt"
+        );
+        Assertions.assertEquals(2, result);
     }
 
     /**
      * Performs a test.
      * @param code Source code of descriptor
      * @param filename The name of file that contains the expected result
-     * @return Testing result, {@code true} if success
+     * @return Expected generated classes number
      */
-    boolean testing(final String code, final String filename) {
+    private int testing(final String code, final String filename) {
         final Environment env = new TestEnvironment();
         final Descriptor descriptor = this.parseCode(code);
         final MatcherGenerator generator = new MatcherGenerator(env, "org.uast");
@@ -62,7 +74,8 @@ public class MatcherGeneratorTest {
             actual.append(entry.getValue().generate());
         }
         final String expected = this.readTest(filename);
-        return expected.equals(actual.toString());
+        Assertions.assertEquals(expected, actual.toString());
+        return units.size();
     }
 
     /**

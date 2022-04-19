@@ -61,6 +61,7 @@ public final class MatcherGenerator {
             "Checks if the node matches some structure, and extracts the data and children",
             name
         );
+        new MatcherClassFiller(this, klass, descriptor).fill();
         final CompilationUnit unit = new CompilationUnit(
             this.env.getLicense(),
             this.pkg,
