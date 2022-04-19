@@ -8,10 +8,10 @@ package org.uast.astgen.analyzer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
@@ -37,16 +37,6 @@ public class Analyzer {
     private static final Logger LOG = Logger.getLogger(Analyzer.class.getName());
 
     /**
-     * Nodes related to current programming language and green nodes.
-     */
-    private final List<Node> nodes;
-
-    /**
-     * The programming language for which the analysis is conducted.
-     */
-    private final String language;
-
-    /**
      * Mappings between a node type and a result of its analysis.
      */
     private final Map<String, Result> info;
@@ -55,6 +45,11 @@ public class Analyzer {
      * Stack to save nodes with tagged types to be analyzed.
      */
     private final Stack<String> stack;
+
+    /**
+     * Storage of nodes.
+     */
+    private final NodeStorage storage;
 
     /**
      * Constructor.
@@ -66,8 +61,7 @@ public class Analyzer {
     public Analyzer(
         final List<Statement<Node>> descriptors,
         final String language) throws DuplicateRule {
-        this.language = language;
-        this.nodes = Collections.unmodifiableList(this.getRelatedNodes(descriptors));
+        this.storage = new NodeStorage(descriptors, language);
         this.info = new HashMap<>();
         this.stack = new Stack<>();
     }
@@ -99,13 +93,31 @@ public class Analyzer {
     }
 
     /**
-     * Conducts analysis of the provided node set.
+     * The list of node types that should be added to an import block
+     *  of the specified node.
+     * @param type The type of the node
+     * @return The list of type names, cannot be {@code null}
+     */
+    public Set<String> getImports(final String type) {
+        return this.storage.getNodesToBeImported(type);
+    }
+
+    /**
+     * Conducts analysis of the provided node set:
+     * - processes ordinary nodes (with children);
+     * - processes abstract nodes.
      * @throws DuplicateRule exception if nodes described in rules
      *  contain duplications
      */
     public void analyze() throws DuplicateRule {
-        this.initialProcess();
-        for (final Node node : this.nodes) {
+        this.storage.collectAndCheck();
+        final List<Node> nodes = this.storage.getNodes();
+        for (final Node node : nodes) {
+            if (node.isOrdinary()) {
+                this.processOrdinaryNode(node);
+            }
+        }
+        for (final Node node : nodes) {
             if (node.isAbstract() && !this.info.containsKey(node.getType())) {
                 this.processAbstractNode(node, new LinkedList<>());
             }
@@ -117,80 +129,7 @@ public class Analyzer {
      * @return The language name
      */
     public String getLanguage() {
-        return this.language;
-    }
-
-    /**
-     * Retrieves the list of nodes related to the selected language and green nodes,
-     * and checks for redundant nodes.
-     * @param descriptors The node descriptors
-     * @return The list of nodes
-     * @throws DuplicateRule exception if nodes described in rules
-     *  contain duplications
-     */
-    private List<Node> getRelatedNodes(
-        final List<Statement<Node>> descriptors) throws DuplicateRule {
-        final List<Statement<Node>> statements =
-            descriptors.stream()
-                .filter(
-                    node -> this.language.equals(node.getLanguage())
-                    || "".equals(node.getLanguage())
-                )
-                .collect(Collectors.toList());
-        final List<Node> related = new LinkedList<>();
-        for (final Statement<Node> descriptor : statements) {
-            final Node node = descriptor.getRule();
-            related.add(node);
-        }
-        checkDuplicateNodes(related);
-        return related;
-    }
-
-    /**
-     * Checks of provided list of nodes contains duplicates.
-     * @param related The list of related nodes
-     * @throws DuplicateRule exception if nodes described in rules
-     *  contain duplications
-     */
-    private static void checkDuplicateNodes(
-        final List<Node> related) throws DuplicateRule {
-        final Set<Node> duplicates =
-            related.stream()
-            .filter(node -> Collections.frequency(related, node) > 1)
-            .collect(Collectors.toSet());
-        for (final Node node : duplicates) {
-            throw new DuplicateRule(
-                new StringBuilder()
-                    .append(node.getType())
-                    .append(" description appears several times (should once)")
-                    .toString()
-            );
-        }
-    }
-
-    /**
-     * Checks if child nodes in the right rule part of abstract nodes
-     * inherit only one ancestor.
-     * @param child The child node
-     * @param types The list of already processed child types
-     * @throws DuplicateRule exception if nodes described in rules
-     *  contain duplications
-     */
-    private static void checkDuplicateInheritance(
-        final Child child,
-        final Set<String> types) throws DuplicateRule {
-        final List<Descriptor> descriptors = ((Disjunction) child).getDescriptors();
-        for (final Descriptor descriptor : descriptors) {
-            if (types.contains(descriptor.getType())) {
-                throw new DuplicateRule(
-                    new StringBuilder()
-                        .append(descriptor)
-                        .append(" inherits an abstract node several times (should once)")
-                        .toString()
-                );
-            }
-            types.add(descriptor.getType());
-        }
+        return this.storage.getLanguage();
     }
 
     /**
@@ -291,7 +230,7 @@ public class Analyzer {
             }
         } else {
             final Optional<Node> optional =
-                this.nodes.stream()
+                this.storage.getNodes().stream()
                 .filter(item -> type.equals(item.getType()))
                 .findFirst();
             if (optional.isPresent() && optional.get().isAbstract()) {
@@ -304,25 +243,6 @@ public class Analyzer {
                     .append(type)
                     .append(" was not described in DSL rules. It will be ignored during analysis!");
                 LOG.info(builder.toString());
-            }
-        }
-    }
-
-    /**
-     * Conducts initial processing of input list of nodes:
-     * - checks that abstract node descendants inherit only once;
-     * - processes ordinary nodes (with children).
-     * @throws DuplicateRule exception if nodes described in rules
-     *  contain duplications
-     */
-    private void initialProcess() throws DuplicateRule {
-        final Set<String> types = new HashSet<>();
-        for (final Node node : this.nodes) {
-            if (node.isAbstract()) {
-                checkDuplicateInheritance(node.getComposition().get(0), types);
-            }
-            if (node.isOrdinary()) {
-                this.processOrdinaryNode(node);
             }
         }
     }
@@ -351,190 +271,210 @@ public class Analyzer {
     }
 
     /**
-     * The class to store the result of analysis.
-     * @since 1.0
-     */
-    private static class Result {
-        /**
-         * The node hierarchy (its type and types of its ancestors)
-         * sorted by increasing depth of inheritance.
-         */
-        private final List<String> hierarchy;
-
-        /**
-         * The list of tagged names.
-         */
-        private final List<TaggedName> tags;
-
-        /**
-         * Constructor.
-         * @param hierarchy The hierarchy list
-         */
-        Result(final List<String> hierarchy) {
-            this.hierarchy = hierarchy;
-            this.tags = new LinkedList<>();
-        }
-
-        /**
-         * Adds ancestor types to the hierarchy.
-         * @param names The list of ancestor type names
-         */
-        public void addAncestors(final List<String> names) {
-            this.hierarchy.addAll(names);
-        }
-
-        /**
-         * Adds a tagged type name.
-         * @param tag The tag
-         * @param type The type
-         */
-        public void addTaggedName(final String tag, final String type) {
-            this.tags.add(new TaggedName(tag, type));
-        }
-
-        /**
-         * Returns the hierarchy of the node.
-         * @return The list of types
-         */
-        public List<String> getHierarchy() {
-            return this.hierarchy;
-        }
-
-        /**
-         * Returns the hierarchy of the node.
-         * @return The list of types
-         */
-        public List<TaggedName> getTaggedNames() {
-            return this.tags;
-        }
-
-        /**
-         * Checks if the node contains tagged names.
-         * @return Checking result
-         */
-        public boolean containsTags() {
-            return !this.tags.isEmpty();
-        }
-
-        /**
-         * Sets the {@code true} value to the {@code overridden} property of
-         * the tagged names.
-         * @param common The common tagged names
-         */
-        public void setOverriddenTags(final Set<TaggedName> common) {
-            for (final TaggedName ancestor : common) {
-                final int idx = this.tags.indexOf(ancestor);
-                final TaggedName local = this.tags.get(idx);
-                local.makeOverridden();
-            }
-        }
-    }
-
-    /**
-     * The null results that is added to nodes that are not described in rules.
+     * Stores nodes to be analyzed and checks their validity.
      *
      * @since 1.0
      */
-    private static final class NullResult extends Result {
+    private static class NodeStorage {
         /**
-         * The instance.
+         * The node descriptors.
          */
-        public static final Result INSTANCE = new NullResult();
+        private final List<Statement<Node>> descriptors;
 
         /**
-         * Constructor.
+         * Nodes related to current programming language and green nodes.
          */
-        NullResult() {
-            super(new LinkedList<>());
-        }
-    }
-
-    /**
-     * The class to store tagged names.
-     *
-     * @since 1.0
-     */
-    private static class TaggedName {
-        /**
-         * The tag.
-         */
-        private final String tag;
+        private final List<Node> nodes;
 
         /**
-         * The type.
+         * Nodes related to green nodes.
          */
-        private final String type;
+        private final List<Node> green;
 
         /**
-         * The flag indicates that the tag is overridden.
+         * Nodes related to the specified programming language.
          */
-        private boolean overridden;
+        private final List<Node> specific;
+
+        /**
+         * The programming language for which the analysis is conducted.
+         */
+        private final String language;
 
         /**
          * Constructor.
-         * @param tag The tag
-         * @param type The type
+         * @param descriptors The node descriptors
+         * @param language The programming language
          */
-        TaggedName(final String tag, final String type) {
-            this.tag = tag;
-            this.type = type;
-            this.overridden = false;
+        NodeStorage(
+            final List<Statement<Node>> descriptors,
+            final String language) {
+            this.descriptors = descriptors;
+            this.language = language;
+            this.nodes = new LinkedList<>();
+            this.green = new LinkedList<>();
+            this.specific = new LinkedList<>();
         }
 
         /**
-         * Makes the tagged name overridden.
+         * Retrieves the list of nodes related to the selected language and green nodes,
+         * and checks for redundant nodes.
+         * @throws DuplicateRule exception if nodes described in rules
+         *  contain duplications
          */
-        public void makeOverridden() {
-            this.overridden = true;
-        }
-
-        /**
-         * Returns the tag.
-         * @return The tag
-         */
-        public String getTag() {
-            return this.tag;
-        }
-
-        /**
-         * Returns the type.
-         * @return The type
-         */
-        public String getType() {
-            return this.type;
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder builder = new StringBuilder();
-            builder
-                .append('{')
-                .append(this.tag)
-                .append(", ")
-                .append(this.type)
-                .append(", ")
-                .append(this.overridden)
-                .append('}');
-            return builder.toString();
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            final TaggedName name;
-            boolean equal = false;
-            if (obj instanceof TaggedName) {
-                name = (TaggedName) obj;
-                if (this.type.equals(name.getType())
-                    && this.tag.equals(name.getTag())) {
-                    equal = true;
+        public void collectAndCheck() throws DuplicateRule {
+            final List<Node> common = new LinkedList<>();
+            final List<Node> target = new LinkedList<>();
+            for (final Statement<Node> statement : this.descriptors) {
+                if ("".equals(statement.getLanguage())) {
+                    common.add(statement.getRule());
+                }
+                if (this.language.equals(statement.getLanguage())) {
+                    target.add(statement.getRule());
                 }
             }
-            return equal;
+            checkDuplicateNodes(common);
+            checkDuplicateNodes(target);
+            final List<Node> related = new LinkedList<>();
+            related.addAll(common);
+            related.addAll(target);
+            final Set<String> types = new HashSet<>();
+            for (final Node node : related) {
+                if (node.isAbstract()) {
+                    checkDuplicateInheritance(node.getComposition().get(0), types);
+                }
+            }
+            this.green.addAll(common);
+            this.specific.addAll(target);
+            this.nodes.addAll(related);
         }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.tag + this.type);
+        /**
+         * Returns all nodes.
+         * @return The list of all nodes
+         */
+        public List<Node> getNodes() {
+            return this.nodes;
+        }
+
+        /**
+         * Returns green nodes.
+         * @return The list of green nodes
+         */
+        public List<Node> getGreenNodes() {
+            return this.green;
+        }
+
+        /**
+         * Returns language-specific nodes.
+         * @return The list of nodes related to the specified
+         *  programming language
+         */
+        public List<Node> getSpecificNodes() {
+            return this.specific;
+        }
+
+        /**
+         * Returns the programming language.
+         * @return The name of the language
+         */
+        public String getLanguage() {
+            return this.language;
+        }
+
+        /**
+         * Returns types of nodes which should be imported into the generated class
+         * of the specified node.
+         * @param type The node type
+         * @return The list of node types
+         */
+        public Set<String> getNodesToBeImported(final String type) {
+            final Set<String> imports = new LinkedHashSet<>();
+            final Optional<Node> optional =
+                this.specific.stream()
+                .filter(item -> type.equals(item.getType()))
+                .findFirst();
+            if (optional.isPresent() && optional.get().isOrdinary()) {
+                final Node node = optional.get();
+                final List<Child> children = node.getComposition();
+                for (final Child child : children) {
+                    final Descriptor descriptor = (Descriptor) child;
+                    final String name = descriptor.getType();
+                    if (!this.isInSpecificNodes(name) && this.isInGreenNodes(name)) {
+                        imports.add(name);
+                    }
+                }
+            }
+            return imports;
+        }
+
+        /**
+         * Checks if the specified node is in the list of
+         * language-specific nodes.
+         * @param type The node type
+         * @return Checking result
+         */
+        private boolean isInSpecificNodes(final String type) {
+            return this.specific.stream()
+                .anyMatch(item -> type.equals(item.getType()));
+        }
+
+        /**
+         * Checks if the specified node is in the list of
+         * green nodes.
+         * @param type The node type
+         * @return Checking result
+         */
+        private boolean isInGreenNodes(final String type) {
+            return this.green.stream()
+                .anyMatch(item -> type.equals(item.getType()));
+        }
+
+        /**
+         * Checks of provided list of nodes contains duplicates.
+         * @param related The list of related nodes
+         * @throws DuplicateRule exception if nodes described in rules
+         *  contain duplications
+         */
+        private static void checkDuplicateNodes(
+            final List<Node> related) throws DuplicateRule {
+            final Set<Node> duplicates =
+                related.stream()
+                    .filter(node -> Collections.frequency(related, node) > 1)
+                    .collect(Collectors.toSet());
+            for (final Node node : duplicates) {
+                throw new DuplicateRule(
+                    new StringBuilder()
+                        .append(node.getType())
+                        .append(" description appears several times (should once)")
+                        .toString()
+                );
+            }
+        }
+
+        /**
+         * Checks if child nodes in the right rule part of abstract nodes
+         * inherit only one ancestor.
+         * @param child The child node
+         * @param types The list of already processed child types
+         * @throws DuplicateRule exception if nodes described in rules
+         *  contain duplications
+         */
+        private static void checkDuplicateInheritance(
+            final Child child,
+            final Set<String> types) throws DuplicateRule {
+            final List<Descriptor> descriptors = ((Disjunction) child).getDescriptors();
+            for (final Descriptor descriptor : descriptors) {
+                if (types.contains(descriptor.getType())) {
+                    throw new DuplicateRule(
+                        new StringBuilder()
+                            .append(descriptor)
+                            .append(" inherits an abstract node several times (should once)")
+                            .toString()
+                    );
+                }
+                types.add(descriptor.getType());
+            }
         }
     }
 }
