@@ -11,7 +11,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Logger;
+import org.uast.astgen.analyzer.PreparedEnvironment;
 import org.uast.astgen.codegen.java.Environment;
 import org.uast.astgen.codegen.java.License;
 import org.uast.astgen.codegen.java.ProgramGenerator;
@@ -155,7 +158,12 @@ public final class Main {
         final ProgramParser parser = new ProgramParser(code);
         try {
             final Program program = parser.parse();
-            final Environment env = new EnvironmentImpl();
+            final Environment base = new EnvironmentImpl();
+            final Map<String, Environment> env = new TreeMap<>();
+            env.put("", new PreparedEnvironment(base, program.getNodes(), ""));
+            for (final String language : program.getNamesOfAllLanguages()) {
+                env.put(language, new PreparedEnvironment(base, program.getNodes(), language));
+            }
             final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
             generator.generate();
         } catch (final BaseException exc) {
