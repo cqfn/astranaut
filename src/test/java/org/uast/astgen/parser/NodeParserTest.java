@@ -112,6 +112,17 @@ public class NodeParserTest {
     }
 
     /**
+     * Test case: abstract node with several extensions.
+     */
+    @Test
+    public void abstractNodeWithExtensionException() {
+        final boolean result = this.run(
+            "BinaryExpression <- & | Exponent | &"
+        );
+        Assertions.assertFalse(result);
+    }
+
+    /**
      * Runs the node parser.
      * @param source Source string
      * @return Test result ({@code true} means no exceptions)
