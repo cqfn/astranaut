@@ -24,6 +24,7 @@ import org.uast.astgen.utils.FilesReader;
  *
  * @since 1.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class AnalyzerTest {
     /**
      * The folder with test resources.
@@ -77,9 +78,10 @@ public class AnalyzerTest {
 
     /**
      * Test for analysis of depth 3 nodes inheritance.
+     * Case with Java nodes request.
      */
     @Test
-    public void testThreeDepthHierarchy() {
+    public void testThreeDepthHierarchyJava() {
         boolean oops = false;
         final ProgramParser parser = this.getSource();
         try {
@@ -88,6 +90,39 @@ public class AnalyzerTest {
             final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
             analyzer.analyze();
             Assertions.assertEquals(AnalyzerTest.JAVA_LANGUAGE, analyzer.getLanguage());
+            final List<String> etype = Collections.singletonList(AnalyzerTest.E_TYPE);
+            Assertions.assertEquals(etype, analyzer.getHierarchy(AnalyzerTest.E_TYPE));
+            final List<String> btype = Arrays.asList(
+                AnalyzerTest.B_TYPE,
+                AnalyzerTest.E_TYPE
+            );
+            Assertions.assertEquals(btype, analyzer.getHierarchy(AnalyzerTest.B_TYPE));
+            final List<String> atype = Arrays.asList(
+                AnalyzerTest.A_TYPE,
+                AnalyzerTest.B_TYPE,
+                AnalyzerTest.E_TYPE
+            );
+            Assertions.assertEquals(atype, analyzer.getHierarchy(AnalyzerTest.A_TYPE));
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test for analysis of depth 3 nodes inheritance.
+     * Case with green nodes request.
+     */
+    @Test
+    public void testThreeDepthHierarchyGreen() {
+        boolean oops = false;
+        final ProgramParser parser = this.getSource();
+        try {
+            final Program program = parser.parse();
+            final List<Statement<Node>> nodes = program.getNodes();
+            final Analyzer analyzer = new Analyzer(nodes, "");
+            analyzer.analyze();
+            Assertions.assertEquals("", analyzer.getLanguage());
             final List<String> etype = Collections.singletonList(AnalyzerTest.E_TYPE);
             Assertions.assertEquals(etype, analyzer.getHierarchy(AnalyzerTest.E_TYPE));
             final List<String> btype = Arrays.asList(
