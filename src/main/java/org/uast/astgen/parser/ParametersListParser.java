@@ -12,7 +12,9 @@ import org.uast.astgen.exceptions.ExpectedDescriptor;
 import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.DescriptorAttribute;
+import org.uast.astgen.rules.Extension;
 import org.uast.astgen.rules.Parameter;
+import org.uast.astgen.scanner.Ampersand;
 import org.uast.astgen.scanner.BracketsPair;
 import org.uast.astgen.scanner.Comma;
 import org.uast.astgen.scanner.HoleMarker;
@@ -68,6 +70,8 @@ public class ParametersListParser {
                 );
             } else if (first instanceof BracketsPair) {
                 result.add(this.parseOptional(segment));
+            } else if (first instanceof Ampersand) {
+                result.add(new Extension());
             } else {
                 throw new CantParseSequence(segment);
             }

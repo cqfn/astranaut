@@ -107,6 +107,7 @@ public class Scanner {
      * @return A token
      * @throws ParserException Parser exception
      */
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     private Token parseTokenByFirstSymbol(final char symbol) throws ParserException {
         Token result = null;
         switch (symbol) {
@@ -133,6 +134,10 @@ public class Scanner {
             case '|':
                 this.nextChar();
                 result = VerticalBar.INSTANCE;
+                break;
+            case '&':
+                this.nextChar();
+                result = Ampersand.INSTANCE;
                 break;
             default:
                 throw new UnknownSymbol(symbol);

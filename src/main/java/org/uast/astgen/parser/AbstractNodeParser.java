@@ -81,7 +81,10 @@ public class AbstractNodeParser {
      * @throws ParserException If checking failed
      */
     private static void checkDescriptor(final Descriptor descriptor) throws ParserException {
-        if (descriptor.getAttribute() != DescriptorAttribute.NONE
+        final boolean attribute =
+            descriptor.getAttribute() == DescriptorAttribute.NONE
+            || descriptor.getAttribute() == DescriptorAttribute.EXT;
+        if (!attribute
             || !descriptor.getTag().isEmpty()
             || !descriptor.getParameters().isEmpty()
             || descriptor.getData().isValid()

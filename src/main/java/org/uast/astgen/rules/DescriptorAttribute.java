@@ -23,5 +23,10 @@ public enum DescriptorAttribute {
     /**
      * Element is a list of elements.
      */
-    LIST
+    LIST,
+
+    /**
+     * Element is a flag that indicates extension.
+     */
+    EXT
 }
