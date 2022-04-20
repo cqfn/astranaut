@@ -14,6 +14,17 @@ import java.util.List;
  * @since 1.0
  */
 public final class Extension extends Descriptor {
+    /**
+     * The instance.
+     */
+    public static final Extension INSTANCE = new Extension();
+
+    /**
+     * Constructor.
+     */
+    private Extension() {
+    }
+
     @Override
     public DescriptorAttribute getAttribute() {
         return DescriptorAttribute.EXT;
