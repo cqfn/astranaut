@@ -45,7 +45,7 @@ public interface Environment {
     boolean isTestMode();
 
     /**
-     * Returns node hierarchy (waiting for PWC).
+     * Returns node hierarchy.
      * @param name Node name
      * @return Node hierarchy
      */

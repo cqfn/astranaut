@@ -6,6 +6,7 @@ package org.uast.astgen.codegen.java;
 
 import java.io.File;
 import java.util.Locale;
+import java.util.Map;
 import org.uast.astgen.exceptions.CouldNotWriteFile;
 import org.uast.astgen.exceptions.GeneratorException;
 import org.uast.astgen.rules.Literal;
@@ -37,7 +38,13 @@ public final class ProgramGenerator {
     private final Program program;
 
     /**
-     * The environment required for generation.
+     * The prepared environment collection required for generation,
+     * one object for each programming language.
+     */
+    private final Map<String, Environment> envs;
+
+    /**
+     * The base environment.
      */
     private final Environment env;
 
@@ -45,12 +52,14 @@ public final class ProgramGenerator {
      * Constructor.
      * @param path The path where to generate
      * @param program The program
-     * @param env The environment required for generation
+     * @param envs The environment collection required for generation
      */
-    public ProgramGenerator(final String path, final Program program, final Environment env) {
+    public ProgramGenerator(final String path, final Program program,
+        final Map<String, Environment> envs) {
         this.path = path;
         this.program = program;
-        this.env = env;
+        this.envs = envs;
+        this.env = envs.get("");
     }
 
     /**
@@ -113,14 +122,15 @@ public final class ProgramGenerator {
     private void generateNodes() throws GeneratorException {
         final String version = this.env.getVersion();
         for (final Statement<Node> stmt : this.program.getNodes()) {
+            final String language = stmt.getLanguage();
             final Node rule = stmt.getRule();
             final CompilationUnit unit;
             if (rule.isOrdinary()) {
-                unit = new OrdinaryNodeGenerator(this.env, stmt).generate();
+                unit = new OrdinaryNodeGenerator(this.envs.get(language), stmt).generate();
             } else if (rule.isAbstract()) {
-                unit = new AbstractNodeGenerator(this.env, stmt).generate();
+                unit = new AbstractNodeGenerator(this.envs.get(language), stmt).generate();
             } else if (rule.isList()) {
-                unit = new ListNodeGenerator(this.env, stmt).generate();
+                unit = new ListNodeGenerator(this.envs.get(language), stmt).generate();
             } else {
                 throw new IllegalStateException();
             }
@@ -140,13 +150,15 @@ public final class ProgramGenerator {
     private void generateLiterals() throws GeneratorException {
         final String version = this.env.getVersion();
         for (final Statement<Literal> stmt : this.program.getLiterals()) {
+            final String language = stmt.getLanguage();
             final Literal rule = stmt.getRule();
-            final CompilationUnit unit = new LiteralGenerator(this.env, stmt).generate();
+            final CompilationUnit unit =
+                new LiteralGenerator(this.envs.get(language), stmt).generate();
             if (!version.isEmpty()) {
                 unit.setVersion(version);
             }
             final String code = unit.generate();
-            final String filename = this.getFilePath(stmt.getLanguage(), rule.getType());
+            final String filename = this.getFilePath(language, rule.getType());
             this.createFile(filename, code);
         }
     }
