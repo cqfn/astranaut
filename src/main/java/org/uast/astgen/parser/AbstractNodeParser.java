@@ -30,6 +30,11 @@ public class AbstractNodeParser {
     private static final String EXPLANATORY = "... | ... | ...";
 
     /**
+     * Text for exception with extension.
+     */
+    private static final String EXT_EXPLANATORY = "& | ... | ...";
+
+    /**
      * The source token list.
      */
     private final TokenList[] segments;
@@ -54,6 +59,15 @@ public class AbstractNodeParser {
                 new DescriptorsListParser(segment, new LabelFactory()).parse();
             checkListAbstract(descriptors);
             composition.add(descriptors.get(0));
+        }
+        int extension = 0;
+        for (final Descriptor descriptor : composition) {
+            if (descriptor.getAttribute() == DescriptorAttribute.EXT) {
+                extension += 1;
+            }
+        }
+        if (extension > 1) {
+            throw new ExpectedOnlyOneEntity(AbstractNodeParser.EXT_EXPLANATORY);
         }
         final Disjunction disjunction = new Disjunction(composition);
         return Collections.singletonList(disjunction);
@@ -81,7 +95,10 @@ public class AbstractNodeParser {
      * @throws ParserException If checking failed
      */
     private static void checkDescriptor(final Descriptor descriptor) throws ParserException {
-        if (descriptor.getAttribute() != DescriptorAttribute.NONE
+        final boolean attribute =
+            descriptor.getAttribute() == DescriptorAttribute.NONE
+            || descriptor.getAttribute() == DescriptorAttribute.EXT;
+        if (!attribute
             || !descriptor.getTag().isEmpty()
             || !descriptor.getParameters().isEmpty()
             || descriptor.getData().isValid()

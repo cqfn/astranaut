@@ -118,6 +118,9 @@ public abstract class Descriptor implements Child, Parameter {
         } else if (attribute == DescriptorAttribute.LIST) {
             builder.append('}');
         }
+        if (attribute == DescriptorAttribute.EXT) {
+            builder.append('&');
+        }
         return builder.toString();
     }
 
