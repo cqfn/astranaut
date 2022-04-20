@@ -329,7 +329,8 @@ public class Analyzer {
                 if ("".equals(statement.getLanguage())) {
                     common.add(statement.getRule());
                 }
-                if (this.language.equals(statement.getLanguage())) {
+                if (this.language.equals(statement.getLanguage())
+                    && !this.language.isEmpty()) {
                     target.add(statement.getRule());
                 }
             }
