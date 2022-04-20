@@ -12,7 +12,7 @@ import java.util.Objects;
  * @since 1.0
  */
 @SuppressWarnings("PMD.DataClass")
-public final class Literal implements Rule {
+public final class Literal implements Vertex {
     /**
      * Left part.
      */

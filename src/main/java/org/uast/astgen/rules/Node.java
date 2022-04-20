@@ -13,7 +13,7 @@ import java.util.Objects;
  *
  * @since 1.0
  */
-public class Node implements Rule {
+public class Node implements Vertex {
     /**
      * Left part.
      */
