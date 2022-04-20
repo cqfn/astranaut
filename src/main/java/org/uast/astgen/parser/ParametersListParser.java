@@ -71,7 +71,7 @@ public class ParametersListParser {
             } else if (first instanceof BracketsPair) {
                 result.add(this.parseOptional(segment));
             } else if (first instanceof Ampersand) {
-                result.add(new Extension());
+                result.add(Extension.INSTANCE);
             } else {
                 throw new CantParseSequence(segment);
             }
