@@ -63,7 +63,7 @@ final class StaticStringGenerator {
             }
             result = name.toString();
             if (result.length() > StaticStringGenerator.NAME_LENGTH) {
-                result = result.substring(StaticStringGenerator.NAME_LENGTH);
+                result = result.substring(0, StaticStringGenerator.NAME_LENGTH);
             }
             final Field field = new Field(
                 String.format("The '%s' string", value),
