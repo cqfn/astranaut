@@ -37,7 +37,7 @@ public final class PreparedEnvironment implements Environment {
     public PreparedEnvironment(final Environment base, final List<Statement<Node>> descriptors,
         final String language) throws GeneratorException {
         this.base = base;
-        this.analyzer = new Analyzer(descriptors, language);
+        this.analyzer = new Analyzer(descriptors, language).analyze();
     }
 
     @Override
