@@ -20,6 +20,11 @@ import org.uast.astgen.rules.Statement;
 @SuppressWarnings("PMD.CloseResource")
 public final class FactoryGenerator extends BaseGenerator {
     /**
+     * The 'factory' string.
+     */
+    private static final String STR_FACTORY = "Factory";
+
+    /**
      * The program.
      */
     private final Program program;
@@ -74,6 +79,7 @@ public final class FactoryGenerator extends BaseGenerator {
         final Environment env = this.getEnv();
         this.prepareRuleSet();
         this.createClass();
+        this.createConstructor();
         final CompilationUnit unit = new CompilationUnit(
             env.getLicense(),
             this.getPackageName(this.language),
@@ -142,6 +148,31 @@ public final class FactoryGenerator extends BaseGenerator {
             name.substring(1)
         );
         this.klass = new Klass(brief, this.classname);
+        this.klass.setParentClass(FactoryGenerator.STR_FACTORY);
+    }
+
+    /**
+     * Creates the constructor and the static instance.
+     */
+    private void createConstructor() {
+        final Field field = new Field(
+            "The instance",
+            FactoryGenerator.STR_FACTORY,
+            "INSTANCE"
+        );
+        field.makePublic();
+        field.makeStaticFinal();
+        field.setInitExpr(String.format("new %s()", this.classname));
+        this.klass.addField(field);
+        final Constructor ctor = new Constructor(this.classname);
+        ctor.makePrivate();
+        ctor.setCode(
+            String.format(
+                "super(Collections.unmodifiableMap(%s.init()));",
+                this.classname
+            )
+        );
+        this.klass.addConstructor(ctor);
     }
 
     /**

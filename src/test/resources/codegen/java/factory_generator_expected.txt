@@ -23,5 +23,16 @@ import org.uast.uast.base.Type;
  *
  * @since 1.0
  */
-public class CFactory {
+public class CFactory extends Factory {
+    /**
+     * The instance.
+     */
+    public static final Factory INSTANCE = new CFactory();
+
+    /**
+     * Constructor.
+     */
+    private CFactory() {
+        super(Collections.unmodifiableMap(CFactory.init()));
+    }
 }
