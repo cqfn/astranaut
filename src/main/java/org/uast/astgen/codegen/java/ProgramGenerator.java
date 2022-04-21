@@ -70,6 +70,7 @@ public final class ProgramGenerator {
         this.generatePackages();
         this.generateNodes();
         this.generateLiterals();
+        this.generateFactories();
     }
 
     /**
@@ -121,24 +122,14 @@ public final class ProgramGenerator {
      */
     private void generateNodes() throws GeneratorException {
         final String version = this.env.getVersion();
+        final NodeGenerator generator = new NodeGenerator(this.envs);
         for (final Statement<Node> stmt : this.program.getNodes()) {
-            final String language = stmt.getLanguage();
-            final Node rule = stmt.getRule();
-            final CompilationUnit unit;
-            if (rule.isOrdinary()) {
-                unit = new OrdinaryNodeGenerator(this.envs.get(language), stmt).generate();
-            } else if (rule.isAbstract()) {
-                unit = new AbstractNodeGenerator(this.envs.get(language), stmt).generate();
-            } else if (rule.isList()) {
-                unit = new ListNodeGenerator(this.envs.get(language), stmt).generate();
-            } else {
-                throw new IllegalStateException();
-            }
+            final CompilationUnit unit = generator.generate(stmt);
             if (!version.isEmpty()) {
                 unit.setVersion(version);
             }
             final String code = unit.generate();
-            final String filename = this.getFilePath(stmt.getLanguage(), rule.getType());
+            final String filename = this.getFilePath(stmt.getLanguage(), stmt.getRule().getType());
             this.createFile(filename, code);
         }
     }
@@ -161,6 +152,34 @@ public final class ProgramGenerator {
             final String filename = this.getFilePath(language, rule.getType());
             this.createFile(filename, code);
         }
+    }
+
+    /**
+     * Generates source code for factories.
+     * @throws GeneratorException When can't generate
+     */
+    private void generateFactories() throws GeneratorException {
+        this.generateFactory("");
+        for (final String language : this.program.getNamesOfAllLanguages()) {
+            this.generateFactory(language);
+        }
+    }
+
+    /**
+     * Generates source code for one factory.
+     * @param language The programming language
+     * @throws GeneratorException When can't generate
+     */
+    private void generateFactory(final String language) throws GeneratorException {
+        final String version = this.env.getVersion();
+        final FactoryGenerator generator = new FactoryGenerator(this.env, this.program, language);
+        final CompilationUnit unit = generator.generate();
+        if (!version.isEmpty()) {
+            unit.setVersion(version);
+        }
+        final String code = unit.generate();
+        final String filename = this.getFilePath(language, generator.getClassname());
+        this.createFile(filename, code);
     }
 
     /**
