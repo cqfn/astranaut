@@ -7,6 +7,9 @@ package org.uast.astgen.codegen.java;
 import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Statement;
 
+import java.util.List;
+import java.util.Locale;
+
 /**
  * Generates source code for rules that describe abstract nodes.
  *
@@ -38,10 +41,35 @@ final class AbstractNodeGenerator extends BaseGenerator {
             type
         );
         iface.setInterfaces("Node");
+        defineGettersForTaggedFields(iface);
         final String pkg = this.getPackageName(this.statement.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, iface);
         this.generateImports(unit);
         return unit;
+    }
+
+    /**
+     * Creates getter methods for tagged fields.
+     * @param iface Where to create
+     */
+    private void defineGettersForTaggedFields(final Interface iface) {
+        final List<TaggedChild> tags = this.getEnv().getTags(this.statement.getRule().getType());
+        for (final TaggedChild child : tags) {
+            if (!child.isOverridden()) {
+                final String type = child.getType();
+                final String tag = child.getTag();
+                final MethodDescriptor getter = new MethodDescriptor(
+                    String.format("Returns the child with the '%s' tag", tag),
+                    String.format(
+                        "get%s%s",
+                        tag.substring(0, 1).toUpperCase(Locale.ENGLISH),
+                        tag.substring(1)
+                    )
+                );
+                getter.setReturnType(type, "The node");
+                iface.addMethod(getter);
+            }
+        }
     }
 
     /**
