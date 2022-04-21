@@ -4,6 +4,8 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
@@ -80,6 +82,7 @@ public final class FactoryGenerator extends BaseGenerator {
         this.prepareRuleSet();
         this.createClass();
         this.createConstructor();
+        this.createInitializer();
         final CompilationUnit unit = new CompilationUnit(
             env.getLicense(),
             this.getPackageName(this.language),
@@ -173,6 +176,54 @@ public final class FactoryGenerator extends BaseGenerator {
             )
         );
         this.klass.addConstructor(ctor);
+    }
+
+    /**
+     * Creates the 'init()' method.
+     */
+    private void createInitializer() {
+        final Method method = new Method(
+            "Initialises the set of types arranged by name",
+            "init"
+        );
+        method.makePrivate();
+        method.makeStatic();
+        method.setReturnType(
+            "Map<String, Type>",
+            "The map of types by name"
+        );
+        final List<String> code = Arrays.asList(
+            "final List<Type> types = Arrays.asList(",
+            this.createList(),
+            ");",
+            "final Map<String, Type> map = new TreeMap<>();",
+            "for (final Type type : types) {",
+            "    map.put(type.getName(), type);",
+            "}\n",
+            "return map;"
+        );
+        method.setCode(String.join("\n", code));
+        this.klass.addMethod(method);
+    }
+
+    /**
+     * Creates list of classes (nodes and literals).
+     * @return The string where all classes are enumerated
+     */
+    private String createList() {
+        final Set<String> set = new TreeSet<>();
+        set.addAll(this.common);
+        set.addAll(this.specific);
+        boolean flag = false;
+        final StringBuilder result = new StringBuilder();
+        for (final String name : set) {
+            if (flag) {
+                result.append(",\n");
+            }
+            flag = true;
+            result.append('\t').append(name).append(".TYPE");
+        }
+        return result.toString();
     }
 
     /**
