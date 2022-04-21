@@ -4,9 +4,12 @@
  */
 package org.uast.astgen.analyzer;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.uast.astgen.codegen.java.Environment;
 import org.uast.astgen.codegen.java.License;
+import org.uast.astgen.codegen.java.TaggedChild;
 import org.uast.astgen.exceptions.GeneratorException;
 import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Statement;
@@ -68,5 +71,15 @@ public final class PreparedEnvironment implements Environment {
     @Override
     public List<String> getHierarchy(final String name) {
         return this.analyzer.getHierarchy(name);
+    }
+
+    @Override
+    public List<TaggedChild> getTags(final String type) {
+        return new ArrayList<>(this.analyzer.getTags(type));
+    }
+
+    @Override
+    public Set<String> getImports(final String type) {
+        return this.analyzer.getImports(type);
     }
 }
