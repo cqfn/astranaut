@@ -4,9 +4,8 @@
  */
 package org.uast.astgen.codegen.java;
 
-import org.uast.astgen.rules.Node;
-
 import java.util.List;
+import org.uast.astgen.rules.Node;
 
 /**
  * Generates source code for rules that describe nodes.

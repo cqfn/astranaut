@@ -4,8 +4,8 @@
  */
 package org.uast.astgen.codegen.java;
 
-import org.uast.astgen.rules.Child;
-import org.uast.astgen.rules.Descriptor;
+import java.util.List;
+import java.util.Locale;
 import org.uast.astgen.rules.Node;
 
 /**
@@ -94,26 +94,30 @@ final class OrdinaryNodeClassConstructor extends NodeConstructor {
      */
     private void createTaggedFields() {
         final Klass klass = this.getKlass();
-        for (final Child child : this.getRule().getComposition()) {
-            final Descriptor descriptor = (Descriptor) child;
-            final String tag = descriptor.getTag();
-            if (!tag.isEmpty()) {
-                final String type = descriptor.getType();
-                final String var = descriptor.getVariableName();
-                final Field field = new Field(
-                    String.format("Child with the '%s' tag", tag),
-                    type,
-                    var
-                );
-                klass.addField(field);
-                final Method getter = new Method(
-                    String.format("Returns the child with the '%s' tag", tag),
-                    String.format("get%s", descriptor.getTagCapital())
-                );
-                getter.setReturnType(type, "The node");
-                getter.setCode(String.format("return this.%s;", var));
-                klass.addMethod(getter);
+        final List<TaggedChild> tags = this.getEnv().getTags(this.getType());
+        for (final TaggedChild child : tags) {
+            final String type = child.getType();
+            final String tag = child.getTag();
+            final Field field = new Field(
+                String.format("Child with the '%s' tag", tag),
+                type,
+                tag
+            );
+            klass.addField(field);
+            final Method getter = new Method(
+                String.format("Returns the child with the '%s' tag", tag),
+                String.format(
+                    "get%s%s",
+                    tag.substring(0, 1).toUpperCase(Locale.ENGLISH),
+                    tag.substring(1)
+                )
+            );
+            getter.setReturnType(type, "The node");
+            getter.setCode(String.format("return this.%s;", tag));
+            if (child.isOverridden()) {
+                getter.makeOverridden();
             }
+            klass.addMethod(getter);
         }
     }
 }

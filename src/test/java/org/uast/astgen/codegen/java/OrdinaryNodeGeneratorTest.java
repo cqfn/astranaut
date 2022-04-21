@@ -6,6 +6,7 @@
 package org.uast.astgen.codegen.java;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,8 +34,9 @@ public class OrdinaryNodeGeneratorTest {
     @Test
     @SuppressWarnings("PMD.CloseResource")
     public void testNodeGeneration() {
-        final Environment env = new TestEnvironment();
         final Statement<Node> statement = this.createStatement();
+        final Environment env =
+            new TestEnvironment(Collections.singletonList(statement.getRule()));
         final OrdinaryNodeGenerator generator = new OrdinaryNodeGenerator(env, statement);
         final String actual = generator.generate().generate();
         final String expected = this.readTest("node_generator.txt");
