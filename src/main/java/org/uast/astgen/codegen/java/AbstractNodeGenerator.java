@@ -4,11 +4,10 @@
  */
 package org.uast.astgen.codegen.java;
 
-import org.uast.astgen.rules.Node;
-import org.uast.astgen.rules.Statement;
-
 import java.util.List;
 import java.util.Locale;
+import org.uast.astgen.rules.Node;
+import org.uast.astgen.rules.Statement;
 
 /**
  * Generates source code for rules that describe abstract nodes.
@@ -41,7 +40,7 @@ final class AbstractNodeGenerator extends BaseGenerator {
             type
         );
         iface.setInterfaces("Node");
-        defineGettersForTaggedFields(iface);
+        this.defineGettersForTaggedFields(iface);
         final String pkg = this.getPackageName(this.statement.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, iface);
         this.generateImports(unit);
