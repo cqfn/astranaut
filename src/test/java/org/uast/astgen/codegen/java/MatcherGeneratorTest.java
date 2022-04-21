@@ -52,6 +52,18 @@ public class MatcherGeneratorTest {
     }
 
     /**
+     * Testing case: extracting data.
+     */
+    @Test
+    public void testExtractingData() {
+        final int result = this.testing(
+            "literal<#13>",
+            "matcher_generator_data.txt"
+        );
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
      * Performs a test.
      * @param code Source code of descriptor
      * @param filename The name of file that contains the expected result

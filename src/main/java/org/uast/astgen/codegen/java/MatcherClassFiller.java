@@ -4,7 +4,11 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.Arrays;
+import java.util.List;
+import org.uast.astgen.rules.Data;
 import org.uast.astgen.rules.Descriptor;
+import org.uast.astgen.rules.Hole;
 import org.uast.astgen.rules.Parameter;
 
 /**
@@ -84,6 +88,26 @@ public class MatcherClassFiller {
         method.addArgument("Node", "node");
         method.addArgument("Map<Integer, Node>", "children");
         method.addArgument("Map<Integer, String>", "data");
+        final String condition = this.createCondition();
+        if (this.descriptor.hasHole()) {
+            final List<String> code = Arrays.asList(
+                String.format("final boolean result = %s;", condition),
+                "if (result) {",
+                this.createExtractor(),
+                "}",
+                "return result;"
+            );
+            method.setCode(String.join("\n", code));
+        } else {
+            method.setCode(String.format("return %s;", condition));
+        }
+    }
+
+    /**
+     * Generates the condition of the matcher.
+     * @return The expression (boolean type)
+     */
+    private String createCondition() {
         final StringBuilder condition = new StringBuilder();
         final String name = this.klass.getName();
         final String common = String.format(
@@ -106,6 +130,39 @@ public class MatcherClassFiller {
             }
             index = index + 1;
         }
-        method.setCode(String.format("return %s;", condition.toString()));
+        return condition.toString();
+    }
+
+    /**
+     * Generates the code that extracts data or (and) children from the node.
+     * @return Source code
+     */
+    private String createExtractor() {
+        final StringBuilder extractor = new StringBuilder();
+        int index = 0;
+        for (final Parameter parameter : this.descriptor.getParameters()) {
+            if (parameter instanceof Hole) {
+                final Hole hole = (Hole) parameter;
+                extractor.append(
+                    String.format(
+                        "children.put(%d, node.getChild(%d));\n",
+                        hole.getValue(),
+                        index
+                    )
+                );
+            }
+            index = index + 1;
+        }
+        final Data data = this.descriptor.getData();
+        if (data instanceof Hole) {
+            final Hole hole = (Hole) data;
+            extractor.append(
+                String.format(
+                    "data.put(%d, node.getData());\n",
+                    hole.getValue()
+                )
+            );
+        }
+        return extractor.toString();
     }
 }
