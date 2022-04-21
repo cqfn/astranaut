@@ -151,6 +151,7 @@ public final class FactoryGenerator extends BaseGenerator {
             name.substring(1)
         );
         this.klass = new Klass(brief, this.classname);
+        this.klass.makeFinal();
         this.klass.setParentClass(FactoryGenerator.STR_FACTORY);
     }
 

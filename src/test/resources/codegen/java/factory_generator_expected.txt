@@ -23,7 +23,7 @@ import org.uast.uast.base.Type;
  *
  * @since 1.0
  */
-public class CFactory extends Factory {
+public final class CFactory extends Factory {
     /**
      * The instance.
      */
