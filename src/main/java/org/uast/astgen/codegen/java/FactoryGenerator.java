@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 import org.uast.astgen.rules.Literal;
@@ -39,6 +40,16 @@ public final class FactoryGenerator extends BaseGenerator {
     private Set<String> specific;
 
     /**
+     * The class.
+     */
+    private Klass klass;
+
+    /**
+     * The class name.
+     */
+    private String classname;
+
+    /**
      * Constructor.
      * @param env The environment required for generation.
      * @param program The program
@@ -50,10 +61,26 @@ public final class FactoryGenerator extends BaseGenerator {
         this.language = language;
     }
 
+    /**
+     * Return the name of the generated class.
+     * @return The class name
+     */
+    public String getClassname() {
+        return this.classname;
+    }
+
     @Override
     public CompilationUnit generate() {
+        final Environment env = this.getEnv();
         this.prepareRuleSet();
-        return null;
+        this.createClass();
+        final CompilationUnit unit = new CompilationUnit(
+            env.getLicense(),
+            this.getPackageName(this.language),
+            this.klass
+        );
+        this.addImports(unit);
+        return unit;
     }
 
     /**
@@ -95,6 +122,44 @@ public final class FactoryGenerator extends BaseGenerator {
             } else if (lang.isEmpty() && !this.language.isEmpty()) {
                 this.common.add(rule.getType());
             }
+        }
+    }
+
+    /**
+     * Creates the class constructor.
+     */
+    private void createClass() {
+        final String name;
+        if (this.language.isEmpty()) {
+            name = "green";
+        } else {
+            name = this.language;
+        }
+        final String brief = String.format("Factory that creates '%s' nodes", name);
+        this.classname = String.format(
+            "%s%sFactory",
+            name.substring(0, 1).toUpperCase(Locale.ENGLISH),
+            name.substring(1)
+        );
+        this.klass = new Klass(brief, this.classname);
+    }
+
+    /**
+     * Adds imports to compilation unit.
+     * @param unit Compilation unit
+     */
+    private void addImports(final CompilationUnit unit) {
+        unit.addImport("java.util.Arrays");
+        unit.addImport("java.util.Collections");
+        unit.addImport("java.util.List");
+        unit.addImport("java.util.Map");
+        unit.addImport("java.util.TreeMap");
+        final Environment env = this.getEnv();
+        final String base = env.getBasePackage();
+        unit.addImport(base.concat(".Factory"));
+        unit.addImport(base.concat(".Type"));
+        for (final String name : this.common) {
+            unit.addImport(String.format("%s.green.%s", env.getRootPackage(), name));
         }
     }
 }
