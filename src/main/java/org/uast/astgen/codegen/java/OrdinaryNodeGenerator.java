@@ -48,7 +48,8 @@ final class OrdinaryNodeGenerator extends BaseNodeGenerator {
         unit.addImport("java.util.Arrays");
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
-        final String base = this.getEnv().getBasePackage();
+        final Environment env = this.getEnv();
+        final String base = env.getBasePackage();
         unit.addImport(base.concat(".Builder"));
         unit.addImport(base.concat(".ChildDescriptor"));
         unit.addImport(base.concat(".ChildrenMapper"));
@@ -56,5 +57,14 @@ final class OrdinaryNodeGenerator extends BaseNodeGenerator {
         unit.addImport(base.concat(".Fragment"));
         unit.addImport(base.concat(".Node"));
         unit.addImport(base.concat(".Type"));
+        for (final String addition : env.getImports(this.statement.getRule().getType())) {
+            unit.addImport(
+                String.format(
+                    "%s.green.%s",
+                    env.getRootPackage(),
+                    addition
+                )
+            );
+        }
     }
 }

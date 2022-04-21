@@ -8,6 +8,7 @@ package org.uast.astgen.codegen.java;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import org.uast.astgen.rules.Node;
 
@@ -80,6 +81,11 @@ final class TestEnvironment implements Environment {
             result = this.nodes.get(type).getTags();
         }
         return result;
+    }
+
+    @Override
+    public Set<String> getImports(final String type) {
+        return Collections.emptySet();
     }
 
     /**

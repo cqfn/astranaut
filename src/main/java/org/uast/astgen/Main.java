@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 import org.uast.astgen.analyzer.PreparedEnvironment;
@@ -223,6 +224,11 @@ public final class Main {
         @Override
         public List<TaggedChild> getTags(final String type) {
             return Collections.emptyList();
+        }
+
+        @Override
+        public Set<String> getImports(final String type) {
+            return Collections.emptySet();
         }
     }
 }
