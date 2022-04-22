@@ -22,6 +22,7 @@ import org.uast.astgen.exceptions.DuplicateRule;
 import org.uast.astgen.rules.Child;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Disjunction;
+import org.uast.astgen.rules.Extension;
 import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Statement;
 import org.uast.astgen.rules.Vertex;
@@ -157,10 +158,14 @@ public class Analyzer {
         ((LinkedList<String>) ancestors).addFirst(node.getType());
         int empty = 0;
         for (final Descriptor descriptor : descriptors) {
-            final String type = descriptor.getType();
-            this.processVertex(type, ancestors);
-            if (this.info.get(type).equals(NullResult.INSTANCE)) {
-                empty += 1;
+            if (descriptor instanceof Extension) {
+                result.addAncestors(Collections.singletonList(node.getType()));
+            } else {
+                final String type = descriptor.getType();
+                this.processVertex(type, ancestors);
+                if (this.info.get(type).equals(NullResult.INSTANCE)) {
+                    empty += 1;
+                }
             }
         }
         ((LinkedList<String>) ancestors).removeFirst();
@@ -445,14 +450,22 @@ public class Analyzer {
          */
         private static void checkDuplicateVertices(
             final List<Vertex> related) throws DuplicateRule {
-            final Set<Vertex> duplicates =
+            final List<Vertex> duplicates =
                 related.stream()
-                    .filter(node -> Collections.frequency(related, node) > 1)
-                    .collect(Collectors.toSet());
-            for (final Vertex node : duplicates) {
+                    .collect(Collectors.groupingBy(p -> p.getType(), Collectors.toList()))
+                    .values()
+                    .stream()
+                    .filter(i -> i.size() > 1)
+                    .flatMap(j -> j.stream())
+                    .collect(Collectors.toList());
+            final Set<String> types = new LinkedHashSet<>();
+            for (final Vertex duplicate : duplicates) {
+                types.add(duplicate.getType());
+            }
+            for (final String type : types) {
                 throw new DuplicateRule(
                     new StringBuilder()
-                        .append(node.getType())
+                        .append(type)
                         .append(" description appears several times (should once)")
                         .toString()
                 );
