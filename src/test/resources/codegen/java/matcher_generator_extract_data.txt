@@ -33,9 +33,9 @@ public class Matcher0 implements Matcher {
     }
 
     @Override
-    public boolean match(Node node,
-        Map<Integer, Node> children,
-        Map<Integer, String> data) {
+    public boolean match(final Node node,
+        final Map<Integer, Node> children,
+        final Map<Integer, String> data) {
         final boolean result = node.belongsToGroup(Matcher0.EXPECTED_TYPE)
             && node.getChildCount() == Matcher0.EXPECTED_COUNT;
         if (result) {

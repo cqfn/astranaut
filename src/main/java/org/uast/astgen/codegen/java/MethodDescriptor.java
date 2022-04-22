@@ -21,6 +21,11 @@ public final class MethodDescriptor implements Entity {
     private static final String VOID_TYPE = "void";
 
     /**
+     * The 'final' prefix.
+     */
+    private static final String FINAL_PREFIX = "final ";
+
+    /**
      * The name of the method.
      */
     private final String name;
@@ -136,7 +141,7 @@ public final class MethodDescriptor implements Entity {
             }
             flag = true;
             if (!iface) {
-                builder.append("final ");
+                builder.append(MethodDescriptor.FINAL_PREFIX);
             }
             builder.append(arg.getType()).append(' ').append(arg.getName());
         }
@@ -160,7 +165,10 @@ public final class MethodDescriptor implements Entity {
                 builder.append(",\n\t");
             }
             flag = true;
-            builder.append(arg.getType()).append(' ').append(arg.getName());
+            builder.append(MethodDescriptor.FINAL_PREFIX)
+                .append(arg.getType())
+                .append(' ')
+                .append(arg.getName());
         }
         builder.append(')');
         return builder.toString();

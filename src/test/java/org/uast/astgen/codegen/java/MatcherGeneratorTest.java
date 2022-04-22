@@ -58,7 +58,19 @@ public class MatcherGeneratorTest {
     public void testExtractingData() {
         final int result = this.testing(
             "literal<#13>",
-            "matcher_generator_data.txt"
+            "matcher_generator_extract_data.txt"
+        );
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
+     * Testing case: checking data.
+     */
+    @Test
+    public void testCheckingData() {
+        final int result = this.testing(
+            "literal<\"+\">",
+            "matcher_generator_check_data.txt"
         );
         Assertions.assertEquals(1, result);
     }

@@ -10,6 +10,8 @@ import org.uast.astgen.rules.Data;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Hole;
 import org.uast.astgen.rules.Parameter;
+import org.uast.astgen.rules.StringData;
+import org.uast.astgen.utils.StringUtils;
 
 /**
  * Fills 'Matcher' classes (creates methods and fields).
@@ -17,6 +19,16 @@ import org.uast.astgen.rules.Parameter;
  * @since 1.0
  */
 public class MatcherClassFiller {
+    /**
+     * The 'String' type name.
+     */
+    private static final String TYPE_STRING = "String";
+
+    /**
+     * The '\"%s\"' format string.
+     */
+    private static final String STRING_IN_QUOTES = "\"%s\"";
+
     /**
      * The generator.
      */
@@ -61,11 +73,16 @@ public class MatcherClassFiller {
     private void createStaticFields() {
         final Field type = new Field(
             "Expected node type",
-            "String",
+            MatcherClassFiller.TYPE_STRING,
             "EXPECTED_TYPE"
         );
         type.makeStaticFinal();
-        type.setInitExpr(String.format("\"%s\"", this.descriptor.getType()));
+        type.setInitExpr(
+            String.format(
+                MatcherClassFiller.STRING_IN_QUOTES,
+                this.descriptor.getType()
+            )
+        );
         this.klass.addField(type);
         final Field count = new Field(
             "Expected number of child nodes",
@@ -129,6 +146,28 @@ public class MatcherClassFiller {
                 );
             }
             index = index + 1;
+        }
+        final Data data = this.descriptor.getData();
+        if (data instanceof StringData) {
+            final Field field = new Field(
+                "Expected data",
+                MatcherClassFiller.TYPE_STRING,
+                "EXPECTED_DATA"
+            );
+            field.makeStaticFinal();
+            field.setInitExpr(
+                String.format(
+                    MatcherClassFiller.STRING_IN_QUOTES,
+                    new StringUtils(((StringData) data).getValue()).escapeEntities()
+                )
+            );
+            this.klass.addField(field);
+            condition.append(
+                String.format(
+                    "\n\t&& %s.EXPECTED_DATA.equals(node.getData())",
+                    name
+                )
+            );
         }
         return condition.toString();
     }
