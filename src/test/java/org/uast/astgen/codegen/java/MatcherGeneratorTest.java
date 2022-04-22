@@ -76,6 +76,30 @@ public class MatcherGeneratorTest {
     }
 
     /**
+     * Testing case: extracting children.
+     */
+    @Test
+    public void testExtractingChildren() {
+        final int result = this.testing(
+            "simpleIdentifier(#1, #2)",
+            "matcher_generator_extract_children.txt"
+        );
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
+     * Testing complex case.
+     */
+    @Test
+    public void testComplexCase() {
+        final int result = this.testing(
+            "singleExpression(identifier(literal<#1>), literal<\"+\">, #2)",
+            "matcher_generator_complex.txt"
+        );
+        Assertions.assertTrue(result > 0);
+    }
+
+    /**
      * Performs a test.
      * @param code Source code of descriptor
      * @param filename The name of file that contains the expected result
