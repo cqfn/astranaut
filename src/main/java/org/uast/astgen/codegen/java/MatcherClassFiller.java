@@ -61,6 +61,7 @@ public class MatcherClassFiller {
      * Fills the class.
      */
     public void fill() {
+        this.klass.makeFinal();
         this.klass.setInterfaces("Matcher");
         this.klass.makeSingleton();
         this.createStaticFields();

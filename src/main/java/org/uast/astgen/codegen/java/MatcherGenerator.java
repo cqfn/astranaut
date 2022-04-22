@@ -67,6 +67,10 @@ public final class MatcherGenerator {
             this.pkg,
             klass
         );
+        unit.addImport("java.util.Map");
+        final String base = this.env.getBasePackage();
+        unit.addImport(base.concat(".Matcher"));
+        unit.addImport(base.concat(".Node"));
         this.units.put(name, unit);
         return name;
     }
