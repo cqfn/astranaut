@@ -5,12 +5,16 @@
 
 package org.uast;
 
+import java.util.Map;
+import org.uast.uast.base.Matcher;
+import org.uast.uast.base.Node;
+
 /**
  * Checks if the node matches some structure, and extracts the data and children.
  *
  * @since 1.0
  */
-public class Matcher0 implements Matcher {
+public final class Matcher0 implements Matcher {
     /**
      * The instance.
      */
@@ -49,12 +53,16 @@ public class Matcher0 implements Matcher {
 
 package org.uast;
 
+import java.util.Map;
+import org.uast.uast.base.Matcher;
+import org.uast.uast.base.Node;
+
 /**
  * Checks if the node matches some structure, and extracts the data and children.
  *
  * @since 1.0
  */
-public class Matcher1 implements Matcher {
+public final class Matcher1 implements Matcher {
     /**
      * The instance.
      */
