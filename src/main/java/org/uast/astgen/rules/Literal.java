@@ -12,7 +12,7 @@ import java.util.Objects;
  * @since 1.0
  */
 @SuppressWarnings("PMD.DataClass")
-public final class Literal implements Vertex {
+public final class Literal extends Vertex {
     /**
      * Left part.
      */
@@ -44,12 +44,24 @@ public final class Literal implements Vertex {
     private Literal() {
     }
 
-    /**
-     * Returns left part.
-     * @return The type name
-     */
+    @Override
     public String getType() {
         return this.type;
+    }
+
+    @Override
+    public boolean isOrdinary() {
+        return false;
+    }
+
+    @Override
+    public boolean isAbstract() {
+        return false;
+    }
+
+    @Override
+    public boolean isTerminal() {
+        return true;
     }
 
     /**

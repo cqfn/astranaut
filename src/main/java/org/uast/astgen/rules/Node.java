@@ -13,7 +13,7 @@ import java.util.Objects;
  *
  * @since 1.0
  */
-public class Node implements Vertex {
+public final class Node extends Vertex {
     /**
      * Left part.
      */
@@ -34,10 +34,7 @@ public class Node implements Vertex {
         this.composition = composition;
     }
 
-    /**
-     * Return left part of the node.
-     * @return The type name
-     */
+    @Override
     public String getType() {
         return this.type;
     }
@@ -51,7 +48,7 @@ public class Node implements Vertex {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         final StringBuilder builder = new StringBuilder();
         builder.append(this.type).append(" <- ");
         boolean flag = false;
@@ -81,10 +78,7 @@ public class Node implements Vertex {
         return result;
     }
 
-    /**
-     * Checks if the node is ordinary, i.e. not abstract and not a list.
-     * @return Checking result
-     */
+    @Override
     public boolean isOrdinary() {
         boolean result = true;
         for (final Child child : this.composition) {
@@ -101,7 +95,7 @@ public class Node implements Vertex {
     }
 
     @Override
-    public final boolean equals(final Object obj) {
+    public boolean equals(final Object obj) {
         final Node node;
         boolean equal = false;
         if (obj instanceof Node) {
@@ -114,16 +108,18 @@ public class Node implements Vertex {
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return Objects.hash(this.type);
     }
 
-    /**
-     * Checks if the node is abstract.
-     * @return Checking result
-     */
+    @Override
     public boolean isAbstract() {
         return this.composition.size() == 1 && this.composition.get(0) instanceof Disjunction;
+    }
+
+    @Override
+    public boolean isTerminal() {
+        return this.isList() || this.isOrdinary();
     }
 
     /**

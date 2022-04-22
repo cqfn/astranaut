@@ -29,9 +29,14 @@ public class Program {
     private final List<Statement<Node>> nodes;
 
     /**
-     * Node descriptors.
+     * Literal descriptors.
      */
     private final List<Statement<Literal>> literals;
+
+    /**
+     * Vertices (Nodes and Literals) descriptors.
+     */
+    private final List<Statement<Vertex>> vertices;
 
     /**
      * Node descriptors.
@@ -45,6 +50,7 @@ public class Program {
         this.all = new LinkedList<>();
         this.nodes = new LinkedList<>();
         this.literals = new LinkedList<>();
+        this.vertices = new LinkedList<>();
         this.transforms = new LinkedList<>();
     }
 
@@ -73,11 +79,27 @@ public class Program {
     }
 
     /**
+     * Returns list of vertex descriptors with addition data.
+     * @return Vertex descriptors.
+     */
+    public List<Statement<Vertex>> getVertices() {
+        return Collections.unmodifiableList(this.vertices);
+    }
+
+    /**
      * Returns list of transformation descriptors with addition data.
      * @return Transformation descriptors.
      */
     public List<Statement<Transformation>> getTransformations() {
         return Collections.unmodifiableList(this.transforms);
+    }
+
+    /**
+     * Adds vertex descriptor with addition data.
+     * @param statement The node descriptor
+     */
+    public void addVertexStmt(final Statement<Vertex> statement) {
+        this.vertices.add(statement);
     }
 
     /**
