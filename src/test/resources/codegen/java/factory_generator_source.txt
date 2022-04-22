@@ -1,5 +1,3 @@
-IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$, $NumberFormatException$;
-StringLiteral <- $String$, $#$, $#$;
 Identifier <- $String$, $#$, $#$;
 
 Addition <- left@Expression, right@Expression;
@@ -9,5 +7,5 @@ BinaryExpression <- Addition | Subtraction;
 Variable <- Identifier;
 ExpressionList <- {Expression};
 
-js:
-singleExpression(identifier(literal<#1>)) -> Variable(Identifier<#1>);
+c:
+AddressOf <- Expression;

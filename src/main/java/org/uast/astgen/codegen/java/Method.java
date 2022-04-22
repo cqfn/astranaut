@@ -38,6 +38,11 @@ public final class Method implements Entity {
     private boolean fprivate;
 
     /**
+     * The flag indicates that the method is static.
+     */
+    private boolean fstatic;
+
+    /**
      * The flag indicates that the method is abstract.
      */
     private boolean fabstract;
@@ -127,6 +132,7 @@ public final class Method implements Entity {
     public void resetFlags() {
         this.fpublic = false;
         this.fprivate = false;
+        this.fstatic = false;
         this.fabstract = false;
         this.foverride = false;
     }
@@ -154,6 +160,7 @@ public final class Method implements Entity {
         this.resetFlags();
         this.fpublic = true;
         this.fabstract = true;
+        this.fstatic = false;
     }
 
     /**
@@ -163,6 +170,16 @@ public final class Method implements Entity {
         this.resetFlags();
         this.fpublic = true;
         this.foverride = true;
+        this.fstatic = false;
+    }
+
+    /**
+     * Makes this method static.
+     */
+    public void makeStatic() {
+        this.fabstract = false;
+        this.foverride = false;
+        this.fstatic = true;
     }
 
     @Override
@@ -190,6 +207,9 @@ public final class Method implements Entity {
             block.append("private ");
         } else if (this.fpublic) {
             block.append("public ");
+        }
+        if (this.fstatic) {
+            block.append("static ");
         }
         if (this.fabstract) {
             final String signature = this.descriptor.generateSignature(true);

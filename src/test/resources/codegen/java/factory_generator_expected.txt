@@ -1,0 +1,58 @@
+/*
+ * MIT License Copyright (c) 2022 unified-ast
+ * https://github.com/unified-ast/ast-generator/blob/master/LICENSE.txt
+ */
+
+package org.uast.example.c;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import org.uast.example.green.Addition;
+import org.uast.example.green.ExpressionList;
+import org.uast.example.green.Identifier;
+import org.uast.example.green.Subtraction;
+import org.uast.example.green.Variable;
+import org.uast.uast.base.Factory;
+import org.uast.uast.base.Type;
+
+/**
+ * Factory that creates 'c' nodes.
+ *
+ * @since 1.0
+ */
+public final class CFactory extends Factory {
+    /**
+     * The instance.
+     */
+    public static final Factory INSTANCE = new CFactory();
+
+    /**
+     * Constructor.
+     */
+    private CFactory() {
+        super(Collections.unmodifiableMap(CFactory.init()));
+    }
+
+    /**
+     * Initialises the set of types arranged by name.
+     * @return The map of types by name
+     */
+    private static Map<String, Type> init() {
+        final List<Type> types = Arrays.asList(
+            Addition.TYPE,
+            AddressOf.TYPE,
+            ExpressionList.TYPE,
+            Identifier.TYPE,
+            Subtraction.TYPE,
+            Variable.TYPE
+        );
+        final Map<String, Type> map = new TreeMap<>();
+        for (final Type type : types) {
+            map.put(type.getName(), type);
+        }
+        return map;
+    }
+}
