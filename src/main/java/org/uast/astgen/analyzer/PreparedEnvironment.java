@@ -11,8 +11,8 @@ import org.uast.astgen.codegen.java.Environment;
 import org.uast.astgen.codegen.java.License;
 import org.uast.astgen.codegen.java.TaggedChild;
 import org.uast.astgen.exceptions.GeneratorException;
-import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Statement;
+import org.uast.astgen.rules.Vertex;
 
 /**
  * Prepared environment, with preliminary analysis of the set of rules.
@@ -37,7 +37,7 @@ public final class PreparedEnvironment implements Environment {
      * @param language The name of programming language that will limit a set of nodes
      * @throws GeneratorException If the environment can't be built for proposed rule set
      */
-    public PreparedEnvironment(final Environment base, final List<Statement<Node>> descriptors,
+    public PreparedEnvironment(final Environment base, final List<Statement<Vertex>> descriptors,
         final String language) throws GeneratorException {
         this.base = base;
         this.analyzer = new Analyzer(descriptors, language).analyze();
