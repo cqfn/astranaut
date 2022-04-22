@@ -6,13 +6,14 @@
 package org.uast.astgen.analyzer;
 
 import java.util.Objects;
+import org.uast.astgen.codegen.java.TaggedChild;
 
 /**
  * The class to store tagged names.
  *
  * @since 1.0
  */
-public final class TaggedName {
+public final class TaggedName implements TaggedChild {
     /**
      * The tag.
      */
@@ -46,20 +47,19 @@ public final class TaggedName {
         this.overridden = true;
     }
 
-    /**
-     * Returns the tag.
-     * @return The tag
-     */
+    @Override
     public String getTag() {
         return this.tag;
     }
 
-    /**
-     * Returns the type.
-     * @return The type
-     */
+    @Override
     public String getType() {
         return this.type;
+    }
+
+    @Override
+    public boolean isOverridden() {
+        return this.overridden;
     }
 
     @Override

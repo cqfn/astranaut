@@ -5,6 +5,7 @@
 package org.uast.astgen.codegen.java;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Environment required for generation.
@@ -45,9 +46,24 @@ public interface Environment {
     boolean isTestMode();
 
     /**
-     * Returns node hierarchy (waiting for PWC).
-     * @param name Node name
+     * Returns node hierarchy.
+     * @param type Node type
      * @return Node hierarchy
      */
-    List<String> getHierarchy(String name);
+    List<String> getHierarchy(String type);
+
+    /**
+     * Return a list of tagged children by type name.
+     * @param type Node type
+     * @return List of children
+     */
+    List<TaggedChild> getTags(String type);
+
+    /**
+     * The list of node types that should be added to an import block
+     *  of the specified node.
+     * @param type Node type
+     * @return The list of type names
+     */
+    Set<String> getImports(String type);
 }

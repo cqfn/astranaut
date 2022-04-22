@@ -23,6 +23,14 @@ public final class Hole implements Data, Parameter {
         this.value = value;
     }
 
+    /**
+     * Returns the value of the hole.
+     * @return The value
+     */
+    public int getValue() {
+        return this.value;
+    }
+
     @Override
     public String toString() {
         return new StringBuilder()

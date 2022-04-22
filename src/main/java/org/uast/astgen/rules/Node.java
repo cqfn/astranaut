@@ -5,8 +5,10 @@
 
 package org.uast.astgen.rules;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.uast.astgen.codegen.java.TaggedChild;
 
 /**
  * A rule that describes node.
@@ -133,6 +135,41 @@ public final class Node extends Vertex {
             if (child instanceof Descriptor
                 && ((Descriptor) child).getAttribute() == DescriptorAttribute.LIST) {
                 result = true;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns list of tags.
+     * @return The list of tags
+     */
+    public List<TaggedChild> getTags() {
+        final List<TaggedChild> result = new ArrayList<>(this.composition.size());
+        for (final Child child : this.composition) {
+            if (child instanceof Descriptor) {
+                final Descriptor descriptor = (Descriptor) child;
+                final String tag = descriptor.getTag();
+                if (!tag.isEmpty()) {
+                    result.add(
+                        new TaggedChild() {
+                            @Override
+                            public String getTag() {
+                                return tag;
+                            }
+
+                            @Override
+                            public String getType() {
+                                return descriptor.getType();
+                            }
+
+                            @Override
+                            public boolean isOverridden() {
+                                return false;
+                            }
+                        }
+                    );
+                }
             }
         }
         return result;

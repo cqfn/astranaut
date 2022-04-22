@@ -6,6 +6,7 @@ package org.uast.astgen.codegen.java;
 
 import java.io.File;
 import java.util.Locale;
+import java.util.Map;
 import org.uast.astgen.exceptions.CouldNotWriteFile;
 import org.uast.astgen.exceptions.GeneratorException;
 import org.uast.astgen.rules.Literal;
@@ -37,7 +38,13 @@ public final class ProgramGenerator {
     private final Program program;
 
     /**
-     * The environment required for generation.
+     * The prepared environment collection required for generation,
+     * one object for each programming language.
+     */
+    private final Map<String, Environment> envs;
+
+    /**
+     * The base environment.
      */
     private final Environment env;
 
@@ -45,12 +52,14 @@ public final class ProgramGenerator {
      * Constructor.
      * @param path The path where to generate
      * @param program The program
-     * @param env The environment required for generation
+     * @param envs The environment collection required for generation
      */
-    public ProgramGenerator(final String path, final Program program, final Environment env) {
+    public ProgramGenerator(final String path, final Program program,
+        final Map<String, Environment> envs) {
         this.path = path;
         this.program = program;
-        this.env = env;
+        this.envs = envs;
+        this.env = envs.get("");
     }
 
     /**
@@ -61,6 +70,8 @@ public final class ProgramGenerator {
         this.generatePackages();
         this.generateNodes();
         this.generateLiterals();
+        this.generateFactories();
+        this.generateTransformations();
     }
 
     /**
@@ -73,13 +84,22 @@ public final class ProgramGenerator {
             ProgramGenerator.GREEN
         );
         for (final String language : this.program.getNamesOfAllLanguages()) {
+            final String name =
+                language.substring(0, 1).toUpperCase(Locale.ENGLISH).concat(language.substring(1));
+            final String pkg = language.toLowerCase(Locale.ENGLISH);
             this.generatePackage(
                 String.format(
-                    "This package contains nodes that describe the %s%s programming language",
-                    language.substring(0, 1).toUpperCase(Locale.ENGLISH),
-                    language.substring(1)
+                    "This package contains nodes that describe the %s language",
+                    name
                 ),
-                language.toLowerCase(Locale.ENGLISH)
+                pkg
+            );
+            this.generatePackage(
+                String.format(
+                    "This package contains rules for processing %s language",
+                    name
+                ),
+                String.format("%s.rules", pkg)
             );
         }
     }
@@ -87,22 +107,25 @@ public final class ProgramGenerator {
     /**
      * Generates 'package-info.java' file for one language.
      * @param brief Brief description
-     * @param language Language name
+     * @param pkg Package name
      * @throws GeneratorException When can't generate
      */
-    private void generatePackage(final String brief, final String language)
+    private void generatePackage(final String brief, final String pkg)
         throws GeneratorException {
         final PackageInfo info = new PackageInfo(
             this.env.getLicense(),
             brief,
-            String.format("%s.%s", this.env.getRootPackage(), language)
+            String.format("%s.%s", this.env.getRootPackage(), pkg)
         );
         final String version = this.env.getVersion();
         if (!version.isEmpty()) {
             info.setVersion(version);
         }
         final String code = info.generate();
-        final String filename = this.getFilePath(language, "package-info");
+        final String filename = this.getFilePath(
+            pkg.replace('.', File.separatorChar),
+            "package-info"
+        );
         this.createFile(filename, code);
     }
 
@@ -112,23 +135,14 @@ public final class ProgramGenerator {
      */
     private void generateNodes() throws GeneratorException {
         final String version = this.env.getVersion();
+        final NodeGenerator generator = new NodeGenerator(this.envs);
         for (final Statement<Node> stmt : this.program.getNodes()) {
-            final Node rule = stmt.getRule();
-            final CompilationUnit unit;
-            if (rule.isOrdinary()) {
-                unit = new OrdinaryNodeGenerator(this.env, stmt).generate();
-            } else if (rule.isAbstract()) {
-                unit = new AbstractNodeGenerator(this.env, stmt).generate();
-            } else if (rule.isList()) {
-                unit = new ListNodeGenerator(this.env, stmt).generate();
-            } else {
-                throw new IllegalStateException();
-            }
+            final CompilationUnit unit = generator.generate(stmt);
             if (!version.isEmpty()) {
                 unit.setVersion(version);
             }
             final String code = unit.generate();
-            final String filename = this.getFilePath(stmt.getLanguage(), rule.getType());
+            final String filename = this.getFilePath(stmt.getLanguage(), stmt.getRule().getType());
             this.createFile(filename, code);
         }
     }
@@ -140,14 +154,72 @@ public final class ProgramGenerator {
     private void generateLiterals() throws GeneratorException {
         final String version = this.env.getVersion();
         for (final Statement<Literal> stmt : this.program.getLiterals()) {
+            final String language = stmt.getLanguage();
             final Literal rule = stmt.getRule();
-            final CompilationUnit unit = new LiteralGenerator(this.env, stmt).generate();
+            final CompilationUnit unit =
+                new LiteralGenerator(this.envs.get(language), stmt).generate();
             if (!version.isEmpty()) {
                 unit.setVersion(version);
             }
             final String code = unit.generate();
-            final String filename = this.getFilePath(stmt.getLanguage(), rule.getType());
+            final String filename = this.getFilePath(language, rule.getType());
             this.createFile(filename, code);
+        }
+    }
+
+    /**
+     * Generates source code for factories.
+     * @throws GeneratorException When can't generate
+     */
+    private void generateFactories() throws GeneratorException {
+        this.generateFactory("");
+        for (final String language : this.program.getNamesOfAllLanguages()) {
+            this.generateFactory(language);
+        }
+    }
+
+    /**
+     * Generates source code for one factory.
+     * @param language The programming language
+     * @throws GeneratorException When can't generate
+     */
+    private void generateFactory(final String language) throws GeneratorException {
+        final String version = this.env.getVersion();
+        final FactoryGenerator generator = new FactoryGenerator(this.env, this.program, language);
+        final CompilationUnit unit = generator.generate();
+        if (!version.isEmpty()) {
+            unit.setVersion(version);
+        }
+        final String code = unit.generate();
+        final String filename = this.getFilePath(language, generator.getClassname());
+        this.createFile(filename, code);
+    }
+
+    /**
+     * Generates source code for transformations.
+     * @throws GeneratorException When can't generate
+     */
+    private void generateTransformations() throws GeneratorException {
+        final String version = this.env.getVersion();
+        for (final String language : this.program.getNamesOfAllLanguages()) {
+            final TransformationGenerator generator = new TransformationGenerator(
+                this.envs.get(language),
+                this.program.getTransformations(),
+                language
+            );
+            final Map<String, CompilationUnit> units = generator.generate();
+            for (final Map.Entry<String, CompilationUnit> entry : units.entrySet()) {
+                final CompilationUnit unit = entry.getValue();
+                if (!version.isEmpty()) {
+                    unit.setVersion(version);
+                }
+                final String code = unit.generate();
+                final String filename = this.getFilePath(
+                    language,
+                    String.format("rules%c%s", File.separatorChar, entry.getKey())
+                );
+                this.createFile(filename, code);
+            }
         }
     }
 

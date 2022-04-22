@@ -16,6 +16,7 @@ import org.uast.astgen.rules.Node;
  *
  * @since 1.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class NodeParserTest {
     /**
      * Test case: node with one child.
@@ -97,6 +98,28 @@ public class NodeParserTest {
             "Expression <- Addition | Subtraction | Multiplication | Division"
         );
         Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: abstract node with extension.
+     */
+    @Test
+    public void abstractNodeWithExtension() {
+        final boolean result = this.run(
+            "BinaryExpression <- & | Exponent"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: abstract node with several extensions.
+     */
+    @Test
+    public void abstractNodeWithExtensionException() {
+        final boolean result = this.run(
+            "BinaryExpression <- & | Exponent | &"
+        );
+        Assertions.assertFalse(result);
     }
 
     /**

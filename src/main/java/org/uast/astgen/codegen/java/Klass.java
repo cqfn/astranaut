@@ -113,7 +113,7 @@ public final class Klass implements Type {
      * Sets the parent class name.
      * @param str The parent class name
      */
-    public void setParenClass(final String str) {
+    public void setParentClass(final String str) {
         this.parent = Objects.requireNonNull(str);
     }
 
@@ -264,7 +264,7 @@ public final class Klass implements Type {
      */
     private void generateParents(final StringBuilder builder) {
         if (!this.parent.isEmpty()) {
-            builder.append(" extends").append(this.name);
+            builder.append(" extends ").append(this.parent);
         }
         if (!this.interfaces.isEmpty()) {
             builder.append(" implements ");

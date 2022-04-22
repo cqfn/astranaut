@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.List;
 import org.uast.astgen.rules.Node;
 
 /**
@@ -25,14 +26,19 @@ public abstract class BaseNodeGenerator extends BaseGenerator {
      * @param rule The rule
      * @return The class constructor
      */
-    protected static Klass createClass(final Node rule) {
+    protected Klass createClass(final Node rule) {
         final String type = rule.getType();
         final Klass klass = new Klass(
             String.format("Node that describes the '%s' type", type),
             type
         );
         klass.makeFinal();
-        klass.setInterfaces("Node");
+        final List<String> hierarchy = this.getEnv().getHierarchy(type);
+        if (hierarchy.size() > 1) {
+            klass.setInterfaces(hierarchy.get(1));
+        } else {
+            klass.setInterfaces("Node");
+        }
         return klass;
     }
 }

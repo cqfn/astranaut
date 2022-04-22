@@ -108,10 +108,11 @@ public class Analyzer {
      * Conducts analysis of the provided node set:
      * - processes ordinary nodes (with children);
      * - processes abstract nodes.
+     * @return Itself
      * @throws DuplicateRule exception if nodes described in rules
      *  contain duplications
      */
-    public void analyze() throws DuplicateRule {
+    public Analyzer analyze() throws DuplicateRule {
         this.storage.collectAndCheck();
         final List<Vertex> vertices = this.storage.getNodes();
         for (final Vertex vertex : vertices) {
@@ -124,6 +125,7 @@ public class Analyzer {
                 this.processAbstractNode((Node) vertex, new LinkedList<>());
             }
         }
+        return this;
     }
 
     /**

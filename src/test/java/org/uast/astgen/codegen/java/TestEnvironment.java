@@ -7,6 +7,10 @@ package org.uast.astgen.codegen.java;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import org.uast.astgen.rules.Node;
 
 /**
  * Environment for test purposes.
@@ -20,10 +24,24 @@ final class TestEnvironment implements Environment {
     private final License license;
 
     /**
+     * The map of nodes.
+     */
+    private final Map<String, Node> nodes;
+
+    /**
+     * Base constructor.
+     * @param nodes The list of nodes
+     */
+    TestEnvironment(final List<Node> nodes) {
+        this.license = new License("LICENSE_header.txt");
+        this.nodes = Collections.unmodifiableMap(TestEnvironment.createNodeMap(nodes));
+    }
+
+    /**
      * Constructor.
      */
     TestEnvironment() {
-        this.license = new License("LICENSE_header.txt");
+        this(Collections.emptyList());
     }
 
     @Override
@@ -54,5 +72,30 @@ final class TestEnvironment implements Environment {
     @Override
     public List<String> getHierarchy(final String name) {
         return Collections.singletonList(name);
+    }
+
+    @Override
+    public List<TaggedChild> getTags(final String type) {
+        List<TaggedChild> result = Collections.emptyList();
+        if (this.nodes.containsKey(type)) {
+            result = this.nodes.get(type).getTags();
+        }
+        return result;
+    }
+
+    @Override
+    public Set<String> getImports(final String type) {
+        return Collections.emptySet();
+    }
+
+    /**
+     * Creates map of nodes from list of nodes.
+     * @param list List of nodes
+     * @return Map of nodes
+     */
+    private static Map<String, Node> createNodeMap(final List<Node> list) {
+        final Map<String, Node> result = new TreeMap<>();
+        list.forEach(node -> result.put(node.getType(), node));
+        return result;
     }
 }

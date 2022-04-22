@@ -94,6 +94,26 @@ public abstract class Descriptor implements Child, Parameter {
         return result;
     }
 
+    /**
+     * Checks whether the descriptor has a hole.
+     * @return Checking result, {@code true} if the descriptor has at least one hole
+     */
+    public boolean hasHole() {
+        boolean result = false;
+        if (this.getData() instanceof Hole) {
+            result = true;
+        }
+        if (!result) {
+            for (final Parameter parameter : this.getParameters()) {
+                if (parameter instanceof Hole) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     @Override
     public final String toString() {
         final StringBuilder builder = new StringBuilder();
@@ -117,6 +137,9 @@ public abstract class Descriptor implements Child, Parameter {
             builder.append(']');
         } else if (attribute == DescriptorAttribute.LIST) {
             builder.append('}');
+        }
+        if (attribute == DescriptorAttribute.EXT) {
+            builder.append('&');
         }
         return builder.toString();
     }

@@ -52,6 +52,54 @@ public class MatcherGeneratorTest {
     }
 
     /**
+     * Testing case: extracting data.
+     */
+    @Test
+    public void testExtractingData() {
+        final int result = this.testing(
+            "literal<#13>",
+            "matcher_generator_extract_data.txt"
+        );
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
+     * Testing case: checking data.
+     */
+    @Test
+    public void testCheckingData() {
+        final int result = this.testing(
+            "literal<\"+\">",
+            "matcher_generator_check_data.txt"
+        );
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
+     * Testing case: extracting children.
+     */
+    @Test
+    public void testExtractingChildren() {
+        final int result = this.testing(
+            "simpleIdentifier(#1, #2)",
+            "matcher_generator_extract_children.txt"
+        );
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
+     * Testing complex case.
+     */
+    @Test
+    public void testComplexCase() {
+        final int result = this.testing(
+            "singleExpression(identifier(literal<#1>), literal<\"+\">, #2)",
+            "matcher_generator_complex.txt"
+        );
+        Assertions.assertTrue(result > 0);
+    }
+
+    /**
      * Performs a test.
      * @param code Source code of descriptor
      * @param filename The name of file that contains the expected result
