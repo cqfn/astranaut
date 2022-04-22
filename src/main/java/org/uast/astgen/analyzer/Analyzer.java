@@ -17,12 +17,14 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.util.Pair;
 import org.uast.astgen.exceptions.DuplicateRule;
 import org.uast.astgen.rules.Child;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Disjunction;
 import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Statement;
+import org.uast.astgen.rules.Vertex;
 
 /**
  * Analyzes nodes hierarchy described with DSL.
@@ -59,7 +61,7 @@ public class Analyzer {
      *  contain duplications
      */
     public Analyzer(
-        final List<Statement<Node>> descriptors,
+        final List<Statement<Vertex>> descriptors,
         final String language) throws DuplicateRule {
         this.storage = new NodeStorage(descriptors, language);
         this.info = new HashMap<>();
@@ -99,7 +101,7 @@ public class Analyzer {
      * @return The list of type names, cannot be {@code null}
      */
     public Set<String> getImports(final String type) {
-        return this.storage.getNodesToBeImported(type);
+        return this.storage.getVerticesToBeImported(type);
     }
 
     /**
@@ -111,15 +113,15 @@ public class Analyzer {
      */
     public void analyze() throws DuplicateRule {
         this.storage.collectAndCheck();
-        final List<Node> nodes = this.storage.getNodes();
-        for (final Node node : nodes) {
-            if (node.isOrdinary()) {
-                this.processOrdinaryNode(node);
+        final List<Vertex> vertices = this.storage.getNodes();
+        for (final Vertex vertex : vertices) {
+            if (vertex.isOrdinary()) {
+                this.processOrdinaryNode((Node) vertex);
             }
         }
-        for (final Node node : nodes) {
-            if (node.isAbstract() && !this.info.containsKey(node.getType())) {
-                this.processAbstractNode(node, new LinkedList<>());
+        for (final Vertex vertex : vertices) {
+            if (vertex.isAbstract() && !this.info.containsKey(vertex.getType())) {
+                this.processAbstractNode((Node) vertex, new LinkedList<>());
             }
         }
     }
@@ -154,7 +156,7 @@ public class Analyzer {
         int empty = 0;
         for (final Descriptor descriptor : descriptors) {
             final String type = descriptor.getType();
-            this.processNode(type, ancestors);
+            this.processVertex(type, ancestors);
             if (this.info.get(type).equals(NullResult.INSTANCE)) {
                 empty += 1;
             }
@@ -211,35 +213,35 @@ public class Analyzer {
     }
 
     /**
-     * Processes the node:
+     * Processes the vertex:
      * - updates the already processed nodes results;
      * - pushes nodes with tagged names to the stack;
-     * - finds a not processed node from the list and processes it if;
+     * - finds a not processed node from the list and processes it if
      *  it is abstract;
      * - ignores a not described node, but prints warning about it.
      *  {@code overridden} fields and add tags to the ancestor
      * @param type The node type
      * @param ancestors The list of ancestor node types
      */
-    private void processNode(final String type, final List<String> ancestors) {
+    private void processVertex(final String type, final List<String> ancestors) {
         if (this.info.containsKey(type)) {
             final Result result = this.info.get(type);
             result.addAncestors(ancestors);
-            if (result.containsTags()) {
+            if (result.containsTags() && !this.stack.contains(type)) {
                 this.stack.push(type);
             }
         } else {
-            final Optional<Node> optional =
+            final Optional<Vertex> optional =
                 this.storage.getNodes().stream()
                 .filter(item -> type.equals(item.getType()))
                 .findFirst();
             if (optional.isPresent() && optional.get().isAbstract()) {
-                this.processAbstractNode(optional.get(), ancestors);
+                this.processAbstractNode((Node) optional.get(), ancestors);
             } else {
                 this.info.put(type, NullResult.INSTANCE);
                 final StringBuilder builder = new StringBuilder(70);
                 builder
-                    .append("The node ")
+                    .append("The vertex ")
                     .append(type)
                     .append(" was not described in DSL rules. It will be ignored during analysis!");
                 LOG.info(builder.toString());
@@ -279,22 +281,22 @@ public class Analyzer {
         /**
          * The node descriptors.
          */
-        private final List<Statement<Node>> descriptors;
+        private final List<Statement<Vertex>> descriptors;
 
         /**
          * Nodes related to current programming language and green nodes.
          */
-        private final List<Node> nodes;
+        private List<Vertex> nodes;
 
         /**
          * Nodes related to green nodes.
          */
-        private final List<Node> green;
+        private final List<Vertex> green;
 
         /**
          * Nodes related to the specified programming language.
          */
-        private final List<Node> specific;
+        private final List<Vertex> specific;
 
         /**
          * The programming language for which the analysis is conducted.
@@ -307,7 +309,7 @@ public class Analyzer {
          * @param language The programming language
          */
         NodeStorage(
-            final List<Statement<Node>> descriptors,
+            final List<Statement<Vertex>> descriptors,
             final String language) {
             this.descriptors = descriptors;
             this.language = language;
@@ -318,14 +320,14 @@ public class Analyzer {
 
         /**
          * Retrieves the list of nodes related to the selected language and green nodes,
-         * and checks for redundant nodes.
+         * checks for redundant nodes and sorts the list of nodes.
          * @throws DuplicateRule exception if nodes described in rules
          *  contain duplications
          */
         public void collectAndCheck() throws DuplicateRule {
-            final List<Node> common = new LinkedList<>();
-            final List<Node> target = new LinkedList<>();
-            for (final Statement<Node> statement : this.descriptors) {
+            final List<Vertex> common = new LinkedList<>();
+            final List<Vertex> target = new LinkedList<>();
+            for (final Statement<Vertex> statement : this.descriptors) {
                 if ("".equals(statement.getLanguage())) {
                     common.add(statement.getRule());
                 }
@@ -334,27 +336,29 @@ public class Analyzer {
                     target.add(statement.getRule());
                 }
             }
-            checkDuplicateNodes(common);
-            checkDuplicateNodes(target);
-            final List<Node> related = new LinkedList<>();
+            checkDuplicateVertices(common);
+            checkDuplicateVertices(target);
+            final List<Vertex> related = new LinkedList<>();
             related.addAll(common);
             related.addAll(target);
             final Set<String> types = new HashSet<>();
-            for (final Node node : related) {
-                if (node.isAbstract()) {
-                    checkDuplicateInheritance(node.getComposition().get(0), types);
+            for (final Vertex vertex : related) {
+                if (vertex.isAbstract()) {
+                    checkDuplicateInheritance(
+                        ((Node) vertex).getComposition().get(0), types
+                    );
                 }
             }
             this.green.addAll(common);
             this.specific.addAll(target);
-            this.nodes.addAll(related);
+            this.nodes = Collections.unmodifiableList(this.sortVertices(related));
         }
 
         /**
          * Returns all nodes.
          * @return The list of all nodes
          */
-        public List<Node> getNodes() {
+        public List<Vertex> getNodes() {
             return this.nodes;
         }
 
@@ -362,7 +366,7 @@ public class Analyzer {
          * Returns green nodes.
          * @return The list of green nodes
          */
-        public List<Node> getGreenNodes() {
+        public List<Vertex> getGreenVertices() {
             return this.green;
         }
 
@@ -371,7 +375,7 @@ public class Analyzer {
          * @return The list of nodes related to the specified
          *  programming language
          */
-        public List<Node> getSpecificNodes() {
+        public List<Vertex> getSpecificVertices() {
             return this.specific;
         }
 
@@ -389,19 +393,19 @@ public class Analyzer {
          * @param type The node type
          * @return The list of node types
          */
-        public Set<String> getNodesToBeImported(final String type) {
+        public Set<String> getVerticesToBeImported(final String type) {
             final Set<String> imports = new LinkedHashSet<>();
-            final Optional<Node> optional =
+            final Optional<Vertex> optional =
                 this.specific.stream()
                 .filter(item -> type.equals(item.getType()))
                 .findFirst();
             if (optional.isPresent() && optional.get().isOrdinary()) {
-                final Node node = optional.get();
+                final Node node = (Node) optional.get();
                 final List<Child> children = node.getComposition();
                 for (final Child child : children) {
                     final Descriptor descriptor = (Descriptor) child;
                     final String name = descriptor.getType();
-                    if (!this.isInSpecificNodes(name) && this.isInGreenNodes(name)) {
+                    if (!this.isInSpecificVertices(name) && this.isInGreenVertices(name)) {
                         imports.add(name);
                     }
                 }
@@ -415,7 +419,7 @@ public class Analyzer {
          * @param type The node type
          * @return Checking result
          */
-        private boolean isInSpecificNodes(final String type) {
+        private boolean isInSpecificVertices(final String type) {
             return this.specific.stream()
                 .anyMatch(item -> type.equals(item.getType()));
         }
@@ -426,7 +430,7 @@ public class Analyzer {
          * @param type The node type
          * @return Checking result
          */
-        private boolean isInGreenNodes(final String type) {
+        private boolean isInGreenVertices(final String type) {
             return this.green.stream()
                 .anyMatch(item -> type.equals(item.getType()));
         }
@@ -437,13 +441,13 @@ public class Analyzer {
          * @throws DuplicateRule exception if nodes described in rules
          *  contain duplications
          */
-        private static void checkDuplicateNodes(
-            final List<Node> related) throws DuplicateRule {
-            final Set<Node> duplicates =
+        private static void checkDuplicateVertices(
+            final List<Vertex> related) throws DuplicateRule {
+            final Set<Vertex> duplicates =
                 related.stream()
                     .filter(node -> Collections.frequency(related, node) > 1)
                     .collect(Collectors.toSet());
-            for (final Node node : duplicates) {
+            for (final Vertex node : duplicates) {
                 throw new DuplicateRule(
                     new StringBuilder()
                         .append(node.getType())
@@ -476,6 +480,137 @@ public class Analyzer {
                 }
                 types.add(descriptor.getType());
             }
+        }
+
+        /**
+         * Sorts the list of vertex by descending order of their depth.
+         * @param vertices The initial list of vertices
+         * @return The sorted list
+         */
+        private List<Vertex> sortVertices(final List<Vertex> vertices) {
+            final Map<Vertex, Integer> depth = new HashMap<>();
+            final Map<Vertex, Boolean> processed = new HashMap<>();
+            for (final Vertex vertex : vertices) {
+                depth.put(vertex, 1);
+                if (vertex.isTerminal()) {
+                    processed.put(vertex, true);
+                } else {
+                    processed.put(vertex, false);
+                }
+            }
+            for (final Vertex vertex : vertices) {
+                if (vertex.isAbstract() && !processed.get(vertex)) {
+                    final List<Vertex> descendants = this.getDescendantVerticesByType(
+                        (Node) vertex,
+                        vertices
+                    );
+                    if (this.descendantsTerminal(descendants)) {
+                        depth.put(vertex, 2);
+                        processed.put(vertex, true);
+                    } else {
+                        final Pair<Vertex, List<Vertex>> pair = new Pair<>(vertex, vertices);
+                        this.getMaxDepth(
+                            pair, depth, processed
+                        );
+                    }
+                }
+            }
+            return this.sortByValue(depth);
+        }
+
+        /**
+         * Gets a maximum depth among descendants of a node.
+         * @param pair The pair of a vertex and an initial list
+         * @param depth The mappings of a vertex with its depth
+         * @param processed The mappings of a vertex with the flag indicating
+         *  if its final depth was found
+         * @return The value of a vertex depth
+         */
+        private Integer getMaxDepth(
+            final Pair<Vertex, List<Vertex>> pair,
+            final Map<Vertex, Integer> depth,
+            final Map<Vertex, Boolean> processed) {
+            Integer max = 2;
+            Integer value;
+            final List<Vertex> descendants = this.getDescendantVerticesByType(
+                (Node) pair.getKey(),
+                pair.getValue()
+            );
+            for (final Vertex vertex : descendants) {
+                if (processed.get(vertex)) {
+                    value = depth.get(vertex);
+                } else {
+                    value = this.getMaxDepth(
+                        new Pair<>(vertex, pair.getValue()),
+                        depth,
+                        processed
+                    );
+                }
+                if (value > max) {
+                    max = value;
+                }
+            }
+            max += 1;
+            depth.put(pair.getKey(), max);
+            processed.put(pair.getKey(), true);
+            return max;
+        }
+
+        /**
+         * Checks if all the specified descendants are terminal vertices
+         * (ordinary nodes, lists or literals).
+         * @param vertices The list of vertices
+         * @return Checking result
+         */
+        private static boolean descendantsTerminal(final List<Vertex> vertices) {
+            boolean result = true;
+            for (final Vertex vertex : vertices) {
+                if (!vertex.isTerminal()) {
+                    result = false;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Gets a list of vertices which are descendants of the specified node.
+         * @param node The node
+         * @param vertices The list of all vertices
+         * @return The list of vertices
+         */
+        private static List<Vertex> getDescendantVerticesByType(
+            final Node node,
+            final List<Vertex> vertices) {
+            final Child child = node.getComposition().get(0);
+            final List<Descriptor> descriptors = ((Disjunction) child).getDescriptors();
+            final List<Vertex> result = new LinkedList<>();
+            for (final Descriptor descriptor : descriptors) {
+                final String type = descriptor.getType();
+                final Optional<Vertex> optional =
+                    vertices.stream()
+                        .filter(item -> type.equals(item.getType()))
+                        .findFirst();
+                optional.ifPresent(result::add);
+            }
+            return result;
+        }
+
+        /**
+         * Converts the specified map to the list of vertices
+         * sorted by descending order of their depth.
+         * @param depth The mappings of a vertex with its depth
+         * @return The sorted list of vertices
+         */
+        private static List<Vertex> sortByValue(final Map<Vertex, Integer> depth) {
+            final List<Map.Entry<Vertex, Integer>> list = new LinkedList<>(depth.entrySet());
+            list.sort(Map.Entry.comparingByValue());
+            final List<Vertex> sorted = new LinkedList<>();
+            for (final Map.Entry<Vertex, Integer> item : list) {
+                sorted.add(item.getKey());
+            }
+            Collections.reverse(sorted);
+            return sorted;
         }
     }
 }
