@@ -83,13 +83,22 @@ public final class ProgramGenerator {
             ProgramGenerator.GREEN
         );
         for (final String language : this.program.getNamesOfAllLanguages()) {
+            final String name =
+                language.substring(0, 1).toUpperCase(Locale.ENGLISH).concat(language.substring(1));
+            final String pkg = language.toLowerCase(Locale.ENGLISH);
             this.generatePackage(
                 String.format(
-                    "This package contains nodes that describe the %s%s programming language",
-                    language.substring(0, 1).toUpperCase(Locale.ENGLISH),
-                    language.substring(1)
+                    "This package contains nodes that describe the %s language",
+                    name
                 ),
-                language.toLowerCase(Locale.ENGLISH)
+                pkg
+            );
+            this.generatePackage(
+                String.format(
+                    "This package contains rules for processing %s language",
+                    name
+                ),
+                String.format("%s.rules", pkg)
             );
         }
     }
@@ -97,22 +106,25 @@ public final class ProgramGenerator {
     /**
      * Generates 'package-info.java' file for one language.
      * @param brief Brief description
-     * @param language Language name
+     * @param pkg Package name
      * @throws GeneratorException When can't generate
      */
-    private void generatePackage(final String brief, final String language)
+    private void generatePackage(final String brief, final String pkg)
         throws GeneratorException {
         final PackageInfo info = new PackageInfo(
             this.env.getLicense(),
             brief,
-            String.format("%s.%s", this.env.getRootPackage(), language)
+            String.format("%s.%s", this.env.getRootPackage(), pkg)
         );
         final String version = this.env.getVersion();
         if (!version.isEmpty()) {
             info.setVersion(version);
         }
         final String code = info.generate();
-        final String filename = this.getFilePath(language, "package-info");
+        final String filename = this.getFilePath(
+            pkg.replace('.', File.separatorChar),
+            "package-info"
+        );
         this.createFile(filename, code);
     }
 
