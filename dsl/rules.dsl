@@ -9,5 +9,5 @@ BinaryExpression <- Addition | Subtraction;
 Variable <- Identifier;
 ExpressionList <- {Expression};
 
-c:
-AddressOf <- Expression;
+js:
+singleExpression(identifier(literal<#1>)) -> Variable(Identifier<#1>);

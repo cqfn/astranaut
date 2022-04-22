@@ -30,6 +30,22 @@ public final class Transformation implements Rule {
         this.right = right;
     }
 
+    /**
+     * Returns the left part of the rule.
+     * @return Descriptor of the left part
+     */
+    public Descriptor getLeft() {
+        return this.left;
+    }
+
+    /**
+     * Returns the right part of the rule.
+     * @return Descriptor of the right part
+     */
+    public Descriptor getRight() {
+        return this.right;
+    }
+
     @Override
     public String toString() {
         return String.format("%s -> %s", this.left.toString(), this.right.toString());

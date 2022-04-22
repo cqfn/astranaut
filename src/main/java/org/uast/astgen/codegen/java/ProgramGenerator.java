@@ -71,6 +71,7 @@ public final class ProgramGenerator {
         this.generateNodes();
         this.generateLiterals();
         this.generateFactories();
+        this.generateTransformations();
     }
 
     /**
@@ -192,6 +193,34 @@ public final class ProgramGenerator {
         final String code = unit.generate();
         final String filename = this.getFilePath(language, generator.getClassname());
         this.createFile(filename, code);
+    }
+
+    /**
+     * Generates source code for transformations.
+     * @throws GeneratorException When can't generate
+     */
+    private void generateTransformations() throws GeneratorException {
+        final String version = this.env.getVersion();
+        for (final String language : this.program.getNamesOfAllLanguages()) {
+            final TransformationGenerator generator = new TransformationGenerator(
+                this.envs.get(language),
+                this.program.getTransformations(),
+                language
+            );
+            final Map<String, CompilationUnit> units = generator.generate();
+            for (final Map.Entry<String, CompilationUnit> entry : units.entrySet()) {
+                final CompilationUnit unit = entry.getValue();
+                if (!version.isEmpty()) {
+                    unit.setVersion(version);
+                }
+                final String code = unit.generate();
+                final String filename = this.getFilePath(
+                    language,
+                    String.format("rules%c%s", File.separatorChar, entry.getKey())
+                );
+                this.createFile(filename, code);
+            }
+        }
     }
 
     /**
