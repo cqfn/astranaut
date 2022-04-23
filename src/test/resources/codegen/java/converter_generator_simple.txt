@@ -42,21 +42,17 @@ public final class Rule0 implements Converter {
         final Map<Integer, String> data = new TreeMap<>();
         final boolean matched = Matcher0.INSTANCE.match(node, children, data);
         if (matched) {
-            result = Rule0.firstBuilder(factory, children, data);
+            result = Rule0.firstBuilder(factory);
         }
-        return result
+        return result;
     }
 
     /**
      * Builds a node with 'Variable' type.
      * @param factory The node factory
-     * @param children The collection of child nodes
-     * @param data The data
      * @return A node
      */
-    public Node firstBuilder(final Factory factory,
-        final Map<Integer, Node> children,
-        final Map<Integer, String> data) {
+    private static Node firstBuilder(final Factory factory) {
         Node result = EmptyTree.INSTANCE;
         final Builder builder = factory.createBuilder(Rule0.VARIABLE);
         if (builder.isValid()) {

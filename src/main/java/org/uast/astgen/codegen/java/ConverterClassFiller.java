@@ -95,6 +95,7 @@ public class ConverterClassFiller {
         method.setReturnType(ConverterClassFiller.NODE_TYPE);
         method.addArgument(ConverterClassFiller.NODE_TYPE, "node");
         method.addArgument(ConverterClassFiller.FACTORY_TYPE, ConverterClassFiller.FACTORY_NAME);
+        final CreationResult builder = this.createBuildMethod(this.root);
         final List<String> code = Arrays.asList(
             ConverterClassFiller.DECLARE_RESULT,
             "final Map<Integer, Node> children = new TreeMap<>();",
@@ -105,12 +106,13 @@ public class ConverterClassFiller {
             ),
             "if (matched) {",
             String.format(
-                "    result = %s.%s(factory, children, data);",
+                "    result = %s.%s(%s);",
                 this.klass.getName(),
-                this.createBuildMethod(this.root)
+                builder.getName(),
+                builder.getArgumentsList()
             ),
             "}",
-            "return result"
+            "return result;"
         );
         method.setCode(String.join("\n", code));
     }
@@ -118,15 +120,18 @@ public class ConverterClassFiller {
     /**
      * Creates the 'xxxBuilder' method, where 'xxx' is 'first', 'second', etc.
      * @param descriptor The descriptor
-     * @return The name of generated method
+     * @return The result of creation
      */
-    private String createBuildMethod(final Descriptor descriptor) {
+    private CreationResult createBuildMethod(final Descriptor descriptor) {
         final String name = this.labels.getLabel().concat("Builder");
+        final CreationResult result = new CreationResult(name);
         final String type = descriptor.getType();
         final Method method = new Method(
             String.format("Builds a node with '%s' type", type),
             name
         );
+        method.makePrivate();
+        method.makeStatic();
         this.klass.addMethod(method);
         method.addArgument(
             ConverterClassFiller.FACTORY_TYPE,
@@ -144,17 +149,115 @@ public class ConverterClassFiller {
             "}"
         );
         method.setCode(String.join("\n", code));
-        method.addArgument(
-            "Map<Integer, Node>",
-            "children",
-            "The collection of child nodes"
-        );
-        method.addArgument(
-            "Map<Integer, String>",
-            "data",
-            "The data"
-        );
+        if (result.areChildrenNeeded()) {
+            method.addArgument(
+                "Map<Integer, Node>",
+                "children",
+                "The collection of child nodes"
+            );
+        }
+        if (result.isDataNeeded()) {
+            method.addArgument(
+                "Map<Integer, String>",
+                "data",
+                "The data"
+            );
+        }
         method.setReturnType(ConverterClassFiller.NODE_TYPE, "A node");
-        return name;
+        return result;
+    }
+
+    /**
+     * The result of the {@link ConverterClassFiller#createConvertMethod()} method.
+     * @since 1.0
+     */
+    private static class CreationResult {
+        /**
+         * The name of the created method.
+         */
+        private final String name;
+
+        /**
+         * Flag indicating that the method has the 'children' argument.
+         */
+        private boolean children;
+
+        /**
+         * Flag indicating that the method has the 'data' argument.
+         */
+        private boolean data;
+
+        /**
+         * Constructor.
+         * @param name The name of the created method
+         */
+        CreationResult(final String name) {
+            this.name = name;
+            this.children = false;
+            this.data = false;
+        }
+
+        /**
+         * Sets the flag to indicate that the 'children' argument is required.
+         */
+        void childrenNeeded() {
+            this.children = true;
+        }
+
+        /**
+         * Sets the flag to indicate that the 'data' argument is required.
+         */
+        void dataNeeded() {
+            this.data = true;
+        }
+
+        /**
+         * Performs flag merging with another object.
+         * @param other Another object
+         */
+        void merge(final CreationResult other) {
+            this.children = this.children | other.children;
+            this.data = this.data | other.data;
+        }
+
+        /**
+         * Returns the name of the created method.
+         * @return The name
+         */
+        String getName() {
+            return this.name;
+        }
+
+        /**
+         * Returns the flag to indicate that the 'children' argument is required.
+         * @return The flag
+         */
+        boolean areChildrenNeeded() {
+            return this.children;
+        }
+
+        /**
+         * Returns the flag to indicate that the 'data' argument is required.
+         * @return The flag
+         */
+        boolean isDataNeeded() {
+            return this.data;
+        }
+
+        /**
+         * Returns the list of arguments required to call the generated method.
+         * @return The list as a string
+         */
+        String getArgumentsList() {
+            final StringBuilder builder = new StringBuilder()
+                .append(ConverterClassFiller.FACTORY_NAME);
+            if (this.children) {
+                builder.append(", children");
+            }
+            if (this.data) {
+                builder.append(", data");
+            }
+            return builder.toString();
+        }
     }
 }
