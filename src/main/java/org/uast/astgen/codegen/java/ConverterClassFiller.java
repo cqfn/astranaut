@@ -6,8 +6,12 @@ package org.uast.astgen.codegen.java;
 
 import java.util.Arrays;
 import java.util.List;
+import org.uast.astgen.rules.Data;
 import org.uast.astgen.rules.Descriptor;
+import org.uast.astgen.rules.Hole;
+import org.uast.astgen.rules.StringData;
 import org.uast.astgen.utils.LabelFactory;
+import org.uast.astgen.utils.StringUtils;
 
 /**
  * Fills 'Matcher' classes (creates methods and fields).
@@ -144,6 +148,7 @@ public class ConverterClassFiller {
                 "final Builder builder = factory.createBuilder(%s);",
                 this.stg.getFieldName(type)
             ),
+            ConverterClassFiller.processData(descriptor, result),
             "if (builder.isValid()) {",
             "    result = builder.createNode();",
             "}"
@@ -165,6 +170,29 @@ public class ConverterClassFiller {
         }
         method.setReturnType(ConverterClassFiller.NODE_TYPE, "A node");
         return result;
+    }
+
+    /**
+     * Processes data, specified in descriptor.
+     * @param descriptor The descriptor
+     * @param result The creation result (for flags modifying)
+     * @return Source code
+     */
+    private static String processData(final Descriptor descriptor, final CreationResult result) {
+        String code = "";
+        final Data data = descriptor.getData();
+        if (data instanceof Hole) {
+            final Hole hole = (Hole) data;
+            code = String.format("builder.setData(data.get(%s));", hole.getValue());
+            result.dataNeeded();
+        } else if (data instanceof StringData) {
+            final StringData string = (StringData) data;
+            code = String.format(
+                "builder.setData(\"%s\");",
+                new StringUtils(string.getValue()).escapeEntities()
+            );
+        }
+        return code;
     }
 
     /**

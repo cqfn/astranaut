@@ -40,6 +40,30 @@ public class ConverterGeneratorTest {
     }
 
     /**
+     * Generate converter that uses data.
+     */
+    @Test
+    public void testConverterUsesData() {
+        final int result = this.testing(
+            "Variable<#13>",
+            "converter_generator_with_data.txt"
+        );
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
+     * Generate converter that creates node using static string as a data.
+     */
+    @Test
+    public void testConverterStaticString() {
+        final int result = this.testing(
+            "Variable<\"test\">",
+            "converter_generator_static_string.txt"
+        );
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
      * Performs a test.
      * @param code Source code of descriptor
      * @param filename The name of file that contains the expected result
