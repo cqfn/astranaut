@@ -21,6 +21,7 @@ import org.uast.astgen.scanner.HoleMarker;
 import org.uast.astgen.scanner.Identifier;
 import org.uast.astgen.scanner.Token;
 import org.uast.astgen.scanner.TokenList;
+import org.uast.astgen.utils.LabelFactory;
 
 /**
  * Extracts parameters (holes and descriptors) from list of tokens.

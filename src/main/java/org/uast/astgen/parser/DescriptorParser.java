@@ -16,6 +16,7 @@ import org.uast.astgen.scanner.Identifier;
 import org.uast.astgen.scanner.RoundBracketsPair;
 import org.uast.astgen.scanner.Token;
 import org.uast.astgen.scanner.TokenList;
+import org.uast.astgen.utils.LabelFactory;
 
 /**
  * Parses list of tokens as a descriptor.
