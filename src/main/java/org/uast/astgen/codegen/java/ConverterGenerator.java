@@ -12,12 +12,13 @@ import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.DescriptorAttribute;
 
 /**
- * Generates 'Matcher' classes.
- * A matcher checks if the node matches some structure, and extracts the data or (and) children.
+ * Generates converter classes.
+ * A converter checks one rule described in DSL and convert the specified AST
+ * built by a third-party parser to the unified format.
  *
  * @since 1.0
  */
-public final class MatcherGenerator {
+public final class ConverterGenerator {
     /**
      * The environment.
      */
@@ -43,37 +44,43 @@ public final class MatcherGenerator {
      * @param env The environment.
      * @param pkg The package name.
      */
-    public MatcherGenerator(final Environment env, final String pkg) {
+    public ConverterGenerator(final Environment env, final String pkg) {
         this.env = env;
         this.pkg = pkg;
-        this.names = new ClassNameGenerator("Matcher");
+        this.names = new ClassNameGenerator("Rule");
         this.units = new TreeMap<>();
     }
 
     /**
      * Generates compilation unit from descriptor.
      * @param descriptor The descriptor
-     * @return The name of generated class
+     * @param matcher The nme of the matcher class
      */
-    public String generate(final Descriptor descriptor) {
+    public void generate(final Descriptor descriptor, final String matcher) {
         assert descriptor.getAttribute() == DescriptorAttribute.NONE;
         final String name = this.names.getName();
         final Klass klass = new Klass(
-            "Checks if the node matches some structure, and extracts the data and children",
+            "Converter describing DSL conversion rule",
             name
         );
-        new MatcherClassFiller(this, klass, descriptor).fill();
+        new ConverterClassFiller(klass, descriptor, matcher).fill();
         final CompilationUnit unit = new CompilationUnit(
             this.env.getLicense(),
             this.pkg,
             klass
         );
+        if (!descriptor.getParameters().isEmpty()) {
+            unit.addImport("java.util.Arrays");
+        }
         unit.addImport("java.util.Map");
+        unit.addImport("java.util.TreeMap");
         final String base = this.env.getBasePackage();
-        unit.addImport(base.concat(".Matcher"));
+        unit.addImport(base.concat(".Builder"));
+        unit.addImport(base.concat(".Converter"));
+        unit.addImport(base.concat(".EmptyTree"));
+        unit.addImport(base.concat(".Factory"));
         unit.addImport(base.concat(".Node"));
         this.units.put(String.format("rules%s%s", File.separator, name), unit);
-        return name;
     }
 
     /**

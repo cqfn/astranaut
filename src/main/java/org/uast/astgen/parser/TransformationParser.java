@@ -11,6 +11,7 @@ import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.DescriptorAttribute;
 import org.uast.astgen.rules.Transformation;
 import org.uast.astgen.scanner.TokenList;
+import org.uast.astgen.utils.LabelFactory;
 
 /**
  * Parser of {@link Transformation} rules.

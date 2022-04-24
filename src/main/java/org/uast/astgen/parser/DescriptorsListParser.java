@@ -12,6 +12,7 @@ import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Hole;
 import org.uast.astgen.rules.Parameter;
 import org.uast.astgen.scanner.TokenList;
+import org.uast.astgen.utils.LabelFactory;
 
 /**
  * Extracts descriptors from list of tokens.

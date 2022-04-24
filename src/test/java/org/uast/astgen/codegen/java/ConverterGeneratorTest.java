@@ -5,6 +5,7 @@
 
 package org.uast.astgen.codegen.java;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -24,7 +25,7 @@ import org.uast.astgen.utils.LabelFactory;
  *
  * @since 1.0
  */
-public class MatcherGeneratorTest {
+public class ConverterGeneratorTest {
     /**
      * The folder with test resources.
      */
@@ -35,54 +36,42 @@ public class MatcherGeneratorTest {
      */
     @Test
     public void testSimpleCase() {
-        final int result = this.testing("statement", "matcher_generator_simple.txt");
+        final int result = this.testing("Variable", "converter_generator_simple.txt");
         Assertions.assertEquals(1, result);
     }
 
     /**
-     * Testing case: descriptor with one child.
+     * Generate converter that uses data.
      */
     @Test
-    public void testDescriptorWithOneChild() {
+    public void testConverterUsesData() {
         final int result = this.testing(
-            "singleExpression(literal())",
-            "matcher_generator_1_child.txt"
-        );
-        Assertions.assertEquals(2, result);
-    }
-
-    /**
-     * Testing case: extracting data.
-     */
-    @Test
-    public void testExtractingData() {
-        final int result = this.testing(
-            "literal<#13>",
-            "matcher_generator_extract_data.txt"
+            "Variable<#13>",
+            "converter_generator_with_data.txt"
         );
         Assertions.assertEquals(1, result);
     }
 
     /**
-     * Testing case: checking data.
+     * Generate converter that creates node using static string as a data.
      */
     @Test
-    public void testCheckingData() {
+    public void testConverterStaticString() {
         final int result = this.testing(
-            "literal<\"+\">",
-            "matcher_generator_check_data.txt"
+            "Variable<\"test\">",
+            "converter_generator_static_string.txt"
         );
         Assertions.assertEquals(1, result);
     }
 
     /**
-     * Testing case: extracting children.
+     * Generate converter that uses children.
      */
     @Test
-    public void testExtractingChildren() {
+    public void testConverterUsesChildren() {
         final int result = this.testing(
-            "simpleIdentifier(#1, #2)",
-            "matcher_generator_extract_children.txt"
+            "Addition(#1, #2)",
+            "converter_generator_with_children.txt"
         );
         Assertions.assertEquals(1, result);
     }
@@ -93,10 +82,10 @@ public class MatcherGeneratorTest {
     @Test
     public void testComplexCase() {
         final int result = this.testing(
-            "singleExpression(identifier(literal<#1>), literal<\"+\">, #2)",
-            "matcher_generator_complex.txt"
+            "VariableDeclaration(Modifier<\"public\">, #1, Identifier<#2>)",
+            "converter_generator_complex.txt"
         );
-        Assertions.assertTrue(result > 0);
+        Assertions.assertEquals(1, result);
     }
 
     /**
@@ -108,21 +97,14 @@ public class MatcherGeneratorTest {
     private int testing(final String code, final String filename) {
         final Environment env = new TestEnvironment();
         final Descriptor descriptor = this.parseCode(code);
-        final MatcherGenerator generator = new MatcherGenerator(env, "org.uast");
-        final String name = generator.generate(descriptor);
-        Assertions.assertEquals("Matcher0", name);
+        final ConverterGenerator generator = new ConverterGenerator(env, "org.uast");
+        generator.generate(descriptor, "Matcher0");
         final Map<String, CompilationUnit> units = generator.getUnits();
-        final StringBuilder actual = new StringBuilder();
-        boolean flag = false;
-        for (final Map.Entry<String, CompilationUnit> entry : units.entrySet()) {
-            if (flag) {
-                actual.append('\n');
-            }
-            flag = true;
-            actual.append(entry.getValue().generate());
-        }
+        final String rule = String.format("rules%sRule0", File.separator);
+        Assertions.assertTrue(units.containsKey(rule));
         final String expected = this.readTest(filename);
-        Assertions.assertEquals(expected, actual.toString());
+        final String actual = units.get(rule).generate();
+        Assertions.assertEquals(expected, actual);
         return units.size();
     }
 
@@ -155,7 +137,7 @@ public class MatcherGeneratorTest {
         String result = "";
         boolean oops = false;
         try {
-            result = new FilesReader(MatcherGeneratorTest.TESTS_PATH.concat(name))
+            result = new FilesReader(ConverterGeneratorTest.TESTS_PATH.concat(name))
                 .readAsString();
         } catch (final IOException ignored) {
             oops = true;

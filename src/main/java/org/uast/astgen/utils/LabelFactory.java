@@ -2,7 +2,7 @@
  * MIT License Copyright (c) 2022 unified-ast
  * https://github.com/unified-ast/ast-generator/blob/master/LICENSE.txt
  */
-package org.uast.astgen.parser;
+package org.uast.astgen.utils;
 
 import java.util.Arrays;
 import java.util.List;

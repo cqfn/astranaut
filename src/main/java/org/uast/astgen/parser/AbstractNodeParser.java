@@ -17,6 +17,7 @@ import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.DescriptorAttribute;
 import org.uast.astgen.rules.Disjunction;
 import org.uast.astgen.scanner.TokenList;
+import org.uast.astgen.utils.LabelFactory;
 
 /**
  * Parses children list for abstract node.
