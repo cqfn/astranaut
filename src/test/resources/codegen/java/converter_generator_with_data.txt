@@ -60,5 +60,6 @@ public final class Rule0 implements Converter {
         if (set && builder.isValid()) {
             result = builder.createNode();
         }
+        return result;
     }
 }

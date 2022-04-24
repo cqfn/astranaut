@@ -41,6 +41,11 @@ public class ConverterClassFiller {
     private static final String DECLARE_RESULT = "Node result = EmptyTree.INSTANCE;";
 
     /**
+     * The result nod return.
+     */
+    private static final String RETURN_RESULT = "return result;";
+
+    /**
      * Class to be filled.
      */
     private final Klass klass;
@@ -117,7 +122,7 @@ public class ConverterClassFiller {
                 builder.getArgumentsList()
             ),
             "}",
-            "return result;"
+            ConverterClassFiller.RETURN_RESULT
         );
         method.setCode(String.join("\n", code));
     }
@@ -157,7 +162,8 @@ public class ConverterClassFiller {
             data,
             String.format("if (%s) {", criteria.toString()),
             "    result = builder.createNode();",
-            "}"
+            "}",
+            ConverterClassFiller.RETURN_RESULT
         );
         method.setCode(String.join("\n", code));
         if (result.areChildrenNeeded()) {
@@ -220,7 +226,7 @@ public class ConverterClassFiller {
                 crr.merge(builder);
                 code.append(
                     String.format(
-                        "\t\t%s.%s(%s);",
+                        "\t\t%s.%s(%s)",
                         this.klass.getName(),
                         builder.getName(),
                         builder.getArgumentsList()

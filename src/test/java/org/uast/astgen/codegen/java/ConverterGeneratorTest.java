@@ -76,6 +76,18 @@ public class ConverterGeneratorTest {
     }
 
     /**
+     * Testing complex case.
+     */
+    @Test
+    public void testComplexCase() {
+        final int result = this.testing(
+            "VariableDeclaration(Modifier<\"public\">, #1, Identifier<#2>)",
+            "converter_generator_complex.txt"
+        );
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
      * Performs a test.
      * @param code Source code of descriptor
      * @param filename The name of file that contains the expected result
