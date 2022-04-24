@@ -11,3 +11,4 @@ ExpressionList <- {Expression};
 
 js:
 singleExpression(identifier(literal<#1>)) -> Variable(Identifier<#1>);
+singleExpression(#1, literal<"+">, #2) -> Addition(#1, #2);

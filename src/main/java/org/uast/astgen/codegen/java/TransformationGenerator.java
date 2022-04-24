@@ -53,15 +53,18 @@ public class TransformationGenerator {
      */
     public Map<String, CompilationUnit> generate() {
         final Map<String, CompilationUnit> units = new TreeMap<>();
-        final MatcherGenerator generator =
-            new MatcherGenerator(this.env, this.getPackageName());
+        final String pkg = this.getPackageName();
+        final MatcherGenerator matchers = new MatcherGenerator(this.env, pkg);
+        final ConverterGenerator converters = new ConverterGenerator(this.env, pkg);
         for (final Statement<Transformation> stmt : this.rules) {
             if (stmt.getLanguage().equals(this.language)) {
                 final Transformation rule = stmt.getRule();
-                generator.generate(rule.getLeft());
+                final String matcher = matchers.generate(rule.getLeft());
+                converters.generate(rule.getRight(), matcher);
             }
         }
-        units.putAll(generator.getUnits());
+        units.putAll(matchers.getUnits());
+        units.putAll(converters.getUnits());
         return units;
     }
 
