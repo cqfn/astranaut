@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
@@ -79,7 +80,7 @@ public final class ConverterGenerator {
         unit.addImport(base.concat(".EmptyTree"));
         unit.addImport(base.concat(".Factory"));
         unit.addImport(base.concat(".Node"));
-        this.units.put(name, unit);
+        this.units.put(String.format("rules%s%s", File.separator, name), unit);
     }
 
     /**

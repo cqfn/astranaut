@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
@@ -71,7 +72,7 @@ public final class MatcherGenerator {
         final String base = this.env.getBasePackage();
         unit.addImport(base.concat(".Matcher"));
         unit.addImport(base.concat(".Node"));
-        this.units.put(name, unit);
+        this.units.put(String.format("rules%s%s", File.separator, name), unit);
         return name;
     }
 

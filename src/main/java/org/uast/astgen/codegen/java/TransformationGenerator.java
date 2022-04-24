@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -34,6 +35,11 @@ public class TransformationGenerator {
     private final String language;
 
     /**
+     * The collection of compilation units.
+     */
+    private final Map<String, CompilationUnit> units;
+
+    /**
      * Constructor.
      * @param env The environment
      * @param rules The list of rules
@@ -45,35 +51,42 @@ public class TransformationGenerator {
         this.env = env;
         this.rules = rules;
         this.language = language;
+        this.units = new TreeMap<>();
     }
 
     /**
      * Generates source code for transformation rules.
-     * @return The collection of compilation units
      */
-    public Map<String, CompilationUnit> generate() {
-        final Map<String, CompilationUnit> units = new TreeMap<>();
-        final String pkg = this.getPackageName();
+    public void generate() {
+        final String root = this.env.getRootPackage();
+        final String pkg = String.format(
+            "%s.%s.rules",
+            root,
+            this.language.toLowerCase(Locale.ENGLISH)
+        );
         final MatcherGenerator matchers = new MatcherGenerator(this.env, pkg);
         final ConverterGenerator converters = new ConverterGenerator(this.env, pkg);
+        int count = 0;
         for (final Statement<Transformation> stmt : this.rules) {
             if (stmt.getLanguage().equals(this.language)) {
                 final Transformation rule = stmt.getRule();
                 final String matcher = matchers.generate(rule.getLeft());
                 converters.generate(rule.getRight(), matcher);
+                count = count + 1;
             }
         }
-        units.putAll(matchers.getUnits());
-        units.putAll(converters.getUnits());
-        return units;
+        this.units.putAll(matchers.getUnits());
+        this.units.putAll(converters.getUnits());
+        final AdapterGenerator adapter = new AdapterGenerator(this.env, this.language, count);
+        final CompilationUnit unit = adapter.generate();
+        this.units.put(adapter.getClassname(), unit);
     }
 
     /**
-     * Returns full package name.
-     * @return Package name
+     * Returns the collection of generated units.
+     * @return Generated units
      */
-    protected String getPackageName() {
-        final String root = this.env.getRootPackage();
-        return String.format("%s.%s.rules", root, this.language.toLowerCase(Locale.ENGLISH));
+    public Map<String, CompilationUnit> getUnits() {
+        return Collections.unmodifiableMap(this.units);
     }
 }

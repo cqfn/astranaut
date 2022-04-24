@@ -207,17 +207,15 @@ public final class ProgramGenerator {
                 this.program.getTransformations(),
                 language
             );
-            final Map<String, CompilationUnit> units = generator.generate();
+            generator.generate();
+            final Map<String, CompilationUnit> units = generator.getUnits();
             for (final Map.Entry<String, CompilationUnit> entry : units.entrySet()) {
                 final CompilationUnit unit = entry.getValue();
                 if (!version.isEmpty()) {
                     unit.setVersion(version);
                 }
                 final String code = unit.generate();
-                final String filename = this.getFilePath(
-                    language,
-                    String.format("rules%c%s", File.separatorChar, entry.getKey())
-                );
+                final String filename = this.getFilePath(language, entry.getKey());
                 this.createFile(filename, code);
             }
         }

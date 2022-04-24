@@ -5,6 +5,7 @@
 
 package org.uast.astgen.codegen.java;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -99,7 +100,7 @@ public class ConverterGeneratorTest {
         final ConverterGenerator generator = new ConverterGenerator(env, "org.uast");
         generator.generate(descriptor, "Matcher0");
         final Map<String, CompilationUnit> units = generator.getUnits();
-        final String rule = "Rule0";
+        final String rule = String.format("rules%sRule0", File.separator);
         Assertions.assertTrue(units.containsKey(rule));
         final String expected = this.readTest(filename);
         final String actual = units.get(rule).generate();
