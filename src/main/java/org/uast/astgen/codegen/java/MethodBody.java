@@ -43,7 +43,14 @@ public final class MethodBody implements Entity {
             String line = lines[index];
             int gap = 0;
             if (line.startsWith("\t")) {
-                gap = 1;
+                final int len = line.length();
+                for (int symbol = 0; symbol < len; symbol = symbol + 1) {
+                    if (line.charAt(symbol) == '\t') {
+                        gap = gap + 1;
+                    } else {
+                        break;
+                    }
+                }
             }
             line = line.trim();
             if (line.isEmpty()) {

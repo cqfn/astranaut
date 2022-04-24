@@ -68,6 +68,9 @@ public final class ConverterGenerator {
             this.pkg,
             klass
         );
+        if (!descriptor.getParameters().isEmpty()) {
+            unit.addImport("java.util.Arrays");
+        }
         unit.addImport("java.util.Map");
         unit.addImport("java.util.TreeMap");
         final String base = this.env.getBasePackage();

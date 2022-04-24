@@ -64,6 +64,18 @@ public class ConverterGeneratorTest {
     }
 
     /**
+     * Generate converter that uses children.
+     */
+    @Test
+    public void testConverterUsesChildren() {
+        final int result = this.testing(
+            "Addition(#1, #2)",
+            "converter_generator_with_children.txt"
+        );
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
      * Performs a test.
      * @param code Source code of descriptor
      * @param filename The name of file that contains the expected result

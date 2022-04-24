@@ -9,6 +9,7 @@ import java.util.List;
 import org.uast.astgen.rules.Data;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Hole;
+import org.uast.astgen.rules.Parameter;
 import org.uast.astgen.rules.StringData;
 import org.uast.astgen.utils.LabelFactory;
 import org.uast.astgen.utils.StringUtils;
@@ -148,6 +149,7 @@ public class ConverterClassFiller {
                 "final Builder builder = factory.createBuilder(%s);",
                 this.stg.getFieldName(type)
             ),
+            this.processCode(descriptor, result),
             ConverterClassFiller.processData(descriptor, result),
             "if (builder.isValid()) {",
             "    result = builder.createNode();",
@@ -173,18 +175,60 @@ public class ConverterClassFiller {
     }
 
     /**
-     * Processes data, specified in descriptor.
+     * Processes code, specified in descriptor.
      * @param descriptor The descriptor
-     * @param result The creation result (for flags modifying)
+     * @param crr The creation result (for flags modifying)
      * @return Source code
      */
-    private static String processData(final Descriptor descriptor, final CreationResult result) {
+    private String processCode(final Descriptor descriptor, final CreationResult crr) {
+        final StringBuilder code = new StringBuilder(128);
+        code.append("builder.setChildrenList(\n\tArrays.asList(\n");
+        boolean flag = false;
+        for (final Parameter parameter : descriptor.getParameters()) {
+            if (flag) {
+                code.append(",\n");
+            }
+            flag = true;
+            if (parameter instanceof Hole) {
+                final Hole hole = (Hole) parameter;
+                code.append(String.format("\t\tchildren.get(%d)", hole.getValue()));
+                crr.childrenNeeded();
+            } else if (parameter instanceof Descriptor) {
+                final Descriptor child = (Descriptor) parameter;
+                final CreationResult builder = this.createBuildMethod(child);
+                crr.merge(builder);
+                code.append(
+                    String.format(
+                        "\t\t%s.%s(%s);",
+                        this.klass.getName(),
+                        builder.getName(),
+                        builder.getArgumentsList()
+                    )
+                );
+            }
+        }
+        final String result;
+        if (flag) {
+            result = code.append("\n\t)\n);").toString();
+        } else {
+            result = "";
+        }
+        return result;
+    }
+
+    /**
+     * Processes data, specified in descriptor.
+     * @param descriptor The descriptor
+     * @param crr The creation result (for flags modifying)
+     * @return Source code
+     */
+    private static String processData(final Descriptor descriptor, final CreationResult crr) {
         String code = "";
         final Data data = descriptor.getData();
         if (data instanceof Hole) {
             final Hole hole = (Hole) data;
             code = String.format("builder.setData(data.get(%s));", hole.getValue());
-            result.dataNeeded();
+            crr.dataNeeded();
         } else if (data instanceof StringData) {
             final StringData string = (StringData) data;
             code = String.format(
