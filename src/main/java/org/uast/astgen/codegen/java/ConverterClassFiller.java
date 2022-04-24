@@ -128,30 +128,34 @@ public class ConverterClassFiller {
      * @return The result of creation
      */
     private CreationResult createBuildMethod(final Descriptor descriptor) {
+        final String type = descriptor.getType();
         final String name = this.labels.getLabel().concat("Builder");
         final CreationResult result = new CreationResult(name);
-        final String type = descriptor.getType();
-        final Method method = new Method(
-            String.format("Builds a node with '%s' type", type),
-            name
-        );
-        method.makePrivate();
-        method.makeStatic();
-        this.klass.addMethod(method);
+        final Method method = this.createMethodObject(type, name);
         method.addArgument(
             ConverterClassFiller.FACTORY_TYPE,
             ConverterClassFiller.FACTORY_NAME,
             "The node factory"
         );
+        final String children = this.processChildren(descriptor, result);
+        final String data = ConverterClassFiller.processData(descriptor, result);
+        final StringBuilder criteria = new StringBuilder(64);
+        if (!children.isEmpty()) {
+            criteria.append("applied && ");
+        }
+        if (!data.isEmpty()) {
+            criteria.append("set && ");
+        }
+        criteria.append("builder.isValid()");
         final List<String> code = Arrays.asList(
             ConverterClassFiller.DECLARE_RESULT,
             String.format(
                 "final Builder builder = factory.createBuilder(%s);",
                 this.stg.getFieldName(type)
             ),
-            this.processCode(descriptor, result),
-            ConverterClassFiller.processData(descriptor, result),
-            "if (builder.isValid()) {",
+            children,
+            data,
+            String.format("if (%s) {", criteria.toString()),
             "    result = builder.createNode();",
             "}"
         );
@@ -170,19 +174,36 @@ public class ConverterClassFiller {
                 "The data"
             );
         }
-        method.setReturnType(ConverterClassFiller.NODE_TYPE, "A node");
         return result;
     }
 
     /**
-     * Processes code, specified in descriptor.
+     * Creates method constructor.
+     * @param type The name of type of created node
+     * @param name The method name
+     * @return The method constructor
+     */
+    private Method createMethodObject(final String type, final String name) {
+        final Method method = new Method(
+            String.format("Builds a node with '%s' type", type),
+            name
+        );
+        method.makePrivate();
+        method.makeStatic();
+        method.setReturnType(ConverterClassFiller.NODE_TYPE, "A node");
+        this.klass.addMethod(method);
+        return method;
+    }
+
+    /**
+     * Processes children, specified in descriptor.
      * @param descriptor The descriptor
      * @param crr The creation result (for flags modifying)
      * @return Source code
      */
-    private String processCode(final Descriptor descriptor, final CreationResult crr) {
+    private String processChildren(final Descriptor descriptor, final CreationResult crr) {
         final StringBuilder code = new StringBuilder(128);
-        code.append("builder.setChildrenList(\n\tArrays.asList(\n");
+        code.append("final boolean applied = builder.setChildrenList(\n\tArrays.asList(\n");
         boolean flag = false;
         for (final Parameter parameter : descriptor.getParameters()) {
             if (flag) {
@@ -227,12 +248,15 @@ public class ConverterClassFiller {
         final Data data = descriptor.getData();
         if (data instanceof Hole) {
             final Hole hole = (Hole) data;
-            code = String.format("builder.setData(data.get(%s));", hole.getValue());
+            code = String.format(
+                "final boolean set = builder.setData(data.get(%s));",
+                hole.getValue()
+            );
             crr.dataNeeded();
         } else if (data instanceof StringData) {
             final StringData string = (StringData) data;
             code = String.format(
-                "builder.setData(\"%s\");",
+                "final boolean set = builder.setData(\"%s\");",
                 new StringUtils(string.getValue()).escapeEntities()
             );
         }

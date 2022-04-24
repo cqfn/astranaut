@@ -55,8 +55,8 @@ public final class Rule0 implements Converter {
     private static Node firstBuilder(final Factory factory) {
         Node result = EmptyTree.INSTANCE;
         final Builder builder = factory.createBuilder(Rule0.VARIABLE);
-        builder.setData("test");
-        if (builder.isValid()) {
+        final boolean set = builder.setData("test");
+        if (set && builder.isValid()) {
             result = builder.createNode();
         }
     }

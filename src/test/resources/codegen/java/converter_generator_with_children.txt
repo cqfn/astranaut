@@ -57,13 +57,13 @@ public final class Rule0 implements Converter {
     private static Node firstBuilder(final Factory factory, final Map<Integer, Node> children) {
         Node result = EmptyTree.INSTANCE;
         final Builder builder = factory.createBuilder(Rule0.ADDITION);
-        builder.setChildrenList(
+        final boolean applied = builder.setChildrenList(
             Arrays.asList(
                 children.get(1),
                 children.get(2)
             )
         );
-        if (builder.isValid()) {
+        if (applied && builder.isValid()) {
             result = builder.createNode();
         }
     }
