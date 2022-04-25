@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javafx.util.Pair;
 import org.uast.astgen.exceptions.DuplicateRule;
 import org.uast.astgen.rules.Child;
 import org.uast.astgen.rules.Descriptor;
@@ -26,6 +25,7 @@ import org.uast.astgen.rules.Extension;
 import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Statement;
 import org.uast.astgen.rules.Vertex;
+import org.uast.astgen.utils.Pair;
 
 /**
  * Analyzes nodes hierarchy described with DSL.
