@@ -5,7 +5,7 @@
 package org.uast.astgen.exceptions;
 
 /**
- * Exception "Duplicate node found in DSL rules".
+ * Exception "Duplicate vertex found in DSL rules".
  *
  * @since 1.0
  */

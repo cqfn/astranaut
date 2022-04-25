@@ -9,7 +9,7 @@ package org.uast.astgen.rules;
  *
  * @since 1.0
  */
-public abstract class Vertex implements Rule {
+public abstract class Vertex implements Rule, Comparable<Vertex> {
     /**
      * Returns left part of the rule.
      * @return The type name

@@ -155,4 +155,9 @@ public final class Node extends Vertex {
         }
         return result;
     }
+
+    @Override
+    public int compareTo(final Vertex obj) {
+        return this.toString().compareTo(obj.toString());
+    }
 }

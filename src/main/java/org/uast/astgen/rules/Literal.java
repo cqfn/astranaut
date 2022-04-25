@@ -121,6 +121,11 @@ public final class Literal extends Vertex {
         return result;
     }
 
+    @Override
+    public int compareTo(final Vertex obj) {
+        return this.toString().compareTo(obj.toString());
+    }
+
     /**
      * Builder for literal building.
      *
