@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.BaseException;
 import org.uast.astgen.exceptions.DuplicateRule;
@@ -89,7 +88,8 @@ public class AnalyzerTest {
     @Test
     public void testThreeDepthHierarchyJava() {
         boolean oops = false;
-        final ProgramParser parser = this.getSource();
+        final String source = this.readTest("depth3_java_set.txt");
+        final ProgramParser parser = new ProgramParser(source);
         try {
             final Program program = parser.parse();
             final List<Statement<Vertex>> vertices = program.getVertices();
@@ -158,7 +158,7 @@ public class AnalyzerTest {
         try {
             final Program program = parser.parse();
             final List<Statement<Vertex>> vertices = program.getVertices();
-            final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
+            final Analyzer analyzer = new Analyzer(vertices, "");
             analyzer.analyze();
             String list = "[{left, E, true}, {right, E, true}]";
             Assertions.assertEquals(
@@ -292,7 +292,7 @@ public class AnalyzerTest {
             final Program program = parser.parse();
             final List<Statement<Vertex>> vertices = program.getVertices();
             try {
-                final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
+                final Analyzer analyzer = new Analyzer(vertices, "");
                 analyzer.analyze();
             } catch (final DuplicateRule exception) {
                 oops = true;
@@ -315,7 +315,7 @@ public class AnalyzerTest {
             final Program program = parser.parse();
             final List<Statement<Vertex>> vertices = program.getVertices();
             try {
-                final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
+                final Analyzer analyzer = new Analyzer(vertices, "");
                 analyzer.analyze();
             } catch (final DuplicateRule exception) {
                 oops = true;
@@ -396,8 +396,7 @@ public class AnalyzerTest {
      * a green abstract node.
      */
     @Test
-    @Disabled
-    public void testSetWithGreenAndJava() {
+    public void testSetWithAbstractNodeExtension() {
         boolean oops = false;
         try {
             final String source = this.readTest("green_java_set.txt");
@@ -405,14 +404,28 @@ public class AnalyzerTest {
             final Program program = parser.parse();
             final List<Statement<Vertex>> vertices = program.getVertices();
             try {
-                final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
-                analyzer.analyze();
-                final List<String> hierarchy = Arrays.asList(
+                final Analyzer janalyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
+                janalyzer.analyze();
+                final List<String> btype = Arrays.asList(
                     AnalyzerTest.B_TYPE,
                     AnalyzerTest.B_TYPE,
                     AnalyzerTest.E_TYPE
                 );
-                Assertions.assertEquals(hierarchy, analyzer.getHierarchy(AnalyzerTest.B_TYPE));
+                Assertions.assertEquals(btype, janalyzer.getHierarchy(AnalyzerTest.B_TYPE));
+                final List<String> dtype = Arrays.asList(
+                    AnalyzerTest.D_TYPE,
+                    AnalyzerTest.B_TYPE,
+                    AnalyzerTest.B_TYPE,
+                    AnalyzerTest.E_TYPE
+                );
+                Assertions.assertEquals(dtype, janalyzer.getHierarchy(AnalyzerTest.D_TYPE));
+                final Analyzer granalyzer = new Analyzer(vertices, "");
+                granalyzer.analyze();
+                final List<String> bgrtype = Arrays.asList(
+                    AnalyzerTest.B_TYPE,
+                    AnalyzerTest.E_TYPE
+                );
+                Assertions.assertEquals(bgrtype, granalyzer.getHierarchy(AnalyzerTest.B_TYPE));
             } catch (final DuplicateRule exception) {
                 oops = true;
             }
@@ -434,7 +447,7 @@ public class AnalyzerTest {
             final Program program = parser.parse();
             final List<Statement<Vertex>> vertices = program.getVertices();
             try {
-                final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
+                final Analyzer analyzer = new Analyzer(vertices, "");
                 analyzer.analyze();
                 final List<String> hierarchy = Arrays.asList(
                     AnalyzerTest.ADD_TYPE,
@@ -442,6 +455,14 @@ public class AnalyzerTest {
                     "Expression"
                 );
                 Assertions.assertEquals(hierarchy, analyzer.getHierarchy(AnalyzerTest.ADD_TYPE));
+                final String identifier = "Identifier";
+                Assertions.assertEquals(
+                    Collections.singletonList(identifier), analyzer.getHierarchy(identifier)
+                );
+                final String list = "ExpressionList";
+                Assertions.assertEquals(
+                    Collections.singletonList(list), analyzer.getHierarchy(list)
+                );
             } catch (final DuplicateRule exception) {
                 oops = true;
             }
@@ -477,7 +498,7 @@ public class AnalyzerTest {
         final ProgramParser parser = new ProgramParser(source);
         final Program program = parser.parse();
         final List<Statement<Vertex>> vertices = program.getVertices();
-        final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
+        final Analyzer analyzer = new Analyzer(vertices, "");
         analyzer.analyze();
         return analyzer;
     }
