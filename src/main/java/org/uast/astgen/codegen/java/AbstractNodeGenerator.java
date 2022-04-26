@@ -39,7 +39,12 @@ final class AbstractNodeGenerator extends BaseGenerator {
             String.format("Node that describes the '%s' type", type),
             type
         );
-        iface.setInterfaces("Node");
+        final List<String> hierarchy = env.getHierarchy(type);
+        if (hierarchy.size() > 1) {
+            iface.setInterfaces(hierarchy.get(1));
+        } else {
+            iface.setInterfaces("Node");
+        }
         this.defineGettersForTaggedFields(iface);
         final String pkg = this.getPackageName(this.statement.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, iface);

@@ -77,7 +77,7 @@ public class Analyzer {
      * @return The list of type names, cannot be {@code null}
      */
     public List<String> getHierarchy(final String type) {
-        List<String> hierarchy = new LinkedList<>();
+        List<String> hierarchy = Collections.emptyList();
         final Vertex vertex = this.storage.getVertexByType(type, true);
         if (vertex != null) {
             hierarchy = this.info.get(vertex).getHierarchy();

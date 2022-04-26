@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.List;
 import org.uast.astgen.rules.Literal;
 import org.uast.astgen.rules.Statement;
 
@@ -32,7 +33,7 @@ final class LiteralGenerator extends BaseGenerator {
     public CompilationUnit generate() {
         final Environment env = this.getEnv();
         final Literal rule = this.statement.getRule();
-        final Klass klass = LiteralGenerator.createClass(rule);
+        final Klass klass = this.createClass(rule);
         new LiteralClassConstructor(env, rule, klass).run();
         final String pkg = this.getPackageName(this.statement.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
@@ -45,14 +46,19 @@ final class LiteralGenerator extends BaseGenerator {
      * @param rule The rule
      * @return The class constructor
      */
-    private static Klass createClass(final Literal rule) {
+    private Klass createClass(final Literal rule) {
         final String type = rule.getType();
         final Klass klass = new Klass(
             String.format("Node that describes the '%s' type", type),
             type
         );
         klass.makeFinal();
-        klass.setInterfaces("Node");
+        final List<String> hierarchy = this.getEnv().getHierarchy(type);
+        if (hierarchy.size() > 1) {
+            klass.setInterfaces(hierarchy.get(1));
+        } else {
+            klass.setInterfaces("Node");
+        }
         return klass;
     }
 
