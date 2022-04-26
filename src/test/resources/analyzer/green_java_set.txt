@@ -1,0 +1,9 @@
+A <- left@E, right@E;
+E <- B | C;
+F <- left@E, right@E;
+B <- A | F;
+C <- E, E;
+
+java:
+B <- & | D;
+D <- E, E;

@@ -14,9 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.uast.astgen.exceptions.BaseException;
 import org.uast.astgen.exceptions.DuplicateRule;
 import org.uast.astgen.parser.ProgramParser;
-import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.rules.Statement;
+import org.uast.astgen.rules.Vertex;
 import org.uast.astgen.utils.FilesReader;
 
 /**
@@ -77,17 +77,23 @@ public class AnalyzerTest {
     private static final String H_TYPE = "H";
 
     /**
+     * The type Addition.
+     */
+    private static final String ADD_TYPE = "Addition";
+
+    /**
      * Test for analysis of depth 3 nodes inheritance.
      * Case with Java nodes request.
      */
     @Test
     public void testThreeDepthHierarchyJava() {
         boolean oops = false;
-        final ProgramParser parser = this.getSource();
+        final String source = this.readTest("depth3_java_set.txt");
+        final ProgramParser parser = new ProgramParser(source);
         try {
             final Program program = parser.parse();
-            final List<Statement<Node>> nodes = program.getNodes();
-            final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+            final List<Statement<Vertex>> vertices = program.getVertices();
+            final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
             analyzer.analyze();
             Assertions.assertEquals(AnalyzerTest.JAVA_LANGUAGE, analyzer.getLanguage());
             final List<String> etype = Collections.singletonList(AnalyzerTest.E_TYPE);
@@ -119,8 +125,8 @@ public class AnalyzerTest {
         final ProgramParser parser = this.getSource();
         try {
             final Program program = parser.parse();
-            final List<Statement<Node>> nodes = program.getNodes();
-            final Analyzer analyzer = new Analyzer(nodes, "");
+            final List<Statement<Vertex>> vertices = program.getVertices();
+            final Analyzer analyzer = new Analyzer(vertices, "");
             analyzer.analyze();
             Assertions.assertEquals("", analyzer.getLanguage());
             final List<String> etype = Collections.singletonList(AnalyzerTest.E_TYPE);
@@ -151,8 +157,8 @@ public class AnalyzerTest {
         final ProgramParser parser = this.getSource();
         try {
             final Program program = parser.parse();
-            final List<Statement<Node>> nodes = program.getNodes();
-            final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+            final List<Statement<Vertex>> vertices = program.getVertices();
+            final Analyzer analyzer = new Analyzer(vertices, "");
             analyzer.analyze();
             String list = "[{left, E, true}, {right, E, true}]";
             Assertions.assertEquals(
@@ -284,9 +290,9 @@ public class AnalyzerTest {
             final String source = this.readTest("duplicated_rule_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Node>> nodes = program.getNodes();
+            final List<Statement<Vertex>> vertices = program.getVertices();
             try {
-                final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+                final Analyzer analyzer = new Analyzer(vertices, "");
                 analyzer.analyze();
             } catch (final DuplicateRule exception) {
                 oops = true;
@@ -307,9 +313,9 @@ public class AnalyzerTest {
             final String source = this.readTest("duplicated_inheritance_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Node>> nodes = program.getNodes();
+            final List<Statement<Vertex>> vertices = program.getVertices();
             try {
-                final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+                final Analyzer analyzer = new Analyzer(vertices, "");
                 analyzer.analyze();
             } catch (final DuplicateRule exception) {
                 oops = true;
@@ -330,8 +336,8 @@ public class AnalyzerTest {
             final String source = this.readTest("one_import_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Node>> nodes = program.getNodes();
-            final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+            final List<Statement<Vertex>> vertices = program.getVertices();
+            final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
             analyzer.analyze();
             final Set<String> imports = analyzer.getImports(AnalyzerTest.D_TYPE);
             Assertions.assertEquals("[E]", imports.toString());
@@ -352,8 +358,8 @@ public class AnalyzerTest {
             final String source = this.readTest("several_imports_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Node>> nodes = program.getNodes();
-            final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+            final List<Statement<Vertex>> vertices = program.getVertices();
+            final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
             analyzer.analyze();
             final Set<String> imports = analyzer.getImports(AnalyzerTest.D_TYPE);
             Assertions.assertEquals("[E, B]", imports.toString());
@@ -374,11 +380,92 @@ public class AnalyzerTest {
             final String source = this.readTest("no_imports_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Node>> nodes = program.getNodes();
-            final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+            final List<Statement<Vertex>> vertices = program.getVertices();
+            final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
             analyzer.analyze();
             final Set<String> imports = analyzer.getImports(AnalyzerTest.D_TYPE);
             Assertions.assertEquals("[]", imports.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test analysis of DSL rules which contain a language-specific node that extends
+     * a green abstract node.
+     */
+    @Test
+    public void testSetWithAbstractNodeExtension() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("green_java_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Statement<Vertex>> vertices = program.getVertices();
+            try {
+                final Analyzer janalyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
+                janalyzer.analyze();
+                final List<String> btype = Arrays.asList(
+                    AnalyzerTest.B_TYPE,
+                    AnalyzerTest.B_TYPE,
+                    AnalyzerTest.E_TYPE
+                );
+                Assertions.assertEquals(btype, janalyzer.getHierarchy(AnalyzerTest.B_TYPE));
+                final List<String> dtype = Arrays.asList(
+                    AnalyzerTest.D_TYPE,
+                    AnalyzerTest.B_TYPE,
+                    AnalyzerTest.B_TYPE,
+                    AnalyzerTest.E_TYPE
+                );
+                Assertions.assertEquals(dtype, janalyzer.getHierarchy(AnalyzerTest.D_TYPE));
+                final Analyzer granalyzer = new Analyzer(vertices, "");
+                granalyzer.analyze();
+                final List<String> bgrtype = Arrays.asList(
+                    AnalyzerTest.B_TYPE,
+                    AnalyzerTest.E_TYPE
+                );
+                Assertions.assertEquals(bgrtype, granalyzer.getHierarchy(AnalyzerTest.B_TYPE));
+            } catch (final DuplicateRule exception) {
+                oops = true;
+            }
+        } catch (final BaseException ignored) {
+            oops = false;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test analysis of DSL rules which contain different types of vertices.
+     */
+    @Test
+    public void testSetWithVariousVertices() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("complex_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Statement<Vertex>> vertices = program.getVertices();
+            try {
+                final Analyzer analyzer = new Analyzer(vertices, "");
+                analyzer.analyze();
+                final List<String> hierarchy = Arrays.asList(
+                    AnalyzerTest.ADD_TYPE,
+                    "BinaryExpression",
+                    "Expression"
+                );
+                Assertions.assertEquals(hierarchy, analyzer.getHierarchy(AnalyzerTest.ADD_TYPE));
+                final String identifier = "Identifier";
+                Assertions.assertEquals(
+                    Collections.singletonList(identifier), analyzer.getHierarchy(identifier)
+                );
+                final String list = "ExpressionList";
+                Assertions.assertEquals(
+                    Collections.singletonList(list), analyzer.getHierarchy(list)
+                );
+            } catch (final DuplicateRule exception) {
+                oops = true;
+            }
         } catch (final BaseException ignored) {
             oops = true;
         }
@@ -410,8 +497,8 @@ public class AnalyzerTest {
         final String source = this.readTest("depth4_set.txt");
         final ProgramParser parser = new ProgramParser(source);
         final Program program = parser.parse();
-        final List<Statement<Node>> nodes = program.getNodes();
-        final Analyzer analyzer = new Analyzer(nodes, AnalyzerTest.JAVA_LANGUAGE);
+        final List<Statement<Vertex>> vertices = program.getVertices();
+        final Analyzer analyzer = new Analyzer(vertices, "");
         analyzer.analyze();
         return analyzer;
     }

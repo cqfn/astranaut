@@ -162,9 +162,9 @@ public final class Main {
             final Program program = parser.parse();
             final Environment base = new EnvironmentImpl();
             final Map<String, Environment> env = new TreeMap<>();
-            env.put("", new PreparedEnvironment(base, program.getNodes(), ""));
+            env.put("", new PreparedEnvironment(base, program.getVertices(), ""));
             for (final String language : program.getNamesOfAllLanguages()) {
-                env.put(language, new PreparedEnvironment(base, program.getNodes(), language));
+                env.put(language, new PreparedEnvironment(base, program.getVertices(), language));
             }
             final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
             generator.generate();

@@ -12,6 +12,7 @@ import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.rules.Statement;
 import org.uast.astgen.rules.Transformation;
+import org.uast.astgen.rules.Vertex;
 
 /**
  * Statement parser, processes individual program lines.
@@ -67,9 +68,11 @@ public class StatementParser {
             if (source.contains("$")) {
                 final Literal literal = new LiteralParser(source).parse();
                 this.program.addLiteralStmt(new Statement<Literal>(literal, this.language));
+                this.program.addVertexStmt(new Statement<Vertex>(literal, this.language));
             } else {
                 final Node node = new NodeParser(source).parse();
                 this.program.addNodeStmt(new Statement<Node>(node, this.language));
+                this.program.addVertexStmt(new Statement<Vertex>(node, this.language));
             }
         } else if (source.contains("->")) {
             final Transformation rule = new TransformationParser(source).parse();

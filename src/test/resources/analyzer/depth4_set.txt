@@ -1,7 +1,7 @@
-A <- B | C;
-B <- E | F;
 C <- G | H;
 E <- D | K;
+A <- B | C;
+B <- E | F;
 F <- a@A, e@E;
 G <- a@A, e@E;
 H <- a@A, E;

@@ -5,11 +5,11 @@
 package org.uast.astgen.exceptions;
 
 /**
- * Exception "Duplicate vertex found in DSL rules".
+ * Exception "Extended vertex was not found in green DSL rules".
  *
  * @since 1.0
  */
-public final class DuplicateRule extends GeneratorException {
+public final class ExtendedNodeNotFound extends GeneratorException {
     /**
      * The explanatory text.
      */
@@ -19,12 +19,12 @@ public final class DuplicateRule extends GeneratorException {
      * Constructor.
      * @param text The explanatory text.
      */
-    public DuplicateRule(final String text) {
+    public ExtendedNodeNotFound(final String text) {
         this.text = text;
     }
 
     @Override
     public String getErrorMessage() {
-        return String.format("Duplication in DSL rules: '%s'", this.text);
+        return String.format("The extended node '%s' was not found in green DSL rules", this.text);
     }
 }

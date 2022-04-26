@@ -7,7 +7,6 @@ package org.uast.astgen.rules;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import org.uast.astgen.codegen.java.TaggedChild;
 
 /**
@@ -15,7 +14,7 @@ import org.uast.astgen.codegen.java.TaggedChild;
  *
  * @since 1.0
  */
-public class Node implements Rule {
+public final class Node extends Vertex {
     /**
      * Left part.
      */
@@ -36,10 +35,7 @@ public class Node implements Rule {
         this.composition = composition;
     }
 
-    /**
-     * Return left part of the node.
-     * @return The type name
-     */
+    @Override
     public String getType() {
         return this.type;
     }
@@ -53,7 +49,7 @@ public class Node implements Rule {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         final StringBuilder builder = new StringBuilder();
         builder.append(this.type).append(" <- ");
         boolean flag = false;
@@ -83,10 +79,7 @@ public class Node implements Rule {
         return result;
     }
 
-    /**
-     * Checks if the node is ordinary, i.e. not abstract and not a list.
-     * @return Checking result
-     */
+    @Override
     public boolean isOrdinary() {
         boolean result = true;
         for (final Child child : this.composition) {
@@ -103,29 +96,13 @@ public class Node implements Rule {
     }
 
     @Override
-    public final boolean equals(final Object obj) {
-        final Node node;
-        boolean equal = false;
-        if (obj instanceof Node) {
-            node = (Node) obj;
-            if (this.type.equals(node.getType())) {
-                equal = true;
-            }
-        }
-        return equal;
+    public boolean isAbstract() {
+        return this.composition.size() == 1 && this.composition.get(0) instanceof Disjunction;
     }
 
     @Override
-    public final int hashCode() {
-        return Objects.hash(this.type);
-    }
-
-    /**
-     * Checks if the node is abstract.
-     * @return Checking result
-     */
-    public boolean isAbstract() {
-        return this.composition.size() == 1 && this.composition.get(0) instanceof Disjunction;
+    public boolean isTerminal() {
+        return this.isList() || this.isOrdinary();
     }
 
     /**
@@ -177,5 +154,10 @@ public class Node implements Rule {
             }
         }
         return result;
+    }
+
+    @Override
+    public int compareTo(final Vertex obj) {
+        return this.toString().compareTo(obj.toString());
     }
 }
