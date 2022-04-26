@@ -4,7 +4,8 @@
  */
 package org.uast.astgen.codegen.java;
 
-import java.util.Objects;
+import java.util.Collections;
+import java.util.List;
 import org.uast.astgen.utils.StringUtils;
 
 /**
@@ -17,6 +18,11 @@ public final class Field implements Entity {
      * End of line string constant.
      */
     private static final String EOL = ";\n";
+
+    /**
+     * Assignment construction.
+     */
+    private static final String ASSIGN = " = ";
 
     /**
      * The brief description.
@@ -56,7 +62,7 @@ public final class Field implements Entity {
     /**
      * Expression that initializes the field.
      */
-    private String init;
+    private List<String> init;
 
     /**
      * Constructor.
@@ -69,7 +75,7 @@ public final class Field implements Entity {
         this.type = type;
         this.name = name;
         this.fprivate = true;
-        this.init = "";
+        this.init = Collections.emptyList();
     }
 
     /**
@@ -134,13 +140,21 @@ public final class Field implements Entity {
      * @param expr The expression
      */
     public void setInitExpr(final String expr) {
-        this.init = Objects.requireNonNull(expr);
+        this.init = Collections.singletonList(expr);
+    }
+
+    /**
+     * Sets the expression that initializes the field.
+     * @param list The expression that takes several lines
+     */
+    public void setInitExpr(final List<String> list) {
+        this.init = list;
     }
 
     @Override
     public String generate(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
-        final StringBuilder builder = new StringBuilder(64);
+        final StringBuilder builder = new StringBuilder(256);
         builder.append(tabulation)
             .append("/**\n")
             .append(tabulation)
@@ -149,7 +163,34 @@ public final class Field implements Entity {
             .append(".\n")
             .append(tabulation)
             .append(" */\n");
-        final StringBuilder declaration = new StringBuilder().append(tabulation);
+        final String declaration = tabulation.concat(this.generateDeclaration());
+        if (this.init.isEmpty()) {
+            builder.append(declaration).append(Field.EOL);
+        } else if (this.init.size() == 1) {
+            final StringBuilder line = new StringBuilder();
+            line.append(declaration).append(Field.ASSIGN)
+                .append(this.init.get(0)).append(Field.EOL);
+            String result = line.toString();
+            if (result.length() > Entity.MAX_LINE_LENGTH) {
+                final StringBuilder multiline = new StringBuilder();
+                multiline.append(declaration);
+                this.generateInitFromSingleLine(multiline, indent + 1);
+                result = multiline.toString();
+            }
+            builder.append(result);
+        } else {
+            builder.append(declaration);
+            this.generateInitFromList(builder, indent + 1);
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Generates field declaration, without init expression.
+     * @return Field declaration
+     */
+    private String generateDeclaration() {
+        final StringBuilder declaration = new StringBuilder(32);
         if (this.fprivate) {
             declaration.append("private ");
         } else if (this.fpublic) {
@@ -162,28 +203,18 @@ public final class Field implements Entity {
             declaration.append("final ");
         }
         declaration.append(this.type).append(' ').append(this.name);
-        final StringBuilder copy = new StringBuilder(declaration.toString());
-        if (!this.init.isEmpty()) {
-            declaration.append(" = ").append(this.init);
-        }
-        declaration.append(Field.EOL);
-        String result = declaration.toString();
-        if (result.length() > Entity.MAX_LINE_LENGTH) {
-            this.generateInit(copy, indent + 1);
-            result = copy.toString();
-        }
-        builder.append(result);
-        return builder.toString();
+        return declaration.toString();
     }
 
     /**
-     * Generates init expression (case if it takes more than one line).
+     * Generates init expression from single line (case if it really
+     *  takes more than one line).
      * @param builder Where to generate
      * @param indent Indentation
      */
-    private void generateInit(final StringBuilder builder, final int indent) {
+    private void generateInitFromSingleLine(final StringBuilder builder, final int indent) {
         builder.append(" =");
-        final String[] lines = this.init.replace("(", "(\n")
+        final String[] lines = this.init.get(0).replace("(", "(\n")
             .replace(")", "\n)")
             .replace(",", ",\n")
             .split("\n");
@@ -202,6 +233,39 @@ public final class Field implements Entity {
             if (line.endsWith("(")) {
                 offset = offset + 1;
             }
+        }
+        builder.append(Field.EOL);
+    }
+
+    /**
+     * Generates init expression from list of lines.
+     * @param builder Where to generate
+     * @param indent Indentation
+     */
+    private void generateInitFromList(final StringBuilder builder, final int indent) {
+        builder.append(Field.ASSIGN);
+        for (int index = 0; index < this.init.size(); index = index + 1) {
+            String line = this.init.get(index);
+            int gap = 0;
+            if (line.startsWith("\t")) {
+                final int len = line.length();
+                for (int symbol = 0; symbol < len; symbol = symbol + 1) {
+                    if (line.charAt(symbol) == '\t') {
+                        gap = gap + 1;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            line = line.trim();
+            if (line.isEmpty()) {
+                continue;
+            }
+            if (index > 0) {
+                builder.append('\n')
+                    .append(StringUtils.SPACE.repeat((indent + gap) * Entity.TAB_SIZE));
+            }
+            builder.append(line);
         }
         builder.append(Field.EOL);
     }

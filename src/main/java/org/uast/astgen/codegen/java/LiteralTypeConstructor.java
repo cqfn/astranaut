@@ -46,6 +46,7 @@ final class LiteralTypeConstructor extends LiteralConstructor {
         getter.setCode("return Collections.emptyList();");
         klass.addMethod(getter);
         this.fillHierarchy(this.ssg);
+        this.fillProperties();
         final Method builder = new Method("createBuilder");
         builder.setReturnType("Builder");
         builder.setCode("return new Constructor();");

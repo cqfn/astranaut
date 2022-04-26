@@ -26,6 +26,11 @@ public final class PreparedEnvironment implements Environment {
     private final Environment base;
 
     /**
+     * The name of programming language that will limit a set of nodes.
+     */
+    private final String language;
+
+    /**
      * The analyzer to get additional data.
      */
     private final Analyzer analyzer;
@@ -40,6 +45,7 @@ public final class PreparedEnvironment implements Environment {
     public PreparedEnvironment(final Environment base, final List<Statement<Node>> descriptors,
         final String language) throws GeneratorException {
         this.base = base;
+        this.language = language;
         this.analyzer = new Analyzer(descriptors, language).analyze();
     }
 
@@ -66,6 +72,11 @@ public final class PreparedEnvironment implements Environment {
     @Override
     public boolean isTestMode() {
         return this.base.isTestMode();
+    }
+
+    @Override
+    public String getLanguage() {
+        return this.language;
     }
 
     @Override

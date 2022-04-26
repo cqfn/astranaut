@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.codegen.java;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,6 +32,11 @@ abstract class BaseConstructor {
      * The 'Type' string.
      */
     private static final String STR_TYPE = "Type";
+
+    /**
+     * The 'String' string.
+     */
+    private static final String STR_STRING = "String";
 
     /**
      * The {@code List<String>} type.
@@ -218,6 +224,40 @@ abstract class BaseConstructor {
         final Method getter = new Method("getHierarchy");
         getter.setReturnType(BaseConstructor.LIST_STRING);
         getter.setCode("return TypeImpl.HIERARCHY;");
+        this.klass.addMethod(getter);
+    }
+
+    /**
+     * Creates 'PROPERTIES' static field and the 'getProperty()' method.
+     */
+    protected void fillProperties() {
+        String language = this.env.getLanguage();
+        final String color;
+        if (language.isEmpty()) {
+            language = "common";
+            color = "green";
+        } else {
+            color = "red";
+        }
+        final List<String> init = Arrays.asList(
+            "Stream.of(",
+            "new String[][] {",
+            String.format("\t{\"color\", \"%s\"},", color),
+            String.format("\t{\"language\", \"%s\"},", language),
+            "}).collect(Collectors.toMap(data -> data[0], data -> data[1]))"
+        );
+        final Field field = new Field(
+            "Properties",
+            "Map<String, String>",
+            "PROPERTIES"
+        );
+        field.makeStaticFinal();
+        field.setInitExpr(init);
+        this.klass.addField(field);
+        final Method getter = new Method("getProperty");
+        getter.addArgument(BaseConstructor.STR_STRING, "name");
+        getter.setReturnType(BaseConstructor.STR_STRING);
+        getter.setCode("return TypeImpl.PROPERTIES.getOrDefault(name, \"\");");
         this.klass.addMethod(getter);
     }
 
