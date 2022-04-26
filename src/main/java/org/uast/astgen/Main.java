@@ -217,6 +217,11 @@ public final class Main {
         }
 
         @Override
+        public String getLanguage() {
+            return "";
+        }
+
+        @Override
         public List<String> getHierarchy(final String name) {
             return Collections.singletonList(name);
         }

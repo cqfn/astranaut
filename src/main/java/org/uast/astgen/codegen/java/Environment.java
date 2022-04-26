@@ -46,6 +46,12 @@ public interface Environment {
     boolean isTestMode();
 
     /**
+     * Returns the language for which this environment was built.
+     * @return The language
+     */
+    String getLanguage();
+
+    /**
      * Returns node hierarchy.
      * @param type Node type
      * @return Node hierarchy

@@ -49,6 +49,9 @@ final class ListNodeGenerator extends BaseNodeGenerator {
         unit.addImport("java.util.Arrays");
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
+        unit.addImport("java.util.Map");
+        unit.addImport("java.util.stream.Collectors");
+        unit.addImport("java.util.stream.Stream");
         final String base = this.getEnv().getBasePackage();
         unit.addImport(base.concat(".Builder"));
         unit.addImport(base.concat(".ChildDescriptor"));

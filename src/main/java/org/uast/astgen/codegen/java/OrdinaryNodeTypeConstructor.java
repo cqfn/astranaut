@@ -61,6 +61,7 @@ final class OrdinaryNodeTypeConstructor extends NodeConstructor {
         klass.addMethod(name);
         this.fillChildTypes();
         this.fillHierarchy(this.ssg);
+        this.fillProperties();
         final Method builder = new Method("createBuilder");
         builder.setReturnType("Builder");
         builder.setCode("return new Constructor();");
