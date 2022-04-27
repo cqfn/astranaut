@@ -15,6 +15,7 @@ import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.rules.Child;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.DescriptorAttribute;
+import org.uast.astgen.rules.Empty;
 import org.uast.astgen.scanner.TokenList;
 import org.uast.astgen.utils.LabelFactory;
 
@@ -49,6 +50,10 @@ public class NonAbstractNodeParser {
         final List<Child> result = new LinkedList<>();
         for (final Descriptor descriptor : descriptors) {
             final String name = descriptor.getType();
+            if (descriptor.equals(Empty.INSTANCE)) {
+                result.add(descriptor);
+                break;
+            }
             if (!descriptor.getParameters().isEmpty() || descriptor.getData().isValid()) {
                 throw new ExpectedTaggedName(name);
             }

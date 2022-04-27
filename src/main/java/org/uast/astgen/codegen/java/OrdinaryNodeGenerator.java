@@ -55,7 +55,9 @@ final class OrdinaryNodeGenerator extends BaseNodeGenerator {
         final String base = env.getBasePackage();
         unit.addImport(base.concat(".Builder"));
         unit.addImport(base.concat(".ChildDescriptor"));
-        unit.addImport(base.concat(".ChildrenMapper"));
+        if (!this.statement.getRule().isEmpty()) {
+            unit.addImport(base.concat(".ChildrenMapper"));
+        }
         unit.addImport(base.concat(".EmptyFragment"));
         unit.addImport(base.concat(".Fragment"));
         unit.addImport(base.concat(".Node"));

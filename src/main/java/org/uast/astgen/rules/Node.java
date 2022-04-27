@@ -102,7 +102,9 @@ public final class Node extends Vertex {
 
     @Override
     public boolean isFinal() {
-        return this.isList() || this.isOrdinary();
+        return this.isList()
+            || this.isOrdinary()
+            || this.isEmpty();
     }
 
     /**
@@ -115,6 +117,21 @@ public final class Node extends Vertex {
             final Child child = this.composition.get(0);
             if (child instanceof Descriptor
                 && ((Descriptor) child).getAttribute() == DescriptorAttribute.LIST) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Checks if the node is empty.
+     * @return Checking result
+     */
+    public boolean isEmpty() {
+        boolean result = false;
+        if (this.composition.size() == 1) {
+            final Child child = this.composition.get(0);
+            if (child.equals(Empty.INSTANCE)) {
                 result = true;
             }
         }
