@@ -39,11 +39,17 @@ final class AbstractNodeGenerator extends BaseGenerator {
             String.format("Node that describes the '%s' type", type),
             type
         );
-        iface.setInterfaces("Node");
         this.defineGettersForTaggedFields(iface);
         final String pkg = this.getPackageName(this.statement.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, iface);
-        this.generateImports(unit);
+        final List<String> hierarchy = env.getHierarchy(type);
+        if (hierarchy.size() > 1) {
+            iface.setInterfaces(hierarchy.get(1));
+        } else {
+            final String base = this.getEnv().getBasePackage();
+            unit.addImport(base.concat(".Node"));
+            iface.setInterfaces("Node");
+        }
         return unit;
     }
 
@@ -69,14 +75,5 @@ final class AbstractNodeGenerator extends BaseGenerator {
                 iface.addMethod(getter);
             }
         }
-    }
-
-    /**
-     * Generates imports block.
-     * @param unit The compilation unit
-     */
-    private void generateImports(final CompilationUnit unit) {
-        final String base = this.getEnv().getBasePackage();
-        unit.addImport(base.concat(".Node"));
     }
 }
