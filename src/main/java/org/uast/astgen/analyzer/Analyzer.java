@@ -128,7 +128,7 @@ public class Analyzer {
 
     /**
      * Conducts analysis of the provided vertex set:
-     * - processes terminal vertices;
+     * - processes final vertices;
      * - processes abstract nodes.
      * @param vertices The list of vertices to be analyzed
      * @throws ExtendedNodeNotFound exception if extended green node
@@ -136,8 +136,8 @@ public class Analyzer {
      */
     public void pipeline(final List<Vertex> vertices) throws ExtendedNodeNotFound {
         for (final Vertex vertex : vertices) {
-            if (vertex.isTerminal()) {
-                this.processTerminalVertex(vertex);
+            if (vertex.isFinal()) {
+                this.processFinalVertex(vertex);
             }
         }
         for (final Vertex vertex : vertices) {
@@ -295,12 +295,12 @@ public class Analyzer {
     }
 
     /**
-     * Conducts initial processing of terminal vertices:
+     * Conducts initial processing of final vertices:
      * - creates the result entity;
      * - adds tagged names of children to result.
-     * @param vertex The terminal vertex
+     * @param vertex The final vertex
      */
-    private void processTerminalVertex(final Vertex vertex) {
+    private void processFinalVertex(final Vertex vertex) {
         final List<String> hierarchy = new LinkedList<>();
         hierarchy.add(vertex.getType());
         final Result result = new Result(hierarchy);
@@ -577,7 +577,7 @@ public class Analyzer {
             final Map<Vertex, Boolean> processed = new TreeMap<>();
             for (final Vertex vertex : list) {
                 depth.put(vertex, 1);
-                if (vertex.isTerminal()) {
+                if (vertex.isFinal()) {
                     processed.put(vertex, true);
                 } else {
                     processed.put(vertex, false);
@@ -589,7 +589,7 @@ public class Analyzer {
                         (Node) vertex,
                         list
                     );
-                    if (this.descendantsTerminal(descendants)) {
+                    if (this.descendantsFinal(descendants)) {
                         depth.put(vertex, 2);
                         processed.put(vertex, true);
                     } else {
@@ -642,15 +642,15 @@ public class Analyzer {
         }
 
         /**
-         * Checks if all the specified descendants are terminal vertices
+         * Checks if all the specified descendants are final vertices
          * (ordinary nodes, lists or literals).
          * @param vertices The list of vertices
          * @return Checking result
          */
-        private static boolean descendantsTerminal(final List<Vertex> vertices) {
+        private static boolean descendantsFinal(final List<Vertex> vertices) {
             boolean result = true;
             for (final Vertex vertex : vertices) {
-                if (!vertex.isTerminal()) {
+                if (!vertex.isFinal()) {
                     result = false;
                     break;
                 }

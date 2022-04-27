@@ -29,8 +29,9 @@ public abstract class Vertex implements Rule, Comparable<Vertex> {
     public abstract boolean isAbstract();
 
     /**
-     * Checks if the vertex is an terminal (leaf) node.
+     * Checks if the vertex is final, that is non-inheritable.
+     *
      * @return Checking result
      */
-    public abstract boolean isTerminal();
+    public abstract boolean isFinal();
 }

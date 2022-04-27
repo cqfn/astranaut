@@ -101,7 +101,7 @@ public final class Node extends Vertex {
     }
 
     @Override
-    public boolean isTerminal() {
+    public boolean isFinal() {
         return this.isList() || this.isOrdinary();
     }
 
