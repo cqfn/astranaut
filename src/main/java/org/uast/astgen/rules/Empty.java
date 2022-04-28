@@ -42,7 +42,7 @@ public final class Empty extends Descriptor {
 
     @Override
     public String getType() {
-        return "";
+        return "0";
     }
 
     @Override
