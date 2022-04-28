@@ -36,7 +36,10 @@ public class FilesWriter {
      * @throws IOException If the file can't be written
      */
     public void writeString(final String str) throws IOException {
-        Files.createDirectories(this.path.getParent());
+        final Path dir = this.path.getParent();
+        if (dir != null) {
+            Files.createDirectories(dir);
+        }
         final OutputStream stream = Files.newOutputStream(this.path);
         stream.write(str.getBytes(StandardCharsets.UTF_8));
         stream.close();
