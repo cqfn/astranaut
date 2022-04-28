@@ -12,11 +12,13 @@ import org.uast.astgen.exceptions.ExpectedDescriptor;
 import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.DescriptorAttribute;
+import org.uast.astgen.rules.Empty;
 import org.uast.astgen.rules.Extension;
 import org.uast.astgen.rules.Parameter;
 import org.uast.astgen.scanner.Ampersand;
 import org.uast.astgen.scanner.BracketsPair;
 import org.uast.astgen.scanner.Comma;
+import org.uast.astgen.scanner.EmptySymbol;
 import org.uast.astgen.scanner.HoleMarker;
 import org.uast.astgen.scanner.Identifier;
 import org.uast.astgen.scanner.Token;
@@ -73,6 +75,8 @@ public class ParametersListParser {
                 result.add(this.parseOptional(segment));
             } else if (first instanceof Ampersand) {
                 result.add(Extension.INSTANCE);
+            } else if (first instanceof EmptySymbol) {
+                result.add(Empty.INSTANCE);
             } else {
                 throw new CantParseSequence(segment);
             }

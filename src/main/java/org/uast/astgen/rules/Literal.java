@@ -60,7 +60,7 @@ public final class Literal extends Vertex {
     }
 
     @Override
-    public boolean isTerminal() {
+    public boolean isFinal() {
         return true;
     }
 

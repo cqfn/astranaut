@@ -59,7 +59,11 @@ abstract class NodeConstructor extends BaseConstructor {
         getter.makeOverridden();
         getter.addArgument(NodeConstructor.STR_INT, "index");
         getter.setReturnType("Node");
-        getter.setCode("return this.children.get(index);");
+        if (this.rule.isEmpty()) {
+            getter.setCode("throw new IndexOutOfBoundsException();");
+        } else {
+            getter.setCode("return this.children.get(index);");
+        }
         this.getKlass().addMethod(getter);
     }
 

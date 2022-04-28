@@ -8,6 +8,7 @@ import java.util.List;
 import org.uast.astgen.rules.Child;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.DescriptorAttribute;
+import org.uast.astgen.rules.Empty;
 import org.uast.astgen.rules.Node;
 
 /**
@@ -45,7 +46,9 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
     public void construct() {
         this.createFragmentWithSetter();
         this.createNoDataSetter();
-        this.fillChildren();
+        if (!this.getRule().isEmpty()) {
+            this.fillChildren();
+        }
         this.createSetterChildrenList();
         this.createValidator();
         this.createCreator();
@@ -87,11 +90,28 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
      */
     private void createSetterChildrenList() {
         final Node rule = this.getRule();
-        final List<Child> composition = rule.getComposition();
         final Method method = new Method("setChildrenList");
         method.makeOverridden();
         method.addArgument("List<Node>", "list");
         method.setReturnType(OrdinaryNodeBuilderConstructor.STR_BOOLEAN);
+        final StringBuilder code = new StringBuilder(256);
+        if (rule.isEmpty()) {
+            code.append("return list.isEmpty();");
+        } else {
+            code.append(this.fillSetterForNonEmptyChildrenList());
+        }
+        method.setCode(code.toString());
+        this.getKlass().addMethod(method);
+    }
+
+    /**
+     * Fills the body of the method 'setChildrenList' for non-empty
+     *  children list.
+     * @return Source code
+     */
+    private String fillSetterForNonEmptyChildrenList() {
+        final Node rule = this.getRule();
+        final List<Child> composition = rule.getComposition();
         final StringBuilder code = new StringBuilder(256);
         final String first = String.format(
             "final Node[] mapping = new Node[%d];\n",
@@ -99,7 +119,7 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
         );
         final String second = String.format(
             "final ChildrenMapper mapper = new ChildrenMapper(%s.TYPE.getChildTypes());\n",
-            rule.getType()
+            this.getRule().getType()
         );
         final String third = "final boolean result = mapper.map(mapping, list);\n";
         code.append(first).append(second).append(third).append("if (result) { \n");
@@ -117,8 +137,7 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
             index = index + 1;
         }
         code.append("}\nreturn result;");
-        method.setCode(code.toString());
-        this.getKlass().addMethod(method);
+        return code.toString();
     }
 
     /**
@@ -133,7 +152,9 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
         boolean flag = false;
         for (final Child child : this.getRule().getComposition()) {
             final Descriptor descriptor = (Descriptor) child;
-            if (descriptor.getAttribute() != DescriptorAttribute.OPTIONAL) {
+            if (descriptor.equals(Empty.INSTANCE)) {
+                break;
+            } else if (descriptor.getAttribute() != DescriptorAttribute.OPTIONAL) {
                 if (flag) {
                     code.append("\n\t&& ");
                 }
@@ -168,13 +189,35 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
      */
     private String prepareCreatorCode() {
         final String type = this.getRule().getType();
-        final String first = "if (!this.isValid()) { throw new IllegalStateException(); }\n";
+        final String first;
+        final boolean empty = this.getRule().isEmpty();
+        if (empty) {
+            first = "";
+        } else {
+            first = "if (!this.isValid()) { throw new IllegalStateException(); }\n";
+        }
         final String second = String.format(
             "final %s node = new %s();\n",
             type,
             type
         );
         final String third = "node.fragment = this.fragment;\n";
+        final StringBuilder next = new StringBuilder(256);
+        if (!empty) {
+            next.append(this.fillCreateNodeForNonEmptyChildrenList());
+        }
+        final StringBuilder code = new StringBuilder(256);
+        code.append(first).append(second).append(third).append(next)
+            .append("return node;\n");
+        return code.toString();
+    }
+
+    /**
+     * Fills variables assignment code in the body of the method 'createNode' for non-empty
+     *  children list.
+     * @return Source code
+     */
+    private String fillCreateNodeForNonEmptyChildrenList() {
         final StringBuilder fourth = new StringBuilder(64);
         final StringBuilder fifth = new StringBuilder(128);
         fourth.append("node.children = Arrays.asList(");
@@ -189,13 +232,10 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
             fourth.append(OrdinaryNodeBuilderConstructor.STR_THIS).append(var);
             if (!descriptor.getTag().isEmpty()) {
                 fifth.append("node.").append(var).append(" = this.").append(var)
-                    .append(OrdinaryNodeBuilderConstructor.STR_SEMICOLON);
+                .append(OrdinaryNodeBuilderConstructor.STR_SEMICOLON);
             }
         }
         fourth.append(");\n");
-        final StringBuilder code = new StringBuilder(256);
-        code.append(first).append(second).append(third).append(fourth).append(fifth)
-            .append("return node;\n");
-        return code.toString();
+        return fourth.append(fifth).toString();
     }
 }

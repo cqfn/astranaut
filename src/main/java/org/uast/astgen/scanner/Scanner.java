@@ -139,6 +139,10 @@ public class Scanner {
                 this.nextChar();
                 result = Ampersand.INSTANCE;
                 break;
+            case '0':
+                this.nextChar();
+                result = EmptySymbol.INSTANCE;
+                break;
             default:
                 throw new UnknownSymbol(symbol);
         }

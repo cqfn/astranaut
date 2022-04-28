@@ -72,11 +72,18 @@ final class OrdinaryNodeTypeConstructor extends NodeConstructor {
      * Fills in everything related to the child types list.
      */
     private void fillChildTypes() {
+        final boolean empty = this.getRule().isEmpty();
         final Klass klass = this.getKlass();
-        this.createChildrenField();
+        if (!empty) {
+            this.createChildrenField();
+        }
         final Method getter = new Method("getChildTypes");
         getter.setReturnType(OrdinaryNodeTypeConstructor.LIST_CHILD);
-        getter.setCode("return TypeImpl.CHILDREN;");
+        if (empty) {
+            getter.setCode("return Collections.emptyList();");
+        } else {
+            getter.setCode("return TypeImpl.CHILDREN;");
+        }
         klass.addMethod(getter);
     }
 

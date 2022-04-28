@@ -69,12 +69,16 @@ final class OrdinaryNodeClassConstructor extends NodeConstructor {
         data.setReturnType("String");
         data.setCode("return \"\";");
         klass.addMethod(data);
-        klass.addField(new Field("List of child nodes", "List<Node>", "children"));
+        if (!rule.isEmpty()) {
+            klass.addField(new Field("List of child nodes", "List<Node>", "children"));
+        }
         final Method count = new Method("getChildCount");
         count.makeOverridden();
         count.setReturnType(OrdinaryNodeClassConstructor.STR_INT);
         if (rule.hasOptionalChild()) {
             count.setCode("return this.children.size();");
+        } else if (rule.isEmpty()) {
+            count.setCode("return 0;");
         } else {
             final Field num = new Field(
                 "The number of children",

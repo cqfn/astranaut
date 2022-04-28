@@ -123,6 +123,28 @@ public class NodeParserTest {
     }
 
     /**
+     * Test case: prototype of an abstract node.
+     */
+    @Test
+    public void abstractNodePrototype() {
+        final boolean result = this.run(
+            "Statement <- Return | 0"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: empty node (no children and no data).
+     */
+    @Test
+    public void emptyNode() {
+        final boolean result = this.run(
+            "This <- 0"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
      * Runs the node parser.
      * @param source Source string
      * @return Test result ({@code true} means no exceptions)
