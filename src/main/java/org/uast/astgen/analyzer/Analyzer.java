@@ -23,6 +23,7 @@ import org.uast.astgen.exceptions.GeneratorException;
 import org.uast.astgen.rules.Child;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Disjunction;
+import org.uast.astgen.rules.Empty;
 import org.uast.astgen.rules.Extension;
 import org.uast.astgen.rules.Node;
 import org.uast.astgen.rules.Statement;
@@ -179,11 +180,11 @@ public class Analyzer {
         ((LinkedList<String>) ancestors).addFirst(node.getType());
         int empty = 0;
         for (final Descriptor descriptor : descriptors) {
-            if (descriptor instanceof Extension) {
+            if (descriptor.equals(Extension.INSTANCE)) {
                 final List<String> extended = this.getHierarchyOfExtendedNode(node);
                 ancestors.addAll(extended);
                 result.addAncestors(extended);
-            } else {
+            } else if (!descriptor.equals(Empty.INSTANCE)) {
                 this.processVertex(descriptor.getType(), ancestors);
                 if (this.storage.getVertexByType(descriptor.getType(), false) == null) {
                     empty += 1;
