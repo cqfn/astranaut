@@ -44,7 +44,12 @@ final class AbstractNodeGenerator extends BaseGenerator {
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, iface);
         final List<String> hierarchy = env.getHierarchy(type);
         if (hierarchy.size() > 1) {
-            iface.setInterfaces(hierarchy.get(1));
+            String ancestor = hierarchy.get(1);
+            if (ancestor.equals(rule.getType())) {
+                final String dir = env.getRootPackage().concat(".green.");
+                ancestor = dir.concat(ancestor);
+            }
+            iface.setInterfaces(ancestor);
         } else {
             final String base = this.getEnv().getBasePackage();
             unit.addImport(base.concat(".Node"));
