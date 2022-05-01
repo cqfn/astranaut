@@ -45,7 +45,7 @@ public class ActionConverter implements IStringConverter<Action> {
             default:
                 throw new ParameterException(
                     String.format(
-                        "The parameter for the option [%s] is not valid action",
+                        "The parameter for the option [%s] is not a valid action",
                         this.option
                     )
                 );

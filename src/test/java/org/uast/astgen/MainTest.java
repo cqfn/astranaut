@@ -80,6 +80,50 @@ public class MainTest {
     }
 
     /**
+     * Test passing the {@code --action} option with no parameters to main().
+     */
+    @Test
+    public void testActionWithoutParameters() {
+        final String[] example = {
+            MainTest.ACTION,
+        };
+        boolean caught = false;
+        String message = "";
+        try {
+            Main.main(example);
+        } catch (final ParameterException | IOException exc) {
+            caught = true;
+            message = exc.getMessage();
+        }
+        Assertions.assertTrue(caught);
+        Assertions.assertEquals("Expected a value after parameter --action", message);
+    }
+
+    /**
+     * Test passing the {@code --action} option with wrong argument.
+     */
+    @Test
+    public void testActionWithWrongArgument() {
+        final String[] example = {
+            MainTest.ACTION,
+            "exterminate",
+        };
+        boolean caught = false;
+        String message = "";
+        try {
+            Main.main(example);
+        } catch (final ParameterException | IOException exc) {
+            caught = true;
+            message = exc.getMessage();
+        }
+        Assertions.assertTrue(caught);
+        Assertions.assertEquals(
+            "The parameter for the option [--action] is not a valid action",
+            message
+        );
+    }
+
+    /**
      * Test passing the {@code --rules} option with no parameters to main().
      */
     @Test

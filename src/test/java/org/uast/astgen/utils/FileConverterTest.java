@@ -23,9 +23,19 @@ import org.uast.astgen.utils.cli.FileConverter;
  */
 public class FileConverterTest {
     /**
-     * The generate option as an argument example.
+     * The action option as an argument example.
      */
-    private static final String ARG = "--rules";
+    private static final String ACTION = "--action";
+
+    /**
+     * The 'generate' option value as an argument example.
+     */
+    private static final String GENERATE = "generate";
+
+    /**
+     * The rules option as an argument example.
+     */
+    private static final String RULES = "--rules";
 
     /**
      * Test passing the {@code --rules} option to main() with file
@@ -38,7 +48,9 @@ public class FileConverterTest {
         final List<String> lines = Collections.singletonList("class A{}");
         Files.write(file, lines);
         final String[] example = {
-            FileConverterTest.ARG,
+            FileConverterTest.ACTION,
+            FileConverterTest.GENERATE,
+            FileConverterTest.RULES,
             file.toString(),
         };
         boolean caught = false;
@@ -57,7 +69,9 @@ public class FileConverterTest {
     @Test
     public void testNotExistingFile() throws IOException {
         final String[] example = {
-            FileConverterTest.ARG,
+            FileConverterTest.ACTION,
+            FileConverterTest.GENERATE,
+            FileConverterTest.RULES,
             "some/file.txt",
         };
         boolean caught = false;
