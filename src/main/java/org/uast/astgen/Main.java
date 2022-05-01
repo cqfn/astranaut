@@ -26,10 +26,12 @@ import org.uast.astgen.parser.ProgramParser;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.utils.FilesReader;
 import org.uast.astgen.utils.cli.ActionConverter;
+import org.uast.astgen.utils.cli.DestinationFileConverter;
 import org.uast.astgen.utils.cli.LicenseValidator;
 import org.uast.astgen.utils.cli.PackageValidator;
 import org.uast.astgen.utils.cli.ProjectRootValidator;
 import org.uast.astgen.utils.cli.RulesFileConverter;
+import org.uast.astgen.utils.cli.SourceFileConverter;
 
 /**
  * Main class.
@@ -55,7 +57,7 @@ public final class Main {
     private Action action;
 
     /**
-     * The source file.
+     * The file contains DSL rules.
      */
     @Parameter(
         names = { "--rules", "--dsl", "-r" },
@@ -118,6 +120,26 @@ public final class Main {
         description = "Specify the version of the implementation"
     )
     private String version;
+
+    /**
+     * The file that contains source syntax tree in the JSON format.
+     */
+    @Parameter(
+        names = { "--source", "--src", "-s" },
+        converter = SourceFileConverter.class,
+        description = "The file that contains source syntax tree in the JSON format"
+    )
+    private File source;
+
+    /**
+     * The file for saving resulting syntax tree in the JSON format.
+     */
+    @Parameter(
+        names = { "--destination", "--dst", "-d" },
+        converter = DestinationFileConverter.class,
+        description = "The file for saving resulting syntax tree in the JSON format"
+    )
+    private File destination;
 
     /**
      * Test mode.
@@ -186,7 +208,11 @@ public final class Main {
                 final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
                 generator.generate();
             } else if (this.action == Action.CONVERT) {
-                new Interpreter("", "", program).run();
+                new Interpreter(
+                    this.source.getPath(),
+                    this.destination.getPath(),
+                    program
+                ).run();
             }
         } catch (final BaseException exc) {
             LOG.severe(String.format("%s, %s", exc.getInitiator(), exc.getErrorMessage()));
