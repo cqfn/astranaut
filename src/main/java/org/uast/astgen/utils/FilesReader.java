@@ -45,4 +45,33 @@ public class FilesReader {
         stream.close();
         return builder.toString();
     }
+
+    /**
+     * Reads file content as string.
+     * @param creator Exception creator
+     * @param <T> Exception type
+     * @return File content
+     * @throws T If the file can't be read
+     */
+    public <T extends Exception> String readAsString(
+        final CustomExceptionCreator<T> creator) throws T {
+        try {
+            return this.readAsString();
+        } catch (final IOException ignored) {
+            throw creator.create();
+        }
+    }
+
+    /**
+     * Custom exception creator.
+     * @param <T> Exception type
+     * @since 1.0
+     */
+    public interface CustomExceptionCreator<T extends Exception> {
+        /**
+         * Creates new exception object.
+         * @return The nex exception object
+         */
+        T create();
+    }
 }

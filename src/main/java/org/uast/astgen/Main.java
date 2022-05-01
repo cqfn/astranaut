@@ -191,9 +191,22 @@ public final class Main {
      * @throws IOException If fails
      */
     private void run() throws IOException {
-        final String code = new FilesReader(this.dsl.getPath()).readAsString();
-        final ProgramParser parser = new ProgramParser(code);
+        final String rules = this.dsl.getPath();
         try {
+            final String code = new FilesReader(rules).readAsString(
+                (FilesReader.CustomExceptionCreator<BaseException>) () -> new BaseException() {
+                    @Override
+                    public String getInitiator() {
+                        return "Main";
+                    }
+
+                    @Override
+                    public String getErrorMessage() {
+                        return String.format("Could not read DSL file: %s", rules);
+                    }
+                }
+            );
+            final ProgramParser parser = new ProgramParser(code);
             final Program program = parser.parse();
             if (this.action == Action.GENERATE) {
                 final Environment base = new EnvironmentImpl();
