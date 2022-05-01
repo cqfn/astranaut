@@ -58,7 +58,7 @@ public class MainTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final IllegalArgumentException | IOException exc) {
+        } catch (final IllegalArgumentException exc) {
             caught = true;
         }
         Assertions.assertFalse(caught);
@@ -73,7 +73,7 @@ public class MainTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException | IOException exc) {
+        } catch (final ParameterException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);
@@ -91,7 +91,7 @@ public class MainTest {
         String message = "";
         try {
             Main.main(example);
-        } catch (final ParameterException | IOException exc) {
+        } catch (final ParameterException exc) {
             caught = true;
             message = exc.getMessage();
         }
@@ -112,7 +112,7 @@ public class MainTest {
         String message = "";
         try {
             Main.main(example);
-        } catch (final ParameterException | IOException exc) {
+        } catch (final ParameterException exc) {
             caught = true;
             message = exc.getMessage();
         }
@@ -137,7 +137,7 @@ public class MainTest {
         String message = "";
         try {
             Main.main(example);
-        } catch (final ParameterException | IOException exc) {
+        } catch (final ParameterException exc) {
             caught = true;
             message = exc.getMessage();
         }

@@ -173,7 +173,7 @@ public final class Main {
      * @param args The command-line arguments
      * @throws IOException If fails
      */
-    public static void main(final String... args) throws IOException {
+    public static void main(final String... args) {
         final Main main = new Main();
         final JCommander jcr = JCommander.newBuilder()
             .addObject(main)
@@ -188,9 +188,8 @@ public final class Main {
 
     /**
      * Runs actions.
-     * @throws IOException If fails
      */
-    private void run() throws IOException {
+    private void run() {
         final String rules = this.dsl.getPath();
         try {
             final String code = new FilesReader(rules).readAsString(

@@ -67,11 +67,17 @@ public final class JsonSerializer {
      * Converts the syntax tree to a string contains JSON object and
      * writes the result to file.
      * @param filename The file name
-     * @throws IOException In case if write operation failed
+     * @return The result, {@code true} if the file was successful written
      */
-    public void serializeToFile(final String filename) throws IOException {
+    public boolean serializeToFile(final String filename) {
         final String json = this.serialize();
-        new FilesWriter(filename).writeString(json);
+        boolean success = true;
+        try {
+            new FilesWriter(filename).writeString(json);
+        } catch (final IOException ignored) {
+            success = false;
+        }
+        return success;
     }
 
     /**

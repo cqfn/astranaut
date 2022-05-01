@@ -4,8 +4,9 @@
  */
 package org.uast.astgen.interpreter;
 
-import java.io.IOException;
 import org.uast.astgen.base.Node;
+import org.uast.astgen.exceptions.InterpreterCouldNotWriteFile;
+import org.uast.astgen.exceptions.InterpreterException;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.utils.FilesReader;
 
@@ -47,12 +48,25 @@ public class Interpreter {
 
     /**
      * Runs the interpreter.
-     * @throws IOException File read/write error
+     * @throws InterpreterException Can't execute the program for some reasons
      */
-    public void run() throws IOException {
+    public void run() throws InterpreterException {
         final Node root = new JsonDeserializer(
-            new FilesReader(this.source).readAsString()
+            new FilesReader(this.source).readAsString(
+                (FilesReader.CustomExceptionCreator<InterpreterException>) ()
+                    -> new InterpreterException() {
+                        @Override
+                        public String getErrorMessage() {
+                            return String.format(
+                                "Could not read the file that contains source syntax tree: %s",
+                                Interpreter.this.source
+                            );
+                        }
+                    }
+            )
         ).convert();
-        new JsonSerializer(root).serializeToFile(this.destination);
+        if (!new JsonSerializer(root).serializeToFile(this.destination)) {
+            throw new InterpreterCouldNotWriteFile(this.destination);
+        }
     }
 }
