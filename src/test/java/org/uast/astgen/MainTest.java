@@ -22,9 +22,19 @@ import org.junit.jupiter.api.io.TempDir;
  */
 public class MainTest {
     /**
-     * The generate option as an argument example.
+     * The action option as an argument example.
      */
-    private static final String ARG = "--generate";
+    private static final String ACTION = "--action";
+
+    /**
+     * The 'generate' option value as an argument example.
+     */
+    private static final String GENERATE = "generate";
+
+    /**
+     * The rules option as an argument example.
+     */
+    private static final String RULES = "--rules";
 
     /**
      * The test option as an argument example.
@@ -32,14 +42,16 @@ public class MainTest {
     private static final String TEST = "--test";
 
     /**
-     * Test passing the {@code --generate} option to main().
+     * Test passing the {@code --rules} option to main().
      * @param source A temporary directory
      */
     @Test
     public void testNoException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
-            MainTest.ARG,
+            MainTest.ACTION,
+            MainTest.GENERATE,
+            MainTest.RULES,
             file.toString(),
             MainTest.TEST,
         };
@@ -68,12 +80,14 @@ public class MainTest {
     }
 
     /**
-     * Test passing the {@code --generate} option with no parameters to main().
+     * Test passing the {@code --rules} option with no parameters to main().
      */
     @Test
-    public void testGenerateWithoutParameters() {
+    public void testRulesWithoutParameters() {
         final String[] example = {
-            MainTest.ARG,
+            MainTest.ACTION,
+            MainTest.GENERATE,
+            MainTest.RULES,
         };
         boolean caught = false;
         String message = "";
@@ -84,7 +98,7 @@ public class MainTest {
             message = exc.getMessage();
         }
         Assertions.assertTrue(caught);
-        Assertions.assertEquals("Expected a value after parameter --generate", message);
+        Assertions.assertEquals("Expected a value after parameter --rules", message);
     }
 
     /**

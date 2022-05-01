@@ -21,13 +21,15 @@ import org.uast.astgen.codegen.java.License;
 import org.uast.astgen.codegen.java.ProgramGenerator;
 import org.uast.astgen.codegen.java.TaggedChild;
 import org.uast.astgen.exceptions.BaseException;
+import org.uast.astgen.interpreter.Interpreter;
 import org.uast.astgen.parser.ProgramParser;
 import org.uast.astgen.rules.Program;
-import org.uast.astgen.utils.FileConverter;
 import org.uast.astgen.utils.FilesReader;
-import org.uast.astgen.utils.LicenseValidator;
-import org.uast.astgen.utils.PackageValidator;
-import org.uast.astgen.utils.ProjectRootValidator;
+import org.uast.astgen.utils.cli.ActionConverter;
+import org.uast.astgen.utils.cli.FileConverter;
+import org.uast.astgen.utils.cli.LicenseValidator;
+import org.uast.astgen.utils.cli.PackageValidator;
+import org.uast.astgen.utils.cli.ProjectRootValidator;
 
 /**
  * Main class.
@@ -42,15 +44,26 @@ public final class Main {
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
     /**
+     * The action.
+     */
+    @Parameter(
+        names = { "--action", "-a" },
+        converter = ActionConverter.class,
+        required = true,
+        description = "The action: 'generate' or 'convert'"
+    )
+    private Action action;
+
+    /**
      * The source file.
      */
     @Parameter(
-        names = { "--generate", "-g" },
+        names = { "--rules", "--dsl", "-r" },
         converter = FileConverter.class,
         required = true,
         description = "Text file with DSL descriptions"
     )
-    private File source;
+    private File dsl;
 
     /**
      * The name of file that contains license header.
@@ -156,18 +169,25 @@ public final class Main {
      * @throws IOException If fails
      */
     private void run() throws IOException {
-        final String code = new FilesReader(this.source.getPath()).readAsString();
+        final String code = new FilesReader(this.dsl.getPath()).readAsString();
         final ProgramParser parser = new ProgramParser(code);
         try {
             final Program program = parser.parse();
-            final Environment base = new EnvironmentImpl();
-            final Map<String, Environment> env = new TreeMap<>();
-            env.put("", new PreparedEnvironment(base, program.getVertices(), ""));
-            for (final String language : program.getNamesOfAllLanguages()) {
-                env.put(language, new PreparedEnvironment(base, program.getVertices(), language));
+            if (this.action == Action.GENERATE) {
+                final Environment base = new EnvironmentImpl();
+                final Map<String, Environment> env = new TreeMap<>();
+                env.put("", new PreparedEnvironment(base, program.getVertices(), ""));
+                for (final String language : program.getNamesOfAllLanguages()) {
+                    env.put(
+                        language,
+                        new PreparedEnvironment(base, program.getVertices(), language)
+                    );
+                }
+                final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
+                generator.generate();
+            } else if (this.action == Action.CONVERT) {
+                new Interpreter("", "", program).run();
             }
-            final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
-            generator.generate();
         } catch (final BaseException exc) {
             LOG.severe(String.format("%s, %s", exc.getInitiator(), exc.getErrorMessage()));
         }

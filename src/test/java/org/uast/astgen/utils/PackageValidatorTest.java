@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.uast.astgen.Main;
+import org.uast.astgen.utils.cli.PackageValidator;
 
 /**
  * Test for {@link PackageValidator} class.
@@ -23,9 +24,19 @@ import org.uast.astgen.Main;
  */
 public class PackageValidatorTest {
     /**
-     * The generate option as an argument example.
+     * The action option as an argument example.
      */
-    private static final String ARG = "--generate";
+    private static final String ACTION = "--action";
+
+    /**
+     * The 'generate' option value as an argument example.
+     */
+    private static final String GENERATE = "generate";
+
+    /**
+     * The rules option as an argument example.
+     */
+    private static final String RULES = "--rules";
 
     /**
      * The test option as an argument example.
@@ -38,7 +49,7 @@ public class PackageValidatorTest {
     private static final String PCG = "--package";
 
     /**
-     * Test passing the {@code --generate} option to main()
+     * Test passing the {@code --rules} option to main()
      * with the {@code --package} option and a valid package name
      * as a parameter.
      * @param source A temporary directory
@@ -47,7 +58,9 @@ public class PackageValidatorTest {
     public void testPackageOptionNoException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
-            PackageValidatorTest.ARG,
+            PackageValidatorTest.ACTION,
+            PackageValidatorTest.GENERATE,
+            PackageValidatorTest.RULES,
             file.toString(),
             PackageValidatorTest.PCG,
             "org.uast",
@@ -63,7 +76,7 @@ public class PackageValidatorTest {
     }
 
     /**
-     * Test passing the {@code --generate} option to main()
+     * Test passing the {@code --rules} option to main()
      * with the {@code --package} option and an invalid package name
      * as a parameter.
      * @param source A temporary directory
@@ -72,7 +85,9 @@ public class PackageValidatorTest {
     public void testPackageOptionWithException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
-            PackageValidatorTest.ARG,
+            PackageValidatorTest.ACTION,
+            PackageValidatorTest.GENERATE,
+            PackageValidatorTest.RULES,
             file.toString(),
             PackageValidatorTest.PCG,
             "org/uast",
@@ -87,7 +102,7 @@ public class PackageValidatorTest {
     }
 
     /**
-     * Test passing the {@code --generate} option to main()
+     * Test passing the {@code --rules} option to main()
      * with the {@code --package} option having no parameter before
      * the next option.
      * @param source A temporary directory
@@ -96,7 +111,9 @@ public class PackageValidatorTest {
     public void testPackageOptionWithoutParameter(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
-            PackageValidatorTest.ARG,
+            PackageValidatorTest.ACTION,
+            PackageValidatorTest.GENERATE,
+            PackageValidatorTest.RULES,
             file.toString(),
             PackageValidatorTest.PCG,
             "-r",

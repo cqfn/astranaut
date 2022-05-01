@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.uast.astgen.Main;
+import org.uast.astgen.utils.cli.FileConverter;
 
 /**
  * Test for {@link FileConverter} class exception cases.
@@ -24,10 +25,10 @@ public class FileConverterTest {
     /**
      * The generate option as an argument example.
      */
-    private static final String ARG = "--generate";
+    private static final String ARG = "--rules";
 
     /**
-     * Test passing the {@code --generate} option to main() with file
+     * Test passing the {@code --rules} option to main() with file
      * which has an irrelevant extension.
      * @param source A temporary directory
      */
@@ -50,7 +51,7 @@ public class FileConverterTest {
     }
 
     /**
-     * Test passing the {@code --generate} option to main() with file
+     * Test passing the {@code --rules} option to main() with file
      * which does not exist.
      */
     @Test
