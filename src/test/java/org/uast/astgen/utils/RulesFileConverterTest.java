@@ -14,14 +14,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.uast.astgen.Main;
-import org.uast.astgen.utils.cli.FileConverter;
+import org.uast.astgen.utils.cli.RulesFileConverter;
 
 /**
- * Test for {@link FileConverter} class exception cases.
+ * Test for {@link RulesFileConverter} class exception cases.
  *
  * @since 1.0
  */
-public class FileConverterTest {
+public class RulesFileConverterTest {
     /**
      * The action option as an argument example.
      */
@@ -48,9 +48,9 @@ public class FileConverterTest {
         final List<String> lines = Collections.singletonList("class A{}");
         Files.write(file, lines);
         final String[] example = {
-            FileConverterTest.ACTION,
-            FileConverterTest.GENERATE,
-            FileConverterTest.RULES,
+            RulesFileConverterTest.ACTION,
+            RulesFileConverterTest.GENERATE,
+            RulesFileConverterTest.RULES,
             file.toString(),
         };
         boolean caught = false;
@@ -69,9 +69,9 @@ public class FileConverterTest {
     @Test
     public void testNotExistingFile() throws IOException {
         final String[] example = {
-            FileConverterTest.ACTION,
-            FileConverterTest.GENERATE,
-            FileConverterTest.RULES,
+            RulesFileConverterTest.ACTION,
+            RulesFileConverterTest.GENERATE,
+            RulesFileConverterTest.RULES,
             "some/file.txt",
         };
         boolean caught = false;

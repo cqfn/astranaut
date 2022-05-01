@@ -26,10 +26,10 @@ import org.uast.astgen.parser.ProgramParser;
 import org.uast.astgen.rules.Program;
 import org.uast.astgen.utils.FilesReader;
 import org.uast.astgen.utils.cli.ActionConverter;
-import org.uast.astgen.utils.cli.FileConverter;
 import org.uast.astgen.utils.cli.LicenseValidator;
 import org.uast.astgen.utils.cli.PackageValidator;
 import org.uast.astgen.utils.cli.ProjectRootValidator;
+import org.uast.astgen.utils.cli.RulesFileConverter;
 
 /**
  * Main class.
@@ -59,7 +59,7 @@ public final class Main {
      */
     @Parameter(
         names = { "--rules", "--dsl", "-r" },
-        converter = FileConverter.class,
+        converter = RulesFileConverter.class,
         required = true,
         description = "Text file with DSL descriptions"
     )
