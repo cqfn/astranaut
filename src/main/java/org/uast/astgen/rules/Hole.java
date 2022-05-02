@@ -4,6 +4,8 @@
  */
 package org.uast.astgen.rules;
 
+import java.util.Objects;
+
 /**
  * Hole, i.e. #1, #2, etc.
  *
@@ -42,5 +44,23 @@ public final class Hole implements Data, Parameter {
     @Override
     public boolean isValid() {
         return true;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        final Hole hole;
+        boolean equal = false;
+        if (obj instanceof Hole) {
+            hole = (Hole) obj;
+            if (this.value == hole.getValue()) {
+                equal = true;
+            }
+        }
+        return equal;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.value);
     }
 }
