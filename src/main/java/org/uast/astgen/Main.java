@@ -8,7 +8,6 @@ package org.uast.astgen;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -21,13 +20,17 @@ import org.uast.astgen.codegen.java.License;
 import org.uast.astgen.codegen.java.ProgramGenerator;
 import org.uast.astgen.codegen.java.TaggedChild;
 import org.uast.astgen.exceptions.BaseException;
+import org.uast.astgen.interpreter.Interpreter;
 import org.uast.astgen.parser.ProgramParser;
 import org.uast.astgen.rules.Program;
-import org.uast.astgen.utils.FileConverter;
 import org.uast.astgen.utils.FilesReader;
-import org.uast.astgen.utils.LicenseValidator;
-import org.uast.astgen.utils.PackageValidator;
-import org.uast.astgen.utils.ProjectRootValidator;
+import org.uast.astgen.utils.cli.ActionConverter;
+import org.uast.astgen.utils.cli.DestinationFileConverter;
+import org.uast.astgen.utils.cli.LicenseValidator;
+import org.uast.astgen.utils.cli.PackageValidator;
+import org.uast.astgen.utils.cli.ProjectRootValidator;
+import org.uast.astgen.utils.cli.RulesFileConverter;
+import org.uast.astgen.utils.cli.SourceFileConverter;
 
 /**
  * Main class.
@@ -42,15 +45,26 @@ public final class Main {
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
     /**
-     * The source file.
+     * The action.
      */
     @Parameter(
-        names = { "--generate", "-g" },
-        converter = FileConverter.class,
+        names = { "--action", "-a" },
+        converter = ActionConverter.class,
+        required = true,
+        description = "The action: 'generate' or 'convert'"
+    )
+    private Action action;
+
+    /**
+     * The file contains DSL rules.
+     */
+    @Parameter(
+        names = { "--rules", "--dsl", "-r" },
+        converter = RulesFileConverter.class,
         required = true,
         description = "Text file with DSL descriptions"
     )
-    private File source;
+    private File dsl;
 
     /**
      * The name of file that contains license header.
@@ -107,6 +121,26 @@ public final class Main {
     private String version;
 
     /**
+     * The file that contains source syntax tree in the JSON format.
+     */
+    @Parameter(
+        names = { "--source", "--src", "-s" },
+        converter = SourceFileConverter.class,
+        description = "The file that contains source syntax tree in the JSON format"
+    )
+    private File source;
+
+    /**
+     * The file for saving resulting syntax tree in the JSON format.
+     */
+    @Parameter(
+        names = { "--destination", "--dst", "-d" },
+        converter = DestinationFileConverter.class,
+        description = "The file for saving resulting syntax tree in the JSON format"
+    )
+    private File destination;
+
+    /**
      * Test mode.
      */
     @Parameter(
@@ -136,9 +170,9 @@ public final class Main {
     /**
      * The main function. Parses the command line.
      * @param args The command-line arguments
-     * @throws IOException If fails
+     * @throws BaseException If fails
      */
-    public static void main(final String... args) throws IOException {
+    public static void main(final String... args) throws BaseException {
         final Main main = new Main();
         final JCommander jcr = JCommander.newBuilder()
             .addObject(main)
@@ -153,23 +187,44 @@ public final class Main {
 
     /**
      * Runs actions.
-     * @throws IOException If fails
+     * @throws BaseException If fails
      */
-    private void run() throws IOException {
-        final String code = new FilesReader(this.source.getPath()).readAsString();
-        final ProgramParser parser = new ProgramParser(code);
+    private void run() throws BaseException {
+        final String rules = this.dsl.getPath();
         try {
+            final String code = new FilesReader(rules).readAsString(
+                (FilesReader.CustomExceptionCreator<BaseException>) () -> new BaseException() {
+                    @Override
+                    public String getInitiator() {
+                        return "Main";
+                    }
+
+                    @Override
+                    public String getErrorMessage() {
+                        return String.format("Could not read DSL file: %s", rules);
+                    }
+                }
+            );
+            final ProgramParser parser = new ProgramParser(code);
             final Program program = parser.parse();
-            final Environment base = new EnvironmentImpl();
-            final Map<String, Environment> env = new TreeMap<>();
-            env.put("", new PreparedEnvironment(base, program.getVertices(), ""));
-            for (final String language : program.getNamesOfAllLanguages()) {
-                env.put(language, new PreparedEnvironment(base, program.getVertices(), language));
+            if (this.action == Action.GENERATE) {
+                final Environment base = new EnvironmentImpl();
+                final Map<String, Environment> env = new TreeMap<>();
+                env.put("", new PreparedEnvironment(base, program.getVertices(), ""));
+                for (final String language : program.getNamesOfAllLanguages()) {
+                    env.put(
+                        language,
+                        new PreparedEnvironment(base, program.getVertices(), language)
+                    );
+                }
+                final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
+                generator.generate();
+            } else if (this.action == Action.CONVERT) {
+                new Interpreter(this.source, this.destination, program).run();
             }
-            final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
-            generator.generate();
         } catch (final BaseException exc) {
             LOG.severe(String.format("%s, %s", exc.getInitiator(), exc.getErrorMessage()));
+            throw exc;
         }
     }
 

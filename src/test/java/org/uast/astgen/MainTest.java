@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.uast.astgen.exceptions.BaseException;
 
 /**
  * Test for {@link Main} class.
@@ -22,9 +23,34 @@ import org.junit.jupiter.api.io.TempDir;
  */
 public class MainTest {
     /**
-     * The generate option as an argument example.
+     * The action option as an argument example.
      */
-    private static final String ARG = "--generate";
+    private static final String ACTION = "--action";
+
+    /**
+     * The 'generate' option value as an argument example.
+     */
+    private static final String GENERATE = "generate";
+
+    /**
+     * The 'convert' option value as an argument example.
+     */
+    private static final String CONVERT = "convert";
+
+    /**
+     * The rules option as an argument example.
+     */
+    private static final String RULES = "--rules";
+
+    /**
+     * The destination option as an argument example.
+     */
+    private static final String DESTINATION = "--destination";
+
+    /**
+     * Test .json file name.
+     */
+    private static final String EXAMPLE_JSON = "example.json";
 
     /**
      * The test option as an argument example.
@@ -32,21 +58,23 @@ public class MainTest {
     private static final String TEST = "--test";
 
     /**
-     * Test passing the {@code --generate} option to main().
+     * Test passing the {@code --rules} option to main().
      * @param source A temporary directory
      */
     @Test
     public void testNoException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
-            MainTest.ARG,
+            MainTest.ACTION,
+            MainTest.GENERATE,
+            MainTest.RULES,
             file.toString(),
             MainTest.TEST,
         };
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final IllegalArgumentException | IOException exc) {
+        } catch (final IllegalArgumentException | BaseException exc) {
             caught = true;
         }
         Assertions.assertFalse(caught);
@@ -61,30 +89,107 @@ public class MainTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException | IOException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);
     }
 
     /**
-     * Test passing the {@code --generate} option with no parameters to main().
+     * Test passing the {@code --action} option with no parameters to main().
      */
     @Test
-    public void testGenerateWithoutParameters() {
+    public void testActionWithoutParameters() {
         final String[] example = {
-            MainTest.ARG,
+            MainTest.ACTION,
         };
         boolean caught = false;
         String message = "";
         try {
             Main.main(example);
-        } catch (final ParameterException | IOException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
             message = exc.getMessage();
         }
         Assertions.assertTrue(caught);
-        Assertions.assertEquals("Expected a value after parameter --generate", message);
+        Assertions.assertEquals("Expected a value after parameter --action", message);
+    }
+
+    /**
+     * Test passing the {@code --action} option with wrong argument.
+     */
+    @Test
+    public void testActionWithWrongArgument() {
+        final String[] example = {
+            MainTest.ACTION,
+            "exterminate",
+        };
+        boolean caught = false;
+        String message = "";
+        try {
+            Main.main(example);
+        } catch (final ParameterException | BaseException exc) {
+            caught = true;
+            message = exc.getMessage();
+        }
+        Assertions.assertTrue(caught);
+        Assertions.assertEquals(
+            "The parameter for the option [--action] is not a valid action",
+            message
+        );
+    }
+
+    /**
+     * Test passing the {@code --rules} option with no parameters to main().
+     */
+    @Test
+    public void testRulesWithoutParameters() {
+        final String[] example = {
+            MainTest.ACTION,
+            MainTest.GENERATE,
+            MainTest.RULES,
+        };
+        boolean caught = false;
+        String message = "";
+        try {
+            Main.main(example);
+        } catch (final ParameterException | BaseException exc) {
+            caught = true;
+            message = exc.getMessage();
+        }
+        Assertions.assertTrue(caught);
+        Assertions.assertEquals("Expected a value after parameter --rules", message);
+    }
+
+    /**
+     * Test passing the {@code --action} option with {@code convert} parameter
+     * and without {@code --source} option.
+     * @param source A temporary directory
+     */
+    @Test
+    public void testConvertWithoutSource(@TempDir final Path source) throws IOException {
+        final Path file = this.createTempTxtFile(source);
+        final String[] example = {
+            MainTest.ACTION,
+            MainTest.CONVERT,
+            MainTest.RULES,
+            file.toString(),
+            MainTest.DESTINATION,
+            MainTest.EXAMPLE_JSON,
+        };
+        boolean caught = false;
+        String message = "";
+        try {
+            Main.main(example);
+        } catch (final BaseException exc) {
+            caught = true;
+            message = exc.getErrorMessage();
+        }
+        Assertions.assertTrue(caught);
+        Assertions.assertEquals(
+            "Missed the [--source] option, source file not specified",
+            message
+        );
     }
 
     /**

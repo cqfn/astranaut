@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.uast.astgen.Main;
+import org.uast.astgen.exceptions.BaseException;
+import org.uast.astgen.utils.cli.ProjectRootValidator;
 
 /**
  * Test for {@link ProjectRootValidator} class.
@@ -23,9 +25,19 @@ import org.uast.astgen.Main;
  */
 public class ProjectRootValidatorTest {
     /**
-     * The generate option as an argument example.
+     * The action option as an argument example.
      */
-    private static final String ARG = "--generate";
+    private static final String ACTION = "--action";
+
+    /**
+     * The 'generate' option value as an argument example.
+     */
+    private static final String GENERATE = "generate";
+
+    /**
+     * The rules option as an argument example.
+     */
+    private static final String RULES = "--rules";
 
     /**
      * The name of the option for a root of the target project.
@@ -38,7 +50,7 @@ public class ProjectRootValidatorTest {
     private static final String TEST = "--test";
 
     /**
-     * Test passing the {@code --generate} option to main()
+     * Test passing the {@code --rules} option to main()
      * with the {@code --root} option and a valid
      * non-existing path as a parameter.
      * @param source A temporary directory
@@ -47,7 +59,9 @@ public class ProjectRootValidatorTest {
     public void testProjectRootOptionNoException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
-            ProjectRootValidatorTest.ARG,
+            ProjectRootValidatorTest.ACTION,
+            ProjectRootValidatorTest.GENERATE,
+            ProjectRootValidatorTest.RULES,
             file.toString(),
             ProjectRootValidatorTest.ROOT,
             "test/root",
@@ -56,14 +70,14 @@ public class ProjectRootValidatorTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
         }
         Assertions.assertFalse(caught);
     }
 
     /**
-     * Test passing the {@code --generate} option to main()
+     * Test passing the {@code --rules} option to main()
      * with the {@code --root} option and an invalid parameter.
      * @param source A temporary directory
      */
@@ -71,7 +85,9 @@ public class ProjectRootValidatorTest {
     public void testProjectRootOptionWithException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
-            ProjectRootValidatorTest.ARG,
+            ProjectRootValidatorTest.ACTION,
+            ProjectRootValidatorTest.GENERATE,
+            ProjectRootValidatorTest.RULES,
             file.toString(),
             ProjectRootValidatorTest.ROOT,
             "test/ro\0ot",
@@ -79,14 +95,14 @@ public class ProjectRootValidatorTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);
     }
 
     /**
-     * Test passing the {@code --generate} option to main()
+     * Test passing the {@code --rules} option to main()
      * with the {@code --root} option and a valid
      * already existing path  as a parameter.
      * @param source A temporary directory
@@ -96,7 +112,9 @@ public class ProjectRootValidatorTest {
         throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
-            ProjectRootValidatorTest.ARG,
+            ProjectRootValidatorTest.ACTION,
+            ProjectRootValidatorTest.GENERATE,
+            ProjectRootValidatorTest.RULES,
             file.toString(),
             ProjectRootValidatorTest.ROOT,
             source.toString(),
@@ -105,14 +123,14 @@ public class ProjectRootValidatorTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
         }
         Assertions.assertFalse(caught);
     }
 
     /**
-     * Test passing the {@code --generate} option to main()
+     * Test passing the {@code --rules} option to main()
      * with the {@code --root} option having no parameter before
      * the next option.
      * @param source A temporary directory
@@ -122,7 +140,9 @@ public class ProjectRootValidatorTest {
         throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
-            ProjectRootValidatorTest.ARG,
+            ProjectRootValidatorTest.ACTION,
+            ProjectRootValidatorTest.GENERATE,
+            ProjectRootValidatorTest.RULES,
             file.toString(),
             ProjectRootValidatorTest.ROOT,
             "-p",
@@ -130,7 +150,7 @@ public class ProjectRootValidatorTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);

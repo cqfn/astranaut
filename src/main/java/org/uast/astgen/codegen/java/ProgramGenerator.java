@@ -7,7 +7,7 @@ package org.uast.astgen.codegen.java;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;
-import org.uast.astgen.exceptions.CouldNotWriteFile;
+import org.uast.astgen.exceptions.GeneratorCouldNotWriteFile;
 import org.uast.astgen.exceptions.GeneratorException;
 import org.uast.astgen.rules.Literal;
 import org.uast.astgen.rules.Node;
@@ -257,7 +257,7 @@ public final class ProgramGenerator {
             final FilesWriter writer = new FilesWriter(filename);
             final boolean result = writer.writeStringNoExcept(code);
             if (!result) {
-                throw new CouldNotWriteFile(filename);
+                throw new GeneratorCouldNotWriteFile(filename);
             }
         }
     }

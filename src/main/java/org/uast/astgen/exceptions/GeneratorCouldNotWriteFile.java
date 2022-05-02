@@ -5,11 +5,11 @@
 package org.uast.astgen.exceptions;
 
 /**
- * Exception "Could not write file".
+ * Exception "Could not write file" produced by the generator.
  *
  * @since 1.0
  */
-public final class CouldNotWriteFile extends GeneratorException {
+public final class GeneratorCouldNotWriteFile extends GeneratorException {
     /**
      * The file name.
      */
@@ -19,7 +19,7 @@ public final class CouldNotWriteFile extends GeneratorException {
      * Constructor.
      * @param filename The file name
      */
-    public CouldNotWriteFile(final String filename) {
+    public GeneratorCouldNotWriteFile(final String filename) {
         this.filename = filename;
     }
 

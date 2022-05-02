@@ -14,20 +14,32 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.uast.astgen.Main;
+import org.uast.astgen.exceptions.BaseException;
+import org.uast.astgen.utils.cli.RulesFileConverter;
 
 /**
- * Test for {@link FileConverter} class exception cases.
+ * Test for {@link RulesFileConverter} class exception cases.
  *
  * @since 1.0
  */
-public class FileConverterTest {
+public class RulesFileConverterTest {
     /**
-     * The generate option as an argument example.
+     * The action option as an argument example.
      */
-    private static final String ARG = "--generate";
+    private static final String ACTION = "--action";
 
     /**
-     * Test passing the {@code --generate} option to main() with file
+     * The 'generate' option value as an argument example.
+     */
+    private static final String GENERATE = "generate";
+
+    /**
+     * The rules option as an argument example.
+     */
+    private static final String RULES = "--rules";
+
+    /**
+     * Test passing the {@code --rules} option to main() with file
      * which has an irrelevant extension.
      * @param source A temporary directory
      */
@@ -37,32 +49,36 @@ public class FileConverterTest {
         final List<String> lines = Collections.singletonList("class A{}");
         Files.write(file, lines);
         final String[] example = {
-            FileConverterTest.ARG,
+            RulesFileConverterTest.ACTION,
+            RulesFileConverterTest.GENERATE,
+            RulesFileConverterTest.RULES,
             file.toString(),
         };
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);
     }
 
     /**
-     * Test passing the {@code --generate} option to main() with file
+     * Test passing the {@code --rules} option to main() with file
      * which does not exist.
      */
     @Test
     public void testNotExistingFile() throws IOException {
         final String[] example = {
-            FileConverterTest.ARG,
+            RulesFileConverterTest.ACTION,
+            RulesFileConverterTest.GENERATE,
+            RulesFileConverterTest.RULES,
             "some/file.txt",
         };
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);
