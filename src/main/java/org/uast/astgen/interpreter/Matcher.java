@@ -25,11 +25,17 @@ public final class Matcher implements org.uast.astgen.base.Matcher {
     private final Descriptor descriptor;
 
     /**
+     * The list of nested matchers.
+     */
+    private final Matcher[] subs;
+
+    /**
      * Constructor.
      * @param descriptor The descriptor
      */
     public Matcher(final Descriptor descriptor) {
         this.descriptor = descriptor;
+        this.subs = new Matcher[this.descriptor.getParameters().size()];
     }
 
     @Override
@@ -96,7 +102,13 @@ public final class Matcher implements org.uast.astgen.base.Matcher {
             if (parameter instanceof Hole) {
                 children.put(((Hole) parameter).getValue(), child);
             } else if (parameter instanceof Descriptor) {
-                final Matcher mather = new Matcher((Descriptor) parameter);
+                final Matcher mather;
+                if (this.subs[index] == null) {
+                    mather = new Matcher((Descriptor) parameter);
+                    this.subs[index] = mather;
+                } else {
+                    mather = this.subs[index];
+                }
                 result = mather.match(child, children, data);
                 if (!result) {
                     break;
