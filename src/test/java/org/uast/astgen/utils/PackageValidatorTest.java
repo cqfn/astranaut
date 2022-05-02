@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.uast.astgen.Main;
+import org.uast.astgen.exceptions.BaseException;
 import org.uast.astgen.utils.cli.PackageValidator;
 
 /**
@@ -69,7 +70,7 @@ public class PackageValidatorTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
         }
         Assertions.assertFalse(caught);
@@ -95,7 +96,7 @@ public class PackageValidatorTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);
@@ -121,7 +122,7 @@ public class PackageValidatorTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);

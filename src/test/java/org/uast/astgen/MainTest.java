@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.uast.astgen.exceptions.BaseException;
 
 /**
  * Test for {@link Main} class.
@@ -32,9 +33,24 @@ public class MainTest {
     private static final String GENERATE = "generate";
 
     /**
+     * The 'convert' option value as an argument example.
+     */
+    private static final String CONVERT = "convert";
+
+    /**
      * The rules option as an argument example.
      */
     private static final String RULES = "--rules";
+
+    /**
+     * The destination option as an argument example.
+     */
+    private static final String DESTINATION = "--destination";
+
+    /**
+     * Test .json file name.
+     */
+    private static final String EXAMPLE_JSON = "example.json";
 
     /**
      * The test option as an argument example.
@@ -58,7 +74,7 @@ public class MainTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final IllegalArgumentException exc) {
+        } catch (final IllegalArgumentException | BaseException exc) {
             caught = true;
         }
         Assertions.assertFalse(caught);
@@ -73,7 +89,7 @@ public class MainTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);
@@ -91,7 +107,7 @@ public class MainTest {
         String message = "";
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
             message = exc.getMessage();
         }
@@ -112,7 +128,7 @@ public class MainTest {
         String message = "";
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
             message = exc.getMessage();
         }
@@ -137,12 +153,43 @@ public class MainTest {
         String message = "";
         try {
             Main.main(example);
-        } catch (final ParameterException exc) {
+        } catch (final ParameterException | BaseException exc) {
             caught = true;
             message = exc.getMessage();
         }
         Assertions.assertTrue(caught);
         Assertions.assertEquals("Expected a value after parameter --rules", message);
+    }
+
+    /**
+     * Test passing the {@code --action} option with {@code convert} parameter
+     * and without {@code --source} option.
+     * @param source A temporary directory
+     */
+    @Test
+    public void testConvertWithoutSource(@TempDir final Path source) throws IOException {
+        final Path file = this.createTempTxtFile(source);
+        final String[] example = {
+            MainTest.ACTION,
+            MainTest.CONVERT,
+            MainTest.RULES,
+            file.toString(),
+            MainTest.DESTINATION,
+            MainTest.EXAMPLE_JSON,
+        };
+        boolean caught = false;
+        String message = "";
+        try {
+            Main.main(example);
+        } catch (final BaseException exc) {
+            caught = true;
+            message = exc.getErrorMessage();
+        }
+        Assertions.assertTrue(caught);
+        Assertions.assertEquals(
+            "Missed the [--source] option, source file not specified",
+            message
+        );
     }
 
     /**

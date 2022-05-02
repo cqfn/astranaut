@@ -8,7 +8,6 @@ package org.uast.astgen;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -171,9 +170,9 @@ public final class Main {
     /**
      * The main function. Parses the command line.
      * @param args The command-line arguments
-     * @throws IOException If fails
+     * @throws BaseException If fails
      */
-    public static void main(final String... args) {
+    public static void main(final String... args) throws BaseException {
         final Main main = new Main();
         final JCommander jcr = JCommander.newBuilder()
             .addObject(main)
@@ -188,8 +187,9 @@ public final class Main {
 
     /**
      * Runs actions.
+     * @throws BaseException If fails
      */
-    private void run() {
+    private void run() throws BaseException {
         final String rules = this.dsl.getPath();
         try {
             final String code = new FilesReader(rules).readAsString(
@@ -220,14 +220,11 @@ public final class Main {
                 final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
                 generator.generate();
             } else if (this.action == Action.CONVERT) {
-                new Interpreter(
-                    this.source.getPath(),
-                    this.destination.getPath(),
-                    program
-                ).run();
+                new Interpreter(this.source, this.destination, program).run();
             }
         } catch (final BaseException exc) {
             LOG.severe(String.format("%s, %s", exc.getInitiator(), exc.getErrorMessage()));
+            throw exc;
         }
     }
 
