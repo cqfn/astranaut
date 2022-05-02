@@ -4,11 +4,13 @@
  */
 package org.uast.astgen.interpreter;
 
+import java.util.List;
 import java.util.Map;
 import org.uast.astgen.base.Node;
 import org.uast.astgen.rules.Data;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Hole;
+import org.uast.astgen.rules.Parameter;
 import org.uast.astgen.rules.StringData;
 
 /**
@@ -34,7 +36,8 @@ public final class Matcher implements org.uast.astgen.base.Matcher {
     public boolean match(final Node node, final Map<Integer, Node> children,
         final Map<Integer, String> data) {
         return this.checkType(node) && this.checkChildCount(node)
-            && this.checkAndExtractData(node, data);
+            && this.checkAndExtractData(node, data)
+            && this.checkAndExtractChildren(node, children, data);
     }
 
     /**
@@ -71,6 +74,35 @@ public final class Matcher implements org.uast.astgen.base.Matcher {
             result = true;
         } else {
             result = node.getData().isEmpty();
+        }
+        return result;
+    }
+
+    /**
+     * Checks the child nodes matches, extracts the children.
+     * @param node The node
+     * @param children The collection for saving extracted children
+     * @param data The collection for saving extracted data
+     * @return Checking result, {@code true} if the data matches
+     */
+    private boolean checkAndExtractChildren(final Node node, final Map<Integer, Node> children,
+        final Map<Integer, String> data) {
+        boolean result = true;
+        final List<Parameter> parameters = this.descriptor.getParameters();
+        assert node.getChildCount() == parameters.size();
+        int index = 0;
+        for (final Parameter parameter : parameters) {
+            final Node child = node.getChild(index);
+            if (parameter instanceof Hole) {
+                children.put(((Hole) parameter).getValue(), child);
+            } else if (parameter instanceof Descriptor) {
+                final Matcher mather = new Matcher((Descriptor) parameter);
+                result = mather.match(child, children, data);
+                if (!result) {
+                    break;
+                }
+            }
+            index = index + 1;
         }
         return result;
     }
