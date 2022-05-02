@@ -19,7 +19,6 @@ import org.uast.astgen.utils.FilesReader;
  *
  * @since 1.0
  */
-@SuppressWarnings("PMD.SingularField")
 public class Interpreter {
     /**
      * The name of the source file.
@@ -34,7 +33,6 @@ public class Interpreter {
     /**
      * The DSL program.
      */
-    @SuppressWarnings("PMD.UnusedPrivateField")
     private final Program program;
 
     /**
@@ -60,7 +58,7 @@ public class Interpreter {
         if (this.destination == null) {
             throw DestinationNotSpecified.INSTANCE;
         }
-        final Node root = new JsonDeserializer(
+        final Node unprocessed = new JsonDeserializer(
             new FilesReader(this.source.getPath()).readAsString(
                 (FilesReader.CustomExceptionCreator<InterpreterException>) ()
                     -> new InterpreterException() {
@@ -74,7 +72,9 @@ public class Interpreter {
                     }
             )
         ).convert();
-        if (!new JsonSerializer(root).serializeToFile(this.destination.getPath())) {
+        final Adapter adapter = new Adapter(this.program.getTransformations());
+        final Node processed = adapter.convert(unprocessed);
+        if (!new JsonSerializer(processed).serializeToFile(this.destination.getPath())) {
             throw new InterpreterCouldNotWriteFile(this.destination.getPath());
         }
     }
