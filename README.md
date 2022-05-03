@@ -19,3 +19,29 @@ predefined syntax tree operations.
 
 In interpreter mode, the application transforms the syntax tree represented in JSON format according
 to the specified DSL rules.
+
+## Requirements
+
+* Java 1.8
+* Maven 3.8+ (to build)
+
+## Syntax tree representation
+
+![syntax tree](docs/ast_example.png)
+
+## Command line interface
+
+Here and below, it is assumed that the name of the executable file is `generator.jar`.
+
+### Compiler mode
+
+This mode generates Java source files that represent the structure of the specified syntax tree
+and methods for processing it. Such sources must be a part of another project that works with syntax trees.
+8 types of files are generated:
+* files `package-info.java`;
+
+Syntax:
+
+```
+java -jar generator.jar --action generate --rules <path to .dsl file> [options]
+```
