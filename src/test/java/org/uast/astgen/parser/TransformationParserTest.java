@@ -6,7 +6,9 @@ package org.uast.astgen.parser;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.uast.astgen.exceptions.ExpectedUniqueNumbers;
 import org.uast.astgen.exceptions.ParserException;
+import org.uast.astgen.exceptions.UnexpectedNumberUsed;
 import org.uast.astgen.exceptions.UnknownSymbol;
 import org.uast.astgen.rules.Transformation;
 
@@ -15,6 +17,7 @@ import org.uast.astgen.rules.Transformation;
  *
  * @since 1.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class TransformationParserTest {
     /**
      * Test case: simple transformation.
@@ -31,7 +34,7 @@ public class TransformationParserTest {
     @Test
     public void complexTransformation() {
         final boolean result = this.run(
-            "singleExpression(identifier(literal<#13>)) -> Variable(#13)"
+            "singleExpression(identifier(literal<#13>)) -> Identifier<#13>"
         );
         Assertions.assertTrue(result);
     }
@@ -53,6 +56,104 @@ public class TransformationParserTest {
     @Test
     public void wrongSyntax() {
         final boolean result = this.run("A -> 123", UnknownSymbol.class);
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: DSL line with duplicated child hole numbers in a left part.
+     */
+    @Test
+    public void duplicatedChildHoleNumbersInLeft() {
+        final boolean result = this.run(
+            "A(#1, #1) -> B(#3)",
+            ExpectedUniqueNumbers.class
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: DSL line with duplicated data hole numbers in a left part.
+     */
+    @Test
+    public void duplicatedDataHoleNumbersInLeft() {
+        final boolean result = this.run(
+            "A(B<#1>, B<#1>) -> C<#1>",
+            ExpectedUniqueNumbers.class
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: DSL line with unexpected child hole number in right part.
+     */
+    @Test
+    public void wrongChildHoleNumbersInRight() {
+        final boolean result = this.run(
+            "A(#1, #2) -> B(#3)",
+            UnexpectedNumberUsed.class
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: DSL line with unexpected data hole number in right part.
+     */
+    @Test
+    public void wrongDataHoleNumbersInRight() {
+        final boolean result = this.run(
+            "A(#1, B<#2>) -> B<#3>",
+            UnexpectedNumberUsed.class
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: DSL line with duplicated child hole numbers in a right part.
+     */
+    @Test
+    public void duplicatedChildHoleNumbersInRight() {
+        final boolean result = this.run(
+            "A(#1, #2) -> B(#1, #1)",
+            ExpectedUniqueNumbers.class
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: DSL line with duplicated data hole numbers in a right part.
+     */
+    @Test
+    public void duplicatedDataHoleNumbersInRight() {
+        final boolean result = this.run(
+            "A(B<#1>, C<#2>) -> D(E<#1>, E<#1>)",
+            ExpectedUniqueNumbers.class
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: DSL line with a child hole number in a right part which duplicates
+     *  a data hole number.
+     */
+    @Test
+    public void duplicatedDataHoleNumberByChildHoleNumberInRight() {
+        final boolean result = this.run(
+            "A(B<#1>, C(#2)) -> D(E<#1>, F(#2), G(#1))",
+            ExpectedUniqueNumbers.class
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: DSL line with a data hole number in a right part which duplicates
+     *  a child hole number.
+     */
+    @Test
+    public void duplicatedChildHoleNumberByDataHoleNumberInRight() {
+        final boolean result = this.run(
+            "A(B<#1>, C(#2)) -> D(E<#1>, F(#2), G<#2>)",
+            ExpectedUniqueNumbers.class
+        );
         Assertions.assertTrue(result);
     }
 
