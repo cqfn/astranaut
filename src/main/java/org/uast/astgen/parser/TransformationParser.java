@@ -163,7 +163,7 @@ public class TransformationParser {
                     params.add((Hole) parameter);
                 }
                 if (parameter instanceof Descriptor) {
-                    getAllHolesInRulePart((Descriptor) parameter, data, params);
+                    getAllHolesInRulePart((Descriptor) parameter, params, data);
                 }
             }
         }
