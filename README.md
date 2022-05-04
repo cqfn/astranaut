@@ -172,7 +172,7 @@ from a class or an interface described in this package. In the `generator` proje
 and must be moved to the target project so that the generated classes can be compiled;
 * `--version` (short: `-v`), specifies the version of the implementation. This version will be added as 
 a `@since` tag to every generated class or interface. Default value is `1.0`;
-* `--test` (short: `t`), without a parameter, test mode. The DSL syntax will be checked, but no files
+* `--test` (short: `-t`), without a parameter, test mode. The DSL syntax will be checked, but no files
 will be written to the file system.
 
 Example:
@@ -181,3 +181,34 @@ Example:
 java -jar generator.jar -a generate --dsl my_rules.dsl -o d:\my_other_project\src\java
      -p com.example.project.ast -b com.example.project.base -l d:\my_other_project\LICENSE.txt
 ```
+
+## Domain-specific language
+
+A DSL program is a set of rules separated by semicolons `;`.
+
+Each rule consists of a left part, a delimiter and a right part, for example:
+
+```
+Addition <- left@Expression, right@Expression;
+```
+There are two types of delimiters. The rule containing the `<-` delimiter describes the structure
+of a syntax tree node. The rule containing the `->` delimiter describes a transformation.
+
+### Description rules
+
+These rules describe the structure of the syntax tree. ***These rules work only in generation mode
+and are ignored by the interpreter***.
+
+### "Ordinary" node descriptor
+
+Describes an "ordinary" node that has a name and possibly some set of successor nodes.
+
+Syntax:
+```
+Type <- Type, Type, ... ;
+```
+For example,
+```
+Addition <- Expression, Expression;
+```
+What does it mean: "A node of type `Addition` has two successors, each of `Expression` type".
