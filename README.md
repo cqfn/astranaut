@@ -90,15 +90,94 @@ required to process the syntax tree, but this application will ignore such data.
 
 Here and below, it is assumed that the name of the executable file is `generator.jar`.
 
-### Compiler mode
+### Interpreter mode
 
-This mode generates Java source files that represent the structure of the specified syntax tree
-and methods for processing it. Such sources must be a part of another project that works with syntax trees.
-8 types of files are generated:
-* files `package-info.java`;
+In this mode, the application loads from files: the source tree represented in JSON format
+as well as the transformation rules described using the DSL syntax, then performs
+transformations and saves the resulting tree in JSON format to a new file.
 
 Syntax:
 
 ```
-java -jar generator.jar --action generate --rules <path to .dsl file> [options]
+java -jar generator.jar --action convert --rules <path to .dsl file> --source <path to sourse .json>
+     --destination <destination.json>
+```
+
+Required arguments:
+
+* `--action` (short: `-a`), the action, should be `convert`;
+* `--rules` (short: `--dsl`, `-r`), the path to a file that contains rules described using the DSL
+syntax, expected file extensions are `.dsl` or `.txt`;
+* `--source` (short: `--src`, `-s`), the path to a file that contains a syntax tree represented
+in JSON format, expected file extension is `.json`;
+* `--destination` (short: `--dst`, `-d`), path to the file where the result will be saved, 
+file extension is `.json`.
+
+This mode does not take any optional arguments.
+
+Example:
+
+```
+java -jar generator.jar -a convert --dsl my_rules.dsl --src source_tree.json --dst result.json
+```
+
+### Compiler mode
+
+This mode generates Java source files that represent the structure of the specified syntax tree
+and methods for processing it. Such sources must be a part of another project that works with syntax trees.
+9 types of files are generated:
+* `package-info.java`;
+* classes that describe the nodes of the syntax tree with a set of required and optional successors
+(so-called "ordinary nodes");
+* classes that describe terminal nodes, such as literals;
+* classes that describe nodes whose list of successors is limited to sub-nodes of one type (so-called
+"list nodes");
+* interfaces that combine some nodes that belong to the same parent type, or the so-called "abstract nodes";
+* factories that create nodes, with syntactic correctness checking;
+* matchers that find subtrees according to some pattern;
+* converters that perform one syntax tree transformation as described by DSL rules;
+* adapters that perform syntax tree transformation applying all rules in some sequence.
+
+Each line of DSL code produces at least 200 lines of Java code.
+Generated code can be checked by static code analyzers such as PMD without any warnings.
+
+Unlike an interpreter, this mode allows you to implement applications that describe a strict
+syntax tree structure. Each code transformation is performed with a syntactic correctness check.
+
+Syntax:
+
+```
+java -jar generator.jar --action generate --rules <path to .dsl file> [optional arguments]
+```
+
+Required arguments:
+
+* `--action` (short: `-a`), the action, should be `generate`;
+* `--rules` (short: `--dsl`, `-r`), the path to a file that contains rules described using the DSL
+  syntax, expected file extensions are `.dsl` or `.txt`.
+
+Optional arguments:
+
+* `--license` (short: `-l`), the file containing license information. This information will be added
+to the beginning of each generated file. The license information is required for the generated code to be 
+validated by a code checker without errors. Default value is `LICENSE_header.txt`;
+* `--output` (short: `-o`), output folder where files will be generated. Default value is `./generated`;
+* `--package` (short: `-p`), the name of the package that contains the generated classes.
+An appropriate directory structure will be built. Default value is `org.uast`;
+* `--base` (short: `-b`), the name of the package that contains the base classes and interfaces
+that describe the base structure of the syntax tree. Each generated class or interface inherits
+from a class or an interface described in this package. In the `generator` project, this package is named
+`org.uast.astgen.base`
+([sources](https://github.com/unified-ast/ast-generator/tree/master/src/main/java/org/uast/astgen/base))
+and must be moved to the target project so that the generated classes can be compiled;
+* `--version` (short: `-v`), specifies the version of the implementation. This version will be added as 
+a `@since` tag to every generated class or interface. Default value is `1.0`;
+* `--test` (short: `t`), without a parameter, test mode. The DSL syntax will be checked, but no files
+will be written to the file system.
+
+Example:
+
+```
+java -jar generator.jar -a generate --dsl my_rules.dsl -o d:\my_other_project\src\java
+     -p com.example.project.ast -b com.example.project.base -l d:\my_other_project\LICENSE.txt
 ```
