@@ -194,12 +194,21 @@ Addition <- left@Expression, right@Expression;
 There are two types of delimiters. The rule containing the `<-` delimiter describes the structure
 of a syntax tree node. The rule containing the `->` delimiter describes a transformation.
 
-### Description rules
+### §1. Description rules
+
+Description rules consist of a type name and a list of child node types, separated by the `<-` delimiter.
 
 These rules describe the structure of the syntax tree. ***These rules work only in generation mode
 and are ignored by the interpreter***.
 
-### "Ordinary" node descriptor
+### §2. Successor nodes number
+Each AST node should contain a number of successor nodes that satisfies only one of the listed options:
+
+* The number of successors is limited. Successors can be of different types.
+* The number of successors is unlimited. All successors must be of the same type.
+* No successors.
+
+### §3. "Ordinary" nodes
 
 Describes an "ordinary" node that has a name and possibly some set of successor nodes.
 
@@ -211,4 +220,137 @@ For example,
 ```
 Addition <- Expression, Expression;
 ```
-What does it mean: "A node of type `Addition` has two successors, each of `Expression` type".
+What does it mean: "A node of type `Addition` has two successors, each of `Expression` type". 
+Such a node can only be created if all the necessary child nodes of the specified type are present,
+otherwise the factory will not build this node. This condition applies to all nodes of the tree.
+Thus, the main feature of a syntax tree described using DSL rules is achieved - **if a syntax tree 
+is built, then it is syntactically correct**.
+
+### §4. Tagged child type names
+
+You can add a tag for a child type. Syntax:
+```
+Type <- tag@Type, ... ;
+```
+For example,
+```
+Addition <- left@Expression, right@Expression;
+```
+When generating code, for each successor that has a tag, additional methods will be created:
+* getter, i.e. method `get...()`, for example `getLeft()`, `getRight()`, to get a child node by its tag,
+which can be convenient when writing a parser;
+* setter, i.e. method `set...()`, for example `setLeft()`, `setRight()`, to specify a child node separately
+when constructing a node.
+
+### §5. Optional child nodes
+
+A set of child nodes can have optional nodes.
+The type name of an optional child node is placed in square brackets. Syntax:
+```
+Type <- [Type], ... ;
+```
+For example,
+```
+Return <- [Expression];
+```
+What does it mean: "A node of type `Return` has no successors, or has one successor of `Expression` type".
+
+Another example:
+```
+VariableDeclaration <- [type@Identifier], name@Identifier, [init@Expression];
+```
+What does it mean: "A node of `VariableDeclaration` type has at least one successor of `Identifier` type,
+and it may or may not have up to two additional successors: one of `Identifier` type
+and one of `Expression` type".
+
+### §6. Nodes without successors
+
+A node that has no successors is described like this:
+
+```
+Type <- 0;
+```
+For example,
+```
+PublicModifier <- 0;
+```
+
+### §7. Literals
+
+This is a special type of node that has data. Node data is stored in its "natural" form
+(that is, integers in an `int` variable, strings in a `String` variable, and so on), so you need
+to specify methods for parsing and serializing such data.
+
+Native Java code is placed between dollar signs `$`, for example:
+```
+$Integer.parseInt(#)$
+```
+Rule syntax:
+
+```
+Type <- $type$, $serializer$, $parser$ [, $exception$];
+```
+Where:
+
+* `type` is a name of native Java type, for example, `$int$`, `$String$`, and so on;
+* `serializer` is a Java expression, a piece of code that converts a node's internal variable
+to a string. The name of the internal variable is replaced with a hash symbol `#`. Example:
+`String.valueOf(#)`;
+* `parser` is a Java expression, a piece of code that converts an input string to 
+a node's internal variable. The name of the input variable that contains string,
+is replaced with a hash symbol `#`. Example: `$Integer.parseInt(#)$`;
+* `exception` (optional) is the class name of a Java exception that may be thrown during 
+the conversion of a string to an internal type, for example, `$NumberFormatException$`.
+
+Examples:
+```
+IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$, $NumberFormatException$;
+StringLiteral <- $String$, $#$, $#$;
+```
+
+### §8. List nodes
+
+A list node is a node, the number of successors of which is unlimited, and all successors
+of the same type. Syntax:
+```
+Type <- {Type};
+```
+For example,
+```
+BlockStatement <- {Statement};
+```
+
+### §9. Abstract nodes
+
+An abstract node is a node whose type combines several other types.
+An abstract node cannot be instantiated directly; however a non-abstract type node can be customized
+to an abstract type node.
+
+Syntax:
+```
+Type <- Type | Type | ... ;
+```
+For example:
+```
+Addition <- Expression, Expression;
+Subtraction <- Expression, Expression;
+IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$, $NumberFormatException$;
+Expression <- Addition | Subtraction | IntegerLiteral;
+```
+What does it mean: "An abstract node of `Expression` type combines nodes of `Addition`, `Subtraction`,
+`IntegerLiteral` types. Therefore, the successor of, for example, a node of the `Addition` type
+can be a node of `Subtraction` or `IntegerLiteral` type, or another node of `Addition` type".
+
+An abstract node can also combine other abstract nodes. The previous example could be rewritten like this:
+```
+Addition <- Expression, Expression;
+Subtraction <- Expression, Expression;
+BinaryOperator <- Addition | Subtraction;
+IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$, $NumberFormatException$;
+Expression <- BinaryOperator | IntegerLiteral;
+```
+
+If an abstract node contains only one non-abstract node, then it is described as follows:
+```
+Type <- Type | 0;
+```
