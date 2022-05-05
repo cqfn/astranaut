@@ -25,6 +25,14 @@ to the specified DSL rules.
 * Java 1.8
 * Maven 3.8+ (to build)
 
+## How to build and download
+
+You can download the latest release
+[here](https://github.com/unified-ast/ast-generator/releases).
+
+Fastest way to build the executable is to open the project in Intellij IDEA, select the "Maven" tab
+and double-click on the "Package" item.
+
 ## Syntax tree representation
 
 An abstract syntax tree is a directed graph with the following properties:
