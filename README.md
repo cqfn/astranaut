@@ -23,7 +23,7 @@ to the specified DSL rules.
 ## Requirements
 
 * Java 1.8
-* Maven 3.8+ (to build)
+* Maven 3.6.3+ (to build)
 
 ## How to build and download
 
@@ -31,7 +31,14 @@ You can download the latest release
 [here](https://github.com/unified-ast/ast-generator/releases).
 
 Fastest way to build the executable is to open the project in Intellij IDEA, select the "Maven" tab
-and double-click on the "Package" item.
+and double-click on the "package" item.
+
+To build using console, go to the folder that contains the project, and type:
+```
+mvn package
+```
+
+In both ways, the executable file named `generator.jar` will be in the `target` folder.
 
 ## Syntax tree representation
 
@@ -192,6 +199,8 @@ java -jar generator.jar -a generate --dsl my_rules.dsl -o d:\my_other_project\sr
 
 ## Domain-specific language
 
+### §1. Program structure
+
 A DSL program is a set of rules separated by semicolons `;`.
 
 Each rule consists of a left part, a delimiter and a right part, for example:
@@ -202,21 +211,57 @@ Addition <- left@Expression, right@Expression;
 There are two types of delimiters. The rule containing the `<-` delimiter describes the structure
 of a syntax tree node. The rule containing the `->` delimiter describes a transformation.
 
-### §1. Description rules
+### §2. Green and red nodes
+
+The project was created as part of an investigation related to the unification of syntactic trees.
+It therefore included a mechanism to support the so-called "green" and "red" nodes.
+
+The program can be divided into sections. A section marker consists of an identifier
+(programming language name), followed by a colon, for example:
+
+```
+Addition <- Expression, Expression;
+
+java:
+
+Synchronized <- Expression, BlockStatement;
+```
+
+All rules that are described after such a marker refer to the appropriate programming language.
+
+A section that is at the beginning of a program that does not have a marker is called
+a common or **green** section. Green section contains description of **green** nodes.
+
+A green node is a node that represents some construction which has a common meaning in all
+programming languages under consideration.
+
+Each green node should contain a comprehensive number of children.
+It means that such a node may represent all possible varieties of the corresponding language
+construction. E.g., the green node `Addition <- Expression, Expression;` matches the addition
+construction of all programming languages. This node has the same successors set for Java,
+JavaScript, Python, and so on.
+
+Another example, the `Synchronized` construction only occurs in the Java language.
+It is in the corresponding section, and therefore it is a **red** node.
+
+The source code generator generates classes and interfaces related to different programming languages
+into different packages.
+
+### §3. Description rules
 
 Description rules consist of a type name and a list of child node types, separated by the `<-` delimiter.
 
 These rules describe the structure of the syntax tree. ***These rules work only in generation mode
 and are ignored by the interpreter***.
 
-### §2. Successor nodes number
+### §4. Successor nodes number
 Each AST node should contain a number of successor nodes that satisfies only one of the listed options:
 
 * The number of successors is limited. Successors can be of different types.
 * The number of successors is unlimited. All successors must be of the same type.
 * No successors.
 
-### §3. "Ordinary" nodes
+### §5. "Ordinary" nodes
 
 Describes an "ordinary" node that has a name and possibly some set of successor nodes.
 
@@ -234,7 +279,7 @@ otherwise the factory will not build this node. This condition applies to all no
 Thus, the main feature of a syntax tree described using DSL rules is achieved - **if a syntax tree 
 is built, then it is syntactically correct**.
 
-### §4. Tagged child type names
+### §6. Tagged child type names
 
 You can add a tag for a child type. Syntax:
 ```
@@ -250,7 +295,7 @@ which can be convenient when writing a parser;
 * setter, i.e. method `set...()`, for example `setLeft()`, `setRight()`, to specify a child node separately
 when constructing a node.
 
-### §5. Optional child nodes
+### §7. Optional child nodes
 
 A set of child nodes can have optional nodes.
 The type name of an optional child node is placed in square brackets. Syntax:
@@ -271,7 +316,7 @@ What does it mean: "A node of `VariableDeclaration` type has at least one succes
 and it may or may not have up to two additional successors: one of `Identifier` type
 and one of `Expression` type".
 
-### §6. Nodes without successors
+### §8. Nodes without successors
 
 A node that has no successors is described like this:
 
@@ -283,7 +328,7 @@ For example,
 PublicModifier <- 0;
 ```
 
-### §7. Literals
+### §9. Literals
 
 This is a special type of node that has data. Node data is stored in its "natural" form
 (that is, integers in an `int` variable, strings in a `String` variable, and so on), so you need
@@ -316,7 +361,7 @@ IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$, $NumberForm
 StringLiteral <- $String$, $#$, $#$;
 ```
 
-### §8. List nodes
+### §10. List nodes
 
 A list node is a node, the number of successors of which is unlimited, and all successors
 of the same type. Syntax:
@@ -328,7 +373,7 @@ For example,
 BlockStatement <- {Statement};
 ```
 
-### §9. Abstract nodes
+### §11. Abstract nodes
 
 An abstract node is a node whose type combines several other types.
 An abstract node cannot be instantiated directly; however a non-abstract type node can be customized
@@ -363,7 +408,28 @@ If an abstract node contains only one non-abstract node, then it is described as
 Type <- Type | 0;
 ```
 
-### §10. Transformation rules
+It is possible to combine an abstract node located in a section related to a specific
+programming language (red section) with an abstract node with the same name, but located in
+the green section. This allows to support a hierarchy of nodes for a specific programming
+language. Syntax:
+```
+Type <- & | Type | ...
+```
+For example:
+```
+Addition <- Expression, Expression;
+Subtraction <- Expression, Expression;
+Expression <- Addition | Subtraction;
+
+c:
+
+AddressOf <- Expression;
+Expression <- & | AddressOf;
+```
+Here, for the C programming language, we added a node that describes "address of" operator.
+It inherits from the `Expression` type.
+
+### §12. Transformation rules
 
 Transformation rules consist of two descriptors, separated by the `->` delimiter.
 ```
@@ -373,7 +439,7 @@ The left descriptor describes the subtree template that is searched for in the t
 The right descriptor describes the resulting subtree, which replaces the original subtree
 in case of a pattern match.
 
-### §11. Transformation descriptor syntax
+### §13. Transformation descriptor syntax
 
 The descriptor consists of the type name and optionally a list of parameters and data.
 
@@ -425,7 +491,7 @@ An example of a descriptor that contains another descriptor, as well as holes:
 singleExpression(#1, literal<"+">, #2)
 ```
 
-### §12. Transformation principles
+### §14. Transformation principles
 
 The converter sequentially applies the rules to all nodes of the source tree, starting from the leaves.
 Each node is treated as a subtree. If a new subtree is created as a result of applying the rule,
