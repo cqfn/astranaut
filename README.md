@@ -354,3 +354,151 @@ If an abstract node contains only one non-abstract node, then it is described as
 ```
 Type <- Type | 0;
 ```
+
+### §10. Transformation rules
+
+Transformation rules consist of two descriptors, separated by the `->` delimiter.
+```
+Descriptor -> Descriptor;
+```
+The left descriptor describes the subtree template that is searched for in the tree being transformed.
+The right descriptor describes the resulting subtree, which replaces the original subtree
+in case of a pattern match.
+
+### §11. Transformation descriptor syntax
+
+The descriptor consists of the type name and optionally a list of parameters and data.
+
+A descriptor with no parameters or data is just a type name:
+```
+Type
+```
+For example,
+```
+PublicModifier
+```
+Descriptors may contain holes. A hole is a marker that designates a child node or data
+to be transferred to the resulting subtree. The hole syntax is a hash sign followed by a positive number:
+```
+#1
+```
+The descriptor data is specified in angle brackets after the type name.
+The data can be a quoted string or a hole.
+
+Descriptor example that contains data represented as a quoted string:
+```
+literal<"+">
+```
+Descriptor example that contains data represented as a hole:
+```
+literal<#0> 
+```
+Characters within a string can be escaped, similar to how it is done in the C or Java programming
+languages. The `\n` construction means "newline", `\r` - "carriage return", `\t` - "tabulation",
+and  `\"` - "quote character".
+
+Descriptor example that contains data represented as a string that contains escaped character:
+```
+literal<"test\n">
+```
+
+The parameter list specifies in parentheses after the type name:
+```
+Type(Parameter, Parameter, ...)
+```
+The parameter can be another descriptor or a hole.
+
+An example of a descriptor that contains two holes in the parameter list:
+```
+Addition(#1, #2)
+```
+An example of a descriptor that contains another descriptor, as well as holes:
+```
+singleExpression(#1, literal<"+">, #2)
+```
+
+### §12. Transformation principles
+
+The converter sequentially applies the rules to all nodes of the source tree, starting from the leaves.
+Each node is treated as a subtree. If a new subtree is created as a result of applying the rule,
+the original subtree is replaced with the new one.
+
+The converter compares the pattern described on the left side of the transformation rule with the subtree,
+and if the pattern matches, creates the subtree described on the right side.
+
+Let's consider several types of descriptors and the actions that the converter performs
+if the descriptor is on the left and on the right side of the transformation rule.
+
+#### Descriptor without parameters and data
+
+```
+Type
+```
+
+*Left side*: The converter compares the node type name with the `Type`.
+If they match, and the node has no successors and no data, then the pattern is considered a match.
+
+*Right side*: The converter creates a node of the specified type, without successors and data.
+
+#### Descriptor with data represented as a string
+
+```
+Type<"...">
+```
+
+*Left side*: The converter compares the node type name with the `Type` and the node data
+with the specified data. If they match, and the node has no successors, then the pattern is considered
+a match.
+
+*Right side*: The converter creates a node of the specified type and data and without successors.
+
+#### Descriptor with data represented as a hole
+
+```
+Type<#...>
+```
+
+*Left side*: The converter compares the node type name with the `Type`.
+If they match, and the node has no successors and no data, then the pattern is considered a match.
+The converter extracts the node data and places it in the cell with the specified number.
+
+*Right side*: The converter creates a node of the specified type, with the data extracted from the cell
+with the specified number, and without successors.
+
+#### Descriptor with a hole parameter
+
+```
+Type(#..., ...)
+```
+
+*Left side*: The converter compares the node type name with the `Type`. If they match, and the node
+has the same number of successors as the number of parameters, and also the node has no data,
+then the pattern is considered a match. The converter extracts the child node and places it in the cell
+with the specified number.
+
+*Right side*: The converter creates a node of the specified type, with the successor extracted from
+the cell with the specified number, and without data.
+
+#### Descriptor with a descriptor parameter
+
+```
+Type(Type...)
+```
+
+*Left side*: The converter compares the node type name with the `Type`.
+If they match, and the node has the same number of successors as the number of parameters,
+and also the node has no data, then the converter extracts the subtree and recursively tries to compare
+the sub-descriptor and subtree. If the sub-descriptor matches, the whole pattern is considered a match.
+
+*Right side*: The converter creates a successor node as specified in the sub-descriptor,
+then creates a node of the specified type, with this successor and without data.
+
+#### Example
+
+```
+singleExpression(#1, literal<"+">, #2) -> Addition(#1, #2);
+```
+If the name of the node type is `singleExpression`, and the node has three successors, and the name of
+the type of the second successor is `literal`, and the second successor has the data represented as `+`
+string, then replace this node by another with `Addition` type, which has successors that are first and third
+successors of original node.
