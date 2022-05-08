@@ -4,12 +4,11 @@
  */
 package org.uast.astgen.interpreter;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.uast.astgen.base.Builder;
-import org.uast.astgen.base.EmptyTree;
 import org.uast.astgen.base.Factory;
+import org.uast.astgen.base.ListBuilder;
 import org.uast.astgen.base.Node;
 import org.uast.astgen.rules.Data;
 import org.uast.astgen.rules.Descriptor;
@@ -49,18 +48,14 @@ public class Creator {
      * @param data The collection contains extracted data
      * @return A node
      */
-    public Node create(final Factory factory, final Map<Integer, Node> children,
+    public Node create(final Factory factory, final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
         final Builder builder = factory.createBuilder(this.descriptor.getType());
-        final List<Node> list = new LinkedList<>();
+        final ListBuilder<Node> list = new ListBuilder<>();
         int index = 0;
         for (final Parameter parameter : this.descriptor.getParameters()) {
             if (parameter instanceof Hole) {
-                final Node child = children.getOrDefault(
-                    ((Hole) parameter).getValue(),
-                    EmptyTree.INSTANCE
-                );
-                list.add(child);
+                list.merge(children.get(((Hole) parameter).getValue()));
             } else if (parameter instanceof Descriptor) {
                 final Creator creator;
                 if (this.subs[index] == null) {
@@ -74,7 +69,7 @@ public class Creator {
             }
             index = index + 1;
         }
-        builder.setChildrenList(list);
+        builder.setChildrenList(list.build());
         this.setData(builder, data);
         return builder.createNode();
     }

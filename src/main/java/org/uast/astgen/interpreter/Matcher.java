@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.interpreter;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.uast.astgen.base.Node;
@@ -39,7 +40,7 @@ public final class Matcher implements org.uast.astgen.base.Matcher {
     }
 
     @Override
-    public boolean match(final Node node, final Map<Integer, Node> children,
+    public boolean match(final Node node, final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
         return this.checkType(node) && this.checkChildCount(node)
             && this.checkAndExtractData(node, data)
@@ -91,8 +92,8 @@ public final class Matcher implements org.uast.astgen.base.Matcher {
      * @param data The collection for saving extracted data
      * @return Checking result, {@code true} if the data matches
      */
-    private boolean checkAndExtractChildren(final Node node, final Map<Integer, Node> children,
-        final Map<Integer, String> data) {
+    private boolean checkAndExtractChildren(final Node node, final Map<Integer,
+        List<Node>> children, final Map<Integer, String> data) {
         boolean result = true;
         final List<Parameter> parameters = this.descriptor.getParameters();
         assert node.getChildCount() == parameters.size();
@@ -100,7 +101,7 @@ public final class Matcher implements org.uast.astgen.base.Matcher {
         for (final Parameter parameter : parameters) {
             final Node child = node.getChild(index);
             if (parameter instanceof Hole) {
-                children.put(((Hole) parameter).getValue(), child);
+                children.put(((Hole) parameter).getValue(), Collections.singletonList(child));
             } else if (parameter instanceof Descriptor) {
                 final Matcher mather;
                 if (this.subs[index] == null) {

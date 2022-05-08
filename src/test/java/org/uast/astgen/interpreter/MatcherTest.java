@@ -5,6 +5,7 @@
 package org.uast.astgen.interpreter;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.junit.jupiter.api.Assertions;
@@ -150,11 +151,11 @@ public class MatcherTest {
         final LabelFactory labels = new LabelFactory();
         final DescriptorFactory factory = new DescriptorFactory(labels.getLabel(), type);
         factory.addParameter(new Hole(1));
-        final Map<Integer, Node> extracted = new TreeMap<>();
+        final Map<Integer, List<Node>> extracted = new TreeMap<>();
         final boolean result = new Matcher(factory.createDescriptor())
             .match(node, extracted, Collections.emptyMap());
         Assertions.assertTrue(result);
         Assertions.assertTrue(extracted.containsKey(1));
-        Assertions.assertEquals(data, extracted.get(1).getData());
+        Assertions.assertEquals(data, extracted.get(1).get(0).getData());
     }
 }
