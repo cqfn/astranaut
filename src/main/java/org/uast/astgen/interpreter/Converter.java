@@ -4,6 +4,7 @@
  */
 package org.uast.astgen.interpreter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.uast.astgen.base.EmptyTree;
@@ -39,7 +40,7 @@ public final class Converter implements org.uast.astgen.base.Converter {
     @Override
     public Node convert(final Node node, final Factory factory) {
         Node result = EmptyTree.INSTANCE;
-        final Map<Integer, Node> children = new TreeMap<>();
+        final Map<Integer, List<Node>> children = new TreeMap<>();
         final Map<Integer, String> data = new TreeMap<>();
         if (this.matcher.match(node, children, data)) {
             result = this.creator.create(factory, children, data);
