@@ -57,6 +57,7 @@ final class OrdinaryNodeGenerator extends BaseNodeGenerator {
         unit.addImport(base.concat(".ChildDescriptor"));
         if (!this.statement.getRule().isEmpty()) {
             unit.addImport(base.concat(".ChildrenMapper"));
+            unit.addImport(base.concat(".ListUtils"));
         }
         unit.addImport(base.concat(".EmptyFragment"));
         unit.addImport(base.concat(".Fragment"));

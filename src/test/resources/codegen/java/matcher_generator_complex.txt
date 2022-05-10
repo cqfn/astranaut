@@ -5,6 +5,8 @@
 
 package org.uast;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.uast.uast.base.Matcher;
 import org.uast.uast.base.Node;
@@ -38,14 +40,14 @@ public final class Matcher0 implements Matcher {
 
     @Override
     public boolean match(final Node node,
-        final Map<Integer, Node> children,
+        final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
         final boolean result = node.belongsToGroup(Matcher0.EXPECTED_TYPE)
             && node.getChildCount() == Matcher0.EXPECTED_COUNT
             && Matcher1.INSTANCE.match(node.getChild(0), children, data)
             && Matcher3.INSTANCE.match(node.getChild(1), children, data);
         if (result) {
-            children.put(2, node.getChild(2));
+            children.put(2, Collections.singletonList(node.getChild(2)));
         }
         return result;
     }
@@ -58,6 +60,7 @@ public final class Matcher0 implements Matcher {
 
 package org.uast;
 
+import java.util.List;
 import java.util.Map;
 import org.uast.uast.base.Matcher;
 import org.uast.uast.base.Node;
@@ -91,7 +94,7 @@ public final class Matcher1 implements Matcher {
 
     @Override
     public boolean match(final Node node,
-        final Map<Integer, Node> children,
+        final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
         return node.belongsToGroup(Matcher1.EXPECTED_TYPE)
             && node.getChildCount() == Matcher1.EXPECTED_COUNT
@@ -106,6 +109,7 @@ public final class Matcher1 implements Matcher {
 
 package org.uast;
 
+import java.util.List;
 import java.util.Map;
 import org.uast.uast.base.Matcher;
 import org.uast.uast.base.Node;
@@ -139,7 +143,7 @@ public final class Matcher2 implements Matcher {
 
     @Override
     public boolean match(final Node node,
-        final Map<Integer, Node> children,
+        final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
         final boolean result = node.belongsToGroup(Matcher2.EXPECTED_TYPE)
             && node.getChildCount() == Matcher2.EXPECTED_COUNT;
@@ -157,6 +161,7 @@ public final class Matcher2 implements Matcher {
 
 package org.uast;
 
+import java.util.List;
 import java.util.Map;
 import org.uast.uast.base.Matcher;
 import org.uast.uast.base.Node;
@@ -195,7 +200,7 @@ public final class Matcher3 implements Matcher {
 
     @Override
     public boolean match(final Node node,
-        final Map<Integer, Node> children,
+        final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
         return node.belongsToGroup(Matcher3.EXPECTED_TYPE)
             && node.getChildCount() == Matcher3.EXPECTED_COUNT

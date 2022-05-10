@@ -45,6 +45,11 @@ public class MatcherClassFiller {
     private final Descriptor descriptor;
 
     /**
+     * Flag indicates that the package 'java.util.Collections' is needed.
+     */
+    private boolean collections;
+
+    /**
      * Constructor.
      * @param generator The generator
      * @param klass Class to be filled
@@ -55,6 +60,7 @@ public class MatcherClassFiller {
         this.generator = generator;
         this.klass = klass;
         this.descriptor = descriptor;
+        this.collections = false;
     }
 
     /**
@@ -66,6 +72,14 @@ public class MatcherClassFiller {
         this.klass.makeSingleton();
         this.createStaticFields();
         this.createMatchMethod();
+    }
+
+    /**
+     * Returns the flag indicates that the package 'java.util.Collections' is needed.
+     * @return The flag
+     */
+    public boolean isCollectionsNeeded() {
+        return this.collections;
     }
 
     /**
@@ -104,7 +118,7 @@ public class MatcherClassFiller {
         method.makeOverridden();
         method.setReturnType("boolean");
         method.addArgument("Node", "node");
-        method.addArgument("Map<Integer, Node>", "children");
+        method.addArgument("Map<Integer, List<Node>>", "children");
         method.addArgument("Map<Integer, String>", "data");
         final String condition = this.createCondition();
         if (this.descriptor.hasHole()) {
@@ -182,10 +196,11 @@ public class MatcherClassFiller {
         int index = 0;
         for (final Parameter parameter : this.descriptor.getParameters()) {
             if (parameter instanceof Hole) {
+                this.collections = true;
                 final Hole hole = (Hole) parameter;
                 extractor.append(
                     String.format(
-                        "children.put(%d, node.getChild(%d));\n",
+                        "children.put(%d, Collections.singletonList(node.getChild(%d)));\n",
                         hole.getValue(),
                         index
                     )

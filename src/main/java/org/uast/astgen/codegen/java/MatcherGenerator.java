@@ -62,13 +62,18 @@ public final class MatcherGenerator {
             "Checks if the node matches some structure, and extracts the data and children",
             name
         );
-        new MatcherClassFiller(this, klass, descriptor).fill();
+        final MatcherClassFiller filler = new MatcherClassFiller(this, klass, descriptor);
+        filler.fill();
         final CompilationUnit unit = new CompilationUnit(
             this.env.getLicense(),
             this.pkg,
             klass
         );
+        unit.addImport("java.util.List");
         unit.addImport("java.util.Map");
+        if (filler.isCollectionsNeeded()) {
+            unit.addImport("java.util.Collections");
+        }
         final String base = this.env.getBasePackage();
         unit.addImport(base.concat(".Matcher"));
         unit.addImport(base.concat(".Node"));
