@@ -18,11 +18,18 @@ public final class Hole implements Data, Parameter {
     private final int value;
 
     /**
+     * Attribute.
+     */
+    private final HoleAttribute attribute;
+
+    /**
      * Constructor.
      * @param value Value of the hole
+     * @param attribute Attribute
      */
-    public Hole(final int value) {
+    public Hole(final int value, final HoleAttribute attribute) {
         this.value = value;
+        this.attribute = attribute;
     }
 
     /**
@@ -33,12 +40,23 @@ public final class Hole implements Data, Parameter {
         return this.value;
     }
 
+    /**
+     * Returns the attribute of the hole.
+     * @return The attribute
+     */
+    public HoleAttribute getAttribute() {
+        return this.attribute;
+    }
+
     @Override
     public String toString() {
-        return new StringBuilder()
+        final StringBuilder builder = new StringBuilder()
             .append('#')
-            .append(this.value)
-            .toString();
+            .append(this.value);
+        if (this.attribute == HoleAttribute.ELLIPSIS) {
+            builder.append("...");
+        }
+        return builder.toString();
     }
 
     @Override

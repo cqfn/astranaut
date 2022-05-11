@@ -15,6 +15,7 @@ import org.uast.astgen.base.Node;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.DescriptorFactory;
 import org.uast.astgen.rules.Hole;
+import org.uast.astgen.rules.HoleAttribute;
 import org.uast.astgen.rules.StringData;
 import org.uast.astgen.utils.LabelFactory;
 
@@ -94,7 +95,7 @@ public class MatcherTest {
         final Node node = ctor.createNode();
         final LabelFactory labels = new LabelFactory();
         final DescriptorFactory factory = new DescriptorFactory(labels.getLabel(), type);
-        factory.setData(new Hole(0));
+        factory.setData(new Hole(0, HoleAttribute.NONE));
         final Descriptor descriptor = factory.createDescriptor();
         final Matcher matcher = new Matcher(descriptor);
         final Map<Integer, String> collection = new TreeMap<>();
@@ -150,7 +151,7 @@ public class MatcherTest {
         final Node node = ctor.createNode();
         final LabelFactory labels = new LabelFactory();
         final DescriptorFactory factory = new DescriptorFactory(labels.getLabel(), type);
-        factory.addParameter(new Hole(1));
+        factory.addParameter(new Hole(1, HoleAttribute.NONE));
         final Map<Integer, List<Node>> extracted = new TreeMap<>();
         final boolean result = new Matcher(factory.createDescriptor())
             .match(node, extracted, Collections.emptyMap());
