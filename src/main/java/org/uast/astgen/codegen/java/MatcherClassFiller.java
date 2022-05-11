@@ -214,7 +214,6 @@ public class MatcherClassFiller {
         int index = 0;
         for (final Parameter parameter : this.descriptor.getParameters()) {
             if (parameter instanceof Hole) {
-                this.collections = true;
                 extractor.append(this.formatHoleExtractor((Hole) parameter, index));
             }
             index = index + 1;
@@ -261,6 +260,7 @@ public class MatcherClassFiller {
             );
             result = String.join("\n", code);
         } else {
+            this.collections = true;
             result =
                 String.format(
                     "children.put(%d, Collections.singletonList(node.getChild(%d)));\n",
