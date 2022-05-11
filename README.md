@@ -490,6 +490,25 @@ An example of a descriptor that contains another descriptor, as well as holes:
 ```
 singleExpression(#1, literal<"+">, #2)
 ```
+The last (or only) hole inside the parameter list can have an ellipsis:
+```
+#1...
+```
+For example,
+```
+StatementBlock(#1...)
+```
+Ellipsis means that this hole will transfer this element, as well as all remaining child
+elements, regardless of their number. Here are some examples:
+```
+AAA(#1, #2...) -> ...;
+```
+...will analyze the node whose first child is different from others, this child will be placed in cell 1,
+and the rest in cell 2.
+```
+AAA(#1...) -> BBB(#1);
+```
+...will move all children of `AAA` node to `BBB` node.
 
 ### §14. Transformation principles
 
