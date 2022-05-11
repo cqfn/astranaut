@@ -74,6 +74,9 @@ public final class MatcherGenerator {
         if (filler.isCollectionsNeeded()) {
             unit.addImport("java.util.Collections");
         }
+        if (filler.isArrayListNeeded()) {
+            unit.addImport("java.util.ArrayList");
+        }
         final String base = this.env.getBasePackage();
         unit.addImport(base.concat(".Matcher"));
         unit.addImport(base.concat(".Node"));

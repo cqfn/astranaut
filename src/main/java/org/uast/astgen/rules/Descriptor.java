@@ -5,6 +5,7 @@
 package org.uast.astgen.rules;
 
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 
 /**
@@ -109,6 +110,25 @@ public abstract class Descriptor implements Child, Parameter {
                     result = true;
                     break;
                 }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Checks whether the descriptor has a hole with ellipsis.
+     * @return Checking result, {@code true} if the descriptor has a hole with ellipsis
+     */
+    public boolean hasEllipsisHole() {
+        boolean result = false;
+        final List<Parameter> parameters = this.getParameters();
+        final ListIterator<Parameter> iterator = parameters.listIterator(parameters.size());
+        while (iterator.hasPrevious()) {
+            final Parameter parameter = iterator.previous();
+            if (parameter instanceof Hole
+                && ((Hole) parameter).getAttribute() == HoleAttribute.ELLIPSIS) {
+                result = true;
+                break;
             }
         }
         return result;
