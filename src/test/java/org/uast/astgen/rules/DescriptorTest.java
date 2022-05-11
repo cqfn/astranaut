@@ -74,7 +74,7 @@ public class DescriptorTest {
             DescriptorTest.LABEL,
             "numericLiteral"
         );
-        factory.setData(new Hole(1));
+        factory.setData(new Hole(1, HoleAttribute.NONE));
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals("numericLiteral<#1>", descriptor.toString());
     }
@@ -138,8 +138,8 @@ public class DescriptorTest {
             DescriptorTest.LABEL,
             "simpleExpression"
         );
-        factory.addParameter(new Hole(1));
-        factory.addParameter(new Hole(2));
+        factory.addParameter(new Hole(1, HoleAttribute.NONE));
+        factory.addParameter(new Hole(2, HoleAttribute.NONE));
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals(
             "simpleExpression(#1, #2)",

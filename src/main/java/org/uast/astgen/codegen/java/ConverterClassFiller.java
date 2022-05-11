@@ -71,6 +71,11 @@ public class ConverterClassFiller {
     private final LabelFactory labels;
 
     /**
+     * Flag indicates that the package 'java.util.LinkedList' is needed.
+     */
+    private boolean llist;
+
+    /**
      * Constructor.
      * @param klass Class to be filled
      * @param descriptor The descriptor
@@ -83,6 +88,7 @@ public class ConverterClassFiller {
         this.matcher = matcher;
         this.stg = new StaticStringGenerator(klass);
         this.labels = new LabelFactory();
+        this.llist = false;
     }
 
     /**
@@ -93,6 +99,14 @@ public class ConverterClassFiller {
         this.klass.setInterfaces("Converter");
         this.klass.makeSingleton();
         this.createConvertMethod();
+    }
+
+    /**
+     * Returns the flag indicates that the package 'java.util.LinkedList' is needed.
+     * @return The flag
+     */
+    public boolean isLinkedListNeeded() {
+        return this.llist;
     }
 
     /**
@@ -108,7 +122,7 @@ public class ConverterClassFiller {
         final CreationResult builder = this.createBuildMethod(this.root);
         final List<String> code = Arrays.asList(
             ConverterClassFiller.DECLARE_RESULT,
-            "final Map<Integer, Node> children = new TreeMap<>();",
+            "final Map<Integer, List<Node>> children = new TreeMap<>();",
             "final Map<Integer, String> data = new TreeMap<>();",
             String.format(
                 "final boolean matched = %s.INSTANCE.match(node, children, data);",
@@ -168,7 +182,7 @@ public class ConverterClassFiller {
         method.setCode(String.join("\n", code));
         if (result.areChildrenNeeded()) {
             method.addArgument(
-                "Map<Integer, Node>",
+                "Map<Integer, List<Node>>",
                 "children",
                 "The collection of child nodes"
             );
@@ -208,39 +222,64 @@ public class ConverterClassFiller {
      * @return Source code
      */
     private String processChildren(final Descriptor descriptor, final CreationResult crr) {
-        final StringBuilder code = new StringBuilder(128);
-        code.append("final boolean applied = builder.setChildrenList(\n\tArrays.asList(\n");
-        boolean flag = false;
-        for (final Parameter parameter : descriptor.getParameters()) {
-            if (flag) {
-                code.append(",\n");
-            }
-            flag = true;
-            if (parameter instanceof Hole) {
-                final Hole hole = (Hole) parameter;
-                code.append(String.format("\t\tchildren.get(%d)", hole.getValue()));
+        final String result;
+        final List<Parameter> parameters = descriptor.getParameters();
+        if (parameters.isEmpty()) {
+            result = "";
+        } else {
+            final StringBuilder code = new StringBuilder(128);
+            if (parameters.size() == 1 && parameters.get(0) instanceof Hole) {
                 crr.childrenNeeded();
-            } else if (parameter instanceof Descriptor) {
-                final Descriptor child = (Descriptor) parameter;
-                final CreationResult builder = this.createBuildMethod(child);
-                crr.merge(builder);
                 code.append(
                     String.format(
-                        "\t\t%s.%s(%s)",
-                        this.klass.getName(),
-                        builder.getName(),
-                        builder.getArgumentsList()
+                        "final List<Node> list = children.get(%d);\n",
+                        ((Hole) parameters.get(0)).getValue()
                     )
                 );
+            } else {
+                this.llist = true;
+                code.append("final List<Node> list = new LinkedList<>();\n");
+                for (final Parameter parameter : parameters) {
+                    this.processChildrenParameter(parameter, code, crr);
+                }
             }
-        }
-        final String result;
-        if (flag) {
-            result = code.append("\n\t)\n);").toString();
-        } else {
-            result = "";
+            result = code
+                .append("final boolean applied = builder.setChildrenList(list);\n")
+                .toString();
         }
         return result;
+    }
+
+    /**
+     * Processes children parameter, specified in descriptor.
+     * @param parameter The parameter
+     * @param code Where to build code
+     * @param crr The creation result (for flags modifying)
+     */
+    private void processChildrenParameter(final Parameter parameter, final StringBuilder code,
+        final CreationResult crr) {
+        if (parameter instanceof Hole) {
+            final Hole hole = (Hole) parameter;
+            code.append(
+                String.format(
+                    "list.addAll(children.get(%d));\n",
+                    hole.getValue()
+                )
+            );
+            crr.childrenNeeded();
+        } else if (parameter instanceof Descriptor) {
+            final Descriptor child = (Descriptor) parameter;
+            final CreationResult builder = this.createBuildMethod(child);
+            crr.merge(builder);
+            code.append(
+                String.format(
+                    "list.add(%s.%s(%s));\n",
+                    this.klass.getName(),
+                    builder.getName(),
+                    builder.getArgumentsList()
+                )
+            );
+        }
     }
 
     /**

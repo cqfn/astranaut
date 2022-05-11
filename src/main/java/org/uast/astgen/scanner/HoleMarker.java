@@ -6,6 +6,7 @@
 package org.uast.astgen.scanner;
 
 import org.uast.astgen.rules.Hole;
+import org.uast.astgen.rules.HoleAttribute;
 
 /**
  * The hole marker (# and a number after).
@@ -19,20 +20,29 @@ public class HoleMarker implements Token {
     private final int value;
 
     /**
-     * Constructor.
-     *
-     * @param value Value of the hole.
+     * Attribute.
      */
-    public HoleMarker(final int value) {
+    private final HoleAttribute attribute;
+
+    /**
+     * Constructor.
+     * @param value Value of the hole
+     * @param attribute Attribute
+     */
+    public HoleMarker(final int value, final HoleAttribute attribute) {
         this.value = value;
+        this.attribute = attribute;
     }
 
     @Override
     public final String toString() {
-        return new StringBuilder()
+        final StringBuilder builder = new StringBuilder()
             .append('#')
-            .append(this.value)
-            .toString();
+            .append(this.value);
+        if (this.attribute == HoleAttribute.ELLIPSIS) {
+            builder.append("...");
+        }
+        return builder.toString();
     }
 
     /**
@@ -40,6 +50,6 @@ public class HoleMarker implements Token {
      * @return A hole
      */
     public Hole createHole() {
-        return new Hole(this.value);
+        return new Hole(this.value, this.attribute);
     }
 }

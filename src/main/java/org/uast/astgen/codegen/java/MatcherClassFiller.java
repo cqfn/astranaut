@@ -9,6 +9,7 @@ import java.util.List;
 import org.uast.astgen.rules.Data;
 import org.uast.astgen.rules.Descriptor;
 import org.uast.astgen.rules.Hole;
+import org.uast.astgen.rules.HoleAttribute;
 import org.uast.astgen.rules.Parameter;
 import org.uast.astgen.rules.StringData;
 import org.uast.astgen.utils.StringUtils;
@@ -45,6 +46,16 @@ public class MatcherClassFiller {
     private final Descriptor descriptor;
 
     /**
+     * Flag indicates that the package 'java.util.Collections' is needed.
+     */
+    private boolean collections;
+
+    /**
+     * Flag indicates that the package 'java.util.ArrayList' is needed.
+     */
+    private boolean alist;
+
+    /**
      * Constructor.
      * @param generator The generator
      * @param klass Class to be filled
@@ -55,6 +66,8 @@ public class MatcherClassFiller {
         this.generator = generator;
         this.klass = klass;
         this.descriptor = descriptor;
+        this.collections = false;
+        this.alist = false;
     }
 
     /**
@@ -66,6 +79,22 @@ public class MatcherClassFiller {
         this.klass.makeSingleton();
         this.createStaticFields();
         this.createMatchMethod();
+    }
+
+    /**
+     * Returns the flag indicates that the package 'java.util.Collections' is needed.
+     * @return The flag
+     */
+    public boolean isCollectionsNeeded() {
+        return this.collections;
+    }
+
+    /**
+     * Returns the flag indicates that the package 'java.util.ArrayList' is needed.
+     * @return The flag
+     */
+    public boolean isArrayListNeeded() {
+        return this.alist;
     }
 
     /**
@@ -85,14 +114,16 @@ public class MatcherClassFiller {
             )
         );
         this.klass.addField(type);
-        final Field count = new Field(
-            "Expected number of child nodes",
-            "int",
-            "EXPECTED_COUNT"
-        );
-        count.makeStaticFinal();
-        count.setInitExpr(String.valueOf(this.descriptor.getParameters().size()));
-        this.klass.addField(count);
+        if (!this.descriptor.hasEllipsisHole()) {
+            final Field count = new Field(
+                "Expected number of child nodes",
+                "int",
+                "EXPECTED_COUNT"
+            );
+            count.makeStaticFinal();
+            count.setInitExpr(String.valueOf(this.descriptor.getParameters().size()));
+            this.klass.addField(count);
+        }
     }
 
     /**
@@ -104,7 +135,7 @@ public class MatcherClassFiller {
         method.makeOverridden();
         method.setReturnType("boolean");
         method.addArgument("Node", "node");
-        method.addArgument("Map<Integer, Node>", "children");
+        method.addArgument("Map<Integer, List<Node>>", "children");
         method.addArgument("Map<Integer, String>", "data");
         final String condition = this.createCondition();
         if (this.descriptor.hasHole()) {
@@ -128,11 +159,12 @@ public class MatcherClassFiller {
     private String createCondition() {
         final StringBuilder condition = new StringBuilder();
         final String name = this.klass.getName();
-        final String common = String.format(
-            "node.belongsToGroup(%s.EXPECTED_TYPE)\n\t&& node.getChildCount() == %s.EXPECTED_COUNT",
-            name,
-            name
-        );
+        String common = String.format("node.belongsToGroup(%s.EXPECTED_TYPE)", name);
+        if (!this.descriptor.hasEllipsisHole()) {
+            common = common.concat(
+                String.format("\n\t&& node.getChildCount() == %s.EXPECTED_COUNT", name)
+            );
+        }
         condition.append(common);
         int index = 0;
         for (final Parameter parameter : this.descriptor.getParameters()) {
@@ -182,14 +214,7 @@ public class MatcherClassFiller {
         int index = 0;
         for (final Parameter parameter : this.descriptor.getParameters()) {
             if (parameter instanceof Hole) {
-                final Hole hole = (Hole) parameter;
-                extractor.append(
-                    String.format(
-                        "children.put(%d, node.getChild(%d));\n",
-                        hole.getValue(),
-                        index
-                    )
-                );
+                extractor.append(this.formatHoleExtractor((Hole) parameter, index));
             }
             index = index + 1;
         }
@@ -204,5 +229,45 @@ public class MatcherClassFiller {
             );
         }
         return extractor.toString();
+    }
+
+    /**
+     * Formats string for the children extractor.
+     * @param hole The hole
+     * @param index The child index
+     * @return Source code
+     */
+    private String formatHoleExtractor(final Hole hole, final int index) {
+        final String result;
+        if (hole.getAttribute() == HoleAttribute.ELLIPSIS && index == 0) {
+            result =
+                String.format(
+                    "children.put(%d, node.getChildrenList());\n",
+                    hole.getValue()
+                );
+        } else if (hole.getAttribute() == HoleAttribute.ELLIPSIS) {
+            this.alist = true;
+            final List<String> code = Arrays.asList(
+                "final int count = node.getChildCount();",
+                String.format("final List<Node> list = new ArrayList<>(count - %d);", index),
+                String.format(
+                    "for (int index = %d; index < count; index = index + 1) {",
+                    index
+                ),
+                "list.add(node.getChild(index));",
+                "}",
+                String.format("children.put(%d, list);", hole.getValue())
+            );
+            result = String.join("\n", code);
+        } else {
+            this.collections = true;
+            result =
+                String.format(
+                    "children.put(%d, Collections.singletonList(node.getChild(%d)));\n",
+                    hole.getValue(),
+                    index
+                );
+        }
+        return result;
     }
 }

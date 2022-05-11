@@ -6,10 +6,12 @@ package org.uast.astgen.scanner;
 
 import java.util.Objects;
 import org.uast.astgen.exceptions.ExpectedNumber;
+import org.uast.astgen.exceptions.IncorrectEllipsis;
 import org.uast.astgen.exceptions.ParserException;
 import org.uast.astgen.exceptions.UnclosedNativeCode;
 import org.uast.astgen.exceptions.UnclosedString;
 import org.uast.astgen.exceptions.UnknownSymbol;
+import org.uast.astgen.rules.HoleAttribute;
 
 /**
  * Scanner that splits a rule by tokens.
@@ -155,17 +157,30 @@ public class Scanner {
      * @throws ParserException Parser exception
      */
     private HoleMarker parseHoleMarker() throws ParserException {
-        final StringBuilder builder = new StringBuilder();
+        final StringBuilder number = new StringBuilder();
         char symbol = this.nextChar();
         while (symbol >= '0' && symbol <= '9') {
-            builder.append(symbol);
+            number.append(symbol);
             symbol = this.nextChar();
         }
-        if (builder.length() == 0) {
+        if (number.length() == 0) {
             throw ExpectedNumber.INSTANCE;
         }
-        final int value = Integer.parseInt(builder.toString());
-        return new HoleMarker(value);
+        HoleAttribute attribute = HoleAttribute.NONE;
+        if (symbol == '.') {
+            final StringBuilder ellipsis = new StringBuilder();
+            while (symbol == '.') {
+                ellipsis.append(symbol);
+                symbol = this.nextChar();
+            }
+            if ("...".equals(ellipsis.toString())) {
+                attribute = HoleAttribute.ELLIPSIS;
+            } else {
+                throw IncorrectEllipsis.INSTANCE;
+            }
+        }
+        final int value = Integer.parseInt(number.toString());
+        return new HoleMarker(value, attribute);
     }
 
     /**

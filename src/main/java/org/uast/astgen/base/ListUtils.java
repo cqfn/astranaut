@@ -15,7 +15,7 @@ import java.util.List;
  * @param <T> Item type
  * @since 1.0
  */
-public class ListBuilder<T> {
+public class ListUtils<T> {
     /**
      * List being built.
      */
@@ -24,21 +24,23 @@ public class ListBuilder<T> {
     /**
      * Constructor.
      */
-    public ListBuilder() {
+    public ListUtils() {
         this.result = new LinkedList<>();
     }
 
     /**
      * Adds non-null items to the list. Null items are skipped.
      * @param items Items
+     * @return Itself
      */
     @SafeVarargs
-    public final void add(final T... items) {
+    public final ListUtils<T> add(final T... items) {
         for (final T item : items) {
             if (item != null) {
                 this.result.add(item);
             }
         }
+        return this;
     }
 
     /**
@@ -59,7 +61,7 @@ public class ListBuilder<T> {
      * Builds an unmodifiable list.
      * @return A list
      */
-    public List<T> build() {
+    public List<T> make() {
         return Collections.unmodifiableList(new ArrayList<>(this.result));
     }
 }

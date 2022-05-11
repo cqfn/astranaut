@@ -63,17 +63,19 @@ public final class ConverterGenerator {
             "Converter describing DSL conversion rule",
             name
         );
-        new ConverterClassFiller(klass, descriptor, matcher).fill();
+        final ConverterClassFiller filler = new ConverterClassFiller(klass, descriptor, matcher);
+        filler.fill();
         final CompilationUnit unit = new CompilationUnit(
             this.env.getLicense(),
             this.pkg,
             klass
         );
-        if (!descriptor.getParameters().isEmpty()) {
-            unit.addImport("java.util.Arrays");
-        }
+        unit.addImport("java.util.List");
         unit.addImport("java.util.Map");
         unit.addImport("java.util.TreeMap");
+        if (filler.isLinkedListNeeded()) {
+            unit.addImport("java.util.LinkedList");
+        }
         final String base = this.env.getBasePackage();
         unit.addImport(base.concat(".Builder"));
         unit.addImport(base.concat(".Converter"));

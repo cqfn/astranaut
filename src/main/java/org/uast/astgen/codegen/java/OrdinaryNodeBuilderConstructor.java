@@ -218,24 +218,27 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
      * @return Source code
      */
     private String fillCreateNodeForNonEmptyChildrenList() {
-        final StringBuilder fourth = new StringBuilder(64);
+        final StringBuilder fourth = new StringBuilder(128);
         final StringBuilder fifth = new StringBuilder(128);
-        fourth.append("node.children = Arrays.asList(");
+        fourth.append("node.children = new ListUtils<Node>()\n\t.add(");
         boolean flag = false;
         for (final Child child : this.getRule().getComposition()) {
             final Descriptor descriptor = (Descriptor) child;
             final String var = descriptor.getVariableName();
             if (flag) {
-                fourth.append(", ");
+                fourth.append(',');
             }
             flag = true;
-            fourth.append(OrdinaryNodeBuilderConstructor.STR_THIS).append(var);
+            fourth
+                .append("\n\t\t")
+                .append(OrdinaryNodeBuilderConstructor.STR_THIS)
+                .append(var);
             if (!descriptor.getTag().isEmpty()) {
                 fifth.append("node.").append(var).append(" = this.").append(var)
                 .append(OrdinaryNodeBuilderConstructor.STR_SEMICOLON);
             }
         }
-        fourth.append(");\n");
+        fourth.append("\n\t)\n\t.make();\n");
         return fourth.append(fifth).toString();
     }
 }
