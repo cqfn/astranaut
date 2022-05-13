@@ -175,7 +175,7 @@ Optional arguments:
 
 * `--license` (short: `-l`), the file containing license information. This information will be added
 to the beginning of each generated file. The license information is required for the generated code to be 
-validated by a code checker without errors. Default value is `LICENSE_header.txt`;
+validated by a code checker without errors. Default value is `LICENSE.txt`;
 * `--output` (short: `-o`), output folder where files will be generated. Default value is `./generated`;
 * `--package` (short: `-p`), the name of the package that contains the generated classes.
 An appropriate directory structure will be built. Default value is `org.uast`;
