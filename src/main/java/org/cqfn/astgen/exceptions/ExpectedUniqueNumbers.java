@@ -22,20 +22,34 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Expected unique numbers of holes".
  *
  * @since 1.0
  */
-public interface Rule {
+public final class ExpectedUniqueNumbers extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The duplicated hole number.
      */
-    void generate(Map<String, String> opt);
+    private final int number;
+
+    /**
+     * Constructor.
+     * @param number A duplicated hole number
+     */
+    public ExpectedUniqueNumbers(final int number) {
+        super();
+        this.number = number;
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return new StringBuilder()
+            .append("Expected unique numbers of holes. Duplicated: '#")
+            .append(this.number)
+            .append('\'')
+            .toString();
+    }
 }

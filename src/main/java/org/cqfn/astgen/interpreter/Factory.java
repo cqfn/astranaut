@@ -21,21 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.interpreter;
 
 import java.util.Collections;
-import java.util.Map;
 
 /**
- * DSL rule.
+ * The node factory.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class Factory extends org.cqfn.astgen.base.Factory {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The instance.
      */
-    void generate(Map<String, String> opt);
+    public static final Factory INSTANCE = new Factory();
+
+    /**
+     * Constructor.
+     */
+    private Factory() {
+        super(Collections.emptyMap());
+    }
 }

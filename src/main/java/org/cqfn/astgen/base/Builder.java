@@ -21,21 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.base;
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
 /**
- * DSL rule.
+ * Object that creates nodes.
  *
  * @since 1.0
  */
-public interface Rule {
+public interface Builder {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Associate a new fragment with the node.
+     * @param fragment A new fragment
      */
-    void generate(Map<String, String> opt);
+    void setFragment(Fragment fragment);
+
+    /**
+     * Associate a new data with the node (in a textual format).
+     * @param str Data as a string
+     * @return Result of operation, {@code true} if the new data is suitable for this type of node
+     */
+    boolean setData(String str);
+
+    /**
+     * Sets a new list of children.
+     * @param list A list of children
+     * @return Result of operation, {@code true} if the new children list is suitable
+     *  for this type of node
+     */
+    boolean setChildrenList(List<Node> list);
+
+    /**
+     * Checks if the Creator is in a valid state,
+     * that is, whether it can create a new node based on its internal data.
+     * @return Checking result
+     */
+    boolean isValid();
+
+    /**
+     * Creates a specific node.
+     * @return A node
+     */
+    Node createNode();
 }

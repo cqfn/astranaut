@@ -22,20 +22,33 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Unclosed string".
  *
  * @since 1.0
  */
-public interface Rule {
+public class UnclosedString extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The content of the string.
      */
-    void generate(Map<String, String> opt);
+    private final String text;
+
+    /**
+     * Constructor.
+     * @param text The content of the string
+     */
+    public UnclosedString(final String text) {
+        super();
+        this.text = text;
+    }
+
+    @Override
+    public final String getErrorMessage() {
+        return new StringBuilder()
+            .append("Unclosed string: \"")
+            .append(this.text)
+            .toString();
+    }
 }

@@ -22,20 +22,34 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Empty data literal".
  *
  * @since 1.0
  */
-public interface Rule {
+public final class EmptyDataLiteral extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The descriptor name.
      */
-    void generate(Map<String, String> opt);
+    private final String name;
+
+    /**
+     * Constructor.
+     * @param name The descriptor name
+     */
+    public EmptyDataLiteral(final String name) {
+        super();
+        this.name = name;
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return new StringBuilder()
+            .append("Empty data literal: '")
+            .append(this.name)
+            .append("<>'")
+            .toString();
+    }
 }

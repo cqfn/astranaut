@@ -21,21 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astgen.codegen.java;
 
-import java.util.Collections;
-import java.util.Map;
-
 /**
- * DSL rule.
+ * Some entity of the Java language.
  *
  * @since 1.0
  */
-public interface Rule {
+public interface Entity {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The tabulation size, i.e. number of repeated spaces.
      */
-    void generate(Map<String, String> opt);
+    int TAB_SIZE = 4;
+
+    /**
+     * The maximum line length.
+     */
+    int MAX_LINE_LENGTH = 100;
+
+    /**
+     * Generates source code.
+     * @param indent Indentation from the beginning of the line
+     * @return Java source code
+     */
+    String generate(int indent);
 }

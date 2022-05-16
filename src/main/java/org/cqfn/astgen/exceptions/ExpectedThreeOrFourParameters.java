@@ -22,20 +22,28 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Expected 3 or 4 parameters".
  *
  * @since 1.0
  */
-public interface Rule {
+public final class ExpectedThreeOrFourParameters extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The instance.
      */
-    void generate(Map<String, String> opt);
+    public static final  ParserException INSTANCE = new ExpectedThreeOrFourParameters();
+
+    /**
+     * Constructor.
+     */
+    private ExpectedThreeOrFourParameters() {
+        super();
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return "Expected 3 or 4 parameters";
+    }
 }

@@ -22,20 +22,27 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.scanner;
 
 /**
- * DSL rule.
+ * The token represents an empty node (with no data or children).
  *
  * @since 1.0
  */
-public interface Rule {
+public final class EmptySymbol implements Token {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The instance.
      */
-    void generate(Map<String, String> opt);
+    public static final Token INSTANCE = new EmptySymbol();
+
+    /**
+     * Constructor.
+     */
+    private EmptySymbol() {
+    }
+
+    @Override
+    public String toString() {
+        return "0";
+    }
 }

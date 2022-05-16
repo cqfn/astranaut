@@ -21,21 +21,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.interpreter;
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import org.cqfn.astgen.base.EmptyTree;
+import org.cqfn.astgen.base.Factory;
+import org.cqfn.astgen.base.Node;
+import org.cqfn.astgen.rules.Transformation;
 
 /**
- * DSL rule.
+ * Converter that checks one rule described in DSL and converts a subtree.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class Converter implements org.cqfn.astgen.base.Converter {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The matcher.
      */
-    void generate(Map<String, String> opt);
+    private final Matcher matcher;
+
+    /**
+     * The node creator.
+     */
+    private final Creator creator;
+
+    /**
+     * Constructor.
+     * @param rule The transformation rule
+     */
+    public Converter(final Transformation rule) {
+        this.matcher = new Matcher(rule.getLeft());
+        this.creator = new Creator(rule.getRight());
+    }
+
+    @Override
+    public Node convert(final Node node, final Factory factory) {
+        Node result = EmptyTree.INSTANCE;
+        final Map<Integer, List<Node>> children = new TreeMap<>();
+        final Map<Integer, String> data = new TreeMap<>();
+        if (this.matcher.match(node, children, data)) {
+            result = this.creator.create(factory, children, data);
+        }
+        return result;
+    }
 }

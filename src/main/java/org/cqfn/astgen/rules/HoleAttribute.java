@@ -21,21 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.rules;
 
 /**
- * DSL rule.
+ * The hole attribute.
  *
- * @since 1.0
+ * @since 1.1
  */
-public interface Rule {
+public enum HoleAttribute {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Hole has no attribute (replaces one child).
      */
-    void generate(Map<String, String> opt);
+    NONE,
+
+    /**
+     * The hole replaces all remaining children.
+     */
+    ELLIPSIS
 }

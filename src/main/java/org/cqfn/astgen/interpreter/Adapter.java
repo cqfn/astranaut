@@ -21,21 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.interpreter;
 
-package org.cqfn.astgen.codegen.java;
-
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
+import org.cqfn.astgen.rules.Statement;
+import org.cqfn.astgen.rules.Transformation;
 
 /**
- * DSL rule.
+ * Tree converter built on a set of rules described in DSL.
  *
  * @since 1.0
  */
-public interface Rule {
+@SuppressWarnings("PMD.CloseResource")
+public class Adapter extends org.cqfn.astgen.base.Adapter {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Constructor.
+     * @param statements The list of transformation statements
      */
-    void generate(Map<String, String> opt);
+    public Adapter(final List<Statement<Transformation>> statements) {
+        super(Collections.unmodifiableList(Adapter.init(statements)), Factory.INSTANCE);
+    }
+
+    /**
+     * Initialises the list of converters.
+     * @param statements The list of transformation statements
+     * @return List of converters
+     */
+    private static List<org.cqfn.astgen.base.Converter> init(
+        final List<Statement<Transformation>> statements) {
+        final List<org.cqfn.astgen.base.Converter> result = new ArrayList<>(statements.size());
+        for (final Statement<Transformation> statement : statements) {
+            final Transformation rule = statement.getRule();
+            result.add(new Converter(rule));
+        }
+        return result;
+    }
 }

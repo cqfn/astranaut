@@ -21,21 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astgen.codegen.java;
 
-import java.util.Collections;
-import java.util.Map;
-
 /**
- * DSL rule.
+ * The tagged child description, i.e. construction 'tag@Type'.
  *
  * @since 1.0
  */
-public interface Rule {
+public interface TaggedChild {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Returns the tag.
+     * @return The tag
      */
-    void generate(Map<String, String> opt);
+    String getTag();
+
+    /**
+     * Returns the type.
+     * @return The type
+     */
+    String getType();
+
+    /**
+     * Returns the flag if the getter method is overridden in the current class.
+     * @return The flag
+     */
+    boolean isOverridden();
 }

@@ -21,21 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.base;
 
 /**
- * DSL rule.
+ * Represents a source code file.
  *
  * @since 1.0
  */
-public interface Rule {
+public interface Source {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Return a string for a source code fragment within the specified range.
+     *
+     * @param start Start position
+     * @param end End position
+     * @return Text of the fragment
      */
-    void generate(Map<String, String> opt);
+    String getFragmentAsString(Position start, Position end);
 }

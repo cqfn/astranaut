@@ -22,20 +22,46 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.parser;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.List;
+import org.cqfn.astgen.exceptions.BadRuleSyntax;
+import org.cqfn.astgen.exceptions.ParserException;
+import org.cqfn.astgen.rules.Child;
+import org.cqfn.astgen.rules.Node;
 
 /**
- * DSL rule.
+ * Parser of {@link Node} rules.
  *
  * @since 1.0
  */
-public interface Rule {
+public class NodeParser {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Source string.
      */
-    void generate(Map<String, String> opt);
+    private final String source;
+
+    /**
+     * Constructor.
+     * @param source Source string
+     */
+    public NodeParser(final String source) {
+        this.source = source;
+    }
+
+    /**
+     * Parses source string as a {@link Node} descriptor.
+     * @return A node descriptor
+     * @throws ParserException If the source string can't be parsed as a node descriptor
+     */
+    public Node parse() throws ParserException {
+        assert this.source.contains("<-");
+        final String[] pair = this.source.split("<-");
+        if (pair.length > 2) {
+            throw BadRuleSyntax.INSTANCE;
+        }
+        final String left = new NodeNameParser(pair[0]).parse();
+        final List<Child> right = new ChildrenListParser(pair[1]).parse();
+        return new Node(left, right);
+    }
 }

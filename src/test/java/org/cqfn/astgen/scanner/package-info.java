@@ -22,20 +22,9 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
-
 /**
- * DSL rule.
+ * This package contains tests for scanner.
  *
  * @since 1.0
  */
-public interface Rule {
-    /**
-     * Generates source code from the rule.
-     * @param opt The options set
-     */
-    void generate(Map<String, String> opt);
-}
+package org.cqfn.astgen.scanner;

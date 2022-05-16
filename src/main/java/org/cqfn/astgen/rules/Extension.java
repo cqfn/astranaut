@@ -21,21 +21,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.rules;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
 /**
- * DSL rule.
+ * States that the ancestor node extends the green abstract node
+ * with the same name.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class Extension extends Descriptor {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The instance.
      */
-    void generate(Map<String, String> opt);
+    public static final Extension INSTANCE = new Extension();
+
+    /**
+     * Constructor.
+     */
+    private Extension() {
+    }
+
+    @Override
+    public DescriptorAttribute getAttribute() {
+        return DescriptorAttribute.EXT;
+    }
+
+    @Override
+    public String getTag() {
+        return "";
+    }
+
+    @Override
+    public String getLabel() {
+        return "";
+    }
+
+    @Override
+    public String getType() {
+        return "";
+    }
+
+    @Override
+    public List<Parameter> getParameters() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Data getData() {
+        return InvalidData.INSTANCE;
+    }
 }

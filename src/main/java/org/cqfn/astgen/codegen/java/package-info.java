@@ -22,20 +22,9 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
-
 /**
- * DSL rule.
+ * This package contains everything you need to generate code in the Java programming language.
  *
  * @since 1.0
  */
-public interface Rule {
-    /**
-     * Generates source code from the rule.
-     * @param opt The options set
-     */
-    void generate(Map<String, String> opt);
-}
+package org.cqfn.astgen.codegen.java;

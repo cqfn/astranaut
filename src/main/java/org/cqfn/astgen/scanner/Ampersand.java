@@ -22,20 +22,27 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.scanner;
 
 /**
- * DSL rule.
+ * The token represents an ampersand.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class Ampersand implements Token {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The instance.
      */
-    void generate(Map<String, String> opt);
+    public static final Token INSTANCE = new Ampersand();
+
+    /**
+     * Constructor.
+     */
+    private Ampersand() {
+    }
+
+    @Override
+    public String toString() {
+        return "&";
+    }
 }

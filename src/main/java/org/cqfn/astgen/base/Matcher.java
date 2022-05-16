@@ -21,21 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.base;
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
- * DSL rule.
+ * Checks if the node matches some structure, and extracts the data or (and) children if so.
  *
  * @since 1.0
  */
-public interface Rule {
+public interface Matcher {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Matches the node.
+     * @param node The node
+     * @param children Where to save children when matched
+     * @param data Where to save data when matched
+     * @return The result of matching, {@code true} if node matches and data was extracted
      */
-    void generate(Map<String, String> opt);
+    boolean match(Node node, Map<Integer, List<Node>> children, Map<Integer, String> data);
 }

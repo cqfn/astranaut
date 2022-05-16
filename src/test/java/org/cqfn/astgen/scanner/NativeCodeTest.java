@@ -22,20 +22,45 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.scanner;
 
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.exceptions.ParserException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
- * DSL rule.
+ * Test for {@link Scanner} and {@link NativeCode} classes.
  *
  * @since 1.0
  */
-public interface Rule {
+public class NativeCodeTest {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Source string.
      */
-    void generate(Map<String, String> opt);
+    private static final String SOURCE = "first $String.valueOf(#)$";
+
+    /**
+     * Output example.
+     */
+    private static final String EXPECTED = "$String.valueOf(#)$";
+
+    /**
+     * Test scanner with string contains two identifiers.
+     */
+    @Test
+    public void nativeCode() {
+        final Scanner scanner = new Scanner(NativeCodeTest.SOURCE);
+        Token token = null;
+        boolean oops = false;
+        try {
+            token = scanner.getToken();
+            Assertions.assertInstanceOf(Identifier.class, token);
+            token = scanner.getToken();
+            Assertions.assertInstanceOf(NativeCode.class, token);
+            Assertions.assertEquals(token.toString(), NativeCodeTest.EXPECTED);
+        } catch (final ParserException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
 }

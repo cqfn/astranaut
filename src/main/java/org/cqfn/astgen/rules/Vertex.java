@@ -21,21 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.rules;
 
 /**
- * DSL rule.
+ * An interface for vertices in AST.
  *
  * @since 1.0
  */
-public interface Rule {
+public abstract class Vertex implements Rule, Comparable<Vertex> {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Returns left part of the rule.
+     * @return The type name
      */
-    void generate(Map<String, String> opt);
+    public abstract String getType();
+
+    /**
+     * Checks if the vertex is an ordinary node, i.e. not abstract and not a list.
+     * @return Checking result
+     */
+    public abstract boolean isOrdinary();
+
+    /**
+     * Checks if the vertex is an abstract node.
+     * @return Checking result
+     */
+    public abstract boolean isAbstract();
+
+    /**
+     * Checks if the vertex is final, that is non-inheritable.
+     *
+     * @return Checking result
+     */
+    public abstract boolean isFinal();
 }

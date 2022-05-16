@@ -53,7 +53,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        org.uast.astgen.Main
+                                        org.cqfn.astgen.Main
                                     </mainClass>
                                 </manifest>
                             </archive>

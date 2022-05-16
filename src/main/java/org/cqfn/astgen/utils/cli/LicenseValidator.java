@@ -21,21 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.utils.cli;
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+import com.beust.jcommander.IParameterValidator;
+import com.beust.jcommander.ParameterException;
+import java.io.File;
 
 /**
- * DSL rule.
+ * Validator of a project root CLI parameter.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class LicenseValidator implements IParameterValidator {
+    @Override
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Validates an input option parameter that should contain
+     * a project root path.
+     * @param name The option name
+     * @param value The option value
+     * @throws ParameterException
      */
-    void generate(Map<String, String> opt);
+    public void validate(final String name, final String value) throws ParameterException {
+        if (value.charAt(0) == '-') {
+            final StringBuilder message = new StringBuilder(50);
+            message
+                .append("Missed parameter for the option [")
+                .append(name)
+                .append(']');
+            throw new ParameterException(message.toString());
+        }
+        final File file = new File(value);
+        if (!file.exists()) {
+            throw new ParameterException(String.format("License not exists: %s", value));
+        }
+    }
 }

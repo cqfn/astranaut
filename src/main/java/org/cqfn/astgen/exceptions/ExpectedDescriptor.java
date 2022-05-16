@@ -22,20 +22,34 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Expected a descriptor".
  *
  * @since 1.0
  */
-public interface Rule {
+public final class ExpectedDescriptor extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The explanatory text.
      */
-    void generate(Map<String, String> opt);
+    private final String text;
+
+    /**
+     * Constructor.
+     * @param text The explanatory text
+     */
+    public ExpectedDescriptor(final String text) {
+        super();
+        this.text = text;
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return new StringBuilder()
+            .append("Expected a descriptor: '")
+            .append(this.text)
+            .append('\'')
+            .toString();
+    }
 }

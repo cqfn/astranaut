@@ -22,20 +22,34 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Unknown symbol".
  *
  * @since 1.0
  */
-public interface Rule {
+public class UnknownSymbol extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The symbol.
      */
-    void generate(Map<String, String> opt);
+    private final char symbol;
+
+    /**
+     * Constructor.
+     * @param symbol The symbol
+     */
+    public UnknownSymbol(final char symbol) {
+        super();
+        this.symbol = symbol;
+    }
+
+    @Override
+    public final String getErrorMessage() {
+        return new StringBuilder()
+            .append("Unknown symbol: \'")
+            .append(this.symbol)
+            .append('\'')
+            .toString();
+    }
 }

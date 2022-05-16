@@ -21,21 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.scanner;
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.exceptions.IncorrectUseOfBrackets;
+import org.cqfn.astgen.exceptions.ParserException;
+import org.cqfn.astgen.rules.DescriptorAttribute;
 
 /**
- * DSL rule.
+ * Token that represents a pair of angle brackets and list of tokens between.
  *
  * @since 1.0
  */
-public interface Rule {
+public class AngleBracketsPair extends BracketsPair {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Constructor.
+     *
+     * @param tokens The list of tokens.
      */
-    void generate(Map<String, String> opt);
+    public AngleBracketsPair(final TokenList tokens) {
+        super(tokens);
+    }
+
+    @Override
+    public final char getOpeningBracket() {
+        return '<';
+    }
+
+    @Override
+    public final char getClosingBracket() {
+        return '>';
+    }
+
+    @Override
+    public final DescriptorAttribute getDescriptorAttribute() throws ParserException {
+        throw IncorrectUseOfBrackets.INSTANCE;
+    }
 }

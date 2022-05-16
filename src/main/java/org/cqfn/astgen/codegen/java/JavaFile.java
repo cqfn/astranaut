@@ -21,21 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astgen.codegen.java;
 
-import java.util.Collections;
-import java.util.Map;
-
 /**
- * DSL rule.
+ * Source code in the Java programming language, fully assembled and ready to be saved.
  *
  * @since 1.0
  */
-public interface Rule {
+public interface JavaFile {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Specifies the class version.
+     * @param version The version
      */
-    void generate(Map<String, String> opt);
+    void setVersion(String version);
+
+    /**
+     * Generates Java source code.
+     * @return Source code
+     */
+    String generate();
 }

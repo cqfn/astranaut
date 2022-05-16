@@ -21,21 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.scanner;
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+import java.util.Iterator;
 
 /**
- * DSL rule.
+ * A list contains tokens.
  *
  * @since 1.0
  */
-public interface Rule {
+public abstract class TokenList implements Iterable<Token> {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Returns the size of the list.
+     * @return The size
      */
-    void generate(Map<String, String> opt);
+    public abstract int size();
+
+    /**
+     * Returns token by its index.
+     * @param index Index
+     * @return A token
+     * @throws IndexOutOfBoundsException If index is negative or greater than size - 1
+     */
+    public abstract Token get(int index) throws IndexOutOfBoundsException;
+
+    @Override
+    public final Iterator<Token> iterator() {
+        return new TokenListIterator(this);
+    }
+
+    @Override
+    public final String toString() {
+        final StringBuilder builder = new StringBuilder();
+        for (int index = 0; index < this.size(); index = index + 1) {
+            builder.append(this.get(index).toString());
+        }
+        return builder.toString();
+    }
 }

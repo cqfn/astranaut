@@ -21,21 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astgen.codegen.java;
 
-import java.util.Collections;
-import java.util.Map;
-
 /**
- * DSL rule.
+ * Generates unique class names.
  *
  * @since 1.0
  */
-public interface Rule {
+public class ClassNameGenerator {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Unique number.
      */
-    void generate(Map<String, String> opt);
+    private int number;
+
+    /**
+     * Name prefix.
+     */
+    private final String prefix;
+
+    /**
+     * Constructor.
+     * @param prefix Name prefix
+     */
+    public ClassNameGenerator(final String prefix) {
+        this.number = -1;
+        this.prefix = prefix;
+    }
+
+    /**
+     * Retuns unique class name.
+     * @return Class name
+     */
+    public String getName() {
+        this.number = this.number + 1;
+        return String.format("%s%d", this.prefix, this.number);
+    }
 }

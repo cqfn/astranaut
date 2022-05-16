@@ -22,20 +22,16 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Base exception thrown by the generator.
  *
  * @since 1.0
  */
-public interface Rule {
-    /**
-     * Generates source code from the rule.
-     * @param opt The options set
-     */
-    void generate(Map<String, String> opt);
+public abstract class GeneratorException extends BaseException {
+    @Override
+    public final String getInitiator() {
+        return "Generator";
+    }
 }

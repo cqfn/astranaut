@@ -22,20 +22,9 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
-
 /**
- * DSL rule.
+ * Scanner that splits a string that contains rule by tokens.
  *
  * @since 1.0
  */
-public interface Rule {
-    /**
-     * Generates source code from the rule.
-     * @param opt The options set
-     */
-    void generate(Map<String, String> opt);
-}
+package org.cqfn.astgen.scanner;

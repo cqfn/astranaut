@@ -21,21 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.base;
 
 /**
- * DSL rule.
+ * Represents a position in source code file.
  *
  * @since 1.0
  */
-public interface Rule {
+public interface Position {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Returns absolute position (character index).
+     * @return The index
      */
-    void generate(Map<String, String> opt);
+    int getIndex();
 }

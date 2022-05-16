@@ -22,20 +22,25 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.analyzer;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.LinkedList;
 
 /**
- * DSL rule.
+ * The null results that is added to nodes that are not described in rules.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class NullResult extends Result {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The instance.
      */
-    void generate(Map<String, String> opt);
+    public static final Result INSTANCE = new NullResult();
+
+    /**
+     * Constructor.
+     */
+    NullResult() {
+        super(new LinkedList<>());
+    }
 }

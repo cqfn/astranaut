@@ -22,20 +22,14 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.rules;
 
 /**
- * DSL rule.
+ * A child node descriptor (for {@link Node}).
  *
  * @since 1.0
  */
-public interface Rule {
-    /**
-     * Generates source code from the rule.
-     * @param opt The options set
-     */
-    void generate(Map<String, String> opt);
+public interface Child {
+    @Override
+    String toString();
 }

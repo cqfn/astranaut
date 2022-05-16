@@ -22,20 +22,37 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.exceptions;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.Locale;
 
 /**
- * DSL rule.
+ * Exception "Node names must start with a capital letter".
  *
  * @since 1.0
  */
-public interface Rule {
+public final class NodeNameCapitalLetter extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The explanatory text.
      */
-    void generate(Map<String, String> opt);
+    private final String text;
+
+    /**
+     * Constructor.
+     * @param text The explanatory text
+     */
+    public NodeNameCapitalLetter(final String text) {
+        super();
+        this.text = text;
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return new StringBuilder()
+            .append("Node names must start with a capital letter: '")
+            .append(this.text.substring(0, 1).toUpperCase(Locale.ENGLISH))
+            .append(this.text.substring(1))
+            .append('\'')
+            .toString();
+    }
 }

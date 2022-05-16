@@ -21,21 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Could not write file" produced by the generator.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class GeneratorCouldNotWriteFile extends GeneratorException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The file name.
      */
-    void generate(Map<String, String> opt);
+    private final String filename;
+
+    /**
+     * Constructor.
+     * @param filename The file name
+     */
+    public GeneratorCouldNotWriteFile(final String filename) {
+        this.filename = filename;
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return String.format("Could not write file: '%s'", this.filename);
+    }
 }

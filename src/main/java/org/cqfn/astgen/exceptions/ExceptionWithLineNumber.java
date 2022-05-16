@@ -21,21 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception with line number, wraps another exception.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class ExceptionWithLineNumber extends BaseException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Base exception.
      */
-    void generate(Map<String, String> opt);
+    private final BaseException base;
+
+    /**
+     * Line number.
+     */
+    private final int number;
+
+    /**
+     * Constructor.
+     * @param base Base exception
+     * @param number Line number
+     */
+    public ExceptionWithLineNumber(final BaseException base, final int number) {
+        this.base = base;
+        this.number = number;
+    }
+
+    @Override
+    public String getInitiator() {
+        return this.base.getInitiator();
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return new StringBuilder()
+            .append(this.number)
+            .append(": ")
+            .append(this.base.getErrorMessage())
+            .toString();
+    }
 }

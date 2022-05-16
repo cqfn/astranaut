@@ -21,21 +21,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.rules;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
 /**
- * DSL rule.
+ * Disjunction, i.e. logical OR expression.
  *
  * @since 1.0
  */
-public interface Rule {
+public class Disjunction implements Child {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * List of descriptors.
      */
-    void generate(Map<String, String> opt);
+    private final List<Descriptor> descriptors;
+
+    /**
+     * Constructor.
+     *
+     * @param descriptors List of descriptors
+     */
+    public Disjunction(final List<Descriptor> descriptors) {
+        this.descriptors = Collections.unmodifiableList(descriptors);
+    }
+
+    @Override
+    public final String toString() {
+        final StringBuilder builder = new StringBuilder();
+        boolean flag = false;
+        for (final Descriptor descriptor : this.descriptors) {
+            if (flag) {
+                builder.append(" | ");
+            }
+            builder.append(descriptor.toString());
+            flag = true;
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Returns the list of descriptors.
+     * @return List of descriptors
+     */
+    public List<Descriptor> getDescriptors() {
+        return this.descriptors;
+    }
 }

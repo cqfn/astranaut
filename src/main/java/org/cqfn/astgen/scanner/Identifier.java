@@ -22,20 +22,38 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.scanner;
 
 /**
- * DSL rule.
+ * Token that represents identifier.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class Identifier implements Token {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The value.
      */
-    void generate(Map<String, String> opt);
+    private final String value;
+
+    /**
+     * Constructor.
+     *
+     * @param value The value, i.e. name of the identifier
+     */
+    public Identifier(final String value) {
+        this.value = value;
+    }
+
+    /**
+     * Returns the value, i.e. name of the identifier
+     * @return The value
+     */
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
 }

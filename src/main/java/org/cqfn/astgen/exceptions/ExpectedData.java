@@ -22,20 +22,36 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Expected a data".
  *
  * @since 1.0
  */
-public interface Rule {
+public final class ExpectedData extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The descriptor name.
      */
-    void generate(Map<String, String> opt);
+    private final String name;
+
+    /**
+     * Constructor.
+     * @param name The descriptor name
+     */
+    public ExpectedData(final String name) {
+        super();
+        this.name = name;
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return new StringBuilder()
+            .append("Expected a data: '")
+            .append(this.name)
+            .append("<#...>' or '")
+            .append(this.name)
+            .append("<\"...\">'")
+            .toString();
+    }
 }

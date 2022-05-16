@@ -22,20 +22,33 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Unclosed native code".
  *
  * @since 1.0
  */
-public interface Rule {
+public class UnclosedNativeCode extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The code.
      */
-    void generate(Map<String, String> opt);
+    private final String code;
+
+    /**
+     * Constructor.
+     * @param code The code
+     */
+    public UnclosedNativeCode(final String code) {
+        super();
+        this.code = code;
+    }
+
+    @Override
+    public final String getErrorMessage() {
+        return new StringBuilder()
+            .append("Unclosed native code: $")
+            .append(this.code)
+            .toString();
+    }
 }

@@ -21,21 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astgen.codegen.java;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.List;
+import org.cqfn.astgen.rules.Node;
 
 /**
- * DSL rule.
+ * Generates source code for rules that describe nodes.
  *
  * @since 1.0
  */
-public interface Rule {
+public abstract class BaseNodeGenerator extends BaseGenerator {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Constructor.
+     * @param env The environment required for generation.
      */
-    void generate(Map<String, String> opt);
+    BaseNodeGenerator(final Environment env) {
+        super(env);
+    }
+
+    /**
+     * Creates class for node construction.
+     * @param rule The rule
+     * @return The class constructor
+     */
+    protected Klass createClass(final Node rule) {
+        final String type = rule.getType();
+        final Klass klass = new Klass(
+            String.format("Node that describes the '%s' type", type),
+            type
+        );
+        klass.makeFinal();
+        final List<String> hierarchy = this.getEnv().getHierarchy(type);
+        if (hierarchy.size() > 1) {
+            klass.setInterfaces(hierarchy.get(1));
+        } else {
+            klass.setInterfaces("Node");
+        }
+        return klass;
+    }
 }

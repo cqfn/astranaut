@@ -22,20 +22,10 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
-
 /**
- * DSL rule.
+ * This package contains rules descriptions.
+ * Rule describes AST nodes or subtrees transformation.
  *
  * @since 1.0
  */
-public interface Rule {
-    /**
-     * Generates source code from the rule.
-     * @param opt The options set
-     */
-    void generate(Map<String, String> opt);
-}
+package org.cqfn.astgen.rules;

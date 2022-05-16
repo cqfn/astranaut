@@ -21,21 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Opening and closing brackets do not match".
  *
  * @since 1.0
  */
-public interface Rule {
+public class BracketsDoNotMatch extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Opening bracket.
      */
-    void generate(Map<String, String> opt);
+    private final char opening;
+
+    /**
+     * Closing bracket.
+     */
+    private final char closing;
+
+    /**
+     * Constructor.
+     * @param opening Opening bracket
+     * @param closing Closing bracket
+     */
+    public BracketsDoNotMatch(final char opening, final char closing) {
+        this.opening = opening;
+        this.closing = closing;
+    }
+
+    @Override
+    public final String getErrorMessage() {
+        return new StringBuilder()
+            .append("Opening \'")
+            .append(this.opening)
+            .append("\' and closing \'")
+            .append(this.closing)
+            .append("\' brackets does not match")
+            .toString();
+    }
 }

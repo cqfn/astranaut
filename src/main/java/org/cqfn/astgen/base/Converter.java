@@ -21,21 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.base;
 
 /**
- * DSL rule.
+ * Interface for converters that checks one rule described in DSL
+ * and convert the specified AST built by a third-party parser to the unified format.
  *
  * @since 1.0
  */
-public interface Rule {
+public interface Converter {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Converts an AST built by a third-party parser to the unified format.
+     *
+     * @param node The root of the AST to be converted
+     * @param factory The node factory
+     * @return A new [unified] node
      */
-    void generate(Map<String, String> opt);
+    Node convert(Node node, Factory factory);
 }

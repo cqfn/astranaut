@@ -21,21 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.parser;
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.exceptions.ParserException;
+import org.cqfn.astgen.scanner.Null;
+import org.cqfn.astgen.scanner.Scanner;
+import org.cqfn.astgen.scanner.Token;
+import org.cqfn.astgen.scanner.TokenList;
+import org.cqfn.astgen.scanner.TokenListBuilder;
 
 /**
- * DSL rule.
+ * Class that transform string into list of tokens.
  *
  * @since 1.0
  */
-public interface Rule {
+public class Tokenizer {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Source string.
      */
-    void generate(Map<String, String> opt);
+    private final String source;
+
+    /**
+     * Constructor.
+     * @param source Source string.
+     */
+    public Tokenizer(final String source) {
+        this.source = source;
+    }
+
+    /**
+     * Returns a list of tokens as a result of parsing.
+     * @return A list of tokens
+     * @throws ParserException Any exception thrown by the parser
+     */
+    public TokenList getTokens() throws ParserException {
+        final TokenListBuilder result = new TokenListBuilder();
+        final Scanner scanner = new Scanner(this.source);
+        Token token = scanner.getToken();
+        while (!(token instanceof Null)) {
+            result.addToken(token);
+            token = scanner.getToken();
+        }
+        return result.createList();
+    }
 }

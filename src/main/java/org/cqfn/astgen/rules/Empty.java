@@ -22,20 +22,55 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.rules;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
 /**
- * DSL rule.
+ * States that the descriptor is empty.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class Empty extends Descriptor {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The instance.
      */
-    void generate(Map<String, String> opt);
+    public static final Empty INSTANCE = new Empty();
+
+    /**
+     * Constructor.
+     */
+    private Empty() {
+    }
+
+    @Override
+    public DescriptorAttribute getAttribute() {
+        return DescriptorAttribute.NONE;
+    }
+
+    @Override
+    public String getTag() {
+        return "";
+    }
+
+    @Override
+    public String getLabel() {
+        return "";
+    }
+
+    @Override
+    public String getType() {
+        return "0";
+    }
+
+    @Override
+    public List<Parameter> getParameters() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Data getData() {
+        return InvalidData.INSTANCE;
+    }
 }

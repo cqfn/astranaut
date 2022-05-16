@@ -22,20 +22,34 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Expected identifier without tag, parameters and data".
  *
  * @since 1.0
  */
-public interface Rule {
+public final class ExpectedSimpleIdentifier extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The explanatory text.
      */
-    void generate(Map<String, String> opt);
+    private final String text;
+
+    /**
+     * Constructor.
+     * @param text The explanatory text
+     */
+    public ExpectedSimpleIdentifier(final String text) {
+        super();
+        this.text = text;
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return new StringBuilder()
+            .append("Expected identifier without tag, parameters and data: '")
+            .append(this.text)
+            .append('\'')
+            .toString();
+    }
 }

@@ -21,21 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.scanner;
 
 /**
- * DSL rule.
+ * Token that represents opening angle bracket.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class OpeningAngleBracket extends Bracket {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The instance.
      */
-    void generate(Map<String, String> opt);
+    public static final Bracket INSTANCE = new OpeningAngleBracket();
+
+    /**
+     * Private constructor.
+     */
+    private OpeningAngleBracket() {
+    }
+
+    @Override
+    public char getSymbol() {
+        return '<';
+    }
+
+    @Override
+    public char getPairSymbol() {
+        return '>';
+    }
+
+    @Override
+    public boolean isClosing() {
+        return false;
+    }
+
+    @Override
+    public BracketsPair createPair(final TokenList tokens) {
+        return new AngleBracketsPair(tokens);
+    }
 }

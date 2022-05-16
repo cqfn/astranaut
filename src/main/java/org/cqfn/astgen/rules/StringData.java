@@ -22,20 +22,48 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.rules;
 
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.utils.StringUtils;
 
 /**
- * DSL rule.
+ * Data represents as a string.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class StringData implements Data {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The value.
      */
-    void generate(Map<String, String> opt);
+    private final String value;
+
+    /**
+     * Constructor.
+     * @param value The value
+     */
+    public StringData(final String value) {
+        this.value = value;
+    }
+
+    /**
+     * Returns the value.
+     * @return The value
+     */
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+            .append('\"')
+            .append(new StringUtils(this.value).escapeEntities())
+            .append('\"')
+            .toString();
+    }
+
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 }

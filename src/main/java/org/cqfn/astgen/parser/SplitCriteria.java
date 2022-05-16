@@ -21,21 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.parser;
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.scanner.Token;
 
 /**
- * DSL rule.
+ * Criteria for the splitter.
  *
  * @since 1.0
  */
-public interface Rule {
+public interface SplitCriteria {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Checks if a token satisfies some criteria.
+     * @param token Token
+     * @return Checking result
      */
-    void generate(Map<String, String> opt);
+    boolean satisfies(Token token);
 }

@@ -22,20 +22,48 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.scanner;
 
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.exceptions.ParserException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
- * DSL rule.
+ * Test for {@link Scanner} and {@link Bracket} classes.
  *
  * @since 1.0
  */
-public interface Rule {
+public class BracketsTest {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Source code.
      */
-    void generate(Map<String, String> opt);
+    private static final String SOURCE = "{ one, [ two ], <t(h)ree> }";
+
+    /**
+     * Output example.
+     */
+    private static final String EXPECTED = "{[]<()>}";
+
+    /**
+     * Test scanner with string contains brackets.
+     */
+    @Test
+    public void brackets() {
+        final Scanner scanner = new Scanner(BracketsTest.SOURCE);
+        final StringBuilder result = new StringBuilder();
+        boolean oops = false;
+        try {
+            Token token = null;
+            do {
+                token = scanner.getToken();
+                if (token instanceof Bracket) {
+                    result.append(token.toString());
+                }
+            } while (!(token instanceof Null));
+        } catch (final ParserException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        Assertions.assertEquals(result.toString(), BracketsTest.EXPECTED);
+    }
 }

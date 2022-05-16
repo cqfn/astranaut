@@ -21,21 +21,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.utils;
 
 /**
- * DSL rule.
+ * Simple pair in case someone needs to use (key, val) objects without creating a map.
+ *
+ * @param <K> The key type
+ * @param <V> The value type
  *
  * @since 1.0
  */
-public interface Rule {
+public final class Pair<K, V> {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The key.
      */
-    void generate(Map<String, String> opt);
+    private final K key;
+
+    /**
+     * The value.
+     */
+    private final V val;
+
+    /**
+     * Constructor.
+     * @param key The key
+     * @param val The value
+     */
+    public Pair(final K key, final V val) {
+        this.key = key;
+        this.val = val;
+    }
+
+    /**
+     * Returns the key.
+     * @return The key
+     */
+    public K getKey() {
+        return this.key;
+    }
+
+    /**
+     * Returns the value.
+     * @return The value
+     */
+    public V getValue() {
+        return this.val;
+    }
 }

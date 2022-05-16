@@ -22,20 +22,43 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.scanner;
 
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.exceptions.ParserException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
- * DSL rule.
+ * Test for {@link Scanner} and {@link AtSign} classes.
  *
  * @since 1.0
  */
-public interface Rule {
+public class AtSignTest {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Source code.
      */
-    void generate(Map<String, String> opt);
+    private static final String SOURCE = "tag@Name";
+
+    /**
+     * Output example.
+     */
+    private static final String EXPECTED = "@";
+
+    /**
+     * Test scanner with string contains "at" sign.
+     */
+    @Test
+    public void comma() {
+        final Scanner scanner = new Scanner(AtSignTest.SOURCE);
+        boolean oops = false;
+        final Token token;
+        try {
+            scanner.getToken();
+            token = scanner.getToken();
+            Assertions.assertEquals(token.toString(), AtSignTest.EXPECTED);
+        } catch (final ParserException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
 }

@@ -22,20 +22,36 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.exceptions;
 
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.scanner.Token;
 
 /**
- * DSL rule.
+ * Exception "Expected a comma after the token".
  *
  * @since 1.0
  */
-public interface Rule {
+public final class ExpectedComma extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The token.
      */
-    void generate(Map<String, String> opt);
+    private final Token token;
+
+    /**
+     * Constructor.
+     * @param token The token
+     */
+    public ExpectedComma(final Token token) {
+        super();
+        this.token = token;
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return new StringBuilder()
+            .append("Expected a comma after the token: '")
+            .append(this.token.toString())
+            .append('\'')
+            .toString();
+    }
 }

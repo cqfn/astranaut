@@ -21,21 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.rules;
 
 /**
- * DSL rule.
+ * The descriptor attribute.
  *
  * @since 1.0
  */
-public interface Rule {
+public enum DescriptorAttribute {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Descriptor has no attribute.
      */
-    void generate(Map<String, String> opt);
+    NONE,
+
+    /**
+     * Element is optional.
+     */
+    OPTIONAL,
+
+    /**
+     * Element is a list of elements.
+     */
+    LIST,
+
+    /**
+     * Element is a flag that indicates extension.
+     */
+    EXT
 }

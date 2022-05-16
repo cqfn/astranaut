@@ -21,21 +21,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.scanner;
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
- * DSL rule.
+ * Wrapper that implements {@link Iterator} interface.
  *
  * @since 1.0
  */
-public interface Rule {
+class TokenListIterator implements Iterator<Token> {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The list instance.
      */
-    void generate(Map<String, String> opt);
+    private final TokenList list;
+
+    /**
+     * The current index.
+     */
+    private int index;
+
+    /**
+     * Constructor.
+     * @param list The list instance.
+     */
+    TokenListIterator(final TokenList list) {
+        this.list = list;
+        this.index = 0;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return this.index < this.list.size();
+    }
+
+    @Override
+    public Token next() {
+        if (!this.hasNext()) {
+            throw new NoSuchElementException();
+        }
+        final Token token = this.list.get(this.index);
+        this.index = this.index + 1;
+        return token;
+    }
 }

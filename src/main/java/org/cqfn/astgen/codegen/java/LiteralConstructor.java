@@ -21,21 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astgen.codegen.java;
 
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.rules.Literal;
 
 /**
- * DSL rule.
+ * Constructs classes, fields and methods for rules that describe literals.
  *
  * @since 1.0
  */
-public interface Rule {
+abstract class LiteralConstructor extends BaseConstructor {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The rule.
      */
-    void generate(Map<String, String> opt);
+    private final Literal rule;
+
+    /**
+     * Constructor.
+     * @param env The environment
+     * @param rule The rule
+     * @param klass The class to be filled
+     */
+    LiteralConstructor(final Environment env, final Literal rule, final Klass klass) {
+        super(env, klass);
+        this.rule = rule;
+    }
+
+    /**
+     * Returns the rule.
+     * @return The rule
+     */
+    protected Literal getRule() {
+        return this.rule;
+    }
+
+    @Override
+    protected String getType() {
+        return this.rule.getType();
+    }
 }

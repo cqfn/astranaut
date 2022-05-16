@@ -21,21 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.utils.cli;
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * DSL rule.
+ * Custom implementation of CLI file parameter converter for the '--rules' option.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class RulesFileConverter extends BaseFileConverter {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The list of valid file extensions.
      */
-    void generate(Map<String, String> opt);
+    private static final List<String> VALID_EXT = Arrays.asList("txt", "dsl");
+
+    /**
+     * Constructor.
+     * @param option An option name
+     */
+    public RulesFileConverter(final String option) {
+        super(option);
+    }
+
+    @Override
+    public List<String> getValidExtensions() {
+        return RulesFileConverter.VALID_EXT;
+    }
+
+    @Override
+    public boolean fileMustExist() {
+        return true;
+    }
 }

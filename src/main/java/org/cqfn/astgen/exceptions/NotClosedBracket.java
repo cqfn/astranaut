@@ -21,21 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception that informs that bracket is not closed.
  *
  * @since 1.0
  */
-public interface Rule {
+public class NotClosedBracket extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Opening bracket.
      */
-    void generate(Map<String, String> opt);
+    private final char opening;
+
+    /**
+     * Constructor.
+     * @param opening Opening bracket
+     */
+    public NotClosedBracket(final char opening) {
+        this.opening = opening;
+    }
+
+    @Override
+    public final String getErrorMessage() {
+        return new StringBuilder()
+            .append("Bracket is not closed: \'")
+            .append(this.opening)
+            .append('\'')
+            .toString();
+    }
 }

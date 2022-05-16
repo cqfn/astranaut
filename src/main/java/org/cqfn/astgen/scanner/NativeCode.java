@@ -22,20 +22,37 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.scanner;
 
 /**
- * DSL rule.
+ * Token that represents native [Java] code.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class NativeCode implements Token {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The code.
      */
-    void generate(Map<String, String> opt);
+    private final String code;
+
+    /**
+     * Constructor.
+     * @param code The code
+     */
+    public NativeCode(final String code) {
+        this.code = code;
+    }
+
+    /**
+     * Returns the code.
+     * @return The code
+     */
+    public String getCode() {
+        return this.code;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("$%s$", this.code);
+    }
 }

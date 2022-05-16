@@ -22,20 +22,37 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.scanner;
 
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.exceptions.ParserException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
- * DSL rule.
+ * Test for {@link Scanner} and {@link Null} classes.
  *
  * @since 1.0
  */
-public interface Rule {
+public class NullTest {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Output example.
      */
-    void generate(Map<String, String> opt);
+    private static final String EXPECTED = "<null>";
+
+    /**
+     * Test scanner with empty string as input.
+     */
+    @Test
+    public void emptyStringAsInput() {
+        final Scanner scanner = new Scanner("");
+        boolean oops = false;
+        final Token token;
+        try {
+            token = scanner.getToken();
+            Assertions.assertEquals(token.toString(), NullTest.EXPECTED);
+        } catch (final ParserException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
 }

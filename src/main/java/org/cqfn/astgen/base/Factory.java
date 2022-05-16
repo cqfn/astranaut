@@ -21,21 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astgen.base;
 
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
 import java.util.Map;
 
 /**
- * DSL rule.
+ * The node factory.
  *
  * @since 1.0
  */
-public interface Rule {
+public class Factory {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The set of types arranged by name.
      */
-    void generate(Map<String, String> opt);
+    private final Map<String, Type> types;
+
+    /**
+     * Constructor.
+     * @param types The set of types arranged by name
+     */
+    public Factory(final Map<String, Type> types) {
+        this.types = types;
+    }
+
+    /**
+     * Creates node builder by type name.
+     * @param name The type name
+     * @return A node builder
+     */
+    public final Builder createBuilder(final String name) {
+        final Builder result;
+        if (this.types.containsKey(name)) {
+            final Type type = this.types.get(name);
+            result = type.createBuilder();
+        } else {
+            final DraftNode.Constructor draft = new DraftNode.Constructor();
+            draft.setName(name);
+            result = draft;
+        }
+        return result;
+    }
 }

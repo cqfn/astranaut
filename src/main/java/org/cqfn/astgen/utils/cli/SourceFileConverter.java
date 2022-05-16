@@ -21,21 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.utils.cli;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
 /**
- * DSL rule.
+ * Custom implementation of CLI file parameter converter for the '--source' option.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class SourceFileConverter extends BaseFileConverter {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The list of valid file extensions.
      */
-    void generate(Map<String, String> opt);
+    private static final List<String> VALID_EXT = Collections.singletonList("json");
+
+    /**
+     * Constructor.
+     * @param option An option name
+     */
+    public SourceFileConverter(final String option) {
+        super(option);
+    }
+
+    @Override
+    public List<String> getValidExtensions() {
+        return SourceFileConverter.VALID_EXT;
+    }
+
+    @Override
+    public boolean fileMustExist() {
+        return true;
+    }
 }

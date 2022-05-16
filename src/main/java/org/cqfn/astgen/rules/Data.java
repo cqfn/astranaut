@@ -21,21 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.rules;
 
 /**
- * DSL rule.
+ * Data that can be inside descriptor.
  *
  * @since 1.0
  */
-public interface Rule {
+public interface Data {
+    @Override
+    String toString();
+
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Returns {@code true} if data is valid.
+     * @return The flag
      */
-    void generate(Map<String, String> opt);
+    boolean isValid();
 }

@@ -21,21 +21,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.base;
 
 /**
- * DSL rule.
+ * The empty fragment.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class EmptyFragment implements Fragment {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The instance.
      */
-    void generate(Map<String, String> opt);
+    public static final Fragment INSTANCE = new EmptyFragment();
+
+    /**
+     * The source.
+     */
+    private static final Source SOURCE = new Source() {
+        @Override
+        public String getFragmentAsString(final Position start, final Position end) {
+            return "";
+        }
+    };
+
+    /**
+     * The position.
+     */
+    private static final Position POSITION = new Position() {
+        @Override
+        public int getIndex() {
+            return 0;
+        }
+    };
+
+    /**
+     * Constructor.
+     */
+    private EmptyFragment() {
+    }
+
+    @Override
+    public Source getSource() {
+        return EmptyFragment.SOURCE;
+    }
+
+    @Override
+    public Position getBegin() {
+        return EmptyFragment.POSITION;
+    }
+
+    @Override
+    public Position getEnd() {
+        return EmptyFragment.POSITION;
+    }
 }

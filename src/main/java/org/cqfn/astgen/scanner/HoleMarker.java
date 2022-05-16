@@ -22,20 +22,53 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.scanner;
 
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.rules.Hole;
+import org.cqfn.astgen.rules.HoleAttribute;
 
 /**
- * DSL rule.
+ * The hole marker (# and a number after).
  *
  * @since 1.0
  */
-public interface Rule {
+public class HoleMarker implements Token {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * Value of the hole.
      */
-    void generate(Map<String, String> opt);
+    private final int value;
+
+    /**
+     * Attribute.
+     */
+    private final HoleAttribute attribute;
+
+    /**
+     * Constructor.
+     * @param value Value of the hole
+     * @param attribute Attribute
+     */
+    public HoleMarker(final int value, final HoleAttribute attribute) {
+        this.value = value;
+        this.attribute = attribute;
+    }
+
+    @Override
+    public final String toString() {
+        final StringBuilder builder = new StringBuilder()
+            .append('#')
+            .append(this.value);
+        if (this.attribute == HoleAttribute.ELLIPSIS) {
+            builder.append("...");
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Creates a hole from this marker.
+     * @return A hole
+     */
+    public Hole createHole() {
+        return new Hole(this.value, this.attribute);
+    }
 }

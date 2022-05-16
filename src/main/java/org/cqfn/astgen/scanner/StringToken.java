@@ -22,20 +22,46 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.scanner;
 
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.rules.Data;
+import org.cqfn.astgen.rules.StringData;
+import org.cqfn.astgen.utils.StringUtils;
 
 /**
- * DSL rule.
+ * Token that represents string.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class StringToken implements Token {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The data.
      */
-    void generate(Map<String, String> opt);
+    private final String data;
+
+    /**
+     * Constructor.
+     *
+     * @param data The data
+     */
+    public StringToken(final String data) {
+        this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+            .append('\"')
+            .append(new StringUtils(this.data).escapeEntities())
+            .append('\"')
+            .toString();
+    }
+
+    /**
+     * Created a {@link Data} instance from this token.
+     * @return Data instance
+     */
+    public StringData createStringData() {
+        return new StringData(this.data);
+    }
 }

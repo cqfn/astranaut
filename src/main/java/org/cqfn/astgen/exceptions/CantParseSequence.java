@@ -22,20 +22,36 @@
  * SOFTWARE.
  */
 
-package org.cqfn.astgen.codegen.java;
+package org.cqfn.astgen.exceptions;
 
-import java.util.Collections;
-import java.util.Map;
+import org.cqfn.astgen.scanner.TokenList;
 
 /**
- * DSL rule.
+ * Exception "Can't parse tokens sequence".
  *
  * @since 1.0
  */
-public interface Rule {
+public final class CantParseSequence extends ParserException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The token sequence.
      */
-    void generate(Map<String, String> opt);
+    private final TokenList sequence;
+
+    /**
+     * Constructor.
+     * @param sequence The token sequence
+     */
+    public CantParseSequence(final TokenList sequence) {
+        super();
+        this.sequence = sequence;
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return new StringBuilder()
+            .append("Can't parse tokens sequence: '")
+            .append(this.sequence.toString())
+            .append('\'')
+            .toString();
+    }
 }

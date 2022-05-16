@@ -21,21 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.rules;
 
 /**
- * DSL rule.
+ * Invalid {@link Data} object.
  *
  * @since 1.0
  */
-public interface Rule {
+public final class InvalidData implements Data {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The instance.
      */
-    void generate(Map<String, String> opt);
+    public static final InvalidData INSTANCE = new InvalidData();
+
+    /**
+     * Private constructor.
+     */
+    private InvalidData() {
+    }
+
+    @Override
+    public String toString() {
+        return "<invalid>";
+    }
+
+    @Override
+    public boolean isValid() {
+        return false;
+    }
 }

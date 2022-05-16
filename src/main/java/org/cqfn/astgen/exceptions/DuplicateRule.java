@@ -21,21 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.cqfn.astgen.codegen.java;
-
-import java.util.Collections;
-import java.util.Map;
+package org.cqfn.astgen.exceptions;
 
 /**
- * DSL rule.
+ * Exception "Duplicate vertex found in DSL rules".
  *
  * @since 1.0
  */
-public interface Rule {
+public final class DuplicateRule extends GeneratorException {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The explanatory text.
      */
-    void generate(Map<String, String> opt);
+    private final String text;
+
+    /**
+     * Constructor.
+     * @param text The explanatory text.
+     */
+    public DuplicateRule(final String text) {
+        this.text = text;
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return String.format("Duplication in DSL rules: '%s'", this.text);
+    }
 }

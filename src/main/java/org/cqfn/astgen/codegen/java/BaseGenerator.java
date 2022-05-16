@@ -21,21 +21,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astgen.codegen.java;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.Locale;
 
 /**
- * DSL rule.
+ * Generates source code for rules.
  *
  * @since 1.0
  */
-public interface Rule {
+abstract class BaseGenerator {
     /**
-     * Generates source code from the rule.
-     * @param opt The options set
+     * The environment.
      */
-    void generate(Map<String, String> opt);
+    private final Environment env;
+
+    /**
+     * Constructor.
+     * @param env The environment required for generation.
+     */
+    BaseGenerator(final Environment env) {
+        this.env = env;
+    }
+
+    /**
+     * Generates Java compilation unit that contains source code that implements a rule.
+     * @return Java compilation unit
+     */
+    public abstract CompilationUnit generate();
+
+    /**
+     * Returns the environment.
+     * @return The environment
+     */
+    protected Environment getEnv() {
+        return this.env;
+    }
+
+    /**
+     * Returns full package name.
+     * @param language The programming language for which the rule is applied
+     * @return Package name
+     */
+    protected String getPackageName(final String language) {
+        final String root = this.env.getRootPackage();
+        final String pkg;
+        if (language.isEmpty()) {
+            pkg = root.concat(".green");
+        } else {
+            pkg = String.format("%s.%s", root, language.toLowerCase(Locale.ENGLISH));
+        }
+        return pkg;
+    }
 }
