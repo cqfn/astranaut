@@ -6,6 +6,7 @@
 ___
 
 ## Brief
+
 This software was prepared as part of an investigation of the possibilities of transformation
 and unification of syntax trees.
 
@@ -51,7 +52,7 @@ If the application is used in generator mode, the node types are supplemented wi
 about the types of successors that such a node can have. This allows the application to control
 semantic integrity in the process of transforming the tree.
 
-![syntax tree](docs/ast_example.png)
+![syntax tree](src/main/documents/ast_example.png)
 
 These properties of the syntax tree allow us to store the tree in a human-readable format.
 We have chosen JSON as such a format. This application reads and writes the following JSON structure:
@@ -595,3 +596,8 @@ If the name of the node type is `singleExpression`, and the node has three succe
 the type of the second successor is `literal`, and the second successor has the data represented as `+`
 string, then replace this node by another with `Addition` type, which has successors that are first and third
 successors of original node.
+
+### Contributors
+
+* Ivan Kniazkov, @kniazkov
+* Polina Volkhontseva, @pollyvolk
