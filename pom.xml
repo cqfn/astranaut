@@ -35,7 +35,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <qulice.license>${project.basedir}/LICENSE_header.txt</qulice.license>
+        <qulice.license>${project.basedir}/LICENSE.txt</qulice.license>
     </properties>
     <build>
         <plugins>
@@ -53,7 +53,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        org.uast.astgen.Main
+                                        org.cqfn.astgen.Main
                                     </mainClass>
                                 </manifest>
                             </archive>

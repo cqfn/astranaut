@@ -6,6 +6,7 @@
 ___
 
 ## Brief
+
 This software was prepared as part of an investigation of the possibilities of transformation
 and unification of syntax trees.
 
@@ -51,7 +52,7 @@ If the application is used in generator mode, the node types are supplemented wi
 about the types of successors that such a node can have. This allows the application to control
 semantic integrity in the process of transforming the tree.
 
-![syntax tree](docs/ast_example.png)
+![syntax tree](src/main/documents/ast_example.png)
 
 These properties of the syntax tree allow us to store the tree in a human-readable format.
 We have chosen JSON as such a format. This application reads and writes the following JSON structure:
@@ -175,14 +176,14 @@ Optional arguments:
 
 * `--license` (short: `-l`), the file containing license information. This information will be added
 to the beginning of each generated file. The license information is required for the generated code to be 
-validated by a code checker without errors. Default value is `LICENSE_header.txt`;
+validated by a code checker without errors. Default value is `LICENSE.txt`;
 * `--output` (short: `-o`), output folder where files will be generated. Default value is `./generated`;
 * `--package` (short: `-p`), the name of the package that contains the generated classes.
 An appropriate directory structure will be built. Default value is `org.uast`;
 * `--base` (short: `-b`), the name of the package that contains the base classes and interfaces
 that describe the base structure of the syntax tree. Each generated class or interface inherits
 from a class or an interface described in this package. In the `generator` project, this package is named
-`org.uast.astgen.base`
+`org.cqfn.astgen.base`
 ([sources](https://github.com/unified-ast/ast-generator/tree/master/src/main/java/org/uast/astgen/base))
 and must be moved to the target project so that the generated classes can be compiled;
 * `--version` (short: `-v`), specifies the version of the implementation. This version will be added as 
@@ -595,3 +596,8 @@ If the name of the node type is `singleExpression`, and the node has three succe
 the type of the second successor is `literal`, and the second successor has the data represented as `+`
 string, then replace this node by another with `Addition` type, which has successors that are first and third
 successors of original node.
+
+### Contributors
+
+* Ivan Kniazkov, @kniazkov
+* Polina Volkhontseva, @pollyvolk
