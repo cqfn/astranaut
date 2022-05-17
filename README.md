@@ -602,4 +602,4 @@ successors of original node.
 * Ivan Kniazkov, @kniazkov
 * Polina Volkhontseva, @pollyvolk
 
-See our [Contributing policy](CONTRIBUTION.md).
+See our [Contributing policy](CONTRIBUTING.md).
