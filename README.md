@@ -1,8 +1,8 @@
 # Abstract Syntax Trees Generator / Converter
 
-![Build and test](https://github.com/unified-ast/ast-generator/workflows/Build%20and%20test/badge.svg)
-[![Codecov](https://codecov.io/gh/unified-ast/ast-generator/branch/master/graph/badge.svg)](https://codecov.io/gh/unified-ast/ast-generator)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/unified-ast/ast-generator/blob/master/LICENSE.txt)
+![Build and test](https://github.com/cqfn/astranaut/workflows/Build%20and%20test/badge.svg)
+[![Codecov](https://codecov.io/gh/cqfn/astranaut/branch/master/graph/badge.svg)](https://codecov.io/gh/cqfn/astranaut)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/cqfn/astranaut/blob/master/LICENSE.txt)
 ___
 
 ## Brief
@@ -29,7 +29,7 @@ to the specified DSL rules.
 ## How to build and download
 
 You can download the latest release
-[here](https://github.com/unified-ast/ast-generator/releases).
+[here](https://github.com/cqfn/astranaut/releases).
 
 Fastest way to build the executable is to open the project in Intellij IDEA, select the "Maven" tab
 and double-click on the "package" item.
@@ -183,8 +183,8 @@ An appropriate directory structure will be built. Default value is `org.uast`;
 * `--base` (short: `-b`), the name of the package that contains the base classes and interfaces
 that describe the base structure of the syntax tree. Each generated class or interface inherits
 from a class or an interface described in this package. In the `generator` project, this package is named
-`org.cqfn.astgen.base`
-([sources](https://github.com/unified-ast/ast-generator/tree/master/src/main/java/org/uast/astgen/base))
+`org.cqfn.astranaut.base`
+([sources](https://github.com/cqfn/astranaut/tree/master/src/main/java/org/cqfn/astranaut/base))
 and must be moved to the target project so that the generated classes can be compiled;
 * `--version` (short: `-v`), specifies the version of the implementation. This version will be added as 
 a `@since` tag to every generated class or interface. Default value is `1.0`;
