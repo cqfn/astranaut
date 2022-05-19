@@ -183,7 +183,7 @@ An appropriate directory structure will be built. Default value is `org.uast`;
 * `--base` (short: `-b`), the name of the package that contains the base classes and interfaces
 that describe the base structure of the syntax tree. Each generated class or interface inherits
 from a class or an interface described in this package. In the `generator` project, this package is named
-`org.cqfn.astgen.base`
+`org.cqfn.astranaut.base`
 ([sources](https://github.com/unified-ast/ast-generator/tree/master/src/main/java/org/uast/astgen/base))
 and must be moved to the target project so that the generated classes can be compiled;
 * `--version` (short: `-v`), specifies the version of the implementation. This version will be added as 
