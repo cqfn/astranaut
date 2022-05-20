@@ -48,34 +48,65 @@ public class OrdinaryNodeGeneratorTest {
     private static final String TESTS_PATH = "src/test/resources/codegen/java/";
 
     /**
-     * Testing source code generation for rules that describe nodes.
+     * Testing node generation without optional children.
      */
     @Test
+    public void testNodeWithoutOptionalChildren() {
+        final boolean result = this.testNodeGeneration(
+            "Addition <- left@Expression, right@Expression;\nExpression <- Addition | Subtraction",
+            "Addition",
+            "node_generator.txt"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Testing node generation with optional child.
+     */
+    @Test
+    public void testNodeWithOptionalChild() {
+        final boolean result = this.testNodeGeneration(
+            "Name <- [composition@Name], last@Identifier;",
+            "Name",
+            "optional_child.txt"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Testing source code generation for rules that describe nodes.
+     * @param source The source string
+     * @param type Expected node type
+     * @param filename The name of file that contains correct result
+     * @return Testing result
+     */
     @SuppressWarnings("PMD.CloseResource")
-    public void testNodeGeneration() {
-        final Statement<Node> statement = this.createStatement();
+    private boolean testNodeGeneration(final String source,
+        final String type, final String filename) {
+        final Statement<Node> statement = this.createStatement(source, type);
         final Environment env =
             new TestEnvironment(Collections.singletonList(statement.getRule()));
         final OrdinaryNodeGenerator generator = new OrdinaryNodeGenerator(env, statement);
         final String actual = generator.generate().generate();
-        final String expected = this.readTest("node_generator.txt");
+        final String expected = this.readTest(filename);
         Assertions.assertEquals(expected, actual);
+        return expected.equals(actual);
     }
 
     /**
      * Creates DSL statement.
+     * @param source The source string
+     * @param type Expected node type
      * @return DSL statement
      */
-    private Statement<Node> createStatement() {
+    private Statement<Node> createStatement(final String source, final String type) {
         boolean oops = false;
-        final String source =
-            "Addition <- left@Expression, right@Expression;\nExpression <- Addition | Subtraction";
         final ProgramParser parser = new ProgramParser(source);
         try {
             final Program program = parser.parse();
             final List<Statement<Node>> list = program.getNodes();
             for (final Statement<Node> statement : list) {
-                if (statement.getRule().getType().equals("Addition")) {
+                if (statement.getRule().getType().equals(type)) {
                     return statement;
                 }
             }

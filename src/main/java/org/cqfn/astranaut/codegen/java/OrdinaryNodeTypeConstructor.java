@@ -122,7 +122,7 @@ final class OrdinaryNodeTypeConstructor extends NodeConstructor {
             }
             flag = true;
             boolean optional = false;
-            if (descriptor.getAttribute() == DescriptorAttribute.LIST) {
+            if (descriptor.getAttribute() == DescriptorAttribute.OPTIONAL) {
                 optional = true;
             }
             init.append("new ChildDescriptor(")
