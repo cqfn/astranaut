@@ -25,6 +25,7 @@ package org.cqfn.astranaut.codegen.java;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import org.cqfn.astranaut.rules.Data;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.Hole;
@@ -87,7 +88,12 @@ public class ConverterClassFiller {
     /**
      * The factory for naming methods.
      */
-    private final LabelFactory labels;
+    private final LabelFactory methods;
+
+    /**
+     * The factory for naming holes.
+     */
+    private final LabelFactory holes;
 
     /**
      * Flag indicates that the package 'java.util.LinkedList' is needed.
@@ -106,7 +112,8 @@ public class ConverterClassFiller {
         this.root = descriptor;
         this.matcher = matcher;
         this.stg = new StaticStringGenerator(klass);
-        this.labels = new LabelFactory();
+        this.methods = new LabelFactory();
+        this.holes = new LabelFactory();
         this.llist = false;
     }
 
@@ -167,7 +174,7 @@ public class ConverterClassFiller {
      */
     private CreationResult createBuildMethod(final Descriptor descriptor) {
         final String type = descriptor.getType();
-        final String name = this.labels.getLabel().concat("Builder");
+        final String name = this.methods.getLabel().concat("Builder");
         final CreationResult result = new CreationResult(name);
         final Method method = this.createMethodObject(type, name);
         method.addArgument(
@@ -279,10 +286,22 @@ public class ConverterClassFiller {
         final CreationResult crr) {
         if (parameter instanceof Hole) {
             final Hole hole = (Hole) parameter;
+            final String label = this.holes.getLabel();
+            final String source = label.toUpperCase(Locale.ENGLISH)
+                .concat("_HOLE_ID");
+            final Field field = new Field(
+                String.format("The number of the %s hole", label),
+                "int",
+                source
+            );
+            field.makeStaticFinal();
+            field.setInitExpr(String.valueOf(hole.getValue()));
+            this.klass.addField(field);
             code.append(
                 String.format(
-                    "list.addAll(children.get(%d));\n",
-                    hole.getValue()
+                    "list.addAll(children.get(%s.%s));\n",
+                    this.klass.getName(),
+                    source
                 )
             );
             crr.childrenNeeded();

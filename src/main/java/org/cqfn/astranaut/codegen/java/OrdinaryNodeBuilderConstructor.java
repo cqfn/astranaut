@@ -43,11 +43,6 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
     private static final String STR_BOOLEAN = "boolean";
 
     /**
-     * The 'int' string.
-     */
-    private static final String STR_INT = "int";
-
-    /**
      * The 'this.' string.
      */
     private static final String STR_THIS = "this.";
@@ -173,23 +168,6 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
         }
         code.append("}\nreturn result;");
         return code.toString();
-    }
-
-    /**
-     * Creates field that contains magic number.
-     * @param brief The brief description
-     * @param name The name
-     * @param value The value
-     */
-    private void createMagicNumber(final String brief, final String name, final int value) {
-        final Field field = new Field(
-            brief,
-            OrdinaryNodeBuilderConstructor.STR_INT,
-            name
-        );
-        field.makeStaticFinal();
-        field.setInitExpr(String.valueOf(value));
-        this.getKlass().addField(field);
     }
 
     /**
