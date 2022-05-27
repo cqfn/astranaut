@@ -118,6 +118,7 @@ final class OrdinaryNodeClassConstructor extends NodeConstructor {
     private void createTaggedFields() {
         final Klass klass = this.getKlass();
         final List<TaggedChild> tags = this.getEnv().getTags(this.getType());
+        int count = 0;
         for (final TaggedChild child : tags) {
             final String type = child.getType();
             final String tag = child.getTag();
@@ -141,6 +142,12 @@ final class OrdinaryNodeClassConstructor extends NodeConstructor {
                 getter.makeOverridden();
             }
             klass.addMethod(getter);
+            if (!child.isOverridden()) {
+                count = count + 1;
+            }
+        }
+        if (count > 2) {
+            klass.suppressWarnings("PMD.DataClass");
         }
     }
 }
