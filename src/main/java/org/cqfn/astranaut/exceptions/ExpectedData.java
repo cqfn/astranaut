@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public final class ExpectedData extends ParserException {
+    private static final long serialVersionUID = -617559464909172896L;
+
     /**
      * The descriptor name.
      */

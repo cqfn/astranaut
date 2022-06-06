@@ -59,7 +59,7 @@ public class StringTokenTest {
         boolean oops = false;
         try {
             token = scanner.getToken();
-            Assertions.assertInstanceOf(StringToken.class, token);
+            Assertions.assertTrue(token instanceof StringToken);
             Assertions.assertEquals(token.toString(), StringTokenTest.EXPECTED);
         } catch (final ParserException ignored) {
             oops = true;

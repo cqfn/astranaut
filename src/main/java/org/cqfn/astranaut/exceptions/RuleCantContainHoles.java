@@ -33,7 +33,9 @@ public final class RuleCantContainHoles extends ParserException {
     /**
      * The instance.
      */
-    public static final  ParserException INSTANCE = new RuleCantContainHoles();
+    public static final ParserException INSTANCE = new RuleCantContainHoles();
+
+    private static final long serialVersionUID = 6767639653105667526L;
 
     /**
      * Constructor.

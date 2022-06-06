@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public abstract class InterpreterException extends BaseException {
+    private static final long serialVersionUID = -3303197695460771594L;
+
     @Override
     public final String getInitiator() {
         return "Interpreter";

@@ -33,7 +33,9 @@ public final class ExpectedThreeOrFourParameters extends ParserException {
     /**
      * The instance.
      */
-    public static final  ParserException INSTANCE = new ExpectedThreeOrFourParameters();
+    public static final ParserException INSTANCE = new ExpectedThreeOrFourParameters();
+
+    private static final long serialVersionUID = -7036987417162520441L;
 
     /**
      * Constructor.

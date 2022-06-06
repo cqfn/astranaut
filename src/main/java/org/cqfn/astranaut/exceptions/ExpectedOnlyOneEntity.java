@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public final class ExpectedOnlyOneEntity extends ParserException {
+    private static final long serialVersionUID = -6855664943664794115L;
+
     /**
      * The explanatory text.
      */

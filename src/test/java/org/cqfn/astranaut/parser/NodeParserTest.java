@@ -192,7 +192,8 @@ public class NodeParserTest {
         try {
             new NodeParser(source).parse();
         } catch (final ParserException error) {
-            Assertions.assertInstanceOf(type, error);
+            final boolean result = type.isInstance(error);
+            Assertions.assertTrue(result);
             oops = true;
         }
         return oops;

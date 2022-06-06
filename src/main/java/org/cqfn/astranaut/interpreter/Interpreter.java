@@ -81,6 +81,8 @@ public class Interpreter {
             new FilesReader(this.source.getPath()).readAsString(
                 (FilesReader.CustomExceptionCreator<InterpreterException>) ()
                     -> new InterpreterException() {
+                        private static final long serialVersionUID = -2486266117492218703L;
+
                         @Override
                         public String getErrorMessage() {
                             return String.format(

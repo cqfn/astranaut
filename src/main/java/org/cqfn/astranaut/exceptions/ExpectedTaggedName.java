@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public final class ExpectedTaggedName extends ParserException {
+    private static final long serialVersionUID = -6857130310151692431L;
+
     /**
      * The explanatory text.
      */

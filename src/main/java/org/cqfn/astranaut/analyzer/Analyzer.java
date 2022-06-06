@@ -605,11 +605,11 @@ public class Analyzer {
             }
             for (final Vertex vertex : list) {
                 if (vertex.isAbstract() && !processed.get(vertex)) {
-                    final List<Vertex> descendants = this.getDescendantVerticesByType(
+                    final List<Vertex> descendants = VertexSorter.getDescendantVerticesByType(
                         (Node) vertex,
                         list
                     );
-                    if (this.descendantsFinal(descendants)) {
+                    if (VertexSorter.descendantsFinal(descendants)) {
                         depth.put(vertex, 2);
                         processed.put(vertex, true);
                     } else {
@@ -620,7 +620,7 @@ public class Analyzer {
                     }
                 }
             }
-            return this.sortByValue(depth);
+            return VertexSorter.sortByValue(depth);
         }
 
         /**
@@ -637,7 +637,7 @@ public class Analyzer {
             final Map<Vertex, Boolean> processed) {
             Integer max = 2;
             Integer value;
-            final List<Vertex> descendants = this.getDescendantVerticesByType(
+            final List<Vertex> descendants = VertexSorter.getDescendantVerticesByType(
                 (Node) pair.getKey(),
                 pair.getValue()
             );

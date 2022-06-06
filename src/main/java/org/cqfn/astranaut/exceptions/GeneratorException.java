@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public abstract class GeneratorException extends BaseException {
+    private static final long serialVersionUID = 2408243061613727116L;
+
     @Override
     public final String getInitiator() {
         return "Generator";

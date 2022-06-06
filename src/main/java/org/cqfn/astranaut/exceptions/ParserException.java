@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public abstract class ParserException extends BaseException {
+    private static final long serialVersionUID = 8708357998656415803L;
+
     @Override
     public final String getInitiator() {
         return "Parser";

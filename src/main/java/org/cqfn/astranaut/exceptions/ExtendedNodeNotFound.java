@@ -29,6 +29,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public final class ExtendedNodeNotFound extends GeneratorException {
+    private static final long serialVersionUID = -2083651109613819562L;
+
     /**
      * The explanatory text.
      */

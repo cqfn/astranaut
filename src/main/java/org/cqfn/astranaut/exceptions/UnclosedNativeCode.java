@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public class UnclosedNativeCode extends ParserException {
+    private static final long serialVersionUID = -5675184566567738218L;
+
     /**
      * The code.
      */

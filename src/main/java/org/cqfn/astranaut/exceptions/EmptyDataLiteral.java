@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public final class EmptyDataLiteral extends ParserException {
+    private static final long serialVersionUID = -1552305885190281021L;
+
     /**
      * The descriptor name.
      */

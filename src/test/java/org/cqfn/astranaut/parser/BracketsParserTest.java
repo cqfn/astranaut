@@ -68,7 +68,7 @@ public class BracketsParserTest {
             Assertions.assertEquals(tokens.toString(), BracketsParserTest.CORRECT);
             Assertions.assertEquals(parsed.size(), 1);
             final Token token = parsed.get(0);
-            Assertions.assertInstanceOf(CurlyBracketsPair.class, token);
+            Assertions.assertTrue(token instanceof CurlyBracketsPair);
         } catch (final ParserException ignored) {
             oops = true;
         }
@@ -87,8 +87,7 @@ public class BracketsParserTest {
             final BracketsParser parser = new BracketsParser(tokens);
             parser.parse();
         } catch (final ParserException exception) {
-            Assertions.assertInstanceOf(NotClosedBracket.class, exception);
-            oops = true;
+            oops = NotClosedBracket.class.isInstance(exception);
         }
         Assertions.assertTrue(oops);
     }
@@ -106,8 +105,7 @@ public class BracketsParserTest {
             final BracketsParser parser = new BracketsParser(tokens);
             parser.parse();
         } catch (final ParserException exception) {
-            Assertions.assertInstanceOf(BracketsDoNotMatch.class, exception);
-            oops = true;
+            oops = BracketsDoNotMatch.class.isInstance(exception);
         }
         Assertions.assertTrue(oops);
     }

@@ -32,6 +32,8 @@ import java.util.Locale;
  * @since 1.0
  */
 public final class NodeNameCapitalLetter extends ParserException {
+    private static final long serialVersionUID = -8958877525261082413L;
+
     /**
      * The explanatory text.
      */
