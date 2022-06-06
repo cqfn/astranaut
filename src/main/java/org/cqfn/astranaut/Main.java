@@ -213,6 +213,8 @@ public final class Main {
         try {
             final String code = new FilesReader(rules).readAsString(
                 (FilesReader.CustomExceptionCreator<BaseException>) () -> new BaseException() {
+                    private static final long serialVersionUID = 574161461218410655L;
+
                     @Override
                     public String getInitiator() {
                         return "Main";
