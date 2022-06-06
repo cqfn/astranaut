@@ -29,6 +29,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public class NotClosedBracket extends ParserException {
+    private static final long serialVersionUID = -7404315113361103951L;
+
     /**
      * Opening bracket.
      */

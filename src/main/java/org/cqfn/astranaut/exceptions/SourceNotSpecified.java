@@ -33,7 +33,9 @@ public final class SourceNotSpecified extends InterpreterException {
     /**
      * The instance.
      */
-    public static final  InterpreterException INSTANCE = new SourceNotSpecified();
+    public static final InterpreterException INSTANCE = new SourceNotSpecified();
+
+    private static final long serialVersionUID = 8639921344041173138L;
 
     /**
      * Constructor.

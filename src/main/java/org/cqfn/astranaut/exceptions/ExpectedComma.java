@@ -32,6 +32,8 @@ import org.cqfn.astranaut.scanner.Token;
  * @since 1.0
  */
 public final class ExpectedComma extends ParserException {
+    private static final long serialVersionUID = 6367285536387850138L;
+
     /**
      * The token.
      */

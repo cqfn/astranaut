@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public class UnknownSymbol extends ParserException {
+    private static final long serialVersionUID = 6185163747357578771L;
+
     /**
      * The symbol.
      */

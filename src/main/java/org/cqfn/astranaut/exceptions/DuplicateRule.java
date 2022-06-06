@@ -29,6 +29,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public final class DuplicateRule extends GeneratorException {
+    private static final long serialVersionUID = -6545375625643610834L;
+
     /**
      * The explanatory text.
      */

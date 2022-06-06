@@ -54,9 +54,9 @@ public class IdentifierTest {
         boolean oops = false;
         try {
             token = scanner.getToken();
-            Assertions.assertInstanceOf(Identifier.class, token);
+            Assertions.assertTrue(token instanceof Identifier);
             token = scanner.getToken();
-            Assertions.assertInstanceOf(Identifier.class, token);
+            Assertions.assertTrue(token instanceof Identifier);
             Assertions.assertEquals(token.toString(), IdentifierTest.EXPECTED);
         } catch (final ParserException ignored) {
             oops = true;

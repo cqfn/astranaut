@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public final class ExpectedUniqueNumbers extends ParserException {
+    private static final long serialVersionUID = 3887236698980100679L;
+
     /**
      * The duplicated hole number.
      */

@@ -79,7 +79,7 @@ public class LiteralParametersParser {
         }
         final List<String> result = new ArrayList<>(segments.length);
         for (final TokenList segment : segments) {
-            this.checkSegment(segment);
+            LiteralParametersParser.checkSegment(segment);
             final NativeCode token = (NativeCode) segment.get(0);
             result.add(token.getCode());
         }

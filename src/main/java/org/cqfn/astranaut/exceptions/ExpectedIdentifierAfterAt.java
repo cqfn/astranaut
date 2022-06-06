@@ -35,6 +35,8 @@ public final class ExpectedIdentifierAfterAt extends ParserException {
      */
     public static final  ParserException INSTANCE = new ExpectedIdentifierAfterAt();
 
+    private static final long serialVersionUID = -3891478765526060252L;
+
     /**
      * Constructor.
      */

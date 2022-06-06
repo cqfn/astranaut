@@ -101,7 +101,8 @@ public class LiteralParserTest {
         try {
             new LiteralParser(source).parse();
         } catch (final ParserException error) {
-            Assertions.assertInstanceOf(type, error);
+            final boolean result = type.isInstance(error);
+            Assertions.assertTrue(result);
             oops = true;
         }
         return oops;

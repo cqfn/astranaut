@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public abstract class BaseException extends Exception {
+    private static final long serialVersionUID = -2735882043088632017L;
+
     /**
      * Returns initiator name, i.e. module that thrown the exception.
      * @return A name

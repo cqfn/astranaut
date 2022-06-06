@@ -33,7 +33,9 @@ public final class DestinationNotSpecified extends InterpreterException {
     /**
      * The instance.
      */
-    public static final  InterpreterException INSTANCE = new DestinationNotSpecified();
+    public static final InterpreterException INSTANCE = new DestinationNotSpecified();
+
+    private static final long serialVersionUID = 8284720532556794012L;
 
     /**
      * Constructor.

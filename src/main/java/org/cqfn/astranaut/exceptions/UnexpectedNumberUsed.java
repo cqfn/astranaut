@@ -30,6 +30,8 @@ package org.cqfn.astranaut.exceptions;
  * @since 1.0
  */
 public final class UnexpectedNumberUsed extends ParserException {
+    private static final long serialVersionUID = -770673234650552171L;
+
     /**
      * The unexpected hole number.
      */
