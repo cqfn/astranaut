@@ -1,0 +1,18 @@
+assets:
+  settings.xml: "cqfn/secrets#settings.xml"
+  pubring.gpg: "cqfn/secrets#pubring.gpg"
+  secring.gpg: "cqfn/secrets#secring.gpg"
+merge:
+  script: |
+    mvn clean install -Pqulice --errors --settings ../settings.xml
+deploy:
+  script: |
+    mvn clean deploy -Pqulice --errors --settings ../settings.xml
+release:
+  script: |
+    mvn versions:set "-DnewVersion=${tag}"
+    git commit -am "${tag}"
+    mvn clean deploy -Pqulice -Pjcabi --settings /home/r/settings.xml
+architect:
+  - kniazkov
+  - pollyvolk
