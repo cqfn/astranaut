@@ -12,7 +12,7 @@ release:
   script: |
     mvn versions:set "-DnewVersion=${tag}"
     git commit -am "${tag}"
-    mvn clean deploy -Pqulice -Pjcabi --settings /home/r/settings.xml
+    mvn clean deploy -Pqulice --settings /home/r/settings.xml
 architect:
   - kniazkov
   - pollyvolk
