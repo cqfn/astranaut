@@ -1,7 +1,7 @@
 assets:
-  settings.xml: "cqfn/secrets#settings.xml"
-  pubring.gpg: "cqfn/secrets#pubring.gpg"
-  secring.gpg: "cqfn/secrets#secring.gpg"
+  settings.xml: "yegor256/cqfn-secrets#settings.xml"
+  pubring.gpg: "yegor256/cqfn-secrets#pubring.gpg"
+  secring.gpg: "yegor256/cqfn-secrets#secring.gpg"
 merge:
   script: |
     mvn clean install -Pqulice --errors --settings ../settings.xml
