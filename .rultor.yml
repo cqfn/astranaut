@@ -10,6 +10,8 @@ deploy:
     mvn clean deploy -Pqulice --errors --settings ../settings.xml
 release:
   script: |
+    gpg --import /home/r/pubring.gpg
+    gpg --allow-secret-key-import --no-tty --batch --import /home/r/secring.gpg
     mvn versions:set "-DnewVersion=${tag}"
     git commit -am "${tag}"
     mvn clean deploy -Pqulice --settings /home/r/settings.xml
