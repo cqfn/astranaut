@@ -14,7 +14,7 @@ release:
     gpg --allow-secret-key-import --no-tty --batch --import /home/r/secring.gpg
     mvn versions:set "-DnewVersion=${tag}"
     git commit -am "${tag}"
-    mvn clean deploy -Pcqfn -Pqulice -Pjcabi --settings /home/r/settings.xml
+    mvn clean deploy -Pcqfn -Pqulice -Psonatype --settings /home/r/settings.xml
 architect:
   - kniazkov
   - pollyvolk
