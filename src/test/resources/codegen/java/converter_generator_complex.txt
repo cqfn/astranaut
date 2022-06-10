@@ -51,6 +51,11 @@ public final class Rule0 implements Converter {
     private static final String MODIFIER = "Modifier";
 
     /**
+     * The number of the first hole.
+     */
+    private static final int FIRST_HOLE_ID = 1;
+
+    /**
      * The 'Identifier' string.
      */
     private static final String IDENTIFIER = "Identifier";
@@ -92,7 +97,7 @@ public final class Rule0 implements Converter {
         final Builder builder = factory.createBuilder(Rule0.VARIABLE_DECLARA);
         final List<Node> list = new LinkedList<>();
         list.add(Rule0.secondBuilder(factory));
-        list.addAll(children.get(1));
+        list.addAll(children.get(Rule0.FIRST_HOLE_ID));
         list.add(Rule0.thirdBuilder(factory, data));
         final boolean applied = builder.setChildrenList(list);
         if (applied && builder.isValid()) {

@@ -25,12 +25,14 @@ package org.cqfn.astranaut.codegen.java;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import org.cqfn.astranaut.rules.Data;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.Hole;
 import org.cqfn.astranaut.rules.HoleAttribute;
 import org.cqfn.astranaut.rules.Parameter;
 import org.cqfn.astranaut.rules.StringData;
+import org.cqfn.astranaut.utils.LabelFactory;
 import org.cqfn.astranaut.utils.StringUtils;
 
 /**
@@ -45,9 +47,24 @@ public class MatcherClassFiller {
     private static final String TYPE_STRING = "String";
 
     /**
+     * The 'String' type name.
+     */
+    private static final String TYPE_INT = "int";
+
+    /**
      * The '\"%s\"' format string.
      */
     private static final String STRING_IN_QUOTES = "\"%s\"";
+
+    /**
+     * The '_HOLE_ID' postfix.
+     */
+    private static final String HOLE_ID_POSTFIX = "_HOLE_ID";
+
+    /**
+     * The description of field that contains a hole number.
+     */
+    private static final String HOLE_NUM_DESCR = "The number of the %s hole";
 
     /**
      * The generator.
@@ -75,6 +92,16 @@ public class MatcherClassFiller {
     private boolean alist;
 
     /**
+     * The set of labels for naming holes.
+     */
+    private final LabelFactory holes;
+
+    /**
+     * The set of labels for naming children.
+     */
+    private final LabelFactory children;
+
+    /**
      * Constructor.
      * @param generator The generator
      * @param klass Class to be filled
@@ -87,6 +114,8 @@ public class MatcherClassFiller {
         this.descriptor = descriptor;
         this.collections = false;
         this.alist = false;
+        this.holes = new LabelFactory();
+        this.children = new LabelFactory();
     }
 
     /**
@@ -136,7 +165,7 @@ public class MatcherClassFiller {
         if (!this.descriptor.hasEllipsisHole()) {
             final Field count = new Field(
                 "Expected number of child nodes",
-                "int",
+                MatcherClassFiller.TYPE_INT,
                 "EXPECTED_COUNT"
             );
             count.makeStaticFinal();
@@ -240,10 +269,19 @@ public class MatcherClassFiller {
         final Data data = this.descriptor.getData();
         if (data instanceof Hole) {
             final Hole hole = (Hole) data;
+            final String label = this.holes.getLabel();
+            final String destination = label.toUpperCase(Locale.ENGLISH)
+                .concat(MatcherClassFiller.HOLE_ID_POSTFIX);
+            this.createMagicNumber(
+                String.format(MatcherClassFiller.HOLE_NUM_DESCR, label),
+                destination,
+                hole.getValue()
+            );
             extractor.append(
                 String.format(
-                    "data.put(%d, node.getData());\n",
-                    hole.getValue()
+                    "data.put(%s.%s, node.getData());\n",
+                    this.klass.getName(),
+                    destination
                 )
             );
         }
@@ -258,11 +296,20 @@ public class MatcherClassFiller {
      */
     private String formatHoleExtractor(final Hole hole, final int index) {
         final String result;
+        final String dstlbl = this.holes.getLabel();
+        final String destination = dstlbl.toUpperCase(Locale.ENGLISH)
+            .concat(MatcherClassFiller.HOLE_ID_POSTFIX);
+        this.createMagicNumber(
+            String.format(MatcherClassFiller.HOLE_NUM_DESCR, dstlbl),
+            destination,
+            hole.getValue()
+        );
         if (hole.getAttribute() == HoleAttribute.ELLIPSIS && index == 0) {
             result =
                 String.format(
-                    "children.put(%d, node.getChildrenList());\n",
-                    hole.getValue()
+                    "children.put(%s.%s, node.getChildrenList());\n",
+                    this.klass.getName(),
+                    destination
                 );
         } else if (hole.getAttribute() == HoleAttribute.ELLIPSIS) {
             this.alist = true;
@@ -275,18 +322,47 @@ public class MatcherClassFiller {
                 ),
                 "list.add(node.getChild(index));",
                 "}",
-                String.format("children.put(%d, list);", hole.getValue())
+                String.format(
+                    "children.put(%s.%s, list);",
+                    this.klass.getName(),
+                    destination
+                )
             );
             result = String.join("\n", code);
         } else {
             this.collections = true;
+            final String srclbl = this.children.getLabel();
+            final String source = srclbl.toUpperCase(Locale.ENGLISH)
+                .concat("_CHILD_ID");
+            this.createMagicNumber(
+                String.format("The index of the %s child", srclbl),
+                source,
+                index
+            );
+            final String format =
+                "children.put(\n\t%s.%s,\n\tCollections.singletonList(node.getChild(%s.%s))\n);\n";
             result =
                 String.format(
-                    "children.put(%d, Collections.singletonList(node.getChild(%d)));\n",
-                    hole.getValue(),
-                    index
+                    format,
+                    this.klass.getName(),
+                    destination,
+                    this.klass.getName(),
+                    source
                 );
         }
         return result;
+    }
+
+    /**
+     * Creates field that contains magic number.
+     * @param brief The brief description
+     * @param name The name
+     * @param value The value
+     */
+    private void createMagicNumber(final String brief, final String name, final int value) {
+        final Field field = new Field(brief, MatcherClassFiller.TYPE_INT, name);
+        field.makeStaticFinal();
+        field.setInitExpr(String.valueOf(value));
+        this.klass.addField(field);
     }
 }

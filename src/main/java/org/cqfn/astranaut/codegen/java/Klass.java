@@ -103,6 +103,11 @@ public final class Klass implements Type {
     private final List<Klass> classes;
 
     /**
+     * The checking name fpr suppress warnings.
+     */
+    private String suppress;
+
+    /**
      * Constructor.
      * @param brief The brief description
      * @param name The class name
@@ -118,6 +123,7 @@ public final class Klass implements Type {
         this.constructors = new ArrayList<>(0);
         this.methods = new ArrayList<>(0);
         this.classes = new ArrayList<>(0);
+        this.suppress = "";
     }
 
     /**
@@ -216,6 +222,14 @@ public final class Klass implements Type {
         this.classes.add(klass);
     }
 
+    /**
+     * Adds an exclusion for static analyzer.
+     * @param type The type of warning
+     */
+    public void suppressWarnings(final String type) {
+        this.suppress = type;
+    }
+
     @Override
     public String getBrief() {
         return this.brief;
@@ -254,6 +268,13 @@ public final class Klass implements Type {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
         final StringBuilder builder = new StringBuilder(128);
         this.generateHeader(builder, indent);
+        if (!this.suppress.isEmpty()) {
+            builder
+                .append(tabulation)
+                .append("@SuppressWarnings(\"")
+                .append(this.suppress)
+                .append("\")\n");
+        }
         builder.append(tabulation);
         if (this.fprivate) {
             builder.append("private ");

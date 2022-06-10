@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 1.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class ClassTest {
     /**
      * Typical class name.
@@ -106,6 +107,22 @@ public class ClassTest {
         this.createMoreMethods(klass);
         this.createInnerClass(klass);
         final String expected = this.readTest("addition.txt");
+        final String actual = klass.generate(0);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    /**
+     * Generating a public class with one method.
+     */
+    @Test
+    public void classWithSuppressedWarning() {
+        final Klass klass = new Klass(
+            "Test class with suppressed warning",
+            ClassTest.CLASS_NAME
+        );
+        klass.addMethod(this.createPublicMethod());
+        klass.suppressWarnings("PMD.TooManyMethods");
+        final String expected = this.readTest("class_with_suppressed_warning.txt");
         final String actual = klass.generate(0);
         Assertions.assertEquals(expected, actual);
     }

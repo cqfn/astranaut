@@ -29,7 +29,7 @@ to the specified DSL rules.
 ## How to build and download
 
 You can download the latest release
-[here](https://github.com/cqfn/astranaut/releases).
+[here](https://repo.maven.apache.org/maven2/org/cqfn/astranaut).
 
 Fastest way to build the executable is to open the project in Intellij IDEA, select the "Maven" tab
 and double-click on the "package" item.

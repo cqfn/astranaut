@@ -37,7 +37,7 @@ abstract class NodeConstructor extends BaseConstructor {
     private static final String STR_INT = "int";
 
     /**
-     * The 'int' string.
+     * The 'boolean' string.
      */
     private static final String STR_BOOLEAN = "boolean";
 
@@ -96,5 +96,22 @@ abstract class NodeConstructor extends BaseConstructor {
         setter.setReturnType(NodeConstructor.STR_BOOLEAN);
         setter.setCode("return str.isEmpty();");
         this.getKlass().addMethod(setter);
+    }
+
+    /**
+     * Creates field that contains magic number.
+     * @param brief The brief description
+     * @param name The name
+     * @param value The value
+     */
+    protected void createMagicNumber(final String brief, final String name, final int value) {
+        final Field field = new Field(
+            brief,
+            NodeConstructor.STR_INT,
+            name
+        );
+        field.makeStaticFinal();
+        field.setInitExpr(String.valueOf(value));
+        this.getKlass().addField(field);
     }
 }

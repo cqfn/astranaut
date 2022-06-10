@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.List;
+import java.util.Locale;
 import org.cqfn.astranaut.rules.Child;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.DescriptorAttribute;
@@ -131,13 +132,15 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
     private String fillSetterForNonEmptyChildrenList() {
         final Node rule = this.getRule();
         final List<Child> composition = rule.getComposition();
-        final StringBuilder code = new StringBuilder(256);
-        final String first = String.format(
-            "final Node[] mapping = new Node[%d];\n",
+        this.createMagicNumber(
+            "The maximum number of nodes",
+            "MAX_NODE_COUNT",
             composition.size()
         );
+        final StringBuilder code = new StringBuilder(256);
+        final String first = "final Node[] mapping = new Node[Constructor.MAX_NODE_COUNT];\n";
         final String second = String.format(
-            "final ChildrenMapper mapper = new ChildrenMapper(%s.TYPE.getChildTypes());\n",
+            "final ChildrenMapper mapper =\n\tnew ChildrenMapper(%s.TYPE.getChildTypes());\n",
             this.getRule().getType()
         );
         final String third = "final boolean result = mapper.map(mapping, list);\n";
@@ -145,12 +148,20 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
         int index = 0;
         for (final Child child : this.getRule().getComposition()) {
             final Descriptor descriptor = (Descriptor) child;
+            final String variable = descriptor.getVariableName();
+            final String magic = variable.toUpperCase(Locale.ENGLISH)
+                .concat("_POS");
+            this.createMagicNumber(
+                String.format("The position of the '%s' field", descriptor.getVariableName()),
+                magic,
+                index
+            );
             code.append(
                 String.format(
-                    "this.%s = (%s) mapping[%d];\n",
-                    descriptor.getVariableName(),
+                    "this.%s = (%s) mapping[Constructor.%s];\n",
+                    variable,
                     descriptor.getType(),
-                    index
+                    magic
                 )
             );
             index = index + 1;
