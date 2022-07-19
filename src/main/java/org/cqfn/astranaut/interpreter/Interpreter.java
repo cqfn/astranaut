@@ -29,6 +29,8 @@ import org.cqfn.astranaut.exceptions.DestinationNotSpecified;
 import org.cqfn.astranaut.exceptions.InterpreterCouldNotWriteFile;
 import org.cqfn.astranaut.exceptions.InterpreterException;
 import org.cqfn.astranaut.exceptions.SourceNotSpecified;
+import org.cqfn.astranaut.handlers.json.JsonDeserializer;
+import org.cqfn.astranaut.handlers.json.JsonSerializer;
 import org.cqfn.astranaut.rules.Program;
 import org.cqfn.astranaut.utils.FilesReader;
 
