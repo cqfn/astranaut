@@ -39,7 +39,7 @@ The `TreeProcessor` has two methods:
 You can create a simple tree:
 
 ```mermaid
-  graph Tree;
+  graph TD;
       Addition -- 0 --> IntegerLiteral_2;
       Addition -- 1 --> IntegerLiteral_3;
 ```
