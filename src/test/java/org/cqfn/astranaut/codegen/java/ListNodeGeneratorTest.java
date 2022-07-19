@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link ListNodeGenerator} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class ListNodeGeneratorTest {
     /**

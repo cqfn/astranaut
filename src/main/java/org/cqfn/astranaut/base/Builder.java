@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Object that creates nodes.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface Builder {
     /**

@@ -27,7 +27,7 @@ package org.cqfn.astranaut.scanner;
 /**
  * The token represents "at" sign (@).
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class AtSign implements Token {
     /**

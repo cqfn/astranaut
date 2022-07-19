@@ -34,7 +34,7 @@ import org.cqfn.astranaut.rules.Transformation;
 /**
  * Generates source code for transformation rules.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.CloseResource")
 public class TransformationGenerator {

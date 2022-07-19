@@ -29,7 +29,7 @@ import org.cqfn.astranaut.utils.StringUtils;
 /**
  * Data represents as a string.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class StringData implements Data {
     /**

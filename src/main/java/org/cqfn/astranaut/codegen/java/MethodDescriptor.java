@@ -31,7 +31,7 @@ import org.cqfn.astranaut.utils.StringUtils;
 /**
  * The method descriptor, i.e. short description, name, arguments, and return value.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class MethodDescriptor implements Entity {
     /**
@@ -206,7 +206,7 @@ public final class MethodDescriptor implements Entity {
 
     /**
      * The class for describing arguments of the method.
-     * @since 1.0
+     * @since 0.1.5
      */
     private static class Argument {
         /**

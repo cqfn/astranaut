@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * States that the descriptor is empty.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Empty extends Descriptor {
     /**

@@ -38,7 +38,7 @@ import org.cqfn.astranaut.scanner.TokenList;
 /**
  * Parses string as a parameters list for the {@link Literal} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class LiteralParametersParser {
     /**

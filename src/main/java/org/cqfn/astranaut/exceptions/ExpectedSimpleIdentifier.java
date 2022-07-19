@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Expected identifier without tag, parameters and data".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExpectedSimpleIdentifier extends ParserException {
     private static final long serialVersionUID = 631192488812531094L;

@@ -27,7 +27,7 @@ package org.cqfn.astranaut.utils;
 /**
  * Some string utilities.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class StringUtils {
     /**

@@ -25,6 +25,6 @@
 /**
  * Parser that parses token sequence and creates rule objects.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 package org.cqfn.astranaut.parser;

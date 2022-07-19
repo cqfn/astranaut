@@ -27,7 +27,7 @@ package org.cqfn.astranaut.rules;
 /**
  * A rule that describes AST nodes or subtrees transformation.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface Rule {
     @Override

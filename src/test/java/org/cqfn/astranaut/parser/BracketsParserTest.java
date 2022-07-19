@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for {@link BracketsParser} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class BracketsParserTest {
     /**

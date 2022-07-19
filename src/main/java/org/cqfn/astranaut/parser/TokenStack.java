@@ -30,7 +30,7 @@ import org.cqfn.astranaut.scanner.Token;
 /**
  * Stack containing tokens, allowing to store an unused token.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class TokenStack {
     /**

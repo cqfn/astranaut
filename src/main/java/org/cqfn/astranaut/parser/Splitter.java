@@ -32,7 +32,7 @@ import org.cqfn.astranaut.scanner.TokenListBuilder;
 /**
  * Splits a sequence of tokens according to some criteria.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class Splitter {
     /**

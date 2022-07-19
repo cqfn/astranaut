@@ -27,7 +27,7 @@ package org.cqfn.astranaut.scanner;
 /**
  * Token that represents native [Java] code.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class NativeCode implements Token {
     /**

@@ -26,7 +26,7 @@ package org.cqfn.astranaut.rules;
 /**
  * Data that can be inside descriptor.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface Data {
     @Override

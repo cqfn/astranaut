@@ -33,7 +33,7 @@ import org.cqfn.astranaut.scanner.TokenListBuilder;
 /**
  * Class that transform string into list of tokens.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class Tokenizer {
     /**

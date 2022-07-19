@@ -34,7 +34,7 @@ import org.cqfn.astranaut.rules.Node;
 /**
  * Environment for test purposes.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 final class TestEnvironment implements Environment {
     /**

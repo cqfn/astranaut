@@ -26,7 +26,7 @@ package org.cqfn.astranaut.rules;
 /**
  * The descriptor attribute.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public enum DescriptorAttribute {
     /**

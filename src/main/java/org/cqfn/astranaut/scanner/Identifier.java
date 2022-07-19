@@ -27,7 +27,7 @@ package org.cqfn.astranaut.scanner;
 /**
  * Token that represents identifier.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Identifier implements Token {
     /**

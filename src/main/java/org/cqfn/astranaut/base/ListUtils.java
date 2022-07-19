@@ -32,7 +32,7 @@ import java.util.List;
  * Helper class for building lists.
  *
  * @param <T> Item type
- * @since 1.0
+ * @since 0.1.5
  */
 public class ListUtils<T> {
     /**

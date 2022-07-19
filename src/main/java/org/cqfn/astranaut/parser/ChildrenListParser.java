@@ -34,7 +34,7 @@ import org.cqfn.astranaut.scanner.VerticalBar;
 /**
  * Parses string as a children list for the {@link Node} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class ChildrenListParser {
     /**

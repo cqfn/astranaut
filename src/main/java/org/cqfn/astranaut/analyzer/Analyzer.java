@@ -52,7 +52,7 @@ import org.cqfn.astranaut.utils.Pair;
 /**
  * Analyzes vertices hierarchy described with DSL.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.CloseResource")
 public class Analyzer {
@@ -343,7 +343,7 @@ public class Analyzer {
     /**
      * Stores vertices to be analyzed and checks their validity.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     private static class VertexStorage {
         /**
@@ -584,7 +584,7 @@ public class Analyzer {
     /**
      * Contains methods for sorting vertices by descending order of their depth in the AST.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     private static class VertexSorter {
         /**

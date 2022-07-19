@@ -28,7 +28,7 @@ import java.util.Collections;
 /**
  * The node factory.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Factory extends org.cqfn.astranaut.base.Factory {
     /**

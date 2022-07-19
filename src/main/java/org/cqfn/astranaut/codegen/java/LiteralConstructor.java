@@ -28,7 +28,7 @@ import org.cqfn.astranaut.rules.Literal;
 /**
  * Constructs classes, fields and methods for rules that describe literals.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 abstract class LiteralConstructor extends BaseConstructor {
     /**

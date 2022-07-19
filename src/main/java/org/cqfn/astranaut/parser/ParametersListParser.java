@@ -47,7 +47,7 @@ import org.cqfn.astranaut.utils.LabelFactory;
 /**
  * Extracts parameters (holes and descriptors) from list of tokens.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class ParametersListParser {
     /**

@@ -36,7 +36,7 @@ import org.cqfn.astranaut.rules.Vertex;
 /**
  * Statement parser, processes individual program lines.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class StatementParser {
     /**

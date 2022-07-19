@@ -30,7 +30,7 @@ import org.cqfn.astranaut.rules.DescriptorAttribute;
 /**
  * Token that represents a pair of angle brackets and list of tokens between.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class AngleBracketsPair extends BracketsPair {
     /**

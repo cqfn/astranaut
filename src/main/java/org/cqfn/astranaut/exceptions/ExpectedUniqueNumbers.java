@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Expected unique numbers of holes".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExpectedUniqueNumbers extends ParserException {
     private static final long serialVersionUID = 3887236698980100679L;

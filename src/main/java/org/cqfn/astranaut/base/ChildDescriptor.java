@@ -26,7 +26,7 @@ package org.cqfn.astranaut.base;
 /**
  * This class describes child node within type descriptor.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ChildDescriptor {
     /**

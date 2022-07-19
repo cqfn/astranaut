@@ -27,7 +27,7 @@ package org.cqfn.astranaut.scanner;
 /**
  * Token that represents bracket.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public abstract class Bracket implements Token {
     @Override

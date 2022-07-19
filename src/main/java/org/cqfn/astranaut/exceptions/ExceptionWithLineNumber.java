@@ -26,7 +26,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception with line number, wraps another exception.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExceptionWithLineNumber extends BaseException {
     private static final long serialVersionUID = 8469819668823203534L;

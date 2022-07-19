@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Expected 3 or 4 parameters".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExpectedThreeOrFourParameters extends ParserException {
     /**

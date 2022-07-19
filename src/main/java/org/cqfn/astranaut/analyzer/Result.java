@@ -30,7 +30,7 @@ import java.util.Set;
 
 /**
  * The class to store the result of analysis.
- * @since 1.0
+ * @since 0.1.5
  */
 public class Result {
     /**

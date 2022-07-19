@@ -29,7 +29,7 @@ package org.cqfn.astranaut.utils;
  * @param <K> The key type
  * @param <V> The value type
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Pair<K, V> {
     /**

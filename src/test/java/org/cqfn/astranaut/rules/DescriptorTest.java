@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for {@link Descriptor} and {@link DescriptorFactory} classes.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class DescriptorTest {
     /**

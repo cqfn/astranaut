@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * Environment required for generation.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface Environment {
     /**

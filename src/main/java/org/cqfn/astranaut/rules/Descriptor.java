@@ -31,7 +31,7 @@ import java.util.Locale;
  * Descriptor, i.e. name with tag, parameters and data.
  * Example: tag@Name(parameter)
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public abstract class Descriptor implements Child, Parameter {
     /**

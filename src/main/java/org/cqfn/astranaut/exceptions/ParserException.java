@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Base exception thrown by the parser.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public abstract class ParserException extends BaseException {
     private static final long serialVersionUID = 8708357998656415803L;

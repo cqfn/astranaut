@@ -30,7 +30,7 @@ import java.util.TreeMap;
 /**
  * The factory for bracket tokens.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 final class BracketFactory {
     /**

@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Incorrect use of brackets".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class IncorrectUseOfBrackets extends ParserException {
     /**

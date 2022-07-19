@@ -35,7 +35,7 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Test that covers {@link Interpreter} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class InterpreterTest {
     /**
