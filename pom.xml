@@ -80,7 +80,7 @@ SOFTWARE.
               <goal>single</goal>
             </goals>
             <configuration>
-              <finalName>generator</finalName>
+              <finalName>astranaut</finalName>
               <archive>
                 <manifest>
                   <mainClass>org.cqfn.astranaut.Main</mainClass>
