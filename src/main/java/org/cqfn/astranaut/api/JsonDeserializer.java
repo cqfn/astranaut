@@ -27,49 +27,35 @@ import org.cqfn.astranaut.base.Node;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 import org.cqfn.astranaut.utils.FilesReader;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
- * Converts a tree to a string that contains a JSON object.
+ * Converts a string that contains a JSON object to a tree.
  *
  * @since 0.2
  */
 public class JsonDeserializer {
-
     /**
-     * The name of the file that contains a JSON object.
+     * The string that contains a JSON object.
      */
-    private final String filename;
+    private final String source;
 
     /**
      * Constructor.
-     * @param filename The file name
+     * @param source The source string
      */
-    public JsonDeserializer(final String filename) {
-        this.filename = filename;
+    public JsonDeserializer(final String source) {
+        this.source = source;
     }
 
     /**
      * Converts the source string that contains a JSON object to a tree.
      * @return Root node of the created tree
-     * @throws ProcessorException In case the operation fails
      */
-    public Node deserialize() throws ProcessorException {
-        final String file = this.filename;
-        final String source = new FilesReader(file).readAsString(
-            (FilesReader.CustomExceptionCreator<ProcessorException>) ()
-                -> new ProcessorException() {
-                    private static final long serialVersionUID = -2486266117492218703L;
-
-                    @Override
-                    public String getErrorMessage() {
-                        return String.format(
-                            "Could not read the file that contains source tree: %s",
-                            file
-                        );
-                    }
-                }
-        );
+    public Node deserialize() {
         final org.cqfn.astranaut.handlers.json.JsonDeserializer deserializer =
-            new org.cqfn.astranaut.handlers.json.JsonDeserializer(source);
+                new org.cqfn.astranaut.handlers.json.JsonDeserializer(this.source);
         return deserializer.convert();
     }
 }

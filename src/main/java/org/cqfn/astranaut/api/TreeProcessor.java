@@ -56,9 +56,10 @@ public class TreeProcessor {
     /**
      * Loads rules of a tree transformation from a DSL file.
      * @param filename The name of a file that contains DSL rules
-     * @throws BaseException If a file processing fails
+     * @return The result, {@code true} if rules were successfully loaded
+     * @throws ProcessorException If a file processing fails
      */
-    public void loadRules(final String filename) throws BaseException {
+    public boolean loadRules(final String filename) throws ProcessorException {
         final String code = new FilesReader(filename).readAsString(
             (FilesReader.CustomExceptionCreator<ProcessorException>)
                 () -> new ProcessorException() {
@@ -70,8 +71,14 @@ public class TreeProcessor {
                 }
         );
         final ProgramParser parser = new ProgramParser(code);
-        final Program program = parser.parse();
-        this.rules.addAll(program.getTransformations());
+        boolean success = true;
+        try {
+            final Program program = parser.parse();
+            this.rules.addAll(program.getTransformations());
+        } catch (final BaseException ignored) {
+            success = false;
+        }
+        return success;
     }
 
     /**

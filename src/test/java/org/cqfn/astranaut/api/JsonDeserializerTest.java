@@ -23,10 +23,9 @@
  */
 package org.cqfn.astranaut.api;
 
-import org.cqfn.astranaut.base.EmptyTree;
 import org.cqfn.astranaut.base.Node;
-import org.cqfn.astranaut.exceptions.BaseException;
 import org.cqfn.astranaut.exceptions.ProcessorException;
+import org.cqfn.astranaut.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -47,20 +46,35 @@ public class JsonDeserializerTest {
     private static final String TESTS_PATH = "src/test/resources/api/";
 
     /**
-     * Test for a tree deserialization from a JSON file.
+     * Test for a tree deserialization from a JSON string.
      */
     @Test
     public void testDeserialization() {
-        Node result = EmptyTree.INSTANCE;
-        final JsonDeserializer deserializer =
-            new JsonDeserializer(JsonDeserializerTest.TESTS_PATH.concat("test_3_source.json"));
+        final String file = JsonDeserializerTest.TESTS_PATH.concat("test_3_source.json");
         boolean oops = false;
+        String source = "";
         try {
-            result = deserializer.deserialize();
+            source = new FilesReader(file).readAsString(
+                    (FilesReader.CustomExceptionCreator<ProcessorException>) ()
+                            -> new ProcessorException() {
+                        private static final long serialVersionUID = -2486266117492218703L;
+
+                        @Override
+                        public String getErrorMessage() {
+                            return String.format(
+                                    "Could not read the file that contains source tree: %s",
+                                    file
+                            );
+                        }
+                    }
+            );
         } catch (final ProcessorException exception) {
             oops = true;
         }
         Assertions.assertFalse(oops);
+        Assertions.assertFalse(source.isEmpty());
+        final JsonDeserializer deserializer = new JsonDeserializer(source);
+        final Node result = deserializer.deserialize();
         Assertions.assertEquals("Addition", result.getTypeName());
         Assertions.assertEquals("", result.getData());
         Assertions.assertEquals(2, result.getChildCount());
@@ -72,28 +86,5 @@ public class JsonDeserializerTest {
         Assertions.assertEquals(JsonDeserializerTest.INT_LITERAL, second.getTypeName());
         Assertions.assertEquals("3", second.getData());
         Assertions.assertEquals(0, second.getChildCount());
-    }
-
-    /**
-     * Test for exception while reading a JSON file.
-     */
-    @Test
-    public void testFilesReaderException() {
-        final String filename = JsonDeserializerTest.TESTS_PATH.concat("test_3.json");
-        final JsonDeserializer deserialize =
-            new JsonDeserializer(filename);
-        boolean oops = false;
-        String msg = "";
-        try {
-            deserialize.deserialize();
-        } catch (final BaseException exception) {
-            oops = true;
-            msg = exception.getErrorMessage();
-        }
-        Assertions.assertTrue(oops);
-        Assertions.assertEquals(
-            "Could not read the file that contains source tree: ".concat(filename),
-            msg
-        );
     }
 }

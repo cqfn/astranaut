@@ -27,6 +27,7 @@ import java.util.Arrays;
 import org.cqfn.astranaut.base.DraftNode;
 import org.cqfn.astranaut.base.Node;
 import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.exceptions.ProcessorException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -88,6 +89,24 @@ public class TreeProcessorTest {
             "Could not read DSL file: ".concat(filename),
             msg
         );
+    }
+
+    /**
+     * Test for exception while reading a DSL file containing bugs.
+     */
+    @Test
+    public void testIncorrectDslFile() {
+        final TreeProcessor processor = new TreeProcessor();
+        boolean oops = false;
+        final String filename = TreeProcessorTest.TESTS_PATH.concat("test_0_bug_rules.txt");
+        boolean result = true;
+        try {
+            result = processor.loadRules(filename);
+        } catch (final ProcessorException exception) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        Assertions.assertFalse(result);
     }
 
     /**
