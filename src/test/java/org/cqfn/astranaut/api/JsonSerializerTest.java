@@ -111,7 +111,7 @@ public class JsonSerializerTest {
         final JsonSerializer serializer = new JsonSerializer(tree);
         boolean oops = false;
         try {
-            serializer.serializeToJsonFile("***");
+            serializer.serializeToJsonFile("/");
         } catch (final ProcessorCouldNotWriteFile exception) {
             oops = true;
         }
