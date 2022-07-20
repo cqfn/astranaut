@@ -54,7 +54,7 @@ public class JsonDeserializer {
      */
     public Node deserialize() throws ProcessorException {
         final String file = this.filename;
-        final String source = new FilesReader("Data/tree.json").readAsString(
+        final String source = new FilesReader(file).readAsString(
             (FilesReader.CustomExceptionCreator<ProcessorException>) ()
                 -> new ProcessorException() {
                     private static final long serialVersionUID = -2486266117492218703L;

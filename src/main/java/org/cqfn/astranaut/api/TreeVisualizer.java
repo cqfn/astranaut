@@ -196,7 +196,7 @@ public class TreeVisualizer {
                 this.appendNullNode();
             } else {
                 final Type type = node.getType();
-                this.appendNode(type.getName(), node.getData(), type.getProperty("color"));
+                this.appendNode(type.getName(), node.getData());
                 final int parent = this.index;
                 for (int idx = 0; idx < node.getChildCount(); idx += 1) {
                     this.index += 1;
@@ -228,9 +228,8 @@ public class TreeVisualizer {
          *
          * @param type A node type
          * @param data A node data
-         * @param color A node color
          */
-        private void appendNode(final String type, final String data, final String color) {
+        private void appendNode(final String type, final String data) {
             this.builder.append(DotRender.NODE).append(this.index).append(" [");
             this.builder.append("label=<").append(type);
             if (!data.isEmpty()) {
@@ -238,11 +237,7 @@ public class TreeVisualizer {
                 this.builder.append(encodeHtml(data));
                 this.builder.append("</font>");
             }
-            this.builder.append('>');
-            if (!color.isEmpty()) {
-                this.builder.append(" color=").append(color);
-            }
-            this.builder.append("];\n");
+            this.builder.append(">];\n");
         }
 
         /**
