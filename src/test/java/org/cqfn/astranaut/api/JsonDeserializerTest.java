@@ -55,15 +55,15 @@ public class JsonDeserializerTest {
         String source = "";
         try {
             source = new FilesReader(file).readAsString(
-                    (FilesReader.CustomExceptionCreator<ProcessorException>) ()
-                            -> new ProcessorException() {
+                (FilesReader.CustomExceptionCreator<ProcessorException>) ()
+                    -> new ProcessorException() {
                         private static final long serialVersionUID = -2486266117492218703L;
 
                         @Override
                         public String getErrorMessage() {
                             return String.format(
-                                    "Could not read the file that contains source tree: %s",
-                                    file
+                                "Could not read the file that contains source tree: %s",
+                                file
                             );
                         }
                     }
@@ -72,7 +72,6 @@ public class JsonDeserializerTest {
             oops = true;
         }
         Assertions.assertFalse(oops);
-        Assertions.assertFalse(source.isEmpty());
         final JsonDeserializer deserializer = new JsonDeserializer(source);
         final Node result = deserializer.deserialize();
         Assertions.assertEquals("Addition", result.getTypeName());

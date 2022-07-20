@@ -24,11 +24,6 @@
 package org.cqfn.astranaut.api;
 
 import org.cqfn.astranaut.base.Node;
-import org.cqfn.astranaut.exceptions.ProcessorException;
-import org.cqfn.astranaut.utils.FilesReader;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Converts a string that contains a JSON object to a tree.
@@ -55,7 +50,7 @@ public class JsonDeserializer {
      */
     public Node deserialize() {
         final org.cqfn.astranaut.handlers.json.JsonDeserializer deserializer =
-                new org.cqfn.astranaut.handlers.json.JsonDeserializer(this.source);
+            new org.cqfn.astranaut.handlers.json.JsonDeserializer(this.source);
         return deserializer.convert();
     }
 }
