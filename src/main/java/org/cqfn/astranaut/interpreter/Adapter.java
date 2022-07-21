@@ -32,7 +32,7 @@ import org.cqfn.astranaut.rules.Transformation;
 /**
  * Tree converter built on a set of rules described in DSL.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.CloseResource")
 public class Adapter extends org.cqfn.astranaut.base.Adapter {

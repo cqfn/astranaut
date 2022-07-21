@@ -26,7 +26,7 @@ package org.cqfn.astranaut.rules;
 /**
  * A rule that describes literal.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Transformation implements Rule {
     /**

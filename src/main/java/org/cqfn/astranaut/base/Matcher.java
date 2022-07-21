@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * Checks if the node matches some structure, and extracts the data or (and) children if so.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface Matcher {
     /**

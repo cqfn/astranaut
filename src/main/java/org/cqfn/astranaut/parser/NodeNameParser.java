@@ -37,7 +37,7 @@ import org.cqfn.astranaut.scanner.TokenList;
 /**
  * Parser of node (class) names.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class NodeNameParser {
     /**

@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link FactoryGenerator} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class FactoryGeneratorTest {
     /**

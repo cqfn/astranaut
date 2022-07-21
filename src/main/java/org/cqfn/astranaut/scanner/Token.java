@@ -26,7 +26,7 @@ package org.cqfn.astranaut.scanner;
 /**
  * An atomic part of rule.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface Token {
     @Override

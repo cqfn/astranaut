@@ -29,7 +29,7 @@ import org.cqfn.astranaut.rules.Node;
 /**
  * Generates class source code for rules that describe list nodes.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 final class ListNodeClassConstructor extends NodeConstructor {
     /**

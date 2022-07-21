@@ -36,7 +36,7 @@ import org.cqfn.astranaut.utils.LabelFactory;
 /**
  * Extracts descriptors from list of tokens.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class DescriptorsListParser {
     /**

@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link Method} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class MethodTest {
     /**

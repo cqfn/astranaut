@@ -31,7 +31,7 @@ import org.cqfn.astranaut.rules.Program;
 /**
  * Parses the whole DSL program.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class ProgramParser {
     /**

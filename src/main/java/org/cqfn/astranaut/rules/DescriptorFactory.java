@@ -31,7 +31,7 @@ import java.util.Objects;
 /**
  * The factory for descriptors composing.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class DescriptorFactory {
     /**
@@ -133,7 +133,7 @@ public class DescriptorFactory {
     /**
      * Implementation of the {@link Descriptor} class.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     private static class DescriptorObject extends Descriptor {
         /**

@@ -26,7 +26,7 @@ package org.cqfn.astranaut.scanner;
 /**
  * Token that represents closing round bracket.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ClosingRoundBracket extends Bracket {
     /**

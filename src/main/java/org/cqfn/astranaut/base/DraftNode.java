@@ -33,7 +33,7 @@ import java.util.Objects;
  * Draft node for wrapping the results of third-party parsers
  * in the {@link Node} interface.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class DraftNode implements Node {
     /**
@@ -90,7 +90,7 @@ public final class DraftNode implements Node {
     /**
      * Type implementation for the draft node.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     private static class TypeImpl implements Type {
         /**
@@ -134,7 +134,7 @@ public final class DraftNode implements Node {
 
     /**
      * The constructor class for draft node.
-     * @since 1.0
+     * @since 0.1.5
      */
     public static final class Constructor implements Builder {
         /**

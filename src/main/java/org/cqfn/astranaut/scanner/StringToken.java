@@ -31,7 +31,7 @@ import org.cqfn.astranaut.utils.StringUtils;
 /**
  * Token that represents string.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class StringToken implements Token {
     /**

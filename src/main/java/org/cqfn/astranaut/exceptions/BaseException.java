@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Base exception thrown by the generator algorithms.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public abstract class BaseException extends Exception {
     private static final long serialVersionUID = -2735882043088632017L;

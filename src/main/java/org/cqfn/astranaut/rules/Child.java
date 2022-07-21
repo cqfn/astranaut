@@ -27,7 +27,7 @@ package org.cqfn.astranaut.rules;
 /**
  * A child node descriptor (for {@link Node}).
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface Child {
     @Override

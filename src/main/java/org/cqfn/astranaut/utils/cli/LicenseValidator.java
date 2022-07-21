@@ -30,7 +30,7 @@ import java.io.File;
 /**
  * Validator of a project root CLI parameter.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class LicenseValidator implements IParameterValidator {
     @Override

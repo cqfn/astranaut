@@ -26,7 +26,7 @@ package org.cqfn.astranaut.codegen.java;
 /**
  * Generates unique class names.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class ClassNameGenerator {
     /**

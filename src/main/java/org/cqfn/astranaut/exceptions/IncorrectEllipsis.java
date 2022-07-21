@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Incorrect ellipsis format".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class IncorrectEllipsis extends ParserException {
     /**

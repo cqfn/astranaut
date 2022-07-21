@@ -28,7 +28,7 @@ import java.util.Objects;
 /**
  * Hole, i.e. #1, #2, etc.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Hole implements Data, Parameter {
     /**

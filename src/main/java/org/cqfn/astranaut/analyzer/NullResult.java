@@ -29,7 +29,7 @@ import java.util.LinkedList;
 /**
  * The null results that is added to nodes that are not described in rules.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class NullResult extends Result {
     /**

@@ -26,7 +26,7 @@ package org.cqfn.astranaut.codegen.java;
 /**
  * Some entity of the Java language.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface Entity {
     /**

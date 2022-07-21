@@ -30,7 +30,7 @@ import org.cqfn.astranaut.Action;
 /**
  * Custom implementation of CLI file parameter converter.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class ActionConverter implements IStringConverter<Action> {
     /**

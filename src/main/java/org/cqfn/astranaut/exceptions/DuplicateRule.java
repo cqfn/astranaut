@@ -26,7 +26,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Duplicate vertex found in DSL rules".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class DuplicateRule extends GeneratorException {
     private static final long serialVersionUID = -6545375625643610834L;

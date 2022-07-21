@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Only one list descriptor is allowed".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class OnlyOneListDescriptor extends ParserException {
     /**

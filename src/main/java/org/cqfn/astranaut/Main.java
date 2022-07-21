@@ -54,7 +54,7 @@ import org.cqfn.astranaut.utils.cli.SourceFileConverter;
 /**
  * Main class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.ImmutableField")
 public final class Main {
@@ -252,7 +252,7 @@ public final class Main {
     /**
      * Environment implementation.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     private class EnvironmentImpl implements Environment {
         /**

@@ -26,7 +26,7 @@ package org.cqfn.astranaut.codegen.java;
 /**
  * Source code in the Java programming language, fully assembled and ready to be saved.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface JavaFile {
     /**

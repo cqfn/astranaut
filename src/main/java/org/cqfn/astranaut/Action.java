@@ -26,7 +26,7 @@ package org.cqfn.astranaut;
 /**
  * The action that a DSL rule handler can perform.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public enum Action {
     /**

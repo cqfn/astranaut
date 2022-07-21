@@ -36,7 +36,7 @@ import org.cqfn.astranaut.rules.Vertex;
 /**
  * Prepared environment, with preliminary analysis of the set of rules.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class PreparedEnvironment implements Environment {
     /**

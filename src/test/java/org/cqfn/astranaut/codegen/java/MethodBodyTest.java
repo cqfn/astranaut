@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link MethodBody} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class MethodBodyTest {
     /**

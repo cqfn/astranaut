@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for {@link NodeParser} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public class NodeParserTest {

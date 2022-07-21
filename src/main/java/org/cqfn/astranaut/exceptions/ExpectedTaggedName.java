@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Expected (tagged) name without parameters and data".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExpectedTaggedName extends ParserException {
     private static final long serialVersionUID = -6857130310151692431L;

@@ -28,7 +28,7 @@ import java.util.Iterator;
 /**
  * A list contains tokens.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public abstract class TokenList implements Iterable<Token> {
     /**

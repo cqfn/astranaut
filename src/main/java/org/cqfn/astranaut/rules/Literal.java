@@ -28,7 +28,7 @@ import java.util.Objects;
 /**
  * A rule that describes literal.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.DataClass")
 public final class Literal extends Vertex {
@@ -148,7 +148,7 @@ public final class Literal extends Vertex {
     /**
      * Builder for literal building.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     public static class Builder {
         /**

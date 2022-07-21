@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Expected an identifier after '@' symbol".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExpectedIdentifierAfterAt extends ParserException {
     /**

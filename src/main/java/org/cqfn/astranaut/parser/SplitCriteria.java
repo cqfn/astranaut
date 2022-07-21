@@ -28,7 +28,7 @@ import org.cqfn.astranaut.scanner.Token;
 /**
  * Criteria for the splitter.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface SplitCriteria {
     /**

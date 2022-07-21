@@ -40,7 +40,7 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Test for {@link PackageValidator} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class PackageValidatorTest {
     /**

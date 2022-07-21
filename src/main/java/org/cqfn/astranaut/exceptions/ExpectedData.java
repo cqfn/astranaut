@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Expected a data".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExpectedData extends ParserException {
     private static final long serialVersionUID = -617559464909172896L;

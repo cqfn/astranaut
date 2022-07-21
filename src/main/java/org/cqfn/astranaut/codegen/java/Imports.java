@@ -29,7 +29,7 @@ import java.util.TreeSet;
 /**
  * Java imports block.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Imports {
     /**

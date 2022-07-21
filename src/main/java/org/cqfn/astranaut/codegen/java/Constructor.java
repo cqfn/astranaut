@@ -28,7 +28,7 @@ import org.cqfn.astranaut.utils.StringUtils;
 /**
  * Java constructor.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Constructor implements Entity {
     /**

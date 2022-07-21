@@ -32,7 +32,7 @@ import java.util.TreeMap;
  * and returns the name of the variable.
  * This eliminates the Qulice error when the same static string is repeated two or more times.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 final class StaticStringGenerator {
     /**

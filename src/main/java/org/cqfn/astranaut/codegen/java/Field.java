@@ -30,7 +30,7 @@ import org.cqfn.astranaut.utils.StringUtils;
 /**
  * Java class field.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Field implements Entity {
     /**

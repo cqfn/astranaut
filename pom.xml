@@ -80,7 +80,7 @@ SOFTWARE.
               <goal>single</goal>
             </goals>
             <configuration>
-              <finalName>generator</finalName>
+              <finalName>astranaut</finalName>
               <archive>
                 <manifest>
                   <mainClass>org.cqfn.astranaut.Main</mainClass>
@@ -112,6 +112,8 @@ SOFTWARE.
             <exclude>pmd:/src/test/resources/.*</exclude>
             <exclude>dependencies:/src/test/resources/.*</exclude>
             <exclude>duplicatefinder:/src/test/resources/.*</exclude>
+            <exclude>dependencies:org.slf4j:slf4j-nop</exclude>
+            <exclude>dependencies:org.slf4j:slf4j-api</exclude>
           </excludes>
         </configuration>
         <executions>
@@ -169,6 +171,21 @@ SOFTWARE.
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.9.0</version>
+    </dependency>
+    <dependency>
+      <groupId>guru.nidi</groupId>
+      <artifactId>graphviz-java</artifactId>
+      <version>0.18.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.36</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-nop</artifactId>
+      <version>1.7.36</version>
     </dependency>
   </dependencies>
 </project>

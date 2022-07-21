@@ -26,7 +26,7 @@ package org.cqfn.astranaut.scanner;
 /**
  * Routines for characters processing.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 final class Char {
     /**

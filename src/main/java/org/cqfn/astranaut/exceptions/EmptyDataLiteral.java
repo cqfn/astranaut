@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Empty data literal".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class EmptyDataLiteral extends ParserException {
     private static final long serialVersionUID = -1552305885190281021L;

@@ -35,7 +35,7 @@ import org.cqfn.astranaut.rules.DescriptorAttribute;
  * A converter checks one rule described in DSL and convert the specified AST
  * built by a third-party parser to the unified format.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ConverterGenerator {
     /**

@@ -25,6 +25,6 @@
 /**
  * This package contains some converters and validators for command line interface.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 package org.cqfn.astranaut.utils.cli;

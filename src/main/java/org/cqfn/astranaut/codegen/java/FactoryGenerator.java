@@ -36,7 +36,7 @@ import org.cqfn.astranaut.rules.Statement;
 /**
  * Generates a factory for node creation.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.CloseResource")
 public final class FactoryGenerator extends BaseGenerator {

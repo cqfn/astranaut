@@ -30,7 +30,7 @@ import org.cqfn.astranaut.rules.HoleAttribute;
 /**
  * The hole marker (# and a number after).
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class HoleMarker implements Token {
     /**

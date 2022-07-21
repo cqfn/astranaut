@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.interpreter;
+package org.cqfn.astranaut.handlers.json;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -34,9 +34,9 @@ import org.cqfn.astranaut.base.EmptyTree;
 import org.cqfn.astranaut.base.Node;
 
 /**
- * Converts a string contains JSON object to a syntax tree.
+ * Converts a string contains JSON object to a tree.
  *
- * @since 1.0
+ * @since 0.2
  */
 public class JsonDeserializer {
     /**
@@ -73,7 +73,7 @@ public class JsonDeserializer {
     }
 
     /**
-     * Converts the source string contains JSON object to a syntax tree.
+     * Converts the source string contains JSON object to a tree.
      * @return Root node
      */
     public Node convert() {

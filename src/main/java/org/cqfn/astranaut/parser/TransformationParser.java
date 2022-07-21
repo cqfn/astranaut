@@ -43,7 +43,7 @@ import org.cqfn.astranaut.utils.LabelFactory;
 /**
  * Parser of {@link Transformation} rules.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class TransformationParser {
     /**
@@ -100,7 +100,7 @@ public class TransformationParser {
     /**
      * Validator of {@link Transformation} rules.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     private static class TransformationRuleValidator {
         /**

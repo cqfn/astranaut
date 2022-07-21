@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * The node factory.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class Factory {
     /**

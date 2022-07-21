@@ -26,6 +26,6 @@
  * This package contains rules descriptions.
  * Rule describes AST nodes or subtrees transformation.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 package org.cqfn.astranaut.rules;

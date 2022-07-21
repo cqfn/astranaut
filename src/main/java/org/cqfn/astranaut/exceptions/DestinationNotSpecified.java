@@ -27,7 +27,7 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Destination file not specified".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class DestinationNotSpecified extends InterpreterException {
     /**

@@ -28,7 +28,7 @@ import java.util.Objects;
 /**
  * Line of DSL code contains rule and addition data.
  * @param <T> Type of rule
- * @since 1.0
+ * @since 0.1.5
  */
 public class Statement<T extends Rule> {
     /**

@@ -28,7 +28,7 @@ import java.util.Objects;
 /**
  * The package info generator.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class PackageInfo implements JavaFile {
     /**

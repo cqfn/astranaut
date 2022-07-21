@@ -41,7 +41,7 @@ import org.cqfn.astranaut.utils.LabelFactory;
 /**
  * Parses children list for abstract node.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class AbstractNodeParser {
     /**

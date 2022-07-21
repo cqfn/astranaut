@@ -36,7 +36,7 @@ import org.cqfn.astranaut.rules.StringData;
 /**
  * Matcher that works with the raw descriptor.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Matcher implements org.cqfn.astranaut.base.Matcher {
     /**

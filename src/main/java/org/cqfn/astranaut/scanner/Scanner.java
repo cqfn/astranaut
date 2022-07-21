@@ -35,7 +35,7 @@ import org.cqfn.astranaut.rules.HoleAttribute;
 /**
  * Scanner that splits a rule by tokens.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class Scanner {
     /**
