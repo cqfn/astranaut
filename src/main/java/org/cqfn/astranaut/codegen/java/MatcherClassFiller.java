@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import org.cqfn.astranaut.rules.Data;
@@ -65,6 +66,52 @@ public class MatcherClassFiller {
      * The description of field that contains a hole number.
      */
     private static final String HOLE_NUM_DESCR = "The number of the %s hole";
+
+    /**
+     * Maximum number of predicates in one condition.
+     */
+    private static final int MAX_COND_COMPLEX = 4;
+
+    /**
+     * Descriptor of the children checker.
+     */
+    private static final String CHECKER_DESCR =
+        "Checks if the children matches some structure, and extracts the data and children if so";
+
+    /**
+     * Type of children collection.
+     */
+    private static final String CHILDREN_TYPE = "Map<Integer, List<Node>>";
+
+    /**
+     * Name of children collection.
+     */
+    private static final String CHILDREN_NAME = "children";
+
+    /**
+     * Type of data collection.
+     */
+    private static final String DATA_TYPE = "Map<Integer, String>";
+
+    /**
+     * Name of data collection.
+     */
+    private static final String DATA_NAME = "data";
+
+    /**
+     * Type of node.
+     */
+    private static final String NODE_TYPE = "Node";
+
+    /**
+     * Name of node variable.
+     */
+    private static final String NODE_NAME = "node";
+
+    /**
+     * The 'boolean' type.
+     */
+    private static final String BOOLEAN_TYPE = "boolean";
 
     /**
      * The generator.
@@ -181,10 +228,10 @@ public class MatcherClassFiller {
         final Method method = new Method("match");
         this.klass.addMethod(method);
         method.makeOverridden();
-        method.setReturnType("boolean");
-        method.addArgument("Node", "node");
-        method.addArgument("Map<Integer, List<Node>>", "children");
-        method.addArgument("Map<Integer, String>", "data");
+        method.setReturnType(MatcherClassFiller.BOOLEAN_TYPE);
+        method.addArgument(MatcherClassFiller.NODE_TYPE, MatcherClassFiller.NODE_NAME);
+        method.addArgument(MatcherClassFiller.CHILDREN_TYPE, MatcherClassFiller.CHILDREN_NAME);
+        method.addArgument(MatcherClassFiller.DATA_TYPE, MatcherClassFiller.DATA_NAME);
         final String condition = this.createCondition();
         if (this.descriptor.hasHole()) {
             final List<String> code = Arrays.asList(
@@ -207,27 +254,15 @@ public class MatcherClassFiller {
     private String createCondition() {
         final StringBuilder condition = new StringBuilder();
         final String name = this.klass.getName();
+        int count = 1;
         String common = String.format("node.belongsToGroup(%s.EXPECTED_TYPE)", name);
         if (!this.descriptor.hasEllipsisHole()) {
             common = common.concat(
                 String.format("\n\t&& node.getChildCount() == %s.EXPECTED_COUNT", name)
             );
+            count = count + 1;
         }
         condition.append(common);
-        int index = 0;
-        for (final Parameter parameter : this.descriptor.getParameters()) {
-            if (parameter instanceof Descriptor) {
-                final String subclass = this.generator.generate((Descriptor) parameter);
-                condition.append(
-                    String.format(
-                        "\n\t&& %s.INSTANCE.match(node.getChild(%d), children, data)",
-                        subclass,
-                        index
-                    )
-                );
-            }
-            index = index + 1;
-        }
         final Data data = this.descriptor.getData();
         if (data instanceof StringData) {
             final Field field = new Field(
@@ -249,8 +284,121 @@ public class MatcherClassFiller {
                     name
                 )
             );
+            count = count + 1;
         }
+        condition.append(this.createChildChecker(count));
         return condition.toString();
+    }
+
+    /**
+     * Generates a checker of child nodes.
+     * @param used Number of conditions that have already been generated
+     * @return The expression (boolean type)
+     */
+    private String createChildChecker(final int used) {
+        final String result;
+        final List<Parameter> parameters = this.descriptor.getParameters();
+        int count = 0;
+        for (final Parameter parameter : parameters) {
+            if (parameter instanceof Descriptor) {
+                count = count + 1;
+            }
+        }
+        if (count + used <= MatcherClassFiller.MAX_COND_COMPLEX) {
+            final StringBuilder condition = new StringBuilder();
+            int index = 0;
+            for (final Parameter parameter : parameters) {
+                if (parameter instanceof Descriptor) {
+                    final String subclass = this.generator.generate((Descriptor) parameter);
+                    condition.append(
+                        String.format(
+                            "\n\t&& %s.INSTANCE.match(node.getChild(%d), children, data)",
+                            subclass,
+                            index
+                        )
+                    );
+                }
+                index = index + 1;
+            }
+            result = condition.toString();
+        } else {
+            result = this.createChildCheckerMethod();
+        }
+        return result;
+    }
+
+    /**
+     * Generates a method that checks of child nodes.
+     * @return The expression (boolean type)
+     */
+    private String createChildCheckerMethod() {
+        final Method method = new Method(
+            MatcherClassFiller.CHECKER_DESCR,
+            "matchChildren"
+        );
+        this.klass.addMethod(method);
+        method.makePrivate();
+        method.makeStatic();
+        method.setReturnType(
+            MatcherClassFiller.BOOLEAN_TYPE,
+            "The result of matching, {@code true} if node matches and data was extracted"
+        );
+        method.addArgument(
+            MatcherClassFiller.NODE_TYPE,
+            MatcherClassFiller.NODE_NAME,
+            "The node"
+        );
+        method.addArgument(
+            MatcherClassFiller.CHILDREN_TYPE,
+            MatcherClassFiller.CHILDREN_NAME,
+            "Where to save children when matched"
+        );
+        method.addArgument(
+            MatcherClassFiller.DATA_TYPE,
+            MatcherClassFiller.DATA_NAME,
+            "Where to save data when matched"
+        );
+        this.fillChildCheckerMethod(method);
+        return String.format(
+            "\n\t&& %s.matchChildren(node, children, data)",
+            this.klass.getName()
+        );
+    }
+
+    /**
+     * Fills a method that checks of child nodes.
+     * @param method Method
+     */
+    private void fillChildCheckerMethod(final Method method) {
+        final List<String> code = new LinkedList<>();
+        boolean first = true;
+        int index = 0;
+        for (final Parameter parameter : this.descriptor.getParameters()) {
+            if (parameter instanceof Descriptor) {
+                final String subclass = this.generator.generate((Descriptor) parameter);
+                if (first) {
+                    code.add(
+                        String.format(
+                            "boolean flag = %s.INSTANCE.match(node.getChild(%d), children, data);",
+                            subclass,
+                            index
+                        )
+                    );
+                    first = false;
+                } else {
+                    code.add(
+                        String.format(
+                            "flag = flag && %s.INSTANCE.match(node.getChild(%d), children, data);",
+                            subclass,
+                            index
+                        )
+                    );
+                }
+            }
+            index = index + 1;
+        }
+        code.add("return flag;");
+        method.setCode(String.join("\n", code));
     }
 
     /**
