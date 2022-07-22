@@ -21,30 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.exceptions;
 
 /**
- * Exception "The file extension must be .png or .svg".
- *
- * @since 0.2
+ * Example for the tree JSON serialization and deserialization in API.
+ * @since 0.2.1
  */
-public final class WrongFileExtension extends VisualizerException {
-    /**
-     * The instance.
-     */
-    public static final VisualizerException INSTANCE = new WrongFileExtension();
-
-    private static final long serialVersionUID = 7044214752430737783L;
-
-    /**
-     * Constructor.
-     */
-    private WrongFileExtension() {
-        super();
-    }
-
-    @Override
-    public String getErrorMessage() {
-        return "The file extension must be .png";
-    }
-}
+package org.cqfn.astranaut.example;
