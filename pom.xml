@@ -112,8 +112,7 @@ SOFTWARE.
             <exclude>pmd:/src/test/resources/.*</exclude>
             <exclude>dependencies:/src/test/resources/.*</exclude>
             <exclude>duplicatefinder:/src/test/resources/.*</exclude>
-            <exclude>dependencies:org.slf4j:slf4j-nop</exclude>
-            <exclude>dependencies:org.slf4j:slf4j-api</exclude>
+            <exclude>dependencies:ch.qos.logback:logback-classic</exclude>
           </excludes>
         </configuration>
         <executions>
@@ -178,14 +177,9 @@ SOFTWARE.
       <version>0.18.1</version>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.36</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-nop</artifactId>
-      <version>1.7.36</version>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.11</version>
     </dependency>
   </dependencies>
 </project>
