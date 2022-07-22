@@ -24,7 +24,7 @@
 package org.cqfn.astranaut.exceptions;
 
 /**
- * Exception "This rule cannot contain holes".
+ * Exception "The file extension must be .png or .svg".
  *
  * @since 0.2
  */
