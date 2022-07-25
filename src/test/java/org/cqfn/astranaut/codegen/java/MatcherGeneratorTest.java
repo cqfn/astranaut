@@ -119,6 +119,18 @@ public class MatcherGeneratorTest {
     }
 
     /**
+     * Test case: large number of child nodes.
+     */
+    @Test
+    public void testLargeNumberOfChildNodes() {
+        final int result = this.testing(
+            "AAA(BBB, CCC, DDD, EEE, FFF)",
+            "matcher_generator_long_condition.txt"
+        );
+        Assertions.assertTrue(result > 0);
+    }
+
+    /**
      * Performs a test.
      * @param code Source code of descriptor
      * @param filename The name of file that contains the expected result
