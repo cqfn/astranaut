@@ -30,7 +30,10 @@ import org.cqfn.astranaut.exceptions.ParserException;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.DescriptorAttribute;
 import org.cqfn.astranaut.rules.DescriptorFactory;
+import org.cqfn.astranaut.rules.Empty;
+import org.cqfn.astranaut.rules.HoleDecorator;
 import org.cqfn.astranaut.rules.Parameter;
+import org.cqfn.astranaut.scanner.HoleMarker;
 import org.cqfn.astranaut.scanner.Identifier;
 import org.cqfn.astranaut.scanner.RoundBracketsPair;
 import org.cqfn.astranaut.scanner.Token;
@@ -88,17 +91,22 @@ public class DescriptorParser {
         this.flag = true;
         assert this.stack.hasTokens();
         final Token first = this.stack.pop();
-        assert first instanceof Identifier;
-        final String name = ((Identifier) first).getValue();
-        final DescriptorFactory factory = new DescriptorFactory(this.labels.getLabel(), name);
-        factory.setAttribute(attribute);
-        new TaggedNameParser(this.stack, factory).parse();
-        this.parseParameters(factory);
-        new DataParser(this.stack, factory).parse();
-        if (this.stack.hasTokens()) {
-            throw new CantParseSequence(this.segment);
+        Descriptor result = Empty.INSTANCE;
+        if (first instanceof Identifier) {
+            final String name = ((Identifier) first).getValue();
+            final DescriptorFactory factory = new DescriptorFactory(this.labels.getLabel(), name);
+            factory.setAttribute(attribute);
+            new TaggedNameParser(this.stack, factory).parse();
+            this.parseParameters(factory);
+            new DataParser(this.stack, factory).parse();
+            if (this.stack.hasTokens()) {
+                throw new CantParseSequence(this.segment);
+            }
+            result = factory.createDescriptor();
+        } else if (first instanceof HoleMarker) {
+            result = new HoleDecorator(((HoleMarker) first).createHole());
         }
-        return factory.createDescriptor();
+        return result;
     }
 
     /**

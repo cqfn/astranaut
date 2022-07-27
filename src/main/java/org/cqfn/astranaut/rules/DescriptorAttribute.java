@@ -47,5 +47,10 @@ public enum DescriptorAttribute {
     /**
      * Element is a flag that indicates extension.
      */
-    EXT
+    EXT,
+
+    /**
+     * Element is a hole.
+     */
+    HOLE
 }

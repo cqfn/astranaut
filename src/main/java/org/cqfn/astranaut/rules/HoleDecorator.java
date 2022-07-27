@@ -21,32 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astranaut.rules;
 
 import java.util.Collections;
 import java.util.List;
 
 /**
- * States that the descriptor is empty.
+ * Decorator wrapping hole as a descriptor.
  *
- * @since 1.0
+ * @since 0.2.2
  */
-public final class Empty extends Descriptor {
+public final class HoleDecorator extends Descriptor {
     /**
-     * The instance.
+     * The decorated hole.
      */
-    public static final Empty INSTANCE = new Empty();
+    private final Hole hole;
 
     /**
      * Constructor.
+     * @param hole The decorated hole
      */
-    private Empty() {
+    public HoleDecorator(final Hole hole) {
+        this.hole = hole;
     }
 
     @Override
     public DescriptorAttribute getAttribute() {
-        return DescriptorAttribute.NONE;
+        return DescriptorAttribute.HOLE;
     }
 
     @Override
@@ -61,7 +62,7 @@ public final class Empty extends Descriptor {
 
     @Override
     public String getType() {
-        return "0";
+        return "";
     }
 
     @Override
@@ -76,6 +77,6 @@ public final class Empty extends Descriptor {
 
     @Override
     public int getHoleNumber() {
-        return 0;
+        return this.hole.getValue();
     }
 }
