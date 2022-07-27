@@ -70,6 +70,15 @@ public class TreeProcessor {
                     }
                 }
         );
+        return this.loadRulesFromString(code);
+    }
+
+    /**
+     * Loads rules of a tree transformation from the given string.
+     * @param code DSL rules of a transformation
+     * @return The result, {@code true} if rules were successfully loaded
+     */
+    public boolean loadRulesFromString(final String code) {
         final ProgramParser parser = new ProgramParser(code);
         boolean success = true;
         try {
