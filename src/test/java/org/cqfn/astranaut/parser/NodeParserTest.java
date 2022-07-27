@@ -137,7 +137,7 @@ public class NodeParserTest {
             Assertions.assertEquals(source, text);
             final List<Child> composition = node.getComposition();
             Assertions.assertFalse(composition.isEmpty());
-            Assertions.assertInstanceOf(Disjunction.class, composition.get(0));
+            Assertions.assertTrue(composition.get(0) instanceof Disjunction);
             final Disjunction disjunction = (Disjunction) composition.get(0);
             final Descriptor descriptor = disjunction.getDescriptors().get(0);
             Assertions.assertEquals(DescriptorAttribute.EXT, descriptor.getAttribute());
