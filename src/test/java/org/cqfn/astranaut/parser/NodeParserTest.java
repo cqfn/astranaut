@@ -23,9 +23,14 @@
  */
 package org.cqfn.astranaut.parser;
 
+import java.util.List;
 import org.cqfn.astranaut.exceptions.NodeNameCapitalLetter;
 import org.cqfn.astranaut.exceptions.OnlyOneListDescriptor;
 import org.cqfn.astranaut.exceptions.ParserException;
+import org.cqfn.astranaut.rules.Child;
+import org.cqfn.astranaut.rules.Descriptor;
+import org.cqfn.astranaut.rules.DescriptorAttribute;
+import org.cqfn.astranaut.rules.Disjunction;
 import org.cqfn.astranaut.rules.Node;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -124,10 +129,23 @@ public class NodeParserTest {
      */
     @Test
     public void abstractNodeWithExtension() {
-        final boolean result = this.run(
-            "BinaryExpression <- & | Exponent"
-        );
-        Assertions.assertTrue(result);
+        final String source = "BinaryExpression <- & | Exponent";
+        boolean oops = false;
+        try {
+            final Node node = new NodeParser(source).parse();
+            final String text = node.toString();
+            Assertions.assertEquals(source, text);
+            final List<Child> composition = node.getComposition();
+            Assertions.assertFalse(composition.isEmpty());
+            Assertions.assertInstanceOf(Disjunction.class, composition.get(0));
+            final Disjunction disjunction = (Disjunction) composition.get(0);
+            final Descriptor descriptor = disjunction.getDescriptors().get(0);
+            Assertions.assertEquals(DescriptorAttribute.EXT, descriptor.getAttribute());
+            Assertions.assertEquals(0, descriptor.getHoleNumber());
+        } catch (final ParserException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 
     /**

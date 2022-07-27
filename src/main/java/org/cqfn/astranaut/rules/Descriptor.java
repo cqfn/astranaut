@@ -186,6 +186,9 @@ public abstract class Descriptor implements Child, Parameter {
         if (attribute == DescriptorAttribute.EXT) {
             builder.append('&');
         }
+        if (attribute == DescriptorAttribute.HOLE) {
+            builder.append('#').append(this.getHoleNumber());
+        }
         return builder.toString();
     }
 
