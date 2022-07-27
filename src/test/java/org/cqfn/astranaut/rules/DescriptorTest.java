@@ -54,6 +54,7 @@ public class DescriptorTest {
         );
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals(DescriptorTest.NAME, descriptor.toString());
+        Assertions.assertEquals(0, descriptor.getHoleNumber());
     }
 
     /**

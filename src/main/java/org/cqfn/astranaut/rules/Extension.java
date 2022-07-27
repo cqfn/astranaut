@@ -73,4 +73,9 @@ public final class Extension extends Descriptor {
     public Data getData() {
         return InvalidData.INSTANCE;
     }
+
+    @Override
+    public int getHoleNumber() {
+        return 0;
+    }
 }

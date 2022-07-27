@@ -27,6 +27,8 @@ import org.cqfn.astranaut.exceptions.ExpectedUniqueNumbers;
 import org.cqfn.astranaut.exceptions.ParserException;
 import org.cqfn.astranaut.exceptions.UnexpectedNumberUsed;
 import org.cqfn.astranaut.exceptions.UnknownSymbol;
+import org.cqfn.astranaut.rules.Descriptor;
+import org.cqfn.astranaut.rules.DescriptorAttribute;
 import org.cqfn.astranaut.rules.Transformation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -174,6 +176,26 @@ public class TransformationParserTest {
             ExpectedUniqueNumbers.class
         );
         Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: remove parent of subtree.
+     */
+    @Test
+    public void removingParentOfSubtree() {
+        final String source = "A(#1) -> #1";
+        boolean oops = false;
+        try {
+            final Transformation rule = new TransformationParser(source).parse();
+            final String text = rule.toString();
+            Assertions.assertEquals(source, text);
+            final Descriptor right = rule.getRight();
+            Assertions.assertEquals(DescriptorAttribute.HOLE, right.getAttribute());
+            Assertions.assertEquals(1, right.getHoleNumber());
+        } catch (final ParserException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 
     /**

@@ -178,5 +178,10 @@ public class DescriptorFactory {
         public Data getData() {
             return this.factory.data;
         }
+
+        @Override
+        public int getHoleNumber() {
+            return 0;
+        }
     }
 }

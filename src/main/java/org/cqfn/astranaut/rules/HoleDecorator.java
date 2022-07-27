@@ -23,34 +23,60 @@
  */
 package org.cqfn.astranaut.rules;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
- * The descriptor attribute.
+ * Decorator wrapping hole as a descriptor.
  *
- * @since 0.1.5
+ * @since 0.2.2
  */
-public enum DescriptorAttribute {
+public final class HoleDecorator extends Descriptor {
     /**
-     * Descriptor has no attribute.
+     * The decorated hole.
      */
-    NONE,
+    private final Hole hole;
 
     /**
-     * Element is optional.
+     * Constructor.
+     * @param hole The decorated hole
      */
-    OPTIONAL,
+    public HoleDecorator(final Hole hole) {
+        this.hole = hole;
+    }
 
-    /**
-     * Element is a list of elements.
-     */
-    LIST,
+    @Override
+    public DescriptorAttribute getAttribute() {
+        return DescriptorAttribute.HOLE;
+    }
 
-    /**
-     * Element is a flag that indicates extension.
-     */
-    EXT,
+    @Override
+    public String getTag() {
+        return "";
+    }
 
-    /**
-     * Element is a hole.
-     */
-    HOLE
+    @Override
+    public String getLabel() {
+        return "";
+    }
+
+    @Override
+    public String getType() {
+        return "";
+    }
+
+    @Override
+    public List<Parameter> getParameters() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Data getData() {
+        return InvalidData.INSTANCE;
+    }
+
+    @Override
+    public int getHoleNumber() {
+        return this.hole.getValue();
+    }
 }

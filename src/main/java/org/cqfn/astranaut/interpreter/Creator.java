@@ -26,11 +26,13 @@ package org.cqfn.astranaut.interpreter;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.base.Builder;
+import org.cqfn.astranaut.base.EmptyTree;
 import org.cqfn.astranaut.base.Factory;
 import org.cqfn.astranaut.base.ListUtils;
 import org.cqfn.astranaut.base.Node;
 import org.cqfn.astranaut.rules.Data;
 import org.cqfn.astranaut.rules.Descriptor;
+import org.cqfn.astranaut.rules.DescriptorAttribute;
 import org.cqfn.astranaut.rules.Hole;
 import org.cqfn.astranaut.rules.Parameter;
 import org.cqfn.astranaut.rules.StringData;
@@ -68,6 +70,30 @@ public class Creator {
      * @return A node
      */
     public Node create(final Factory factory, final Map<Integer, List<Node>> children,
+        final Map<Integer, String> data) {
+        final Node result;
+        if (this.descriptor.getAttribute() == DescriptorAttribute.HOLE) {
+            final List<Node> list = children.get(this.descriptor.getHoleNumber());
+            if (list == null || list.size() != 1) {
+                result = EmptyTree.INSTANCE;
+            } else {
+                result = list.get(0);
+            }
+        } else {
+            result = this.createFromOrdinaryDescriptor(factory, children, data);
+        }
+        return result;
+    }
+
+    /**
+     * Creates a node as described in the "ordinary" descriptor.
+     * @param factory The node factory
+     * @param children The collection contains extracted children
+     * @param data The collection contains extracted data
+     * @return A node
+     */
+    private Node createFromOrdinaryDescriptor(final Factory factory,
+        final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
         final Builder builder = factory.createBuilder(this.descriptor.getType());
         final ListUtils<Node> list = new ListUtils<>();

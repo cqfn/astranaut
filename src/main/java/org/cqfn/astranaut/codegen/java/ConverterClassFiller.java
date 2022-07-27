@@ -24,10 +24,12 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import org.cqfn.astranaut.rules.Data;
 import org.cqfn.astranaut.rules.Descriptor;
+import org.cqfn.astranaut.rules.DescriptorAttribute;
 import org.cqfn.astranaut.rules.Hole;
 import org.cqfn.astranaut.rules.Parameter;
 import org.cqfn.astranaut.rules.StringData;
@@ -145,7 +147,29 @@ public class ConverterClassFiller {
         method.setReturnType(ConverterClassFiller.NODE_TYPE);
         method.addArgument(ConverterClassFiller.NODE_TYPE, "node");
         method.addArgument(ConverterClassFiller.FACTORY_TYPE, ConverterClassFiller.FACTORY_NAME);
-        final CreationResult builder = this.createBuildMethod(this.root);
+        final List<String> action;
+        if (this.root.getAttribute() == DescriptorAttribute.HOLE) {
+            action = Arrays.asList(
+                String.format(
+                    "final List<Node> list = children.get(%s.%s);",
+                    this.klass.getName(),
+                    this.createHoleIdField(this.root.getHoleNumber())
+                ),
+                "if (list != null && list.size() == 1) {",
+                "result = list.get(0);",
+                "}"
+            );
+        } else {
+            final CreationResult builder = this.createBuildMethod(this.root);
+            action = Collections.singletonList(
+                String.format(
+                    "    result = %s.%s(%s);",
+                    this.klass.getName(),
+                    builder.getName(),
+                    builder.getArgumentsList()
+                )
+            );
+        }
         final List<String> code = Arrays.asList(
             ConverterClassFiller.DECLARE_RESULT,
             "final Map<Integer, List<Node>> children = new TreeMap<>();",
@@ -155,12 +179,7 @@ public class ConverterClassFiller {
                 this.matcher
             ),
             "if (matched) {",
-            String.format(
-                "    result = %s.%s(%s);",
-                this.klass.getName(),
-                builder.getName(),
-                builder.getArgumentsList()
-            ),
+            String.join("\n", action),
             "}",
             ConverterClassFiller.RETURN_RESULT
         );
@@ -286,22 +305,11 @@ public class ConverterClassFiller {
         final CreationResult crr) {
         if (parameter instanceof Hole) {
             final Hole hole = (Hole) parameter;
-            final String label = this.holes.getLabel();
-            final String source = label.toUpperCase(Locale.ENGLISH)
-                .concat("_HOLE_ID");
-            final Field field = new Field(
-                String.format("The number of the %s hole", label),
-                "int",
-                source
-            );
-            field.makeStaticFinal();
-            field.setInitExpr(String.valueOf(hole.getValue()));
-            this.klass.addField(field);
             code.append(
                 String.format(
                     "list.addAll(children.get(%s.%s));\n",
                     this.klass.getName(),
-                    source
+                    this.createHoleIdField(hole.getValue())
                 )
             );
             crr.childrenNeeded();
@@ -318,6 +326,26 @@ public class ConverterClassFiller {
                 )
             );
         }
+    }
+
+    /**
+     * Creates field that contains hole id.
+     * @param value The hole value
+     * @return The field name
+     */
+    private String createHoleIdField(final int value) {
+        final String label = this.holes.getLabel();
+        final String name = label.toUpperCase(Locale.ENGLISH)
+            .concat("_HOLE_ID");
+        final Field field = new Field(
+            String.format("The number of the %s hole", label),
+            "int",
+            name
+        );
+        field.makeStaticFinal();
+        field.setInitExpr(String.valueOf(value));
+        this.klass.addField(field);
+        return name;
     }
 
     /**

@@ -72,6 +72,12 @@ public abstract class Descriptor implements Child, Parameter {
     public abstract Data getData();
 
     /**
+     * Returns the hole number if the descriptor decorates a hole.
+     * @return Hole number
+     */
+    public abstract int getHoleNumber();
+
+    /**
      * Returns the name of the variable to which the node corresponding
      * to this descriptor can be written.
      * @return Variable name
@@ -179,6 +185,9 @@ public abstract class Descriptor implements Child, Parameter {
         }
         if (attribute == DescriptorAttribute.EXT) {
             builder.append('&');
+        }
+        if (attribute == DescriptorAttribute.HOLE) {
+            builder.append('#').append(this.getHoleNumber());
         }
         return builder.toString();
     }

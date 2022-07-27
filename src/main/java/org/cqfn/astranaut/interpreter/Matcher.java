@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.interpreter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,13 @@ public final class Matcher implements org.cqfn.astranaut.base.Matcher {
      * @return Checking result, {@code true} if the number of child nodes matches
      */
     private boolean checkChildCount(final Node node) {
-        return node.getChildCount() == this.descriptor.getParameters().size();
+        final boolean result;
+        if (this.descriptor.hasEllipsisHole()) {
+            result = true;
+        } else {
+            result = node.getChildCount() == this.descriptor.getParameters().size();
+        }
+        return result;
     }
 
     /**
@@ -114,22 +121,37 @@ public final class Matcher implements org.cqfn.astranaut.base.Matcher {
     private boolean checkAndExtractChildren(final Node node, final Map<Integer,
         List<Node>> children, final Map<Integer, String> data) {
         boolean result = true;
-        final List<Parameter> parameters = this.descriptor.getParameters();
-        assert node.getChildCount() == parameters.size();
         int index = 0;
-        for (final Parameter parameter : parameters) {
-            final Node child = node.getChild(index);
+        for (final Parameter parameter : this.descriptor.getParameters()) {
             if (parameter instanceof Hole) {
-                children.put(((Hole) parameter).getValue(), Collections.singletonList(child));
-            } else if (parameter instanceof Descriptor) {
-                final Matcher mather;
-                if (this.subs[index] == null) {
-                    mather = new Matcher((Descriptor) parameter);
-                    this.subs[index] = mather;
-                } else {
-                    mather = this.subs[index];
+                final Hole hole = (Hole) parameter;
+                switch (hole.getAttribute()) {
+                    case NONE:
+                        children.put(
+                            hole.getValue(),
+                            Collections.singletonList(node.getChild(index))
+                        );
+                        break;
+                    case ELLIPSIS:
+                        final int count = node.getChildCount();
+                        final List<Node> list = new ArrayList<>(count - index);
+                        for (int position = index; position < count; position += 1) {
+                            list.add(node.getChild(position));
+                        }
+                        children.put(hole.getValue(), list);
+                        break;
+                    default:
+                        break;
                 }
-                result = mather.match(child, children, data);
+            } else if (parameter instanceof Descriptor) {
+                final Matcher matcher;
+                if (this.subs[index] == null) {
+                    matcher = new Matcher((Descriptor) parameter);
+                    this.subs[index] = matcher;
+                } else {
+                    matcher = this.subs[index];
+                }
+                result = matcher.match(node.getChild(index), children, data);
                 if (!result) {
                     break;
                 }
