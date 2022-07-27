@@ -96,6 +96,18 @@ public class ConverterGeneratorTest {
     }
 
     /**
+     * Generate converter that uses hole as descriptor.
+     */
+    @Test
+    public void testConverterUsesHoleAsDescriptor() {
+        final int result = this.testing(
+            "#19",
+            "converter_generator_with_hole_as_descriptor.txt"
+        );
+        Assertions.assertEquals(1, result);
+    }
+
+    /**
      * Testing complex case.
      */
     @Test

@@ -76,7 +76,8 @@ public final class ConverterGenerator {
      * @param matcher The nme of the matcher class
      */
     public void generate(final Descriptor descriptor, final String matcher) {
-        assert descriptor.getAttribute() == DescriptorAttribute.NONE;
+        final DescriptorAttribute attrib = descriptor.getAttribute();
+        assert attrib == DescriptorAttribute.NONE || attrib == DescriptorAttribute.HOLE;
         final String name = this.names.getName();
         final Klass klass = new Klass(
             "Converter describing DSL conversion rule",
@@ -96,7 +97,9 @@ public final class ConverterGenerator {
             unit.addImport("java.util.LinkedList");
         }
         final String base = this.env.getBasePackage();
-        unit.addImport(base.concat(".Builder"));
+        if (attrib == DescriptorAttribute.NONE) {
+            unit.addImport(base.concat(".Builder"));
+        }
         unit.addImport(base.concat(".Converter"));
         unit.addImport(base.concat(".EmptyTree"));
         unit.addImport(base.concat(".Factory"));
