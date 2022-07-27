@@ -70,6 +70,21 @@ public class TreeProcessorTest {
     }
 
     /**
+     * Test for a tree transformation with rules from a string
+     */
+    @Test
+    public void testTreeTransformationFromString() {
+        final Node tree = this.createSampleTree();
+        final TreeProcessor processor = new TreeProcessor();
+        processor.loadRulesFromString("Addition(IntegerLiteral<\"2\">, IntegerLiteral<\"3\">) -> IntegerLiteral<\"5\"> ;");
+        Node result = processor.transform(tree);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(TreeProcessorTest.INT_LITERAL, result.getTypeName());
+        Assertions.assertEquals("5", result.getData());
+        Assertions.assertEquals(0, result.getChildCount());
+    }
+
+    /**
      * Test for exception while reading a DSL file.
      */
     @Test
