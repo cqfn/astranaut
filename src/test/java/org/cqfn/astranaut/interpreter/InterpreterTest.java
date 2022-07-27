@@ -49,6 +49,16 @@ public class InterpreterTest {
     }
 
     /**
+     * Testing holes with ellipsis.
+     * @param temp A temporary directory
+     */
+    @Test
+    public void ellipsisTest(@TempDir final Path temp) {
+        final boolean result = this.test("test_1", temp);
+        Assertions.assertTrue(result);
+    }
+
+    /**
      * Performs the test.
      * @param prefix The prefix of names of files that contains rules and syntax trees
      * @param temp A temporary directory
