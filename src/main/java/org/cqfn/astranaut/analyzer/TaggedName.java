@@ -30,7 +30,7 @@ import org.cqfn.astranaut.codegen.java.TaggedChild;
 /**
  * The class to store tagged names.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class TaggedName implements TaggedChild {
     /**

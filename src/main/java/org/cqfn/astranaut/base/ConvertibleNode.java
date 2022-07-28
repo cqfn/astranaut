@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Mutable node whose children can be replaced during syntactic tree customization.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ConvertibleNode implements Node {
     /**

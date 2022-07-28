@@ -26,7 +26,7 @@ package org.cqfn.astranaut.codegen.java;
 /**
  * The tagged child description, i.e. construction 'tag@Type'.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface TaggedChild {
     /**

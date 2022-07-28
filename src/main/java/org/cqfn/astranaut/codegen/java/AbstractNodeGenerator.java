@@ -31,7 +31,7 @@ import org.cqfn.astranaut.rules.Statement;
 /**
  * Generates source code for rules that describe abstract nodes.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 final class AbstractNodeGenerator extends BaseGenerator {
     /**

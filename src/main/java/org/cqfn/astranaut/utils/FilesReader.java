@@ -32,7 +32,7 @@ import java.nio.file.Paths;
 /**
  * Class for reading files.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class FilesReader {
     /**
@@ -84,7 +84,7 @@ public class FilesReader {
     /**
      * Custom exception creator.
      * @param <T> Exception type
-     * @since 1.0
+     * @since 0.1.5
      */
     public interface CustomExceptionCreator<T extends Exception> {
         /**

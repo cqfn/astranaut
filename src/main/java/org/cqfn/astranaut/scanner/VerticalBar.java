@@ -27,7 +27,7 @@ package org.cqfn.astranaut.scanner;
 /**
  * The token represents vertical bar.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class VerticalBar implements Token {
     /**

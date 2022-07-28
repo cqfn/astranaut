@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Tree converter built on a set of rules described in DSL.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class Adapter {
     /**

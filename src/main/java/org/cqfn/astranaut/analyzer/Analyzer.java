@@ -52,7 +52,7 @@ import org.cqfn.astranaut.utils.Pair;
 /**
  * Analyzes vertices hierarchy described with DSL.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.CloseResource")
 public class Analyzer {
@@ -343,7 +343,7 @@ public class Analyzer {
     /**
      * Stores vertices to be analyzed and checks their validity.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     private static class VertexStorage {
         /**
@@ -584,7 +584,7 @@ public class Analyzer {
     /**
      * Contains methods for sorting vertices by descending order of their depth in the AST.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     private static class VertexSorter {
         /**
@@ -605,11 +605,11 @@ public class Analyzer {
             }
             for (final Vertex vertex : list) {
                 if (vertex.isAbstract() && !processed.get(vertex)) {
-                    final List<Vertex> descendants = this.getDescendantVerticesByType(
+                    final List<Vertex> descendants = VertexSorter.getDescendantVerticesByType(
                         (Node) vertex,
                         list
                     );
-                    if (this.descendantsFinal(descendants)) {
+                    if (VertexSorter.descendantsFinal(descendants)) {
                         depth.put(vertex, 2);
                         processed.put(vertex, true);
                     } else {
@@ -620,7 +620,7 @@ public class Analyzer {
                     }
                 }
             }
-            return this.sortByValue(depth);
+            return VertexSorter.sortByValue(depth);
         }
 
         /**
@@ -637,7 +637,7 @@ public class Analyzer {
             final Map<Vertex, Boolean> processed) {
             Integer max = 2;
             Integer value;
-            final List<Vertex> descendants = this.getDescendantVerticesByType(
+            final List<Vertex> descendants = VertexSorter.getDescendantVerticesByType(
                 (Node) pair.getKey(),
                 pair.getValue()
             );

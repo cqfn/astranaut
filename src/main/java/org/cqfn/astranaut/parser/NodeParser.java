@@ -33,7 +33,7 @@ import org.cqfn.astranaut.rules.Node;
 /**
  * Parser of {@link Node} rules.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class NodeParser {
     /**

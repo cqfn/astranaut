@@ -27,13 +27,15 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Bad rule syntax".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class BadRuleSyntax extends ParserException {
     /**
      * The instance.
      */
-    public static final  ParserException INSTANCE = new BadRuleSyntax();
+    public static final ParserException INSTANCE = new BadRuleSyntax();
+
+    private static final long serialVersionUID = 6887596466418186752L;
 
     /**
      * Constructor.

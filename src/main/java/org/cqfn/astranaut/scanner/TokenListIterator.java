@@ -29,7 +29,7 @@ import java.util.NoSuchElementException;
 /**
  * Wrapper that implements {@link Iterator} interface.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 class TokenListIterator implements Iterator<Token> {
     /**

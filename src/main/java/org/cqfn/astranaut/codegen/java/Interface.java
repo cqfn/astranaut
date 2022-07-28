@@ -33,7 +33,7 @@ import org.cqfn.astranaut.utils.StringUtils;
 /**
  * Java interface.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Interface implements Type {
     /**

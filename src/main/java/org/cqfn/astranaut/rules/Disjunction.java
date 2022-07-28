@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Disjunction, i.e. logical OR expression.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class Disjunction implements Child {
     /**

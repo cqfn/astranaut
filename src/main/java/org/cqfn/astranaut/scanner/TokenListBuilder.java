@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * The builder of list of tokens.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class TokenListBuilder {
     /**

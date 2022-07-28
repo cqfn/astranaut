@@ -30,7 +30,7 @@ import java.util.List;
  * States that the ancestor node extends the green abstract node
  * with the same name.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Extension extends Descriptor {
     /**

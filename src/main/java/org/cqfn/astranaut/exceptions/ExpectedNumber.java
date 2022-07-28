@@ -27,13 +27,15 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Expected a number after '#' symbol".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExpectedNumber extends ParserException {
     /**
      * The instance.
      */
-    public static final  ParserException INSTANCE = new ExpectedNumber();
+    public static final ParserException INSTANCE = new ExpectedNumber();
+
+    private static final long serialVersionUID = -6790807444002569795L;
 
     /**
      * Constructor.

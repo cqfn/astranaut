@@ -31,7 +31,7 @@ import org.cqfn.astranaut.rules.Node;
 /**
  * Generates type subclass source code for rules that describe ordinary nodes.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 final class OrdinaryNodeTypeConstructor extends NodeConstructor {
     /**

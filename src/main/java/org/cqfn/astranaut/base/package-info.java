@@ -25,6 +25,6 @@
 /**
  * This package contains base classes that define the  syntax tree structure.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 package org.cqfn.astranaut.base;

@@ -27,13 +27,15 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Expected 3 or 4 parameters".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExpectedThreeOrFourParameters extends ParserException {
     /**
      * The instance.
      */
-    public static final  ParserException INSTANCE = new ExpectedThreeOrFourParameters();
+    public static final ParserException INSTANCE = new ExpectedThreeOrFourParameters();
+
+    private static final long serialVersionUID = -7036987417162520441L;
 
     /**
      * Constructor.

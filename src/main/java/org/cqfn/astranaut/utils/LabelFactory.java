@@ -30,7 +30,7 @@ import java.util.List;
  * The label factory for label generation.
  * The label cannot be an empty string and can be used as a variable name.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class LabelFactory {
     /**

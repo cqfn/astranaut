@@ -27,13 +27,15 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Source file not specified".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class SourceNotSpecified extends InterpreterException {
     /**
      * The instance.
      */
-    public static final  InterpreterException INSTANCE = new SourceNotSpecified();
+    public static final InterpreterException INSTANCE = new SourceNotSpecified();
+
+    private static final long serialVersionUID = 8639921344041173138L;
 
     /**
      * Constructor.

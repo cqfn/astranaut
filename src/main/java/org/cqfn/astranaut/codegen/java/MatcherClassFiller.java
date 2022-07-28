@@ -39,7 +39,7 @@ import org.cqfn.astranaut.utils.StringUtils;
 /**
  * Fills 'Matcher' classes (creates methods and fields).
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class MatcherClassFiller {
     /**

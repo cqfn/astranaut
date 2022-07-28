@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for {@link ParametersListParser} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public class ParametersListParserTest {
@@ -51,7 +51,7 @@ public class ParametersListParserTest {
     @Test
     public void hole() {
         final Parameter parameter = this.extractOne("#1");
-        Assertions.assertInstanceOf(Hole.class, parameter);
+        Assertions.assertTrue(parameter instanceof Hole);
     }
 
     /**
@@ -60,7 +60,7 @@ public class ParametersListParserTest {
     @Test
     public void simpleName() {
         final Parameter parameter = this.extractOne("Expression");
-        Assertions.assertInstanceOf(Descriptor.class, parameter);
+        Assertions.assertTrue(parameter instanceof Descriptor);
     }
 
     /**
@@ -69,7 +69,7 @@ public class ParametersListParserTest {
     @Test
     public void taggedName() {
         final Parameter parameter = this.extractOne("left@Expression");
-        Assertions.assertInstanceOf(Descriptor.class, parameter);
+        Assertions.assertTrue(parameter instanceof Descriptor);
     }
 
     /**
@@ -78,7 +78,7 @@ public class ParametersListParserTest {
     @Test
     public void holeAsData() {
         final Parameter parameter = this.extractOne("literal<#1>");
-        Assertions.assertInstanceOf(Descriptor.class, parameter);
+        Assertions.assertTrue(parameter instanceof Descriptor);
     }
 
     /**
@@ -87,7 +87,7 @@ public class ParametersListParserTest {
     @Test
     public void stringData() {
         final Parameter parameter = this.extractOne("literal<\"+\">");
-        Assertions.assertInstanceOf(Descriptor.class, parameter);
+        Assertions.assertTrue(parameter instanceof Descriptor);
     }
 
     /**
@@ -126,7 +126,7 @@ public class ParametersListParserTest {
     @Test
     public void twoParameters() {
         final Parameter parameter = this.extractOne("Addition(Expression, Expression)");
-        Assertions.assertInstanceOf(Descriptor.class, parameter);
+        Assertions.assertTrue(parameter instanceof Descriptor);
     }
 
     /**
@@ -137,7 +137,7 @@ public class ParametersListParserTest {
         final Parameter parameter = this.extractOne(
             "simpleExpression(#1, literal<\"+\">, #2)"
         );
-        Assertions.assertInstanceOf(Descriptor.class, parameter);
+        Assertions.assertTrue(parameter instanceof Descriptor);
     }
 
     /**
@@ -146,7 +146,7 @@ public class ParametersListParserTest {
     @Test
     public void optional() {
         final Parameter parameter = this.extractOne("[Expression]");
-        Assertions.assertInstanceOf(Descriptor.class, parameter);
+        Assertions.assertTrue(parameter instanceof Descriptor);
     }
 
     /**
@@ -155,7 +155,7 @@ public class ParametersListParserTest {
     @Test
     public void list() {
         final Parameter parameter = this.extractOne("{Expression}");
-        Assertions.assertInstanceOf(Descriptor.class, parameter);
+        Assertions.assertTrue(parameter instanceof Descriptor);
     }
 
     /**
@@ -223,7 +223,8 @@ public class ParametersListParserTest {
             );
             parser.parse();
         } catch (final ParserException error) {
-            Assertions.assertInstanceOf(type, error);
+            final boolean result = type.isInstance(error);
+            Assertions.assertTrue(result);
             oops = true;
             message = error.getErrorMessage();
         }

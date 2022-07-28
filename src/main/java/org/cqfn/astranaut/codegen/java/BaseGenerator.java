@@ -28,7 +28,7 @@ import java.util.Locale;
 /**
  * Generates source code for rules.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 abstract class BaseGenerator {
     /**

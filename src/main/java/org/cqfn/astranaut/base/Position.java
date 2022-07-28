@@ -26,7 +26,7 @@ package org.cqfn.astranaut.base;
 /**
  * Represents a position in source code file.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface Position {
     /**

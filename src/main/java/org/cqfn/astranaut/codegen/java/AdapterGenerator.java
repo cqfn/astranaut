@@ -28,7 +28,7 @@ import java.util.Locale;
 /**
  * Generates an adapter for syntax tree transformation.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class AdapterGenerator extends BaseGenerator {
     /**

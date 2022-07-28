@@ -26,7 +26,7 @@ package org.cqfn.astranaut.rules;
 /**
  * An interface for vertices in AST.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public abstract class Vertex implements Rule, Comparable<Vertex> {
     /**

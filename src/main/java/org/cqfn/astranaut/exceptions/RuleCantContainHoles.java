@@ -27,13 +27,15 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "This rule cannot contain holes".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class RuleCantContainHoles extends ParserException {
     /**
      * The instance.
      */
-    public static final  ParserException INSTANCE = new RuleCantContainHoles();
+    public static final ParserException INSTANCE = new RuleCantContainHoles();
+
+    private static final long serialVersionUID = 6767639653105667526L;
 
     /**
      * Constructor.

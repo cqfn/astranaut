@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for {@link LiteralParser} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class LiteralParserTest {
     /**
@@ -101,7 +101,8 @@ public class LiteralParserTest {
         try {
             new LiteralParser(source).parse();
         } catch (final ParserException error) {
-            Assertions.assertInstanceOf(type, error);
+            final boolean result = type.isInstance(error);
+            Assertions.assertTrue(result);
             oops = true;
         }
         return oops;

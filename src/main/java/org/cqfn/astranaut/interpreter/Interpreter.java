@@ -29,6 +29,8 @@ import org.cqfn.astranaut.exceptions.DestinationNotSpecified;
 import org.cqfn.astranaut.exceptions.InterpreterCouldNotWriteFile;
 import org.cqfn.astranaut.exceptions.InterpreterException;
 import org.cqfn.astranaut.exceptions.SourceNotSpecified;
+import org.cqfn.astranaut.handlers.json.JsonDeserializer;
+import org.cqfn.astranaut.handlers.json.JsonSerializer;
 import org.cqfn.astranaut.rules.Program;
 import org.cqfn.astranaut.utils.FilesReader;
 
@@ -36,7 +38,7 @@ import org.cqfn.astranaut.utils.FilesReader;
  * The interpreter that loads the syntax tree in Json format,
  * then applies DSL rules and saves the result to a file.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class Interpreter {
     /**
@@ -81,6 +83,8 @@ public class Interpreter {
             new FilesReader(this.source.getPath()).readAsString(
                 (FilesReader.CustomExceptionCreator<InterpreterException>) ()
                     -> new InterpreterException() {
+                        private static final long serialVersionUID = -2486266117492218703L;
+
                         @Override
                         public String getErrorMessage() {
                             return String.format(

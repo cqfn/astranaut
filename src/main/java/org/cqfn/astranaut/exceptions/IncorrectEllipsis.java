@@ -27,13 +27,15 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Incorrect ellipsis format".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class IncorrectEllipsis extends ParserException {
     /**
      * The instance.
      */
-    public static final  ParserException INSTANCE = new IncorrectEllipsis();
+    public static final ParserException INSTANCE = new IncorrectEllipsis();
+
+    private static final long serialVersionUID = 8712723294162184449L;
 
     /**
      * Constructor.

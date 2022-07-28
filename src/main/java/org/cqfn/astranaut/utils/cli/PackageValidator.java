@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 /**
  * Validator of a package CLI parameter.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class PackageValidator implements IParameterValidator {
     @Override

@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link LiteralGenerator} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class LiteralGeneratorTest {
     /**

@@ -34,7 +34,7 @@ import org.cqfn.astranaut.scanner.Token;
 /**
  * Parser for tagged names.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class TaggedNameParser {
     /**

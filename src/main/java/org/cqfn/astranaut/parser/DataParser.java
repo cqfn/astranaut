@@ -38,7 +38,7 @@ import org.cqfn.astranaut.scanner.TokenList;
 /**
  * Parses data inside descriptor.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class DataParser {
     /**

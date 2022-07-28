@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for {@link Scanner} and {@link StringToken} classes.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class StringTokenTest {
     /**
@@ -59,7 +59,7 @@ public class StringTokenTest {
         boolean oops = false;
         try {
             token = scanner.getToken();
-            Assertions.assertInstanceOf(StringToken.class, token);
+            Assertions.assertTrue(token instanceof StringToken);
             Assertions.assertEquals(token.toString(), StringTokenTest.EXPECTED);
         } catch (final ParserException ignored) {
             oops = true;

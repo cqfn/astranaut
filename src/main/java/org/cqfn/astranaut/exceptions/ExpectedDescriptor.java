@@ -27,9 +27,11 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Expected a descriptor".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExpectedDescriptor extends ParserException {
+    private static final long serialVersionUID = 3055559813626839969L;
+
     /**
      * The explanatory text.
      */

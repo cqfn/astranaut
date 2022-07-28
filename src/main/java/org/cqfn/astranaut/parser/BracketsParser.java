@@ -35,7 +35,7 @@ import org.cqfn.astranaut.scanner.TokenListBuilder;
 /**
  * Combines brackets and also tokens inside brackets into non-terminals.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class BracketsParser {
     /**

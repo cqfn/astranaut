@@ -28,7 +28,7 @@ import java.util.Objects;
 /**
  * Java compilation unit.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class CompilationUnit implements JavaFile {
     /**

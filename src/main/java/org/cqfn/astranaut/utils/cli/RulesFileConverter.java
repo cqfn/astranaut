@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Custom implementation of CLI file parameter converter for the '--rules' option.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class RulesFileConverter extends BaseFileConverter {
     /**

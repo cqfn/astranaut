@@ -28,7 +28,7 @@ import org.cqfn.astranaut.utils.StringUtils;
 /**
  * The Java type (interface or class).
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface Type extends Entity {
     /**

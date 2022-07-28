@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for {@link Scanner} and {@link Identifier} classes.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class IdentifierTest {
     /**
@@ -54,9 +54,9 @@ public class IdentifierTest {
         boolean oops = false;
         try {
             token = scanner.getToken();
-            Assertions.assertInstanceOf(Identifier.class, token);
+            Assertions.assertTrue(token instanceof Identifier);
             token = scanner.getToken();
-            Assertions.assertInstanceOf(Identifier.class, token);
+            Assertions.assertTrue(token instanceof Identifier);
             Assertions.assertEquals(token.toString(), IdentifierTest.EXPECTED);
         } catch (final ParserException ignored) {
             oops = true;

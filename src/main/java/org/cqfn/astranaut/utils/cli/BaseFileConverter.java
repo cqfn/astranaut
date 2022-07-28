@@ -32,7 +32,7 @@ import java.util.Optional;
 /**
  * Base implementation of CLI file parameter converter.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public abstract class BaseFileConverter implements IStringConverter<File> {
     /**

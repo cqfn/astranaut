@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * The empty syntax tree.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class EmptyTree implements Node {
     /**
@@ -81,7 +81,7 @@ public final class EmptyTree implements Node {
     /**
      * The fake builder that only returns static reference.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     private static final class BuilderImpl implements Builder {
         @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
@@ -113,7 +113,7 @@ public final class EmptyTree implements Node {
     /**
      * The type of empty tree.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     private static class TypeImpl implements Type {
         @Override

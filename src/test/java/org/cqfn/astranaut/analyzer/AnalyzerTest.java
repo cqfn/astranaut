@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for the {@link Analyzer} of parsed rules.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public class AnalyzerTest {

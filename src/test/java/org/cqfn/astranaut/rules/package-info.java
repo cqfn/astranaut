@@ -25,6 +25,6 @@
 /**
  * This package contains tests for rules structures.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 package org.cqfn.astranaut.rules;

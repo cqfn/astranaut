@@ -33,7 +33,7 @@ import org.cqfn.astranaut.rules.Literal;
 /**
  * Parser of {@link Literal} rules.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class LiteralParser {
     /**

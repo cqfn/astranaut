@@ -26,7 +26,7 @@ package org.cqfn.astranaut.rules;
 /**
  * Invalid {@link Data} object.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class InvalidData implements Data {
     /**

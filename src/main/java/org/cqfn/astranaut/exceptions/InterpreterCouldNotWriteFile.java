@@ -26,9 +26,11 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Could not write file" produced by the interpreter.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class InterpreterCouldNotWriteFile extends InterpreterException {
+    private static final long serialVersionUID = -6062670408421831827L;
+
     /**
      * The file name.
      */

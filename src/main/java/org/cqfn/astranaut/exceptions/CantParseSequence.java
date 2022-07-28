@@ -29,9 +29,11 @@ import org.cqfn.astranaut.scanner.TokenList;
 /**
  * Exception "Can't parse tokens sequence".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class CantParseSequence extends ParserException {
+    private static final long serialVersionUID = 3397907520840834017L;
+
     /**
      * The token sequence.
      */

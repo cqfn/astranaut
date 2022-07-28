@@ -30,7 +30,7 @@ import org.cqfn.astranaut.rules.Statement;
 /**
  * Generates source code for rules that describe literals.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 final class LiteralGenerator extends BaseGenerator {
     /**

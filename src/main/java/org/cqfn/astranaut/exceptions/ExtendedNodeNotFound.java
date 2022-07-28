@@ -26,9 +26,11 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Extended vertex was not found in green DSL rules".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExtendedNodeNotFound extends GeneratorException {
+    private static final long serialVersionUID = -2083651109613819562L;
+
     /**
      * The explanatory text.
      */

@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for {@link Scanner} and {@link HoleMarker} classes.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class HoleTest {
     /**
@@ -74,7 +74,7 @@ public class HoleTest {
         boolean oops = false;
         try {
             token = scanner.getToken();
-            Assertions.assertInstanceOf(HoleMarker.class, token);
+            Assertions.assertTrue(token instanceof HoleMarker);
             Assertions.assertEquals(token.toString(), HoleTest.SIMPLE_EXPECTED);
         } catch (final ParserException ignored) {
             oops = true;
@@ -107,7 +107,7 @@ public class HoleTest {
         boolean oops = false;
         try {
             token = scanner.getToken();
-            Assertions.assertInstanceOf(HoleMarker.class, token);
+            Assertions.assertTrue(token instanceof HoleMarker);
             Assertions.assertEquals(token.toString(), HoleTest.ELLIPSIS_EXPECTED);
         } catch (final ParserException ignored) {
             oops = true;

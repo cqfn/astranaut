@@ -33,7 +33,7 @@ import java.util.TreeSet;
 /**
  * The set of DSL rules with addition data.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.CloseResource")
 public class Program {

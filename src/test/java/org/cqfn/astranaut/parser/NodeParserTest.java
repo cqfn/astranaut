@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for {@link NodeParser} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public class NodeParserTest {
@@ -210,7 +210,8 @@ public class NodeParserTest {
         try {
             new NodeParser(source).parse();
         } catch (final ParserException error) {
-            Assertions.assertInstanceOf(type, error);
+            final boolean result = type.isInstance(error);
+            Assertions.assertTrue(result);
             oops = true;
         }
         return oops;

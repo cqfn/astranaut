@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for {@link Scanner} and {@link NativeCode} classes.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class NativeCodeTest {
     /**
@@ -54,9 +54,9 @@ public class NativeCodeTest {
         boolean oops = false;
         try {
             token = scanner.getToken();
-            Assertions.assertInstanceOf(Identifier.class, token);
+            Assertions.assertTrue(token instanceof Identifier);
             token = scanner.getToken();
-            Assertions.assertInstanceOf(NativeCode.class, token);
+            Assertions.assertTrue(token instanceof NativeCode);
             Assertions.assertEquals(token.toString(), NativeCodeTest.EXPECTED);
         } catch (final ParserException ignored) {
             oops = true;

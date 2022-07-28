@@ -27,13 +27,15 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Expected a native code literal".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class ExpectedNativeLiteral extends ParserException {
     /**
      * The instance.
      */
-    public static final  ParserException INSTANCE = new ExpectedNativeLiteral();
+    public static final ParserException INSTANCE = new ExpectedNativeLiteral();
+
+    private static final long serialVersionUID = -2409635262396924080L;
 
     /**
      * Constructor.

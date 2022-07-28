@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * An abstract syntax tree node.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public interface Node {
     /**

@@ -38,7 +38,7 @@ import org.cqfn.astranaut.scanner.TokenList;
 /**
  * Parses string as a parameters list for the {@link Literal} class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class LiteralParametersParser {
     /**
@@ -79,7 +79,7 @@ public class LiteralParametersParser {
         }
         final List<String> result = new ArrayList<>(segments.length);
         for (final TokenList segment : segments) {
-            this.checkSegment(segment);
+            LiteralParametersParser.checkSegment(segment);
             final NativeCode token = (NativeCode) segment.get(0);
             result.add(token.getCode());
         }

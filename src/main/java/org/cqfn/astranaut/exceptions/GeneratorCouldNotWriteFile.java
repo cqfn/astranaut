@@ -26,9 +26,11 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Could not write file" produced by the generator.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class GeneratorCouldNotWriteFile extends GeneratorException {
+    private static final long serialVersionUID = 8893315636563514950L;
+
     /**
      * The file name.
      */

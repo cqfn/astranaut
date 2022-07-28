@@ -27,13 +27,15 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Only one list descriptor is allowed".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class OnlyOneListDescriptor extends ParserException {
     /**
      * The instance.
      */
-    public static final  ParserException INSTANCE = new OnlyOneListDescriptor();
+    public static final ParserException INSTANCE = new OnlyOneListDescriptor();
+
+    private static final long serialVersionUID = -8973258472452501555L;
 
     /**
      * Constructor.

@@ -31,7 +31,7 @@ import org.cqfn.astranaut.codegen.java.TaggedChild;
 /**
  * A rule that describes node.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Node extends Vertex {
     /**

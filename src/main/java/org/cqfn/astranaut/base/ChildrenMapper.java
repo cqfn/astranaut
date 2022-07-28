@@ -32,7 +32,7 @@ import java.util.TreeMap;
 /**
  * Mapping of the list of nodes by positions based on node types.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class ChildrenMapper {
     /**
@@ -212,7 +212,7 @@ public class ChildrenMapper {
 
     /**
      * The set of types with a relationship of possible position for a node of each such type.
-     * @since 1.0
+     * @since 0.1.5
      */
     private final class PositionSet {
         /**

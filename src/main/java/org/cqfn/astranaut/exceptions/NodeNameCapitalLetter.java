@@ -29,9 +29,11 @@ import java.util.Locale;
 /**
  * Exception "Node names must start with a capital letter".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class NodeNameCapitalLetter extends ParserException {
+    private static final long serialVersionUID = -8958877525261082413L;
+
     /**
      * The explanatory text.
      */

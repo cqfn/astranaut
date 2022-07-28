@@ -27,13 +27,15 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Incorrect use of brackets".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class IncorrectUseOfBrackets extends ParserException {
     /**
      * The instance.
      */
-    public static final  ParserException INSTANCE = new IncorrectUseOfBrackets();
+    public static final ParserException INSTANCE = new IncorrectUseOfBrackets();
+
+    private static final long serialVersionUID = 7686333203585215599L;
 
     /**
      * Constructor.

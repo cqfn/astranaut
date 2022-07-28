@@ -27,7 +27,7 @@ package org.cqfn.astranaut.scanner;
 /**
  * The token represents an empty node (with no data or children).
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class EmptySymbol implements Token {
     /**

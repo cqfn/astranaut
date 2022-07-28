@@ -54,7 +54,7 @@ import org.cqfn.astranaut.utils.cli.SourceFileConverter;
 /**
  * Main class.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.ImmutableField")
 public final class Main {
@@ -213,6 +213,8 @@ public final class Main {
         try {
             final String code = new FilesReader(rules).readAsString(
                 (FilesReader.CustomExceptionCreator<BaseException>) () -> new BaseException() {
+                    private static final long serialVersionUID = 574161461218410655L;
+
                     @Override
                     public String getInitiator() {
                         return "Main";
@@ -250,7 +252,7 @@ public final class Main {
     /**
      * Environment implementation.
      *
-     * @since 1.0
+     * @since 0.1.5
      */
     private class EnvironmentImpl implements Environment {
         /**

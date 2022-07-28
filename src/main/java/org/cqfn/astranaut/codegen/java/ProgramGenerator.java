@@ -37,7 +37,7 @@ import org.cqfn.astranaut.utils.FilesWriter;
 /**
  * Generates source code for the whole DSL program.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 @SuppressWarnings("PMD.CloseResource")
 public final class ProgramGenerator {

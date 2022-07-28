@@ -27,9 +27,11 @@ package org.cqfn.astranaut.exceptions;
 /**
  * Exception "Unclosed string".
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public class UnclosedString extends ParserException {
+    private static final long serialVersionUID = 3895344300072453243L;
+
     /**
      * The content of the string.
      */

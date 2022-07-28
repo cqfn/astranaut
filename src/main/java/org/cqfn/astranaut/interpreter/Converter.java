@@ -34,7 +34,7 @@ import org.cqfn.astranaut.rules.Transformation;
 /**
  * Converter that checks one rule described in DSL and converts a subtree.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Converter implements org.cqfn.astranaut.base.Converter {
     /**

@@ -28,7 +28,7 @@ import org.cqfn.astranaut.utils.StringUtils;
 /**
  * Java method body.
  *
- * @since 1.0
+ * @since 0.1.5
  */
 public final class Method implements Entity {
     /**

@@ -21,21 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.interpreter;
+package org.cqfn.astranaut.handlers.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
 import org.cqfn.astranaut.base.Node;
 import org.cqfn.astranaut.base.Type;
 import org.cqfn.astranaut.utils.FilesWriter;
 
 /**
- * Converts a syntax tree to a string contains JSON object.
+ * Converts a tree to a string that contains JSON object.
  *
- * @since 1.0
+ * @since 0.2
  */
 public final class JsonSerializer {
     /**
@@ -72,8 +73,8 @@ public final class JsonSerializer {
     }
 
     /**
-     * Converts the syntax tree to a string contains JSON object.
-     * @return The syntax tree represents as a string
+     * Converts the tree to a string that contains JSON object.
+     * @return The tree represented as a string
      */
     public String serialize() {
         final JsonObject obj = new JsonObject();
@@ -93,7 +94,7 @@ public final class JsonSerializer {
         boolean success = true;
         try {
             new FilesWriter(filename).writeString(json);
-        } catch (final IOException ignored) {
+        } catch (final IOException | InvalidPathException ignored) {
             success = false;
         }
         return success;
