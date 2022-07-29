@@ -74,6 +74,19 @@ public class OrdinaryNodeGeneratorTest {
     }
 
     /**
+     * Testing generation of node with long name.
+     */
+    @Test
+    public void testNodeWithLongName() {
+        final boolean result = this.testNodeGeneration(
+            "GreaterThenOrEqualTo <- left@Expression, right@Expression;",
+            "GreaterThenOrEqualTo",
+            "node_with_long_name_generator.txt"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
      * Testing source code generation for rules that describe nodes.
      * @param source The source string
      * @param type Expected node type
