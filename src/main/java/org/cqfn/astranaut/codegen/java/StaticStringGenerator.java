@@ -65,7 +65,7 @@ final class StaticStringGenerator {
      * @return The field name
      */
     public String getFieldName(final String value) {
-        String result;
+        final String result;
         if (this.map.containsKey(value)) {
             result = this.map.get(value).getName();
         } else {
@@ -80,10 +80,7 @@ final class StaticStringGenerator {
                 flag = true;
                 name.append(Character.toUpperCase(symbol));
             }
-            result = name.toString();
-            if (result.length() > StaticStringGenerator.NAME_LENGTH) {
-                result = result.substring(0, StaticStringGenerator.NAME_LENGTH);
-            }
+            result = StaticStringGenerator.fixName(name.toString());
             final Field field = new Field(
                 String.format("The '%s' string", value),
                 "String",
@@ -96,5 +93,23 @@ final class StaticStringGenerator {
             this.klass.addField(field);
         }
         return String.format("%s.%s", this.klass.getName(), result);
+    }
+
+    /**
+     * Fixes name to met Qulice requirements.
+     * @param name The name
+     * @return The fixed name
+     */
+    private static String fixName(final String name) {
+        String result;
+        if (name.length() > StaticStringGenerator.NAME_LENGTH) {
+            result = name.substring(0, StaticStringGenerator.NAME_LENGTH);
+        } else {
+            result = name;
+        }
+        if (result.endsWith("_")) {
+            result = result.substring(0, result.length() - 1);
+        }
+        return result;
     }
 }
