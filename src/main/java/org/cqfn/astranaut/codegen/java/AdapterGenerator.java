@@ -37,6 +37,11 @@ public final class AdapterGenerator extends BaseGenerator {
     private static final String STR_ADAPTER = "Adapter";
 
     /**
+     * Maximum number of rules that does not produce Qulice warning.
+     */
+    private static final int MAX_COUNT_QULICE = 100;
+
+    /**
      * Language for which the factory is generated.
      */
     private final String language;
@@ -113,6 +118,9 @@ public final class AdapterGenerator extends BaseGenerator {
         this.klass = new Klass(brief, this.classname);
         this.klass.makeFinal();
         this.klass.setParentClass(AdapterGenerator.STR_ADAPTER);
+        if (this.count >= AdapterGenerator.MAX_COUNT_QULICE) {
+            this.klass.suppressWarnings("PMD.ExcessiveMethodLength");
+        }
     }
 
     /**
