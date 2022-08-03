@@ -41,14 +41,26 @@ public class AdapterGeneratorTest {
     private static final String TESTS_PATH = "src/test/resources/codegen/java/";
 
     /**
-     * Testing source code generation for rules that describe nodes.
+     * Testing source code generation for adapters.
      */
     @Test
-    public void testNodeGeneration() {
+    public void testAdapterGeneration() {
         final Environment env = new TestEnvironment();
         final AdapterGenerator generator = new AdapterGenerator(env, "js", 10);
         final String actual = generator.generate().generate();
         final String expected = this.readTest("adapter_generator.txt");
+        Assertions.assertEquals(expected, actual);
+    }
+
+    /**
+     * Testing source code generation for adapters that contains a lot of rules.
+     */
+    @Test
+    public void testLongAdapterGeneration() {
+        final Environment env = new TestEnvironment();
+        final AdapterGenerator generator = new AdapterGenerator(env, "js", 200);
+        final String actual = generator.generate().generate();
+        final String expected = this.readTest("long_adapter_generator.txt");
         Assertions.assertEquals(expected, actual);
     }
 
