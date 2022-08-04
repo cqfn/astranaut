@@ -30,6 +30,11 @@ package org.cqfn.astranaut.utils;
  */
 public class CommentsRemover {
     /**
+     * TODO #73 Maybe we should add information about the syntax of the comments
+     *  to bnf.md file.
+     */
+
+    /**
      * Source DSL code.
      */
     private final String source;
