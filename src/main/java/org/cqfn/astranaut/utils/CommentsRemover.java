@@ -27,13 +27,11 @@ package org.cqfn.astranaut.utils;
  * Removes comments from the DSL program.
  *
  * @since 0.2.2
+ * @todo #76:60min Maybe we should add information about the syntax of the comments
+ *  to bnf.md file. Moreover, the current version of BNF is old. The task is to
+ *  provide the up-to-date version and add more examples.
  */
 public class CommentsRemover {
-    /**
-     * TODO #74 Maybe we should add information about the syntax of the comments
-     *  to bnf.md file.
-     */
-
     /**
      * Source DSL code.
      */

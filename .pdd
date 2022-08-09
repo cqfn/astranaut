@@ -6,5 +6,3 @@
 --exclude target/**/*
 --exclude .idea/**/*
 --rule min-words:10
---rule min-estimate:15
---rule max-estimate:90
