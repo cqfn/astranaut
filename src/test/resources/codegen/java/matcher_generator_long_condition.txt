@@ -51,6 +51,31 @@ public final class Matcher0 implements Matcher {
     private static final int EXPECTED_COUNT = 5;
 
     /**
+     * The index of the first child.
+     */
+    private static final int FIRST_CHILD_ID = 0;
+
+    /**
+     * The index of the second child.
+     */
+    private static final int SECOND_CHILD_ID = 1;
+
+    /**
+     * The index of the third child.
+     */
+    private static final int THIRD_CHILD_ID = 2;
+
+    /**
+     * The index of the fourth child.
+     */
+    private static final int FOURTH_CHILD_ID = 3;
+
+    /**
+     * The index of the fifth child.
+     */
+    private static final int FIFTH_CHILD_ID = 4;
+
+    /**
      * Constructor.
      */
     private Matcher0() {
@@ -75,11 +100,21 @@ public final class Matcher0 implements Matcher {
     private static boolean matchChildren(final Node node,
         final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
-        boolean flag = Matcher1.INSTANCE.match(node.getChild(0), children, data);
-        flag = flag && Matcher2.INSTANCE.match(node.getChild(1), children, data);
-        flag = flag && Matcher3.INSTANCE.match(node.getChild(2), children, data);
-        flag = flag && Matcher4.INSTANCE.match(node.getChild(3), children, data);
-        flag = flag && Matcher5.INSTANCE.match(node.getChild(4), children, data);
+        boolean flag = Matcher1.INSTANCE.match(
+            node.getChild(Matcher0.FIRST_CHILD_ID), children, data
+        );
+        flag = flag && Matcher2.INSTANCE.match(
+            node.getChild(Matcher0.SECOND_CHILD_ID), children, data
+        );
+        flag = flag && Matcher3.INSTANCE.match(
+            node.getChild(Matcher0.THIRD_CHILD_ID), children, data
+        );
+        flag = flag && Matcher4.INSTANCE.match(
+            node.getChild(Matcher0.FOURTH_CHILD_ID), children, data
+        );
+        flag = flag && Matcher5.INSTANCE.match(
+            node.getChild(Matcher0.FIFTH_CHILD_ID), children, data
+        );
         return flag;
     }
 }
