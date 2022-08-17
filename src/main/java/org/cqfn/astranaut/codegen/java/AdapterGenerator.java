@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -37,9 +39,9 @@ public final class AdapterGenerator extends BaseGenerator {
     private static final String STR_ADAPTER = "Adapter";
 
     /**
-     * Maximum number of rules that does not produce Qulice warning.
+     * The 'String' string.
      */
-    private static final int MAX_COUNT_QULICE = 100;
+    private static final String STR_STRING = "String";
 
     /**
      * Language for which the factory is generated.
@@ -92,13 +94,16 @@ public final class AdapterGenerator extends BaseGenerator {
         this.createClass();
         this.createConstructor();
         this.createInitializer();
+        this.createRulesNumberField();
+        this.createRulePrefixField();
+        this.createRuleInstanceNameField();
         final String pkg = this.getPackageName(this.language);
         final CompilationUnit unit = new CompilationUnit(
             env.getLicense(),
             pkg,
             this.klass
         );
-        this.addImports(unit, pkg);
+        this.addImports(unit);
         return unit;
     }
 
@@ -118,9 +123,6 @@ public final class AdapterGenerator extends BaseGenerator {
         this.klass = new Klass(brief, this.classname);
         this.klass.makeFinal();
         this.klass.setParentClass(AdapterGenerator.STR_ADAPTER);
-        if (this.count >= AdapterGenerator.MAX_COUNT_QULICE) {
-            this.klass.suppressWarnings("PMD.ExcessiveMethodLength");
-        }
     }
 
     /**
@@ -162,42 +164,97 @@ public final class AdapterGenerator extends BaseGenerator {
             "List<Converter>",
             "The list of node converters"
         );
-        final StringBuilder code = new StringBuilder(256);
-        code.append("return Arrays.asList(\n");
-        boolean flag = false;
-        for (int index = 0; index < count; index = index + 1) {
-            if (flag) {
-                code.append(",\n");
-            }
-            flag = true;
-            code.append("\tRule").append(index).append(".INSTANCE");
-        }
-        code.append("\n);\n");
-        method.setCode(code.toString());
+        final List<String> code = Arrays.asList(
+            String.format(
+                "final List<Converter> rules = new ArrayList<>(%s.RULES_NUM);",
+                this.classname
+            ),
+            String.format(
+                "for (int index = 0; index < %s.RULES_NUM; index = index + 1) {",
+                this.classname
+            ),
+            String.format(
+                "    final String name = %s.PREFIX",
+                this.classname
+            ),
+            "\t.concat(Integer.toString(index));",
+            "    try {",
+            "        final Class<?> cls = Class.forName(name);",
+            String.format(
+                "        final Field instance = cls.getField(%s.RULE_INSTANCE);",
+                this.classname
+            ),
+            "        rules.add((Converter) instance.get(null));",
+            "    } catch (final ClassNotFoundException | IllegalAccessException",
+            "\t| NoSuchFieldException ignored) {",
+            "        continue;",
+            "    }",
+            "}",
+            "return rules;"
+        );
+        method.setCode(String.join("\n", code));
         this.klass.addMethod(method);
     }
 
     /**
      * Adds imports to compilation unit.
      * @param unit Compilation unit
-     * @param pkg Package name
      */
-    private void addImports(final CompilationUnit unit, final String pkg) {
-        unit.addImport("java.util.Arrays");
+    private void addImports(final CompilationUnit unit) {
+        unit.addImport("java.lang.reflect.Field");
+        unit.addImport("java.util.ArrayList");
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
         final Environment env = this.getEnv();
         final String base = env.getBasePackage();
         unit.addImport(base.concat(".Adapter"));
         unit.addImport(base.concat(".Converter"));
-        for (int index = 0; index < this.count; index = index + 1) {
-            unit.addImport(
-                String.format(
-                    "%s.rules.Rule%d",
-                    pkg,
-                    index
-                )
-            );
-        }
+    }
+
+    /**
+     * Creates field that contains a number of rules.
+     */
+    private void createRulesNumberField() {
+        final Field field = new Field(
+            "The number of rules",
+            "int",
+            "RULES_NUM"
+        );
+        field.makePrivate();
+        field.makeStaticFinal();
+        field.setInitExpr(Integer.toString(this.count));
+        this.klass.addField(field);
+    }
+
+    /**
+     * Creates field that contains a prefix of a rule class name.
+     */
+    private void createRulePrefixField() {
+        final Field field = new Field(
+            "The prefix of a rule class name",
+            AdapterGenerator.STR_STRING,
+            "PREFIX"
+        );
+        field.makePrivate();
+        field.makeStaticFinal();
+        field.setInitExpr(
+            String.format("\"%s\"", this.getPackageName(this.language).concat(".rules.Rule"))
+        );
+        this.klass.addField(field);
+    }
+
+    /**
+     * Creates field that contains a name of the rule instance field.
+     */
+    private void createRuleInstanceNameField() {
+        final Field field = new Field(
+            "The name of the rule instance field",
+            AdapterGenerator.STR_STRING,
+            "RULE_INSTANCE"
+        );
+        field.makePrivate();
+        field.makeStaticFinal();
+        field.setInitExpr("\"INSTANCE\"");
+        this.klass.addField(field);
     }
 }
