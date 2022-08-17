@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.api;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.cqfn.astranaut.base.Node;
@@ -98,5 +99,39 @@ public class TreeProcessor {
     public Node transform(final Node tree) {
         final Adapter adapter = new Adapter(this.rules);
         return adapter.convert(tree);
+    }
+
+    /**
+     * Counts an amount of transformation rules.
+     * @return Rules amount
+     */
+    public int countRules() {
+        return this.rules.size();
+    }
+
+    /**
+     * Calculates the number of variants of a single rule
+     * application.
+     * @param index The rule index
+     * @param tree The initial tree to be modified
+     * @return Amount of application variants
+     */
+    public int calculateVariants(final int index, final Node tree) {
+        final Statement<Transformation> rule = this.rules.get(index);
+        final Adapter adapter = new Adapter(Collections.singletonList(rule));
+        return adapter.calculateConversions(tree);
+    }
+
+    /**
+     * Applies specified variant of transformation to the tree.
+     * @param index The rule index
+     * @param variant The variant index
+     * @param tree The initial tree to be modified
+     * @return Tree with chosen variant of transformation applied
+     */
+    public Node partialTransform(final int index, final int variant, final Node tree) {
+        final Statement<Transformation> rule = this.rules.get(index);
+        final Adapter adapter = new Adapter(Collections.singletonList(rule));
+        return adapter.partialConvert(variant, tree);
     }
 }

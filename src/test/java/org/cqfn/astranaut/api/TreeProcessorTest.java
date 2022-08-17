@@ -28,6 +28,7 @@ import org.cqfn.astranaut.base.DraftNode;
 import org.cqfn.astranaut.base.Node;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.cqfn.astranaut.exceptions.ProcessorException;
+import org.cqfn.astranaut.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -41,6 +42,11 @@ public class TreeProcessorTest {
      * The type IntegerLiteral.
      */
     private static final String INT_LITERAL = "IntegerLiteral";
+
+    /**
+     * The type Addition.
+     */
+    private static final String ADDITION = "Addition";
 
     /**
      * The folder with test resources.
@@ -127,6 +133,40 @@ public class TreeProcessorTest {
     }
 
     /**
+     * Test for calculation of variants of a rule application.
+     */
+    @Test
+    public void testCalculatingTransformationVariants() {
+        final String source = this.loadSampleTreeFromJson();
+        final JsonDeserializer deserializer = new JsonDeserializer(source);
+        final Node initial = deserializer.deserialize();
+        final TreeProcessor processor = new TreeProcessor();
+        processor.loadRulesFromString("Addition(#1, #2) -> Subtraction(#1, #2);");
+        final int result = processor.calculateVariants(0, initial);
+        Assertions.assertEquals(3, result);
+    }
+
+    /**
+     * Test for transformation with a chosen variant.
+     */
+    @Test
+    public void testPartialTransformation() {
+        final String source = this.loadSampleTreeFromJson();
+        final JsonDeserializer deserializer = new JsonDeserializer(source);
+        final Node initial = deserializer.deserialize();
+        final TreeProcessor processor = new TreeProcessor();
+        processor.loadRulesFromString("Addition(#1, #2) -> Subtraction(#1, #2);");
+        final Node result = processor.partialTransform(0, 0, initial);
+        Assertions.assertNotNull(result);
+        final Node third = result.getChild(0);
+        Assertions.assertEquals(TreeProcessorTest.ADDITION, third.getTypeName());
+        final Node second = third.getChild(0);
+        Assertions.assertEquals(TreeProcessorTest.ADDITION, second.getTypeName());
+        final Node first = second.getChild(0);
+        Assertions.assertEquals("Subtraction", first.getTypeName());
+    }
+
+    /**
      * Create a simple tree for testing.
      * @return Tree
      */
@@ -141,5 +181,35 @@ public class TreeProcessorTest {
         right.setData("3");
         addition.setChildrenList(Arrays.asList(left.createNode(), right.createNode()));
         return addition.createNode();
+    }
+
+    /**
+     * Load a sample tree from JSON file for testing.
+     * @return Serialized tree as string
+     */
+    public String loadSampleTreeFromJson() {
+        final String file = TreeProcessorTest.TESTS_PATH.concat("test_calculation.json");
+        boolean oops = false;
+        String source = "";
+        try {
+            source = new FilesReader(file).readAsString(
+                (FilesReader.CustomExceptionCreator<ProcessorException>) ()
+                    -> new ProcessorException() {
+                        private static final long serialVersionUID = -2486266117492218703L;
+
+                        @Override
+                        public String getErrorMessage() {
+                            return String.format(
+                                    "Could not read the file that contains source tree: %s",
+                                    file
+                            );
+                        }
+                    }
+            );
+        } catch (final ProcessorException exception) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        return source;
     }
 }

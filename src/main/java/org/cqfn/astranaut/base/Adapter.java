@@ -54,7 +54,7 @@ public class Adapter {
 
     /**
      * Converts the [sub]tree to another, based on DSL rules.
-     * @param root The root node of the subtree.
+     * @param root The root node of the subtree
      * @return A converted tree or empty tree if the conversion is impossible
      */
     public Node convert(final Node root) {
@@ -74,6 +74,58 @@ public class Adapter {
                     }
                     break;
                 }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Calculate an amount of possible conversions that one rule may conduct
+     * within the tree.
+     * @param root The root node of the subtree
+     * @return Amount of conversions
+     */
+    public int calculateConversions(final Node root) {
+        int conversions = 0;
+        final ConvertibleNode convertible = new ConvertibleNode(root);
+        final List<ConvertibleNode> nodes = new ArrayList<>(0);
+        Adapter.buildNodeList(convertible, nodes);
+        for (final ConvertibleNode original : nodes) {
+            final Converter converter = this.converters.get(0);
+            final Node transformed = converter.convert(original, this.factory);
+            if (!(transformed instanceof EmptyTree)) {
+                conversions += 1;
+            }
+        }
+        return conversions;
+    }
+
+    /**
+     * Converts the [sub]tree to another, based on DSL rules.
+     * @param variant The variant index
+     * @param root The root node of the subtree
+     * @return A converted tree or empty tree if the conversion is impossible
+     */
+    public Node partialConvert(final int variant, final Node root) {
+        int conversions = 0;
+        final ConvertibleNode convertible = new ConvertibleNode(root);
+        Node result = convertible;
+        final List<ConvertibleNode> nodes = new ArrayList<>(0);
+        Adapter.buildNodeList(convertible, nodes);
+        for (final ConvertibleNode original : nodes) {
+            final Converter converter = this.converters.get(0);
+            final Node transformed = converter.convert(original, this.factory);
+            if (!(transformed instanceof EmptyTree)) {
+                final ConvertibleNode parent = original.getParent();
+                if (variant == conversions) {
+                    if (parent == null) {
+                        result = transformed;
+                    } else {
+                        parent.replaceChild(original, transformed);
+                    }
+                    break;
+                }
+                conversions += 1;
             }
         }
         return result;
