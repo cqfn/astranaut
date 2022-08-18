@@ -33,14 +33,14 @@ import org.cqfn.astranaut.rules.Node;
  */
 final class OrdinaryNodeGenerator extends BaseNodeGenerator {
     /**
-     * The DSL statement.
+     * The DSL instruction.
      */
     private final Instruction<Node> instruction;
 
     /**
      * Constructor.
      * @param env The environment required for generation.
-     * @param instruction The DSL statement
+     * @param instruction The DSL instruction
      */
     OrdinaryNodeGenerator(final Environment env, final Instruction<Node> instruction) {
         super(env);

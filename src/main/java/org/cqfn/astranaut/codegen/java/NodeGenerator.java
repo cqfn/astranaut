@@ -49,19 +49,19 @@ public class NodeGenerator {
 
     /**
      * Generates source code for node descriptor.
-     * @param stmt The statement that contains node descriptor.
+     * @param instruction The instruction that contains node descriptor.
      * @return Compilation unit
      */
-    public CompilationUnit generate(final Instruction<Node> stmt) {
-        final String language = stmt.getLanguage();
-        final Node rule = stmt.getRule();
+    public CompilationUnit generate(final Instruction<Node> instruction) {
+        final String language = instruction.getLanguage();
+        final Node rule = instruction.getRule();
         final CompilationUnit unit;
         if (rule.isOrdinary()) {
-            unit = new OrdinaryNodeGenerator(this.envs.get(language), stmt).generate();
+            unit = new OrdinaryNodeGenerator(this.envs.get(language), instruction).generate();
         } else if (rule.isAbstract()) {
-            unit = new AbstractNodeGenerator(this.envs.get(language), stmt).generate();
+            unit = new AbstractNodeGenerator(this.envs.get(language), instruction).generate();
         } else if (rule.isList()) {
-            unit = new ListNodeGenerator(this.envs.get(language), stmt).generate();
+            unit = new ListNodeGenerator(this.envs.get(language), instruction).generate();
         } else {
             throw new IllegalStateException();
         }

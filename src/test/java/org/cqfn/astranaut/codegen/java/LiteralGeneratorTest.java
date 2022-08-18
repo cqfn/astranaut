@@ -49,10 +49,9 @@ public class LiteralGeneratorTest {
      * Testing source code generation for rules that describe literals.
      */
     @Test
-    @SuppressWarnings("PMD.CloseResource")
     public void testLiteralGeneration() {
         final Environment env = new TestEnvironment();
-        final Instruction<Literal> instruction = this.createStatement();
+        final Instruction<Literal> instruction = this.createInstruction();
         final LiteralGenerator generator = new LiteralGenerator(env, instruction);
         final String actual = generator.generate().generate();
         final String expected = this.readTest("literal_generator.txt");
@@ -60,10 +59,10 @@ public class LiteralGeneratorTest {
     }
 
     /**
-     * Creates DSL statement.
-     * @return DSL statement
+     * Creates DSL instruction.
+     * @return DSL instruction
      */
-    private Instruction<Literal> createStatement() {
+    private Instruction<Literal> createInstruction() {
         boolean oops = false;
         final String source =
             "IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$, $Exception$";

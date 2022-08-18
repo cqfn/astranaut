@@ -36,7 +36,6 @@ import org.cqfn.astranaut.rules.Transformation;
  *
  * @since 0.1.5
  */
-@SuppressWarnings("PMD.CloseResource")
 public class TransformationGenerator {
     /**
      * The environment.
@@ -86,9 +85,9 @@ public class TransformationGenerator {
         final MatcherGenerator matchers = new MatcherGenerator(this.env, pkg);
         final ConverterGenerator converters = new ConverterGenerator(this.env, pkg);
         int count = 0;
-        for (final Instruction<Transformation> stmt : this.rules) {
-            if (stmt.getLanguage().equals(this.language)) {
-                final Transformation rule = stmt.getRule();
+        for (final Instruction<Transformation> instruction : this.rules) {
+            if (instruction.getLanguage().equals(this.language)) {
+                final Transformation rule = instruction.getRule();
                 final String matcher = matchers.generate(rule.getLeft());
                 converters.generate(rule.getRight(), matcher);
                 count = count + 1;

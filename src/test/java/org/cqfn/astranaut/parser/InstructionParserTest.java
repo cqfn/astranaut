@@ -32,19 +32,19 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test for {@link StatementParser} class.
+ * Test for {@link InstructionParser} class.
  *
  * @since 0.1.5
  */
 public class InstructionParserTest {
     /**
-     * Test parsed 2 statements.
+     * Test parsed 2 instructions.
      */
     @Test
-    public void parseTwoStatements() {
+    public void parseTwoInstructions() {
         boolean oops = false;
         final Program program = new Program();
-        final StatementParser parser = new StatementParser(program);
+        final InstructionParser parser = new InstructionParser(program);
         try {
             parser.parse("Addition <- Expression, Expression");
             parser.parse("java:");

@@ -35,7 +35,6 @@ import java.util.TreeSet;
  *
  * @since 0.1.5
  */
-@SuppressWarnings("PMD.CloseResource")
 public class Program {
     /**
      * All rules.
@@ -117,7 +116,7 @@ public class Program {
      * Adds vertex descriptor with addition data.
      * @param instruction The node descriptor
      */
-    public void addVertexStmt(final Instruction<Vertex> instruction) {
+    public void addVertexInstruction(final Instruction<Vertex> instruction) {
         this.vertices.add(instruction);
     }
 
@@ -125,8 +124,8 @@ public class Program {
      * Adds node descriptor with addition data.
      * @param instruction The node descriptor
      */
-    public void addNodeStmt(final Instruction<Node> instruction) {
-        this.all.add(instruction.toRuleStmt());
+    public void addNodeInstruction(final Instruction<Node> instruction) {
+        this.all.add(instruction.toRuleInstruction());
         this.nodes.add(instruction);
     }
 
@@ -134,8 +133,8 @@ public class Program {
      * Adds literal descriptor with addition data.
      * @param instruction The literal descriptor
      */
-    public void addLiteralStmt(final Instruction<Literal> instruction) {
-        this.all.add(instruction.toRuleStmt());
+    public void addLiteralInstruction(final Instruction<Literal> instruction) {
+        this.all.add(instruction.toRuleInstruction());
         this.literals.add(instruction);
     }
 
@@ -143,8 +142,8 @@ public class Program {
      * Adds transformation descriptor with addition data.
      * @param instruction The literal descriptor
      */
-    public void addTransformStmt(final Instruction<Transformation> instruction) {
-        this.all.add(instruction.toRuleStmt());
+    public void addTransformInstruction(final Instruction<Transformation> instruction) {
+        this.all.add(instruction.toRuleInstruction());
         this.transforms.add(instruction);
     }
 

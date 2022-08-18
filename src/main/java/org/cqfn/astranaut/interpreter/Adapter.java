@@ -34,11 +34,10 @@ import org.cqfn.astranaut.rules.Transformation;
  *
  * @since 0.1.5
  */
-@SuppressWarnings("PMD.CloseResource")
 public class Adapter extends org.cqfn.astranaut.base.Adapter {
     /**
      * Constructor.
-     * @param instructions The list of transformation statements
+     * @param instructions The list of transformation instructions
      */
     public Adapter(final List<Instruction<Transformation>> instructions) {
         super(Collections.unmodifiableList(Adapter.init(instructions)), Factory.INSTANCE);
@@ -46,12 +45,13 @@ public class Adapter extends org.cqfn.astranaut.base.Adapter {
 
     /**
      * Initialises the list of converters.
-     * @param instructions The list of transformation statements
+     * @param instructions The list of transformation instructions
      * @return List of converters
      */
     private static List<org.cqfn.astranaut.base.Converter> init(
         final List<Instruction<Transformation>> instructions) {
-        final List<org.cqfn.astranaut.base.Converter> result = new ArrayList<>(instructions.size());
+        final List<org.cqfn.astranaut.base.Converter> result =
+            new ArrayList<>(instructions.size());
         for (final Instruction<Transformation> instruction : instructions) {
             final Transformation rule = instruction.getRule();
             result.add(new Converter(rule));

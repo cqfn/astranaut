@@ -50,10 +50,9 @@ public class ListNodeGeneratorTest {
      * Testing source code generation for rules that describe nodes.
      */
     @Test
-    @SuppressWarnings("PMD.CloseResource")
     public void testNodeGeneration() {
         final Environment env = new TestEnvironment();
-        final Instruction<Node> instruction = this.createStatement();
+        final Instruction<Node> instruction = this.createInstruction();
         final ListNodeGenerator generator = new ListNodeGenerator(env, instruction);
         final String actual = generator.generate().generate();
         final String expected = this.readTest("list_node_generator.txt");
@@ -61,10 +60,10 @@ public class ListNodeGeneratorTest {
     }
 
     /**
-     * Creates DSL statement.
-     * @return DSL statement
+     * Creates DSL instruction.
+     * @return DSL instruction
      */
-    private Instruction<Node> createStatement() {
+    private Instruction<Node> createInstruction() {
         boolean oops = false;
         final String source =
             "ExpressionList <- {Expression}; Expression <- Addition | Subtraction";

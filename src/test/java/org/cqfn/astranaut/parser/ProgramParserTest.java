@@ -39,10 +39,10 @@ import org.junit.jupiter.api.Test;
  */
 public class ProgramParserTest {
     /**
-     * Test parsed 2 statements.
+     * Test parsed 2 instructions.
      */
     @Test
-    public void parseTwoStatements() {
+    public void parseTwoInstructions() {
         boolean oops = false;
         final String source =
             "Addition<-Expression, Expression;\njava:\nSynchronized<-Expression, StatementBlock;";

@@ -164,7 +164,7 @@ public class TreeProcessorTest {
     }
 
     /**
-     * Test for calculation of variants of a first rule application
+     * Test for calculation of variants of a second rule application
      * choosing from a list with two rules.
      */
     @Test

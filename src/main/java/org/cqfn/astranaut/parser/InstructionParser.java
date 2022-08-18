@@ -34,11 +34,11 @@ import org.cqfn.astranaut.rules.Transformation;
 import org.cqfn.astranaut.rules.Vertex;
 
 /**
- * Statement parser, processes individual program lines.
+ * Instruction parser, processes individual program lines.
  *
  * @since 0.1.5
  */
-public class StatementParser {
+public class InstructionParser {
     /**
      * The program, i.e. set of DSL rules with addition data.
      */
@@ -53,7 +53,7 @@ public class StatementParser {
      * Constructor.
      * @param program The program.
      */
-    public StatementParser(final Program program) {
+    public InstructionParser(final Program program) {
         this.program = program;
         this.language = "";
     }
@@ -86,16 +86,22 @@ public class StatementParser {
         if (source.contains("<-")) {
             if (source.contains("$")) {
                 final Literal literal = new LiteralParser(source).parse();
-                this.program.addLiteralStmt(new Instruction<Literal>(literal, this.language));
-                this.program.addVertexStmt(new Instruction<Vertex>(literal, this.language));
+                this.program.addLiteralInstruction(
+                    new Instruction<Literal>(literal, this.language)
+                );
+                this.program.addVertexInstruction(
+                    new Instruction<Vertex>(literal, this.language)
+                );
             } else {
                 final Node node = new NodeParser(source).parse();
-                this.program.addNodeStmt(new Instruction<Node>(node, this.language));
-                this.program.addVertexStmt(new Instruction<Vertex>(node, this.language));
+                this.program.addNodeInstruction(new Instruction<Node>(node, this.language));
+                this.program.addVertexInstruction(new Instruction<Vertex>(node, this.language));
             }
         } else if (source.contains("->")) {
             final Transformation rule = new TransformationParser(source).parse();
-            this.program.addTransformStmt(new Instruction<Transformation>(rule, this.language));
+            this.program.addTransformInstruction(
+                new Instruction<Transformation>(rule, this.language)
+            );
         } else {
             throw BadRuleSyntax.INSTANCE;
         }

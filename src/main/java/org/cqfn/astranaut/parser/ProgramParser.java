@@ -57,7 +57,7 @@ public class ProgramParser {
         final String code = new CommentsRemover(this.source).remove();
         final String[] lines = code.split(";");
         final Program program = new Program();
-        final StatementParser parser = new StatementParser(program);
+        final InstructionParser parser = new InstructionParser(program);
         int number = 1;
         for (final String line : lines) {
             final String dsl = line.trim();

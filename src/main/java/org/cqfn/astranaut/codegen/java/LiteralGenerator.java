@@ -34,14 +34,14 @@ import org.cqfn.astranaut.rules.Literal;
  */
 final class LiteralGenerator extends BaseGenerator {
     /**
-     * The DSL statement.
+     * The DSL instruction.
      */
     private final Instruction<Literal> instruction;
 
     /**
      * Constructor.
      * @param env The environment required for generation.
-     * @param instruction The DSL statement
+     * @param instruction The DSL instruction
      */
     LiteralGenerator(final Environment env, final Instruction<Literal> instruction) {
         super(env);

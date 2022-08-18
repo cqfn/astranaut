@@ -38,7 +38,6 @@ import org.cqfn.astranaut.rules.Program;
  *
  * @since 0.1.5
  */
-@SuppressWarnings("PMD.CloseResource")
 public final class FactoryGenerator extends BaseGenerator {
     /**
      * The 'factory' string.

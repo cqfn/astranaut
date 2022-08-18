@@ -93,10 +93,9 @@ public class OrdinaryNodeGeneratorTest {
      * @param filename The name of file that contains correct result
      * @return Testing result
      */
-    @SuppressWarnings("PMD.CloseResource")
     private boolean testNodeGeneration(final String source,
         final String type, final String filename) {
-        final Instruction<Node> instruction = this.createStatement(source, type);
+        final Instruction<Node> instruction = this.createInstruction(source, type);
         final Environment env =
             new TestEnvironment(Collections.singletonList(instruction.getRule()));
         final OrdinaryNodeGenerator generator = new OrdinaryNodeGenerator(env, instruction);
@@ -107,12 +106,12 @@ public class OrdinaryNodeGeneratorTest {
     }
 
     /**
-     * Creates DSL statement.
+     * Creates DSL instruction.
      * @param source The source string
      * @param type Expected node type
-     * @return DSL statement
+     * @return DSL instruction
      */
-    private Instruction<Node> createStatement(final String source, final String type) {
+    private Instruction<Node> createInstruction(final String source, final String type) {
         boolean oops = false;
         final ProgramParser parser = new ProgramParser(source);
         try {

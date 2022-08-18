@@ -75,7 +75,8 @@ public class Adapter {
     }
 
     /**
-     * Converts the [sub]tree to another, based on DSL rules.
+     * Converts the [sub]tree to another applying the specified variant
+     * of conversion.
      * @param variant The variant index
      * @param root The root node of the subtree
      * @return A converted tree or empty tree if the conversion is impossible

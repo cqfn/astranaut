@@ -67,10 +67,10 @@ public class Instruction<T extends Rule> {
     }
 
     /**
-     * Creates base (untyped) statement.
-     * @return Base statement
+     * Creates base (untyped) instruction.
+     * @return Base instruction
      */
-    public Instruction<Rule> toRuleStmt() {
+    public Instruction<Rule> toRuleInstruction() {
         return new Instruction<Rule>(this.rule, this.language);
     }
 

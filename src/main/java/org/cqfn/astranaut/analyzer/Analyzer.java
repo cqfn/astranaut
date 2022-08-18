@@ -54,7 +54,6 @@ import org.cqfn.astranaut.utils.Pair;
  *
  * @since 0.1.5
  */
-@SuppressWarnings("PMD.CloseResource")
 public class Analyzer {
     /**
      * The logger.
