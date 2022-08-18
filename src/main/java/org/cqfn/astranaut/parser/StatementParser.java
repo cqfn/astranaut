@@ -26,10 +26,10 @@ package org.cqfn.astranaut.parser;
 
 import org.cqfn.astranaut.exceptions.BadRuleSyntax;
 import org.cqfn.astranaut.exceptions.ParserException;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Node;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.rules.Statement;
 import org.cqfn.astranaut.rules.Transformation;
 import org.cqfn.astranaut.rules.Vertex;
 
@@ -86,16 +86,16 @@ public class StatementParser {
         if (source.contains("<-")) {
             if (source.contains("$")) {
                 final Literal literal = new LiteralParser(source).parse();
-                this.program.addLiteralStmt(new Statement<Literal>(literal, this.language));
-                this.program.addVertexStmt(new Statement<Vertex>(literal, this.language));
+                this.program.addLiteralStmt(new Instruction<Literal>(literal, this.language));
+                this.program.addVertexStmt(new Instruction<Vertex>(literal, this.language));
             } else {
                 final Node node = new NodeParser(source).parse();
-                this.program.addNodeStmt(new Statement<Node>(node, this.language));
-                this.program.addVertexStmt(new Statement<Vertex>(node, this.language));
+                this.program.addNodeStmt(new Instruction<Node>(node, this.language));
+                this.program.addVertexStmt(new Instruction<Vertex>(node, this.language));
             }
         } else if (source.contains("->")) {
             final Transformation rule = new TransformationParser(source).parse();
-            this.program.addTransformStmt(new Statement<Transformation>(rule, this.language));
+            this.program.addTransformStmt(new Instruction<Transformation>(rule, this.language));
         } else {
             throw BadRuleSyntax.INSTANCE;
         }

@@ -26,13 +26,14 @@ package org.cqfn.astranaut.api;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.cqfn.astranaut.base.EmptyTree;
 import org.cqfn.astranaut.base.Node;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 import org.cqfn.astranaut.interpreter.Adapter;
 import org.cqfn.astranaut.parser.ProgramParser;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.rules.Statement;
 import org.cqfn.astranaut.rules.Transformation;
 import org.cqfn.astranaut.utils.FilesReader;
 
@@ -45,7 +46,7 @@ public class TreeProcessor {
     /**
      * Rules of a tree transformation.
      */
-    private final List<Statement<Transformation>> rules;
+    private final List<Instruction<Transformation>> rules;
 
     /**
      * Constructor.
@@ -117,9 +118,15 @@ public class TreeProcessor {
      * @return Amount of application variants
      */
     public int calculateVariants(final int index, final Node tree) {
-        final Statement<Transformation> rule = this.rules.get(index);
-        final Adapter adapter = new Adapter(Collections.singletonList(rule));
-        return adapter.calculateConversions(tree);
+        int result;
+        try {
+            final Instruction<Transformation> rule = this.rules.get(index);
+            final Adapter adapter = new Adapter(Collections.singletonList(rule));
+            result =  adapter.calculateConversions(tree);
+        } catch (final IndexOutOfBoundsException exception) {
+            result = 0;
+        }
+        return result;
     }
 
     /**
@@ -130,8 +137,14 @@ public class TreeProcessor {
      * @return Tree with chosen variant of transformation applied
      */
     public Node partialTransform(final int index, final int variant, final Node tree) {
-        final Statement<Transformation> rule = this.rules.get(index);
-        final Adapter adapter = new Adapter(Collections.singletonList(rule));
-        return adapter.partialConvert(variant, tree);
+        Node result;
+        try {
+            final Instruction<Transformation> rule = this.rules.get(index);
+            final Adapter adapter = new Adapter(Collections.singletonList(rule));
+            result =  adapter.partialConvert(variant, tree);
+        } catch (final IndexOutOfBoundsException exception) {
+            result = EmptyTree.INSTANCE;
+        }
+        return result;
     }
 }

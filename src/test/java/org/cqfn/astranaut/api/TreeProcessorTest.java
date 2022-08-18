@@ -25,6 +25,7 @@ package org.cqfn.astranaut.api;
 
 import java.util.Arrays;
 import org.cqfn.astranaut.base.DraftNode;
+import org.cqfn.astranaut.base.EmptyTree;
 import org.cqfn.astranaut.base.Node;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.cqfn.astranaut.exceptions.ProcessorException;
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.2
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class TreeProcessorTest {
     /**
      * The type IntegerLiteral.
@@ -47,6 +49,21 @@ public class TreeProcessorTest {
      * The type Addition.
      */
     private static final String ADDITION = "Addition";
+
+    /**
+     * The type Subtraction.
+     */
+    private static final String SUBTRACTION = "Subtraction";
+
+    /**
+     * The rule that replaces addition with subtraction.
+     */
+    private static final String RULE = "Addition(#1, #2) -> Subtraction(#1, #2);";
+
+    /**
+     * The number "3".
+     */
+    private static final int THREE = 3;
 
     /**
      * The folder with test resources.
@@ -133,29 +150,43 @@ public class TreeProcessorTest {
     }
 
     /**
-     * Test for calculation of variants of a rule application.
+     * Test for calculation of variants of a rule application
+     * choosing from a list with a single rule.
      */
     @Test
     public void testCalculatingTransformationVariants() {
-        final String source = this.loadSampleTreeFromJson();
-        final JsonDeserializer deserializer = new JsonDeserializer(source);
-        final Node initial = deserializer.deserialize();
+        final Node initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
-        processor.loadRulesFromString("Addition(#1, #2) -> Subtraction(#1, #2);");
+        processor.loadRulesFromString(TreeProcessorTest.RULE);
+        Assertions.assertEquals(1, processor.countRules());
         final int result = processor.calculateVariants(0, initial);
-        Assertions.assertEquals(3, result);
+        Assertions.assertEquals(TreeProcessorTest.THREE, result);
     }
 
     /**
-     * Test for transformation with a chosen variant.
+     * Test for calculation of variants of a first rule application
+     * choosing from a list with two rules.
      */
     @Test
-    public void testPartialTransformation() {
-        final String source = this.loadSampleTreeFromJson();
-        final JsonDeserializer deserializer = new JsonDeserializer(source);
-        final Node initial = deserializer.deserialize();
+    public void testCalculatingTransformationVariantsFromList() {
+        final Node initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
-        processor.loadRulesFromString("Addition(#1, #2) -> Subtraction(#1, #2);");
+        processor.loadRulesFromString(
+            "SimpleName<#1> -> Identifier<#1>; Addition(#1, #2) -> Subtraction(#1, #2);"
+        );
+        Assertions.assertEquals(2, processor.countRules());
+        final int result = processor.calculateVariants(1, initial);
+        Assertions.assertEquals(TreeProcessorTest.THREE, result);
+    }
+
+    /**
+     * Test for transformation with a first variant.
+     */
+    @Test
+    public void testPartialTransformationFirstVar() {
+        final Node initial = this.loadSampleTreeFromJson();
+        final TreeProcessor processor = new TreeProcessor();
+        processor.loadRulesFromString(TreeProcessorTest.RULE);
         final Node result = processor.partialTransform(0, 0, initial);
         Assertions.assertNotNull(result);
         final Node third = result.getChild(0);
@@ -163,7 +194,74 @@ public class TreeProcessorTest {
         final Node second = third.getChild(0);
         Assertions.assertEquals(TreeProcessorTest.ADDITION, second.getTypeName());
         final Node first = second.getChild(0);
-        Assertions.assertEquals("Subtraction", first.getTypeName());
+        Assertions.assertEquals(TreeProcessorTest.SUBTRACTION, first.getTypeName());
+    }
+
+    /**
+     * Test for transformation with a second variant.
+     */
+    @Test
+    public void testPartialTransformationSecVar() {
+        final Node initial = this.loadSampleTreeFromJson();
+        final TreeProcessor processor = new TreeProcessor();
+        processor.loadRulesFromString(TreeProcessorTest.RULE);
+        final Node result = processor.partialTransform(0, 1, initial);
+        Assertions.assertNotNull(result);
+        final Node third = result.getChild(0);
+        Assertions.assertEquals(TreeProcessorTest.ADDITION, third.getTypeName());
+        final Node second = third.getChild(0);
+        Assertions.assertEquals(TreeProcessorTest.SUBTRACTION, second.getTypeName());
+        final Node first = second.getChild(0);
+        Assertions.assertEquals(TreeProcessorTest.ADDITION, first.getTypeName());
+    }
+
+    /**
+     * Test for transformations with second and third variants.
+     */
+    @Test
+    public void testPartialTransformationTwoVars() {
+        final Node initial = this.loadSampleTreeFromJson();
+        final TreeProcessor processor = new TreeProcessor();
+        processor.loadRulesFromString(TreeProcessorTest.RULE);
+        Node result = processor.partialTransform(0, 1, initial);
+        result = processor.partialTransform(0, 1, result);
+        Assertions.assertNotNull(result);
+        final Node third = result.getChild(0);
+        Assertions.assertEquals(TreeProcessorTest.SUBTRACTION, third.getTypeName());
+        final Node second = third.getChild(0);
+        Assertions.assertEquals(TreeProcessorTest.SUBTRACTION, second.getTypeName());
+        final Node first = second.getChild(0);
+        Assertions.assertEquals(TreeProcessorTest.ADDITION, first.getTypeName());
+    }
+
+    /**
+     * Test for transformation with a wrong rule index specified.
+     */
+    @Test
+    public void testWrongIndexOfRule() {
+        final Node initial = this.loadSampleTreeFromJson();
+        final TreeProcessor processor = new TreeProcessor();
+        processor.loadRulesFromString(TreeProcessorTest.RULE);
+        final Node result = processor.partialTransform(4, 0, initial);
+        Assertions.assertEquals(EmptyTree.INSTANCE, result);
+    }
+
+    /**
+     * Test for transformation with a wrong variant index specified.
+     */
+    @Test
+    public void testWrongIndexOfVariant() {
+        final Node initial = this.loadSampleTreeFromJson();
+        final TreeProcessor processor = new TreeProcessor();
+        processor.loadRulesFromString(TreeProcessorTest.RULE);
+        final Node result = processor.partialTransform(0, 3, initial);
+        Assertions.assertNotNull(result);
+        final Node third = result.getChild(0);
+        Assertions.assertEquals(TreeProcessorTest.ADDITION, third.getTypeName());
+        final Node second = third.getChild(0);
+        Assertions.assertEquals(TreeProcessorTest.ADDITION, second.getTypeName());
+        final Node first = second.getChild(0);
+        Assertions.assertEquals(TreeProcessorTest.ADDITION, first.getTypeName());
     }
 
     /**
@@ -172,7 +270,7 @@ public class TreeProcessorTest {
      */
     public Node createSampleTree() {
         final DraftNode.Constructor addition = new DraftNode.Constructor();
-        addition.setName("Addition");
+        addition.setName(TreeProcessorTest.ADDITION);
         final DraftNode.Constructor left = new DraftNode.Constructor();
         left.setName(TreeProcessorTest.INT_LITERAL);
         left.setData("2");
@@ -185,9 +283,9 @@ public class TreeProcessorTest {
 
     /**
      * Load a sample tree from JSON file for testing.
-     * @return Serialized tree as string
+     * @return Deserialized tree
      */
-    public String loadSampleTreeFromJson() {
+    public Node loadSampleTreeFromJson() {
         final String file = TreeProcessorTest.TESTS_PATH.concat("test_calculation.json");
         boolean oops = false;
         String source = "";
@@ -200,8 +298,8 @@ public class TreeProcessorTest {
                         @Override
                         public String getErrorMessage() {
                             return String.format(
-                                    "Could not read the file that contains source tree: %s",
-                                    file
+                                "Could not read the file that contains source tree: %s",
+                                file
                             );
                         }
                     }
@@ -210,6 +308,7 @@ public class TreeProcessorTest {
             oops = true;
         }
         Assertions.assertFalse(oops);
-        return source;
+        final JsonDeserializer deserializer = new JsonDeserializer(source);
+        return deserializer.deserialize();
     }
 }

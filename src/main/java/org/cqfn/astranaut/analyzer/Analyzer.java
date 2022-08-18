@@ -44,8 +44,8 @@ import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.Disjunction;
 import org.cqfn.astranaut.rules.Empty;
 import org.cqfn.astranaut.rules.Extension;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Node;
-import org.cqfn.astranaut.rules.Statement;
 import org.cqfn.astranaut.rules.Vertex;
 import org.cqfn.astranaut.utils.Pair;
 
@@ -84,7 +84,7 @@ public class Analyzer {
      *  contain duplications
      */
     public Analyzer(
-        final List<Statement<Vertex>> descriptors,
+        final List<Instruction<Vertex>> descriptors,
         final String language) throws DuplicateRule {
         this.storage = new VertexStorage(descriptors, language);
         this.info = new TreeMap<>();
@@ -349,7 +349,7 @@ public class Analyzer {
         /**
          * The vertex descriptors.
          */
-        private final List<Statement<Vertex>> descriptors;
+        private final List<Instruction<Vertex>> descriptors;
 
         /**
          * Vertices related to current programming language and green nodes.
@@ -377,7 +377,7 @@ public class Analyzer {
          * @param language The programming language
          */
         VertexStorage(
-            final List<Statement<Vertex>> descriptors,
+            final List<Instruction<Vertex>> descriptors,
             final String language) {
             this.descriptors = descriptors;
             this.language = language;
@@ -395,13 +395,13 @@ public class Analyzer {
         public void collectAndCheck() throws DuplicateRule {
             final List<Vertex> common = new LinkedList<>();
             final List<Vertex> target = new LinkedList<>();
-            for (final Statement<Vertex> statement : this.descriptors) {
-                if (statement.getLanguage().isEmpty()) {
-                    common.add(statement.getRule());
+            for (final Instruction<Vertex> instruction : this.descriptors) {
+                if (instruction.getLanguage().isEmpty()) {
+                    common.add(instruction.getRule());
                 }
-                if (this.language.equals(statement.getLanguage())
+                if (this.language.equals(instruction.getLanguage())
                     && !this.language.isEmpty()) {
-                    target.add(statement.getRule());
+                    target.add(instruction.getRule());
                 }
             }
             checkDuplicateVertices(common);

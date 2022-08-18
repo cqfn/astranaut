@@ -28,10 +28,10 @@ import java.util.Locale;
 import java.util.Map;
 import org.cqfn.astranaut.exceptions.GeneratorCouldNotWriteFile;
 import org.cqfn.astranaut.exceptions.GeneratorException;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Node;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.rules.Statement;
 import org.cqfn.astranaut.utils.FilesWriter;
 
 /**
@@ -155,7 +155,7 @@ public final class ProgramGenerator {
     private void generateNodes() throws GeneratorException {
         final String version = this.env.getVersion();
         final NodeGenerator generator = new NodeGenerator(this.envs);
-        for (final Statement<Node> stmt : this.program.getNodes()) {
+        for (final Instruction<Node> stmt : this.program.getNodes()) {
             final CompilationUnit unit = generator.generate(stmt);
             if (!version.isEmpty()) {
                 unit.setVersion(version);
@@ -172,7 +172,7 @@ public final class ProgramGenerator {
      */
     private void generateLiterals() throws GeneratorException {
         final String version = this.env.getVersion();
-        for (final Statement<Literal> stmt : this.program.getLiterals()) {
+        for (final Instruction<Literal> stmt : this.program.getLiterals()) {
             final String language = stmt.getLanguage();
             final Literal rule = stmt.getRule();
             final CompilationUnit unit =

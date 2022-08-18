@@ -23,8 +23,8 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Node;
-import org.cqfn.astranaut.rules.Statement;
 
 /**
  * Generates source code for rules that describe list nodes.
@@ -35,25 +35,25 @@ final class ListNodeGenerator extends BaseNodeGenerator {
     /**
      * The DSL statement.
      */
-    private final Statement<Node> statement;
+    private final Instruction<Node> instruction;
 
     /**
      * Constructor.
      * @param env The environment required for generation.
-     * @param statement The DSL statement
+     * @param instruction The DSL statement
      */
-    ListNodeGenerator(final Environment env, final Statement<Node> statement) {
+    ListNodeGenerator(final Environment env, final Instruction<Node> instruction) {
         super(env);
-        this.statement = statement;
+        this.instruction = instruction;
     }
 
     @Override
     public CompilationUnit generate() {
         final Environment env = this.getEnv();
-        final Node rule = this.statement.getRule();
+        final Node rule = this.instruction.getRule();
         final Klass klass = this.createClass(rule);
         new ListNodeClassConstructor(env, rule, klass).run();
-        final String pkg = this.getPackageName(this.statement.getLanguage());
+        final String pkg = this.getPackageName(this.instruction.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
         this.generateImports(unit);
         return unit;

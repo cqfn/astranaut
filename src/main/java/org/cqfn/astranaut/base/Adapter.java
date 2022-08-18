@@ -61,19 +61,40 @@ public class Adapter {
         final ConvertibleNode convertible = new ConvertibleNode(root);
         Node result = convertible;
         final List<ConvertibleNode> nodes = new ArrayList<>(0);
-        Adapter.buildNodeList(convertible, nodes);
+        NodeListBuilder.buildNodeList(convertible, nodes);
         for (final ConvertibleNode original : nodes) {
             for (final Converter converter : this.converters) {
                 final Node transformed = converter.convert(original, this.factory);
                 if (!(transformed instanceof EmptyTree)) {
-                    final ConvertibleNode parent = original.getParent();
-                    if (parent == null) {
-                        result = transformed;
-                    } else {
-                        parent.replaceChild(original, transformed);
-                    }
+                    result = Adapter.replace(original, result, transformed);
                     break;
                 }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Converts the [sub]tree to another, based on DSL rules.
+     * @param variant The variant index
+     * @param root The root node of the subtree
+     * @return A converted tree or empty tree if the conversion is impossible
+     */
+    public Node partialConvert(final int variant, final Node root) {
+        int conversions = 0;
+        final ConvertibleNode convertible = new ConvertibleNode(root);
+        Node result = convertible;
+        final List<ConvertibleNode> nodes = new ArrayList<>(0);
+        NodeListBuilder.buildNodeList(convertible, nodes);
+        for (final ConvertibleNode original : nodes) {
+            final Converter converter = this.converters.get(0);
+            final Node transformed = converter.convert(original, this.factory);
+            if (!(transformed instanceof EmptyTree)) {
+                if (variant == conversions) {
+                    result = Adapter.replace(original, result, transformed);
+                    break;
+                }
+                conversions += 1;
             }
         }
         return result;
@@ -89,7 +110,7 @@ public class Adapter {
         int conversions = 0;
         final ConvertibleNode convertible = new ConvertibleNode(root);
         final List<ConvertibleNode> nodes = new ArrayList<>(0);
-        Adapter.buildNodeList(convertible, nodes);
+        NodeListBuilder.buildNodeList(convertible, nodes);
         for (final ConvertibleNode original : nodes) {
             final Converter converter = this.converters.get(0);
             final Node transformed = converter.convert(original, this.factory);
@@ -101,47 +122,44 @@ public class Adapter {
     }
 
     /**
-     * Converts the [sub]tree to another, based on DSL rules.
-     * @param variant The variant index
-     * @param root The root node of the subtree
-     * @return A converted tree or empty tree if the conversion is impossible
+     * Replaces the [sub]tree to another.
+     * @param original The initial node to be converted
+     * @param target The result node
+     * @param transformed The new node
+     * @return Modified [sub]tree
      */
-    public Node partialConvert(final int variant, final Node root) {
-        int conversions = 0;
-        final ConvertibleNode convertible = new ConvertibleNode(root);
-        Node result = convertible;
-        final List<ConvertibleNode> nodes = new ArrayList<>(0);
-        Adapter.buildNodeList(convertible, nodes);
-        for (final ConvertibleNode original : nodes) {
-            final Converter converter = this.converters.get(0);
-            final Node transformed = converter.convert(original, this.factory);
-            if (!(transformed instanceof EmptyTree)) {
-                final ConvertibleNode parent = original.getParent();
-                if (variant == conversions) {
-                    if (parent == null) {
-                        result = transformed;
-                    } else {
-                        parent.replaceChild(original, transformed);
-                    }
-                    break;
-                }
-                conversions += 1;
-            }
+    private static Node replace(final ConvertibleNode original,
+        final Node target, final Node transformed) {
+        Node result = target;
+        final ConvertibleNode parent = original.getParent();
+        if (parent == null) {
+            result = transformed;
+        } else {
+            parent.replaceChild(original, transformed);
         }
         return result;
     }
 
     /**
-     * Expands the tree to the node list.
-     * @param root Root node
-     * @param nodes Resulting list of nodes
+     * Creates a list from nodes.
+     * The list is sorted in descending order of nodes depth in the tree.
+     * Leaf nodes are at the beginning of the list, and the last element is the root.
+     *
+     * @since 0.2.2
      */
-    private static void buildNodeList(final ConvertibleNode root,
-        final List<ConvertibleNode> nodes) {
-        final int count = root.getChildCount();
-        for (int index = 0; index < count; index = index + 1) {
-            Adapter.buildNodeList(root.getConvertibleChild(index), nodes);
+    private static class NodeListBuilder {
+        /**
+         * Expands the tree to the node list.
+         * @param root Root node
+         * @param nodes Resulting list of nodes
+         */
+        private static void buildNodeList(final ConvertibleNode root,
+            final List<ConvertibleNode> nodes) {
+            final int count = root.getChildCount();
+            for (int index = 0; index < count; index = index + 1) {
+                NodeListBuilder.buildNodeList(root.getConvertibleChild(index), nodes);
+            }
+            nodes.add(root);
         }
-        nodes.add(root);
     }
 }

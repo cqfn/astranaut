@@ -25,9 +25,9 @@ package org.cqfn.astranaut.parser;
 
 import java.util.List;
 import org.cqfn.astranaut.exceptions.ParserException;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Program;
 import org.cqfn.astranaut.rules.Rule;
-import org.cqfn.astranaut.rules.Statement;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class StatementParserTest {
+public class InstructionParserTest {
     /**
      * Test parsed 2 statements.
      */
@@ -49,7 +49,7 @@ public class StatementParserTest {
             parser.parse("Addition <- Expression, Expression");
             parser.parse("java:");
             parser.parse("Synchronized <- Expression, StatementBlock");
-            final List<Statement<Rule>> list = program.getAllRules();
+            final List<Instruction<Rule>> list = program.getAllRules();
             Assertions.assertEquals(2, list.size());
             Assertions.assertEquals(
                 "green: Addition <- Expression, Expression",

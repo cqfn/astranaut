@@ -24,8 +24,8 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.Map;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Node;
-import org.cqfn.astranaut.rules.Statement;
 
 /**
  * Generates source code for rules that describe nodes.
@@ -52,7 +52,7 @@ public class NodeGenerator {
      * @param stmt The statement that contains node descriptor.
      * @return Compilation unit
      */
-    public CompilationUnit generate(final Statement<Node> stmt) {
+    public CompilationUnit generate(final Instruction<Node> stmt) {
         final String language = stmt.getLanguage();
         final Node rule = stmt.getRule();
         final CompilationUnit unit;

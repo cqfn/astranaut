@@ -29,9 +29,9 @@ import java.util.Collections;
 import java.util.List;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.cqfn.astranaut.parser.ProgramParser;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Node;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.rules.Statement;
 import org.cqfn.astranaut.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -96,10 +96,10 @@ public class OrdinaryNodeGeneratorTest {
     @SuppressWarnings("PMD.CloseResource")
     private boolean testNodeGeneration(final String source,
         final String type, final String filename) {
-        final Statement<Node> statement = this.createStatement(source, type);
+        final Instruction<Node> instruction = this.createStatement(source, type);
         final Environment env =
-            new TestEnvironment(Collections.singletonList(statement.getRule()));
-        final OrdinaryNodeGenerator generator = new OrdinaryNodeGenerator(env, statement);
+            new TestEnvironment(Collections.singletonList(instruction.getRule()));
+        final OrdinaryNodeGenerator generator = new OrdinaryNodeGenerator(env, instruction);
         final String actual = generator.generate().generate();
         final String expected = this.readTest(filename);
         Assertions.assertEquals(expected, actual);
@@ -112,15 +112,15 @@ public class OrdinaryNodeGeneratorTest {
      * @param type Expected node type
      * @return DSL statement
      */
-    private Statement<Node> createStatement(final String source, final String type) {
+    private Instruction<Node> createStatement(final String source, final String type) {
         boolean oops = false;
         final ProgramParser parser = new ProgramParser(source);
         try {
             final Program program = parser.parse();
-            final List<Statement<Node>> list = program.getNodes();
-            for (final Statement<Node> statement : list) {
-                if (statement.getRule().getType().equals(type)) {
-                    return statement;
+            final List<Instruction<Node>> list = program.getNodes();
+            for (final Instruction<Node> instruction : list) {
+                if (instruction.getRule().getType().equals(type)) {
+                    return instruction;
                 }
             }
         } catch (final BaseException ignored) {

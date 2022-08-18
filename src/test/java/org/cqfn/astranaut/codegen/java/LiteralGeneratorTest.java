@@ -27,9 +27,9 @@ package org.cqfn.astranaut.codegen.java;
 import java.io.IOException;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.cqfn.astranaut.parser.ProgramParser;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.rules.Statement;
 import org.cqfn.astranaut.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -52,8 +52,8 @@ public class LiteralGeneratorTest {
     @SuppressWarnings("PMD.CloseResource")
     public void testLiteralGeneration() {
         final Environment env = new TestEnvironment();
-        final Statement<Literal> statement = this.createStatement();
-        final LiteralGenerator generator = new LiteralGenerator(env, statement);
+        final Instruction<Literal> instruction = this.createStatement();
+        final LiteralGenerator generator = new LiteralGenerator(env, instruction);
         final String actual = generator.generate().generate();
         final String expected = this.readTest("literal_generator.txt");
         Assertions.assertEquals(expected, actual);
@@ -63,7 +63,7 @@ public class LiteralGeneratorTest {
      * Creates DSL statement.
      * @return DSL statement
      */
-    private Statement<Literal> createStatement() {
+    private Instruction<Literal> createStatement() {
         boolean oops = false;
         final String source =
             "IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$, $Exception$";

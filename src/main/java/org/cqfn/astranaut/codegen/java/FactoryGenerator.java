@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Node;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.rules.Statement;
 
 /**
  * Generates a factory for node creation.
@@ -125,9 +125,9 @@ public final class FactoryGenerator extends BaseGenerator {
      * Prepares set of nodes.
      */
     private void prepareNodeSet() {
-        for (final Statement<Node> statement : this.program.getNodes()) {
-            final Node rule = statement.getRule();
-            final String lang = statement.getLanguage();
+        for (final Instruction<Node> instruction : this.program.getNodes()) {
+            final Node rule = instruction.getRule();
+            final String lang = instruction.getLanguage();
             if (rule.isOrdinary() || rule.isList()) {
                 if (lang.equals(this.language)) {
                     this.specific.add(rule.getType());
@@ -142,9 +142,9 @@ public final class FactoryGenerator extends BaseGenerator {
      * Prepares set of literals.
      */
     private void prepareLiteralSet() {
-        for (final Statement<Literal> statement : this.program.getLiterals()) {
-            final Literal rule = statement.getRule();
-            final String lang = statement.getLanguage();
+        for (final Instruction<Literal> instruction : this.program.getLiterals()) {
+            final Literal rule = instruction.getRule();
+            final String lang = instruction.getLanguage();
             if (lang.equals(this.language)) {
                 this.specific.add(rule.getType());
             } else if (lang.isEmpty() && !this.language.isEmpty()) {
