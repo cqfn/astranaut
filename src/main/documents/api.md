@@ -43,15 +43,23 @@ To transform a tree you have to represent a tree with classes that implement the
 There is a class with a basic implementation of `Node` called `DraftNode`, 
 which you can use if it is not possible to implement `Node`.
 
-To convert the tree you have to create a `txt` file with transformation rules 
+To convert the tree you have to create a `txt` file or compose a string with transformation rules 
 and apply them to an initial tree using `TreeProcessor`.
 
-The `TreeProcessor` has two methods:
+The `TreeProcessor` has the following methods:
 
-1. `void loadRules(String filename)` - to load transformation rules from a file.
-2. `Node transform(Node tree)` - to transform an input tree using loaded rules.
+1. `boolean loadRules(String filename)` - to load transformation rules from a file.
+2. `boolean loadRulesFromString(String code)` - to load transformation rules from a given string.  
+3. `Node transform(Node tree)` - to transform an input tree using loaded rules.
+4. `int countRules()` - to get an amount of loaded rules.
+5. `int calculateVariants(int index, Node tree)` - to get an amount of possible tree transformations that may be
+    done by applying a specified rule.
+6. `Node partialTransform(int index, int variant, Node tree)` - to apply a chosen variant of transformation to 
+   an input tree using a specified rule.
 
 **Example:**
+
+#### Transformation
 
 You can create a simple tree:
 
@@ -96,6 +104,56 @@ final TreeProcessor processor = new TreeProcessor();
 processor.loadRules("rules.txt");
 final Node result = processor.transform(tree);
 ~~~
+
+#### Partial transformation
+
+Consider the case when an initial tree has several subtrees with same features.
+
+For example, the following tree has three additional expressions:
+
+```mermaid
+graph TD;
+    R(Return) -- 0 --> A3(Addition);
+    A3(Addition) -- 0 --> A2(Addition);
+    A3(Addition) -- 1 --> I1(IntegerLiteral<br />3);
+
+    A2(Addition) -- 0 --> A1(Addition);
+    A2(Addition) -- 1 --> I2(IntegerLiteral<br />2);
+    
+    A1(Addition) -- 0 --> I3(IntegerLiteral<br />1);
+    A1(Addition) -- 1 --> I4(IntegerLiteral<br />0);
+```
+
+Suppose, you want to apply the rule `Addition(#1, #2) -> Subtraction(#1, #2);` only to the first (the left one) expression.
+
+To do so, pass your rules to the processor. Then specify the exact rule you want to apply, the index of the transformation
+variant and the tree to be modified:
+
+~~~java
+final TreeProcessor processor = new TreeProcessor();
+processor.loadRulesFromString("Addition(#1, #2) -> Subtraction(#1, #2);");
+final Node result = processor.partialTransform(0, 0, tree);
+~~~
+
+For this example, result will be:
+```mermaid
+graph TD;
+    R(Return) -- 0 --> A3(Addition);
+    A3(Addition) -- 0 --> A2(Addition);
+    A3(Addition) -- 1 --> I1(IntegerLiteral<br />3);
+
+    A2(Addition) -- 0 --> A1(Subtraction);
+    A2(Addition) -- 1 --> I2(IntegerLiteral<br />2);
+    
+    A1(Subtraction) -- 0 --> I3(IntegerLiteral<br />1);
+    A1(Subtraction) -- 1 --> I4(IntegerLiteral<br />0);
+```
+
+To calculate an amount of possible variants of the rule application:
+
+```java
+final int amount = processor.calculateVariants(0, tree);
+```
 
 ## Serialize
 
