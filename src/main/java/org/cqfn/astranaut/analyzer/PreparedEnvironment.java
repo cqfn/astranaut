@@ -30,7 +30,7 @@ import org.cqfn.astranaut.codegen.java.Environment;
 import org.cqfn.astranaut.codegen.java.License;
 import org.cqfn.astranaut.codegen.java.TaggedChild;
 import org.cqfn.astranaut.exceptions.GeneratorException;
-import org.cqfn.astranaut.rules.Statement;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Vertex;
 
 /**
@@ -61,7 +61,7 @@ public final class PreparedEnvironment implements Environment {
      * @param language The name of programming language that will limit a set of nodes
      * @throws GeneratorException If the environment can't be built for proposed rule set
      */
-    public PreparedEnvironment(final Environment base, final List<Statement<Vertex>> descriptors,
+    public PreparedEnvironment(final Environment base, final List<Instruction<Vertex>> descriptors,
         final String language) throws GeneratorException {
         this.base = base;
         this.language = language;

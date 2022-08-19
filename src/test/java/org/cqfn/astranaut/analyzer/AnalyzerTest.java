@@ -31,8 +31,8 @@ import java.util.Set;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.cqfn.astranaut.exceptions.DuplicateRule;
 import org.cqfn.astranaut.parser.ProgramParser;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.rules.Statement;
 import org.cqfn.astranaut.rules.Vertex;
 import org.cqfn.astranaut.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
@@ -111,7 +111,7 @@ public class AnalyzerTest {
         final ProgramParser parser = new ProgramParser(source);
         try {
             final Program program = parser.parse();
-            final List<Statement<Vertex>> vertices = program.getVertices();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
             final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
             analyzer.analyze();
             Assertions.assertEquals(AnalyzerTest.JAVA_LANGUAGE, analyzer.getLanguage());
@@ -144,7 +144,7 @@ public class AnalyzerTest {
         final ProgramParser parser = this.getSource();
         try {
             final Program program = parser.parse();
-            final List<Statement<Vertex>> vertices = program.getVertices();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
             final Analyzer analyzer = new Analyzer(vertices, "");
             analyzer.analyze();
             Assertions.assertEquals("", analyzer.getLanguage());
@@ -176,7 +176,7 @@ public class AnalyzerTest {
         final ProgramParser parser = this.getSource();
         try {
             final Program program = parser.parse();
-            final List<Statement<Vertex>> vertices = program.getVertices();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
             final Analyzer analyzer = new Analyzer(vertices, "");
             analyzer.analyze();
             String list = "[{left, E, true}, {right, E, true}]";
@@ -309,7 +309,7 @@ public class AnalyzerTest {
             final String source = this.readTest("duplicated_rule_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Vertex>> vertices = program.getVertices();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
             try {
                 final Analyzer analyzer = new Analyzer(vertices, "");
                 analyzer.analyze();
@@ -332,7 +332,7 @@ public class AnalyzerTest {
             final String source = this.readTest("duplicated_inheritance_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Vertex>> vertices = program.getVertices();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
             try {
                 final Analyzer analyzer = new Analyzer(vertices, "");
                 analyzer.analyze();
@@ -355,7 +355,7 @@ public class AnalyzerTest {
             final String source = this.readTest("one_import_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Vertex>> vertices = program.getVertices();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
             final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
             analyzer.analyze();
             final Set<String> imports = analyzer.getImports(AnalyzerTest.D_TYPE);
@@ -377,7 +377,7 @@ public class AnalyzerTest {
             final String source = this.readTest("several_imports_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Vertex>> vertices = program.getVertices();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
             final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
             analyzer.analyze();
             final Set<String> imports = analyzer.getImports(AnalyzerTest.D_TYPE);
@@ -399,7 +399,7 @@ public class AnalyzerTest {
             final String source = this.readTest("no_imports_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Vertex>> vertices = program.getVertices();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
             final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
             analyzer.analyze();
             final Set<String> imports = analyzer.getImports(AnalyzerTest.D_TYPE);
@@ -421,7 +421,7 @@ public class AnalyzerTest {
             final String source = this.readTest("green_java_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Vertex>> vertices = program.getVertices();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
             try {
                 final Analyzer janalyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
                 janalyzer.analyze();
@@ -464,7 +464,7 @@ public class AnalyzerTest {
             final String source = this.readTest("complex_set.txt");
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
-            final List<Statement<Vertex>> vertices = program.getVertices();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
             try {
                 final Analyzer analyzer = new Analyzer(vertices, "");
                 analyzer.analyze();
@@ -516,7 +516,7 @@ public class AnalyzerTest {
         final String source = this.readTest("depth4_set.txt");
         final ProgramParser parser = new ProgramParser(source);
         final Program program = parser.parse();
-        final List<Statement<Vertex>> vertices = program.getVertices();
+        final List<Instruction<Vertex>> vertices = program.getVertices();
         final Analyzer analyzer = new Analyzer(vertices, "");
         analyzer.analyze();
         return analyzer;

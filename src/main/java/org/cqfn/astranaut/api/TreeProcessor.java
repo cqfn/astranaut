@@ -23,15 +23,17 @@
  */
 package org.cqfn.astranaut.api;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.cqfn.astranaut.base.EmptyTree;
 import org.cqfn.astranaut.base.Node;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 import org.cqfn.astranaut.interpreter.Adapter;
 import org.cqfn.astranaut.parser.ProgramParser;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.rules.Statement;
 import org.cqfn.astranaut.rules.Transformation;
 import org.cqfn.astranaut.utils.FilesReader;
 
@@ -44,7 +46,7 @@ public class TreeProcessor {
     /**
      * Rules of a tree transformation.
      */
-    private final List<Statement<Transformation>> rules;
+    private final List<Instruction<Transformation>> rules;
 
     /**
      * Constructor.
@@ -98,5 +100,51 @@ public class TreeProcessor {
     public Node transform(final Node tree) {
         final Adapter adapter = new Adapter(this.rules);
         return adapter.convert(tree);
+    }
+
+    /**
+     * Counts an amount of transformation rules.
+     * @return Rules amount
+     */
+    public int countRules() {
+        return this.rules.size();
+    }
+
+    /**
+     * Calculates the number of variants of a single rule
+     * application.
+     * @param index The rule index
+     * @param tree The initial tree to be modified
+     * @return Amount of application variants
+     */
+    public int calculateVariants(final int index, final Node tree) {
+        int result;
+        try {
+            final Instruction<Transformation> rule = this.rules.get(index);
+            final Adapter adapter = new Adapter(Collections.singletonList(rule));
+            result =  adapter.calculateConversions(tree);
+        } catch (final IndexOutOfBoundsException exception) {
+            result = 0;
+        }
+        return result;
+    }
+
+    /**
+     * Applies specified variant of transformation to the tree.
+     * @param index The rule index
+     * @param variant The variant index
+     * @param tree The initial tree to be modified
+     * @return Tree with chosen variant of transformation applied
+     */
+    public Node partialTransform(final int index, final int variant, final Node tree) {
+        Node result;
+        try {
+            final Instruction<Transformation> rule = this.rules.get(index);
+            final Adapter adapter = new Adapter(Collections.singletonList(rule));
+            result =  adapter.partialConvert(variant, tree);
+        } catch (final IndexOutOfBoundsException exception) {
+            result = EmptyTree.INSTANCE;
+        }
+        return result;
     }
 }

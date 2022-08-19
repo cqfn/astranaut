@@ -28,10 +28,10 @@ import java.util.Locale;
 import java.util.Map;
 import org.cqfn.astranaut.exceptions.GeneratorCouldNotWriteFile;
 import org.cqfn.astranaut.exceptions.GeneratorException;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Node;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.rules.Statement;
 import org.cqfn.astranaut.utils.FilesWriter;
 
 /**
@@ -39,7 +39,6 @@ import org.cqfn.astranaut.utils.FilesWriter;
  *
  * @since 0.1.5
  */
-@SuppressWarnings("PMD.CloseResource")
 public final class ProgramGenerator {
     /**
      * The 'green' package name.
@@ -155,13 +154,15 @@ public final class ProgramGenerator {
     private void generateNodes() throws GeneratorException {
         final String version = this.env.getVersion();
         final NodeGenerator generator = new NodeGenerator(this.envs);
-        for (final Statement<Node> stmt : this.program.getNodes()) {
-            final CompilationUnit unit = generator.generate(stmt);
+        for (final Instruction<Node> instruction : this.program.getNodes()) {
+            final CompilationUnit unit = generator.generate(instruction);
             if (!version.isEmpty()) {
                 unit.setVersion(version);
             }
             final String code = unit.generate();
-            final String filename = this.getFilePath(stmt.getLanguage(), stmt.getRule().getType());
+            final String filename = this.getFilePath(
+                instruction.getLanguage(), instruction.getRule().getType()
+            );
             this.createFile(filename, code);
         }
     }
@@ -172,11 +173,11 @@ public final class ProgramGenerator {
      */
     private void generateLiterals() throws GeneratorException {
         final String version = this.env.getVersion();
-        for (final Statement<Literal> stmt : this.program.getLiterals()) {
-            final String language = stmt.getLanguage();
-            final Literal rule = stmt.getRule();
+        for (final Instruction<Literal> instruction : this.program.getLiterals()) {
+            final String language = instruction.getLanguage();
+            final Literal rule = instruction.getRule();
             final CompilationUnit unit =
-                new LiteralGenerator(this.envs.get(language), stmt).generate();
+                new LiteralGenerator(this.envs.get(language), instruction).generate();
             if (!version.isEmpty()) {
                 unit.setVersion(version);
             }

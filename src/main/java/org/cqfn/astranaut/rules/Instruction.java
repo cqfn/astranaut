@@ -30,7 +30,7 @@ import java.util.Objects;
  * @param <T> Type of rule
  * @since 0.1.5
  */
-public class Statement<T extends Rule> {
+public class Instruction<T extends Rule> {
     /**
      * The rule.
      */
@@ -46,7 +46,7 @@ public class Statement<T extends Rule> {
      * @param rule The rule
      * @param language The programming language
      */
-    public Statement(final T rule, final String language) {
+    public Instruction(final T rule, final String language) {
         this.rule = Objects.requireNonNull(rule);
         this.language = Objects.requireNonNull(language);
     }
@@ -67,11 +67,11 @@ public class Statement<T extends Rule> {
     }
 
     /**
-     * Creates base (untyped) statement.
-     * @return Base statement
+     * Creates base (untyped) instruction.
+     * @return Base instruction
      */
-    public Statement<Rule> toRuleStmt() {
-        return new Statement<Rule>(this.rule, this.language);
+    public Instruction<Rule> toRuleInstruction() {
+        return new Instruction<Rule>(this.rule, this.language);
     }
 
     /**

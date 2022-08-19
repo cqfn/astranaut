@@ -35,32 +35,31 @@ import java.util.TreeSet;
  *
  * @since 0.1.5
  */
-@SuppressWarnings("PMD.CloseResource")
 public class Program {
     /**
      * All rules.
      */
-    private final List<Statement<Rule>> all;
+    private final List<Instruction<Rule>> all;
 
     /**
      * Node descriptors.
      */
-    private final List<Statement<Node>> nodes;
+    private final List<Instruction<Node>> nodes;
 
     /**
      * Literal descriptors.
      */
-    private final List<Statement<Literal>> literals;
+    private final List<Instruction<Literal>> literals;
 
     /**
      * Vertices (Nodes and Literals) descriptors.
      */
-    private final List<Statement<Vertex>> vertices;
+    private final List<Instruction<Vertex>> vertices;
 
     /**
      * Node descriptors.
      */
-    private final List<Statement<Transformation>> transforms;
+    private final List<Instruction<Transformation>> transforms;
 
     /**
      * Constructor.
@@ -77,7 +76,7 @@ public class Program {
      * Returns list of all rules with addition data.
      * @return All rules.
      */
-    public List<Statement<Rule>> getAllRules() {
+    public List<Instruction<Rule>> getAllRules() {
         return Collections.unmodifiableList(this.all);
     }
 
@@ -85,7 +84,7 @@ public class Program {
      * Returns list of node descriptors with addition data.
      * @return Node descriptors.
      */
-    public List<Statement<Node>> getNodes() {
+    public List<Instruction<Node>> getNodes() {
         return Collections.unmodifiableList(this.nodes);
     }
 
@@ -93,7 +92,7 @@ public class Program {
      * Returns list of literal descriptors with addition data.
      * @return Literal descriptors.
      */
-    public List<Statement<Literal>> getLiterals() {
+    public List<Instruction<Literal>> getLiterals() {
         return Collections.unmodifiableList(this.literals);
     }
 
@@ -101,7 +100,7 @@ public class Program {
      * Returns list of vertex descriptors with addition data.
      * @return Vertex descriptors.
      */
-    public List<Statement<Vertex>> getVertices() {
+    public List<Instruction<Vertex>> getVertices() {
         return Collections.unmodifiableList(this.vertices);
     }
 
@@ -109,43 +108,43 @@ public class Program {
      * Returns list of transformation descriptors with addition data.
      * @return Transformation descriptors.
      */
-    public List<Statement<Transformation>> getTransformations() {
+    public List<Instruction<Transformation>> getTransformations() {
         return Collections.unmodifiableList(this.transforms);
     }
 
     /**
      * Adds vertex descriptor with addition data.
-     * @param statement The node descriptor
+     * @param instruction The node descriptor
      */
-    public void addVertexStmt(final Statement<Vertex> statement) {
-        this.vertices.add(statement);
+    public void addVertexInstruction(final Instruction<Vertex> instruction) {
+        this.vertices.add(instruction);
     }
 
     /**
      * Adds node descriptor with addition data.
-     * @param statement The node descriptor
+     * @param instruction The node descriptor
      */
-    public void addNodeStmt(final Statement<Node> statement) {
-        this.all.add(statement.toRuleStmt());
-        this.nodes.add(statement);
+    public void addNodeInstruction(final Instruction<Node> instruction) {
+        this.all.add(instruction.toRuleInstruction());
+        this.nodes.add(instruction);
     }
 
     /**
      * Adds literal descriptor with addition data.
-     * @param statement The literal descriptor
+     * @param instruction The literal descriptor
      */
-    public void addLiteralStmt(final Statement<Literal> statement) {
-        this.all.add(statement.toRuleStmt());
-        this.literals.add(statement);
+    public void addLiteralInstruction(final Instruction<Literal> instruction) {
+        this.all.add(instruction.toRuleInstruction());
+        this.literals.add(instruction);
     }
 
     /**
      * Adds transformation descriptor with addition data.
-     * @param statement The literal descriptor
+     * @param instruction The literal descriptor
      */
-    public void addTransformStmt(final Statement<Transformation> statement) {
-        this.all.add(statement.toRuleStmt());
-        this.transforms.add(statement);
+    public void addTransformInstruction(final Instruction<Transformation> instruction) {
+        this.all.add(instruction.toRuleInstruction());
+        this.transforms.add(instruction);
     }
 
     /**
@@ -154,8 +153,8 @@ public class Program {
      */
     public Set<String> getNamesOfAllLanguages() {
         final Set<String> result = new TreeSet<>();
-        for (final Statement<Rule> statement : this.all) {
-            final String language = statement.getLanguage();
+        for (final Instruction<Rule> instruction : this.all) {
+            final String language = instruction.getLanguage();
             if (!language.isEmpty()) {
                 result.add(language);
             }

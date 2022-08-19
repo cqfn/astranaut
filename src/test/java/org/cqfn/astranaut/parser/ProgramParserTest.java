@@ -25,10 +25,10 @@ package org.cqfn.astranaut.parser;
 
 import java.util.List;
 import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Program;
 import org.cqfn.astranaut.rules.Rule;
-import org.cqfn.astranaut.rules.Statement;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -39,17 +39,17 @@ import org.junit.jupiter.api.Test;
  */
 public class ProgramParserTest {
     /**
-     * Test parsed 2 statements.
+     * Test parsed 2 instructions.
      */
     @Test
-    public void parseTwoStatements() {
+    public void parseTwoInstructions() {
         boolean oops = false;
         final String source =
             "Addition<-Expression, Expression;\njava:\nSynchronized<-Expression, StatementBlock;";
         final ProgramParser parser = new ProgramParser(source);
         try {
             final Program program = parser.parse();
-            final List<Statement<Rule>> list = program.getAllRules();
+            final List<Instruction<Rule>> list = program.getAllRules();
             Assertions.assertEquals(2, list.size());
             Assertions.assertEquals(
                 "green: Addition <- Expression, Expression",
@@ -98,7 +98,7 @@ public class ProgramParserTest {
         final ProgramParser parser = new ProgramParser(source);
         try {
             final Program program = parser.parse();
-            final List<Statement<Literal>> list = program.getLiterals();
+            final List<Instruction<Literal>> list = program.getLiterals();
             Assertions.assertEquals(1, list.size());
             Assertions.assertEquals(
                 "green: IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$",
