@@ -96,14 +96,27 @@ public class Result {
 
     /**
      * Sets the {@code true} value to the {@code overridden} property of
-     * the tagged names.
+     * the tagged names or sets the {@code false} if there are no common tags.
      * @param common The common tagged names
      */
     public void setOverriddenTags(final Set<TaggedName> common) {
-        for (final TaggedName ancestor : common) {
-            final int idx = this.tags.indexOf(ancestor);
-            final TaggedName local = this.tags.get(idx);
-            local.makeOverridden();
+        if (common.isEmpty()) {
+            for (final TaggedName ancestor : this.getTaggedNames()) {
+                ancestor.makeNotOverridden();
+            }
+        } else {
+            for (final TaggedName ancestor : common) {
+                final int idx = this.tags.indexOf(ancestor);
+                final TaggedName local = this.tags.get(idx);
+                local.makeOverridden();
+            }
         }
+    }
+
+    /**
+     * Removes tags.
+     */
+    public void removeTags() {
+        this.tags.clear();
     }
 }

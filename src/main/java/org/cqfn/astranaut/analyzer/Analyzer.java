@@ -25,6 +25,7 @@
 package org.cqfn.astranaut.analyzer;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -119,6 +120,21 @@ public class Analyzer {
     }
 
     /**
+     * The list of tagged names which the provided node has.
+     * @param type The type of the node
+     * @param dedicated Indicates if that the requested node is from the language-specific list
+     * @return The list of tagged names, cannot be {@code null}
+     */
+    public List<TaggedName> getTags(final String type, final boolean dedicated) {
+        List<TaggedName> tags = new LinkedList<>();
+        final Vertex vertex = this.storage.getVertexByType(type, dedicated);
+        if (vertex != null) {
+            tags = this.info.get(vertex).getTaggedNames();
+        }
+        return tags;
+    }
+
+    /**
      * The list of vertex types that should be added to an import block
      *  of the specified node.
      * @param type The type of the vertex
@@ -197,11 +213,11 @@ public class Analyzer {
             ((Disjunction) node.getComposition().get(0)).getDescriptors();
         ((LinkedList<String>) ancestors).addFirst(node.getType());
         int empty = 0;
+        Vertex extended = null;
         for (final Descriptor descriptor : descriptors) {
             if (descriptor.equals(Extension.INSTANCE)) {
-                final List<String> extended = this.getHierarchyOfExtendedNode(node);
-                ancestors.addAll(extended);
-                result.addAncestors(extended);
+                extended = this.getExtendedNode(node);
+                this.processAbstractNodeExtension(extended, ancestors, result);
             } else if (!descriptor.equals(Empty.INSTANCE)) {
                 this.processVertex(descriptor.getType(), ancestors);
                 if (this.storage.getVertexByType(descriptor.getType(), false) == null) {
@@ -211,7 +227,7 @@ public class Analyzer {
         }
         ((LinkedList<String>) ancestors).removeFirst();
         if (!this.stack.empty()) {
-            this.findCommonTags(descriptors.size() - empty, result);
+            this.processCommonTags(descriptors.size() - empty, result, extended);
             if (result.containsTags()) {
                 this.stack.push(node);
             }
@@ -220,43 +236,104 @@ public class Analyzer {
     }
 
     /**
+     * Processes dependencies of a language-specific abstract node that extends a green
+     * abstract node.
+     * @param extended The abstract green node that was extended by the current node
+     * @param ancestors The list of ancestor vertex types
+     * @param result The result of the analysis
+     */
+    private void processAbstractNodeExtension(
+        final Vertex extended,
+        final List<String> ancestors,
+        final Result result) {
+        final List<String> extension = this.getHierarchyOfExtendedNode(extended);
+        ancestors.addAll(extension);
+        result.addAncestors(extension);
+        if (!this.stack.contains((Node) extended)) {
+            this.stack.push((Node) extended);
+        }
+    }
+
+    /**
      * Returns the hierarchy of the abstract green node that was extended
      *  by a language-specific node.
-     * @param node The abstract language-specific node
+     * @param ancestor The abstract green node
      * @return The list of ancestor vertex types
+     */
+    private List<String> getHierarchyOfExtendedNode(final Vertex ancestor) {
+        final Result result = this.info.get(ancestor);
+        return result.getHierarchy();
+    }
+
+    /**
+     * Returns the abstract green node that was extended
+     *  by a language-specific node.
+     * @param node The abstract language-specific node
+     * @return The extended green node
      * @throws ExtendedNodeNotFound exception if extended green node
      *  was not found
      */
-    private List<String> getHierarchyOfExtendedNode(final Node node)
+    private Vertex getExtendedNode(final Node node)
         throws ExtendedNodeNotFound {
-        List<String> hierarchy = new LinkedList<>();
+        Vertex result = null;
         final Optional<Vertex> optional = this.storage.getGreenVertices()
             .stream()
             .filter(item -> node.getType().equals(item.getType()))
             .findFirst();
         if (optional.isPresent() && optional.get().isAbstract()) {
             if (this.info.containsKey(optional.get())) {
-                final Vertex ancestor = optional.get();
-                final Result result = this.info.get(ancestor);
-                hierarchy = result.getHierarchy();
+                result = optional.get();
             }
         } else {
             throw new ExtendedNodeNotFound(node.getType());
         }
-        return hierarchy;
+        return result;
     }
 
     /**
-     * Finds common tags of an abstract node and its descendants:
+     * Finds and processes common tags of an abstract node and its descendants:
      * - iterates over nodes in stack to collect common tagged names;
      * - if processed nodes count equals descendants size, update
      *  {@code overridden} fields and add tags to the ancestor.
      * @param count The count of described descendant nodes
      * @param ancestor The result of ancestor analysis
+     * @param extended The abstract green node that was extended by the current node
      */
-    private void findCommonTags(final int count, final Result ancestor) {
-        final Set<Node> descendants = new HashSet<>();
-        final Set<TaggedName> common = new HashSet<>();
+    private void processCommonTags(final int count, final Result ancestor, final Vertex extended) {
+        final Set<Node> related = new HashSet<>();
+        final Map<TaggedName, Boolean> common = new HashMap<>();
+        final int idx = this.findCommonTags(count, related, common);
+        if (count > 1) {
+            common.values().removeAll(Collections.singleton(false));
+        }
+        if (count == idx) {
+            for (final Node node : related) {
+                final Result result = this.info.get(node);
+                if (node.equals(extended) && common.isEmpty()) {
+                    result.removeTags();
+                    this.updateExtendedNodeDescendants(extended, common.keySet());
+                } else {
+                    result.setOverriddenTags(common.keySet());
+                }
+            }
+            for (final TaggedName name : common.keySet()) {
+                ancestor.addTaggedName(name.getTag(), name.getType());
+            }
+        }
+    }
+
+    /**
+     * Iterates over nodes in stack to collect common tagged names.
+     * @param count The count of described descendant nodes
+     * @param related The set of nodes to be updated after finding common tagged names
+     * @param common The mappings of found common tagged names and the key that shows
+     *  if it was found in other nodes
+     * @return The amount of processed nodes
+     */
+    private int findCommonTags(
+        final int count,
+        final Set<Node> related,
+        final Map<TaggedName, Boolean> common) {
         int idx = 0;
         while (!this.stack.empty() && idx < count) {
             idx += 1;
@@ -265,25 +342,36 @@ public class Analyzer {
             final List<TaggedName> names = result.getTaggedNames();
             for (final TaggedName name : names) {
                 if (idx == 1) {
-                    common.add(name);
-                    descendants.add(node);
+                    common.put(name, false);
+                    related.add(node);
                     continue;
                 }
-                if (!common.contains(name)) {
-                    common.remove(name);
-                    continue;
+                if (common.containsKey(name)) {
+                    common.put(name, true);
+                } else {
+                    common.put(name, false);
                 }
-                descendants.add(node);
+                related.add(node);
             }
         }
-        if (count == idx) {
-            for (final Node descendant : descendants) {
-                final Result result = this.info.get(descendant);
-                result.setOverriddenTags(common);
-            }
-            for (final TaggedName name : common) {
-                ancestor.addTaggedName(name.getTag(), name.getType());
-            }
+        return idx;
+    }
+
+    /**
+     * Updates tags of the descendant nodes of the abstract green node that was extended
+     * in other language.
+     * @param extended The abstract green node that was extended by other abstract node
+     *  in some language
+     * @param tags The common tagged names
+     */
+    private void updateExtendedNodeDescendants(
+        final Vertex extended, final Set<TaggedName> tags) {
+        final List<Vertex> descendants = VertexSorter.getDescendantVerticesByType(
+            (Node) extended, this.storage.getGreenVertices()
+        );
+        for (final Vertex descendant : descendants) {
+            final Result result = this.info.get(descendant);
+            result.setOverriddenTags(tags);
         }
     }
 

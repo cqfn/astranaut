@@ -96,6 +96,16 @@ public class AnalyzerTest {
     private static final String H_TYPE = "H";
 
     /**
+     * The type I.
+     */
+    private static final String I_TYPE = "I";
+
+    /**
+     * The type Z.
+     */
+    private static final String Z_TYPE = "Z";
+
+    /**
      * The type Addition.
      */
     private static final String ADD_TYPE = "Addition";
@@ -197,6 +207,93 @@ public class AnalyzerTest {
             Assertions.assertEquals(
                 list,
                 analyzer.getTags(AnalyzerTest.E_TYPE).toString()
+            );
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test for analysis of complex tags, 1 set.
+     */
+    @Test
+    public void testComplexTagsOne() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("complex_tags_1.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
+            final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
+            analyzer.analyze();
+            String list = "[]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.A_TYPE, false).toString()
+            );
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.A_TYPE, true).toString()
+            );
+            list = "[{d, D, false}, {e, E, false}, {f, F, false}]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.B_TYPE, false).toString()
+            );
+            list = "[{d, D, false}, {e, E, false}, {g, G, false}, {h, H, false}]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.C_TYPE, false).toString()
+            );
+            list = "[{l, N, false}, {r, N, false}]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.I_TYPE, true).toString()
+            );
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test for analysis of complex tags, 2 set.
+     */
+    @Test
+    public void testComplexTagsTwo() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("complex_tags_2.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
+            final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
+            analyzer.analyze();
+            String list = "[]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.A_TYPE, false).toString()
+            );
+            list = "[{d, D, false}, {e, E, false}]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.Z_TYPE, false).toString()
+            );
+            list = "[{d, D, true}, {e, E, true}, {f, F, false}]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.B_TYPE, false).toString()
+            );
+            list = "[{d, D, true}, {e, E, true}, {g, G, false}, {h, H, false}]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.C_TYPE, false).toString()
+            );
+            list = "[{left, N, false}, {right, N, false}]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.I_TYPE, true).toString()
             );
         } catch (final BaseException ignored) {
             oops = true;
