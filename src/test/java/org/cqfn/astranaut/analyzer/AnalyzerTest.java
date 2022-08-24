@@ -302,6 +302,49 @@ public class AnalyzerTest {
     }
 
     /**
+     * Test for analysis of complex tags, 3 set.
+     */
+    @Test
+    public void testComplexTagsThree() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("complex_tags_3.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
+            final Analyzer analyzer = new Analyzer(vertices, AnalyzerTest.JAVA_LANGUAGE);
+            analyzer.analyze();
+            String list = "[]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.A_TYPE, false).toString()
+            );
+            list = "[{d, D, true}, {f, F, false}]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.B_TYPE, false).toString()
+            );
+            list = "[{le, N, true}, {ri, N, true}]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.E_TYPE, false).toString()
+            );
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.I_TYPE, false).toString()
+            );
+            list = "[{le, N, false}, {ri, N, false}]";
+            Assertions.assertEquals(
+                list,
+                analyzer.getTags(AnalyzerTest.H_TYPE, true).toString()
+            );
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
      * Test hierarchy of nodes in depth4_set.txt.
      */
     @Test
