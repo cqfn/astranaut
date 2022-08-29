@@ -639,7 +639,7 @@ public class AnalyzerTest {
             );
             Assertions.assertEquals(expected, imports.toString());
             imports = analyzer.getImports(
-                AnalyzerTest.A_TYPE,""
+            AnalyzerTest.A_TYPE, ""
             );
             Assertions.assertEquals(expected, imports.toString());
         } catch (final BaseException ignored) {
