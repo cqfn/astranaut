@@ -30,8 +30,6 @@ import org.cqfn.astranaut.codegen.java.Environment;
 import org.cqfn.astranaut.codegen.java.License;
 import org.cqfn.astranaut.codegen.java.TaggedChild;
 import org.cqfn.astranaut.exceptions.GeneratorException;
-import org.cqfn.astranaut.rules.Instruction;
-import org.cqfn.astranaut.rules.Vertex;
 
 /**
  * Prepared environment, with preliminary analysis of the set of rules.
@@ -57,15 +55,15 @@ public final class PreparedEnvironment implements Environment {
     /**
      * Constructor.
      * @param base The base environment
-     * @param descriptors The list of descriptors
+     * @param analyzer The analyzer
      * @param language The name of programming language that will limit a set of nodes
      * @throws GeneratorException If the environment can't be built for proposed rule set
      */
-    public PreparedEnvironment(final Environment base, final List<Instruction<Vertex>> descriptors,
+    public PreparedEnvironment(final Environment base, final Analyzer analyzer,
         final String language) throws GeneratorException {
         this.base = base;
         this.language = language;
-        this.analyzer = new Analyzer(descriptors, language).analyze();
+        this.analyzer = analyzer;
     }
 
     @Override
@@ -100,16 +98,16 @@ public final class PreparedEnvironment implements Environment {
 
     @Override
     public List<String> getHierarchy(final String name) {
-        return this.analyzer.getHierarchy(name);
+        return this.analyzer.getHierarchy(name, this.language);
     }
 
     @Override
     public List<TaggedChild> getTags(final String type) {
-        return new ArrayList<>(this.analyzer.getTags(type));
+        return new ArrayList<>(this.analyzer.getTags(type, this.language));
     }
 
     @Override
     public Set<String> getImports(final String type) {
-        return this.analyzer.getImports(type);
+        return this.analyzer.getImports(type, this.language);
     }
 }

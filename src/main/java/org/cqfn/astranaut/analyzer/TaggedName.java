@@ -66,6 +66,13 @@ public final class TaggedName implements TaggedChild {
         this.overridden = true;
     }
 
+    /**
+     * Makes the tagged name not overridden.
+     */
+    public void makeNotOverridden() {
+        this.overridden = false;
+    }
+
     @Override
     public String getTag() {
         return this.tag;

@@ -31,9 +31,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.logging.Logger;
-import org.cqfn.astranaut.analyzer.PreparedEnvironment;
+import org.cqfn.astranaut.analyzer.EnvironmentPreparator;
 import org.cqfn.astranaut.codegen.java.Environment;
 import org.cqfn.astranaut.codegen.java.License;
 import org.cqfn.astranaut.codegen.java.ProgramGenerator;
@@ -229,15 +228,8 @@ public final class Main {
             final ProgramParser parser = new ProgramParser(code);
             final Program program = parser.parse();
             if (this.action == Action.GENERATE) {
-                final Environment base = new EnvironmentImpl();
-                final Map<String, Environment> env = new TreeMap<>();
-                env.put("", new PreparedEnvironment(base, program.getVertices(), ""));
-                for (final String language : program.getNamesOfAllLanguages()) {
-                    env.put(
-                        language,
-                        new PreparedEnvironment(base, program.getVertices(), language)
-                    );
-                }
+                final Map<String, Environment> env =
+                    new EnvironmentPreparator(program, new Main.EnvironmentImpl()).prepare();
                 final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
                 generator.generate();
             } else if (this.action == Action.CONVERT) {
