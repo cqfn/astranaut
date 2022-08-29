@@ -135,7 +135,7 @@ public class VertexStorage {
      *  programming language
      */
     public List<Vertex> getSpecificVertices(final String language) {
-        return this.red.get(language);
+        return this.red.getOrDefault(language, Collections.emptyList());
     }
 
     /**
@@ -147,10 +147,8 @@ public class VertexStorage {
      */
     public Set<String> getVerticesToBeImported(final String type, final String language) {
         final Set<String> imports = new LinkedHashSet<>();
-        final List<Vertex> list;
-        if (language.isEmpty()) {
-            list = this.green;
-        } else {
+        List<Vertex> list = Collections.emptyList();
+        if (!language.isEmpty()) {
             list = this.red.get(language);
         }
         final Optional<Vertex> optional =

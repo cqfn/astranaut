@@ -633,10 +633,15 @@ public class AnalyzerTest {
             final ProgramParser parser = new ProgramParser(source);
             final Program program = parser.parse();
             final Analyzer analyzer = this.createAnalyzer(program);
-            final Set<String> imports = analyzer.getImports(
+            final String expected = "[]";
+            Set<String> imports = analyzer.getImports(
                 AnalyzerTest.D_TYPE, AnalyzerTest.JAVA_LANGUAGE
             );
-            Assertions.assertEquals("[]", imports.toString());
+            Assertions.assertEquals(expected, imports.toString());
+            imports = analyzer.getImports(
+                AnalyzerTest.A_TYPE,""
+            );
+            Assertions.assertEquals(expected, imports.toString());
         } catch (final BaseException ignored) {
             oops = true;
         }
