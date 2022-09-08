@@ -28,9 +28,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.cqfn.astranaut.core.Pair;
 import org.cqfn.astranaut.rules.Node;
 import org.cqfn.astranaut.rules.Vertex;
-import org.cqfn.astranaut.utils.Pair;
 
 /**
  * Contains methods for sorting vertices by descending order of their depth in the AST.

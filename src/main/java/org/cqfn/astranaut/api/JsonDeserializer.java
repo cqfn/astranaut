@@ -23,7 +23,7 @@
  */
 package org.cqfn.astranaut.api;
 
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.Node;
 
 /**
  * Converts a string that contains a JSON object to a tree.

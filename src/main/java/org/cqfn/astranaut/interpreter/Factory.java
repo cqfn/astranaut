@@ -30,7 +30,7 @@ import java.util.Collections;
  *
  * @since 0.1.5
  */
-public final class Factory extends org.cqfn.astranaut.base.Factory {
+public final class Factory extends org.cqfn.astranaut.core.Factory {
     /**
      * The instance.
      */

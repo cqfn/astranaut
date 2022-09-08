@@ -25,11 +25,11 @@ package org.cqfn.astranaut.interpreter;
 
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.base.Builder;
-import org.cqfn.astranaut.base.EmptyTree;
-import org.cqfn.astranaut.base.Factory;
-import org.cqfn.astranaut.base.ListUtils;
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.Builder;
+import org.cqfn.astranaut.core.EmptyTree;
+import org.cqfn.astranaut.core.Factory;
+import org.cqfn.astranaut.core.ListUtils;
+import org.cqfn.astranaut.core.Node;
 import org.cqfn.astranaut.rules.Data;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.DescriptorAttribute;

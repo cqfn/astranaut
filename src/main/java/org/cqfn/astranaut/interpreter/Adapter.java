@@ -34,7 +34,7 @@ import org.cqfn.astranaut.rules.Transformation;
  *
  * @since 0.1.5
  */
-public class Adapter extends org.cqfn.astranaut.base.Adapter {
+public class Adapter extends org.cqfn.astranaut.core.Adapter {
     /**
      * Constructor.
      * @param instructions The list of transformation instructions
@@ -48,9 +48,9 @@ public class Adapter extends org.cqfn.astranaut.base.Adapter {
      * @param instructions The list of transformation instructions
      * @return List of converters
      */
-    private static List<org.cqfn.astranaut.base.Converter> init(
+    private static List<org.cqfn.astranaut.core.Converter> init(
         final List<Instruction<Transformation>> instructions) {
-        final List<org.cqfn.astranaut.base.Converter> result =
+        final List<org.cqfn.astranaut.core.Converter> result =
             new ArrayList<>(instructions.size());
         for (final Instruction<Transformation> instruction : instructions) {
             final Transformation rule = instruction.getRule();

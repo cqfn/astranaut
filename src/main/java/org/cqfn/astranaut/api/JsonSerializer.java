@@ -23,7 +23,7 @@
  */
 package org.cqfn.astranaut.api;
 
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.Node;
 import org.cqfn.astranaut.exceptions.ProcessorCouldNotWriteFile;
 
 /**

@@ -96,7 +96,7 @@ public final class MatcherGenerator {
         if (filler.isArrayListNeeded()) {
             unit.addImport("java.util.ArrayList");
         }
-        final String base = this.env.getBasePackage();
+        final String base = "org.cqfn.astranaut.core";
         unit.addImport(base.concat(".Matcher"));
         unit.addImport(base.concat(".Node"));
         this.units.put(String.format("rules%s%s", File.separator, name), unit);

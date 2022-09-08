@@ -118,17 +118,6 @@ public final class Main {
     private String rootpkg;
 
     /**
-     * The name of the package that contains the 'Node' base interface.
-     */
-    @Parameter(
-        names = { "--base", "-b" },
-        validateWith = PackageValidator.class,
-        arity = 1,
-        description = "The name of the package that contains the 'Node' base interface"
-    )
-    private String basepkg;
-
-    /**
      * Specify the version of the implementation.
      */
     @Parameter(
@@ -181,7 +170,6 @@ public final class Main {
         this.license = "LICENSE.txt";
         this.path = "generated";
         this.rootpkg = "org.uast";
-        this.basepkg = "org.uast.uast.base";
         this.version = "";
     }
 
@@ -272,11 +260,6 @@ public final class Main {
         @Override
         public String getRootPackage() {
             return Main.this.rootpkg;
-        }
-
-        @Override
-        public String getBasePackage() {
-            return Main.this.basepkg;
         }
 
         @Override

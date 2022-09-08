@@ -79,11 +79,6 @@ final class TestEnvironment implements Environment {
     }
 
     @Override
-    public String getBasePackage() {
-        return "org.uast.uast.base";
-    }
-
-    @Override
     public boolean isTestMode() {
         return false;
     }

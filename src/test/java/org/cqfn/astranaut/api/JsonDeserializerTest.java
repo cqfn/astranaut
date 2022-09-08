@@ -23,7 +23,7 @@
  */
 package org.cqfn.astranaut.api;
 
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.Node;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 import org.cqfn.astranaut.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;

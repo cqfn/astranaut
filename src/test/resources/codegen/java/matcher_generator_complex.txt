@@ -27,8 +27,8 @@ package org.uast;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.uast.uast.base.Matcher;
-import org.uast.uast.base.Node;
+import org.cqfn.astranaut.core.Matcher;
+import org.cqfn.astranaut.core.Node;
 
 /**
  * Checks if the node matches some structure, and extracts the data and children.
@@ -113,8 +113,8 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.uast.uast.base.Matcher;
-import org.uast.uast.base.Node;
+import org.cqfn.astranaut.core.Matcher;
+import org.cqfn.astranaut.core.Node;
 
 /**
  * Checks if the node matches some structure, and extracts the data and children.
@@ -181,8 +181,8 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.uast.uast.base.Matcher;
-import org.uast.uast.base.Node;
+import org.cqfn.astranaut.core.Matcher;
+import org.cqfn.astranaut.core.Node;
 
 /**
  * Checks if the node matches some structure, and extracts the data and children.
@@ -257,8 +257,8 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.uast.uast.base.Matcher;
-import org.uast.uast.base.Node;
+import org.cqfn.astranaut.core.Matcher;
+import org.cqfn.astranaut.core.Node;
 
 /**
  * Checks if the node matches some structure, and extracts the data and children.

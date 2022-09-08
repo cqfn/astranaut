@@ -28,10 +28,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.LinkedList;
 import java.util.List;
-import org.cqfn.astranaut.base.Builder;
-import org.cqfn.astranaut.base.DraftNode;
-import org.cqfn.astranaut.base.EmptyTree;
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.Builder;
+import org.cqfn.astranaut.core.DraftNode;
+import org.cqfn.astranaut.core.EmptyTree;
+import org.cqfn.astranaut.core.Node;
 
 /**
  * Converts a string contains JSON object to a tree.

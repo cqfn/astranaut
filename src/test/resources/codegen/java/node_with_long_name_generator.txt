@@ -30,14 +30,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.uast.uast.base.Builder;
-import org.uast.uast.base.ChildDescriptor;
-import org.uast.uast.base.ChildrenMapper;
-import org.uast.uast.base.EmptyFragment;
-import org.uast.uast.base.Fragment;
-import org.uast.uast.base.ListUtils;
-import org.uast.uast.base.Node;
-import org.uast.uast.base.Type;
+import org.cqfn.astranaut.core.Builder;
+import org.cqfn.astranaut.core.ChildDescriptor;
+import org.cqfn.astranaut.core.ChildrenMapper;
+import org.cqfn.astranaut.core.EmptyFragment;
+import org.cqfn.astranaut.core.Fragment;
+import org.cqfn.astranaut.core.ListUtils;
+import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.Type;
 
 /**
  * Node that describes the 'GreaterThenOrEqualTo' type.

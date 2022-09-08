@@ -24,9 +24,9 @@
 package org.cqfn.astranaut.api;
 
 import java.util.Arrays;
-import org.cqfn.astranaut.base.DraftNode;
-import org.cqfn.astranaut.base.EmptyTree;
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.DraftNode;
+import org.cqfn.astranaut.core.EmptyTree;
+import org.cqfn.astranaut.core.Node;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 import org.cqfn.astranaut.utils.FilesReader;

@@ -24,7 +24,7 @@
 package org.cqfn.astranaut.interpreter;
 
 import java.io.File;
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.Node;
 import org.cqfn.astranaut.exceptions.DestinationNotSpecified;
 import org.cqfn.astranaut.exceptions.InterpreterCouldNotWriteFile;
 import org.cqfn.astranaut.exceptions.InterpreterException;

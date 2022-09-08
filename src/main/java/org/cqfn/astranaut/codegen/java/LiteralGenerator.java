@@ -56,7 +56,7 @@ final class LiteralGenerator extends BaseGenerator {
         new LiteralClassConstructor(env, rule, klass).run();
         final String pkg = this.getPackageName(this.instruction.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
-        this.generateImports(unit);
+        LiteralGenerator.generateImports(unit);
         return unit;
     }
 
@@ -85,14 +85,14 @@ final class LiteralGenerator extends BaseGenerator {
      * Generates imports block.
      * @param unit The compilation unit
      */
-    private void generateImports(final CompilationUnit unit) {
+    private static void generateImports(final CompilationUnit unit) {
         unit.addImport("java.util.Arrays");
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
         unit.addImport("java.util.Map");
         unit.addImport("java.util.stream.Collectors");
         unit.addImport("java.util.stream.Stream");
-        final String base = this.getEnv().getBasePackage();
+        final String base = "org.cqfn.astranaut.core";
         unit.addImport(base.concat(".Builder"));
         unit.addImport(base.concat(".ChildDescriptor"));
         unit.addImport(base.concat(".EmptyFragment"));

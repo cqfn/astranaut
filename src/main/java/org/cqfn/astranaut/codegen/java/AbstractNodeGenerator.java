@@ -70,7 +70,7 @@ final class AbstractNodeGenerator extends BaseGenerator {
             }
             iface.setInterfaces(ancestor);
         } else {
-            final String base = this.getEnv().getBasePackage();
+            final String base = "org.cqfn.astranaut.core";
             unit.addImport(base.concat(".Node"));
             iface.setInterfaces("Node");
         }
