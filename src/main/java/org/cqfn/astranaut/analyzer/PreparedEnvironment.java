@@ -82,11 +82,6 @@ public final class PreparedEnvironment implements Environment {
     }
 
     @Override
-    public String getBasePackage() {
-        return this.base.getBasePackage();
-    }
-
-    @Override
     public boolean isTestMode() {
         return this.base.isTestMode();
     }

@@ -29,13 +29,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.cqfn.astranaut.core.Factory;
+import org.cqfn.astranaut.core.Type;
 import org.uast.example.green.Addition;
 import org.uast.example.green.ExpressionList;
 import org.uast.example.green.Identifier;
 import org.uast.example.green.Subtraction;
 import org.uast.example.green.Variable;
-import org.uast.uast.base.Factory;
-import org.uast.uast.base.Type;
 
 /**
  * Factory that creates 'c' nodes.

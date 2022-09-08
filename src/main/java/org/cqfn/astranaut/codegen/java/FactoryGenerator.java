@@ -256,7 +256,7 @@ public final class FactoryGenerator extends BaseGenerator {
         unit.addImport("java.util.Map");
         unit.addImport("java.util.TreeMap");
         final Environment env = this.getEnv();
-        final String base = env.getBasePackage();
+        final String base = "org.cqfn.astranaut.core";
         unit.addImport(base.concat(".Factory"));
         unit.addImport(base.concat(".Type"));
         for (final String name : this.common) {

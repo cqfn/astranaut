@@ -103,7 +103,7 @@ public final class AdapterGenerator extends BaseGenerator {
             pkg,
             this.klass
         );
-        this.addImports(unit);
+        AdapterGenerator.addImports(unit);
         return unit;
     }
 
@@ -200,13 +200,12 @@ public final class AdapterGenerator extends BaseGenerator {
      * Adds imports to compilation unit.
      * @param unit Compilation unit
      */
-    private void addImports(final CompilationUnit unit) {
+    private static void addImports(final CompilationUnit unit) {
         unit.addImport("java.lang.reflect.Field");
         unit.addImport("java.util.ArrayList");
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
-        final Environment env = this.getEnv();
-        final String base = env.getBasePackage();
+        final String base = "org.cqfn.astranaut.core";
         unit.addImport(base.concat(".Adapter"));
         unit.addImport(base.concat(".Converter"));
     }
