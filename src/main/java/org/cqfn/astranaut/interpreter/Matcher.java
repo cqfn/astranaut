@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.Node;
 import org.cqfn.astranaut.rules.Data;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.Hole;
@@ -39,7 +39,7 @@ import org.cqfn.astranaut.rules.StringData;
  *
  * @since 0.1.5
  */
-public final class Matcher implements org.cqfn.astranaut.base.Matcher {
+public final class Matcher implements org.cqfn.astranaut.core.Matcher {
     /**
      * The descriptor.
      */

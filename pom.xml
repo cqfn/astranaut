@@ -205,5 +205,10 @@ SOFTWARE.
       <artifactId>logback-classic</artifactId>
       <version>1.2.11</version>
     </dependency>
+    <dependency>
+      <groupId>org.cqfn</groupId>
+      <artifactId>astranaut-core</artifactId>
+      <version>1.0.1</version>
+    </dependency>
   </dependencies>
 </project>

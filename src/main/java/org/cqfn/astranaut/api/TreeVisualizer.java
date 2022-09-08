@@ -32,9 +32,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
-import org.cqfn.astranaut.base.EmptyTree;
-import org.cqfn.astranaut.base.Node;
-import org.cqfn.astranaut.base.Type;
+import org.cqfn.astranaut.core.EmptyTree;
+import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.Type;
 import org.cqfn.astranaut.exceptions.VisualizerException;
 import org.cqfn.astranaut.exceptions.WrongFileExtension;
 

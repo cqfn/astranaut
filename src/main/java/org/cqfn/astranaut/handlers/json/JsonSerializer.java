@@ -29,8 +29,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
-import org.cqfn.astranaut.base.Node;
-import org.cqfn.astranaut.base.Type;
+import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.Type;
 import org.cqfn.astranaut.utils.FilesWriter;
 
 /**
