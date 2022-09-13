@@ -43,7 +43,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class MatcherGeneratorTest {
+class MatcherGeneratorTest {
     /**
      * The folder with test resources.
      */
@@ -53,7 +53,7 @@ public class MatcherGeneratorTest {
      * Testing simple case.
      */
     @Test
-    public void testSimpleCase() {
+    void testSimpleCase() {
         final int result = this.testing("statement", "matcher_generator_simple.txt");
         Assertions.assertEquals(1, result);
     }
@@ -62,7 +62,7 @@ public class MatcherGeneratorTest {
      * Testing case: descriptor with one child.
      */
     @Test
-    public void testDescriptorWithOneChild() {
+    void testDescriptorWithOneChild() {
         final int result = this.testing(
             "singleExpression(literal())",
             "matcher_generator_1_child.txt"
@@ -74,7 +74,7 @@ public class MatcherGeneratorTest {
      * Testing case: extracting data.
      */
     @Test
-    public void testExtractingData() {
+    void testExtractingData() {
         final int result = this.testing(
             "literal<#13>",
             "matcher_generator_extract_data.txt"
@@ -86,7 +86,7 @@ public class MatcherGeneratorTest {
      * Testing case: checking data.
      */
     @Test
-    public void testCheckingData() {
+    void testCheckingData() {
         final int result = this.testing(
             "literal<\"+\">",
             "matcher_generator_check_data.txt"
@@ -98,7 +98,7 @@ public class MatcherGeneratorTest {
      * Testing case: extracting children.
      */
     @Test
-    public void testExtractingChildren() {
+    void testExtractingChildren() {
         final int result = this.testing(
             "simpleIdentifier(#1, #2)",
             "matcher_generator_extract_children.txt"
@@ -110,7 +110,7 @@ public class MatcherGeneratorTest {
      * Testing complex case.
      */
     @Test
-    public void testComplexCase() {
+    void testComplexCase() {
         final int result = this.testing(
             "singleExpression(identifier(literal<#1>), literal<\"+\">, #2)",
             "matcher_generator_complex.txt"
@@ -122,7 +122,7 @@ public class MatcherGeneratorTest {
      * Test case: large number of child nodes.
      */
     @Test
-    public void testLargeNumberOfChildNodes() {
+    void testLargeNumberOfChildNodes() {
         final int result = this.testing(
             "AAA(BBB, CCC, DDD, EEE, FFF)",
             "matcher_generator_long_condition.txt"

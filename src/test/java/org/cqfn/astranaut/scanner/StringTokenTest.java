@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class StringTokenTest {
+class StringTokenTest {
     /**
      * Source string (correct).
      */
@@ -53,7 +53,7 @@ public class StringTokenTest {
      * Test scanner with string literal.
      */
     @Test
-    public void correctString() {
+    void correctString() {
         final Scanner scanner = new Scanner(StringTokenTest.CORRECT);
         Token token = null;
         boolean oops = false;
@@ -71,7 +71,7 @@ public class StringTokenTest {
      * Test scanner with incorrect string literal.
      */
     @Test
-    public void incorrectString() {
+    void incorrectString() {
         final Scanner scanner = new Scanner(StringTokenTest.INCORRECT);
         boolean oops = false;
         try {

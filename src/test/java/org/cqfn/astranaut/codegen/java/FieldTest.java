@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class FieldTest {
+class FieldTest {
     /**
      * The folder with test resources.
      */
@@ -44,7 +44,7 @@ public class FieldTest {
      * Testing code generation with private field.
      */
     @Test
-    public void privateField() {
+    void privateField() {
         final Field field = new Field("The fragment", "Fragment", "fragment");
         final String expected = this.readTest("private_field.txt");
         final String actual = field.generate(1);
@@ -55,7 +55,7 @@ public class FieldTest {
      * Testing code generation with public, static, final and initialized field.
      */
     @Test
-    public void publicStaticFinalInitField() {
+    void publicStaticFinalInitField() {
         final Field field = new Field("The type of the node", "Type", "TYPE");
         field.makePublic();
         field.makeStaticFinal();

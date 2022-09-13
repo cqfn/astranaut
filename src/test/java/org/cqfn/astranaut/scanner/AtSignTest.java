@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class AtSignTest {
+class AtSignTest {
     /**
      * Source code.
      */
@@ -48,7 +48,7 @@ public class AtSignTest {
      * Test scanner with string contains "at" sign.
      */
     @Test
-    public void comma() {
+    void comma() {
         final Scanner scanner = new Scanner(AtSignTest.SOURCE);
         boolean oops = false;
         final Token token;

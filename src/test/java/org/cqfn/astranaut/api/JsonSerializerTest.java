@@ -40,7 +40,7 @@ import org.junit.jupiter.api.io.TempDir;
  *
  * @since 0.2
  */
-public class JsonSerializerTest {
+class JsonSerializerTest {
     /**
      * The type IntegerLiteral.
      */
@@ -55,7 +55,7 @@ public class JsonSerializerTest {
      * Test for a tree serialization to a JSON string.
      */
     @Test
-    public void testSerializationToString() {
+    void testSerializationToString() {
         final DraftNode.Constructor ctor = new DraftNode.Constructor();
         ctor.setName("TestNode");
         ctor.setData("value");
@@ -81,7 +81,7 @@ public class JsonSerializerTest {
      * @param temp A temporary directory
      */
     @Test
-    public void testSerializationToFile(@TempDir final Path temp) {
+    void testSerializationToFile(@TempDir final Path temp) {
         final Node tree = this.createSampleTree();
         final JsonSerializer serializer = new JsonSerializer(tree);
         boolean oops = false;
@@ -106,7 +106,7 @@ public class JsonSerializerTest {
      * Test for exception while writing to a JSON file.
      */
     @Test
-    public void testFilesWriterException() {
+    void testFilesWriterException() {
         final Node tree = EmptyTree.INSTANCE;
         final JsonSerializer serializer = new JsonSerializer(tree);
         boolean oops = false;
@@ -122,7 +122,7 @@ public class JsonSerializerTest {
      * Create a simple tree for testing.
      * @return Tree
      */
-    public Node createSampleTree() {
+    private Node createSampleTree() {
         final DraftNode.Constructor addition = new DraftNode.Constructor();
         addition.setName("Addition");
         final DraftNode.Constructor left = new DraftNode.Constructor();

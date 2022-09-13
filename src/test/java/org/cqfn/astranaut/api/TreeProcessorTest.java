@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Test;
  * @since 0.2
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class TreeProcessorTest {
+class TreeProcessorTest {
     /**
      * The type IntegerLiteral.
      */
@@ -74,7 +74,7 @@ public class TreeProcessorTest {
      * Test for a tree transformation.
      */
     @Test
-    public void testTreeTransformation() {
+    void testTreeTransformation() {
         final Node tree = this.createSampleTree();
         final TreeProcessor processor = new TreeProcessor();
         boolean oops = false;
@@ -96,7 +96,7 @@ public class TreeProcessorTest {
      * Test for a tree transformation with rules from a string.
      */
     @Test
-    public void testTreeTransformationFromString() {
+    void testTreeTransformationFromString() {
         final Node tree = this.createSampleTree();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(
@@ -113,7 +113,7 @@ public class TreeProcessorTest {
      * Test for exception while reading a DSL file.
      */
     @Test
-    public void testFilesReaderException() {
+    void testFilesReaderException() {
         final TreeProcessor processor = new TreeProcessor();
         boolean oops = false;
         String msg = "";
@@ -135,7 +135,7 @@ public class TreeProcessorTest {
      * Test for exception while reading a DSL file containing bugs.
      */
     @Test
-    public void testIncorrectDslFile() {
+    void testIncorrectDslFile() {
         final TreeProcessor processor = new TreeProcessor();
         boolean oops = false;
         final String filename = TreeProcessorTest.TESTS_PATH.concat("test_0_bug_rules.txt");
@@ -154,7 +154,7 @@ public class TreeProcessorTest {
      * choosing from a list with a single rule.
      */
     @Test
-    public void testCalculatingTransformationVariants() {
+    void testCalculatingTransformationVariants() {
         final Node initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
@@ -168,7 +168,7 @@ public class TreeProcessorTest {
      * choosing from a list with two rules.
      */
     @Test
-    public void testCalculatingTransformationVariantsFromList() {
+    void testCalculatingTransformationVariantsFromList() {
         final Node initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(
@@ -183,7 +183,7 @@ public class TreeProcessorTest {
      * Test for transformation with a first variant.
      */
     @Test
-    public void testPartialTransformationFirstVar() {
+    void testPartialTransformationFirstVar() {
         final Node initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
@@ -201,7 +201,7 @@ public class TreeProcessorTest {
      * Test for transformation with a second variant.
      */
     @Test
-    public void testPartialTransformationSecVar() {
+    void testPartialTransformationSecVar() {
         final Node initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
@@ -219,7 +219,7 @@ public class TreeProcessorTest {
      * Test for transformations with second and third variants.
      */
     @Test
-    public void testPartialTransformationTwoVars() {
+    void testPartialTransformationTwoVars() {
         final Node initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
@@ -238,7 +238,7 @@ public class TreeProcessorTest {
      * Test for transformation with a wrong rule index specified.
      */
     @Test
-    public void testWrongIndexOfRule() {
+    void testWrongIndexOfRule() {
         final Node initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
@@ -250,7 +250,7 @@ public class TreeProcessorTest {
      * Test for transformation with a wrong variant index specified.
      */
     @Test
-    public void testWrongIndexOfVariant() {
+    void testWrongIndexOfVariant() {
         final Node initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
@@ -268,7 +268,7 @@ public class TreeProcessorTest {
      * Create a simple tree for testing.
      * @return Tree
      */
-    public Node createSampleTree() {
+    private Node createSampleTree() {
         final DraftNode.Constructor addition = new DraftNode.Constructor();
         addition.setName(TreeProcessorTest.ADDITION);
         final DraftNode.Constructor left = new DraftNode.Constructor();
@@ -285,7 +285,7 @@ public class TreeProcessorTest {
      * Load a sample tree from JSON file for testing.
      * @return Deserialized tree
      */
-    public Node loadSampleTreeFromJson() {
+    private Node loadSampleTreeFromJson() {
         final String file = TreeProcessorTest.TESTS_PATH.concat("test_calculation.json");
         boolean oops = false;
         String source = "";

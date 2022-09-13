@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class MethodTest {
+class MethodTest {
     /**
      * Typical method name for tests.
      */
@@ -49,7 +49,7 @@ public class MethodTest {
      * Testing code generation with a very simple method.
      */
     @Test
-    public void simpleMethod() {
+    void simpleMethod() {
         final Method method = new Method("Prints test string", MethodTest.METHOD_NAME);
         method.setCode("System.out.print(\"Ok.\");");
         final String expected = this.readTest("simple_method.txt");
@@ -61,7 +61,7 @@ public class MethodTest {
      * Testing code generation with a private method.
      */
     @Test
-    public void simplePrivateMethod() {
+    void simplePrivateMethod() {
         final Method method = new Method("Prints another test string", MethodTest.METHOD_NAME);
         method.setCode("System.out.print(\"Hello )\");");
         method.makePrivate();
@@ -74,7 +74,7 @@ public class MethodTest {
      * Testing code generation for method with arguments and return value.
      */
     @Test
-    public void methodWithArgsAndReturn() {
+    void methodWithArgsAndReturn() {
         final Method method = new Method("Finds the sum of two numbers", MethodTest.METHOD_NAME);
         final String type = "int";
         method.addArgument(type, "aaa", "First number");
@@ -90,7 +90,7 @@ public class MethodTest {
      * Testing code generation for method that contains 'if' statement.
      */
     @Test
-    public void methodWithIfStatement() {
+    void methodWithIfStatement() {
         final Method method = new Method(
             "Finds the maximum of two numbers",
             MethodTest.METHOD_NAME
@@ -111,7 +111,7 @@ public class MethodTest {
      * Testing code generation with overridden method.
      */
     @Test
-    public void overriddenMethod() {
+    void overriddenMethod() {
         final Method method = new Method("Represents the object as a string", "toString");
         method.setReturnType("String", "A string");
         method.setCode("return \"test\";");
@@ -125,7 +125,7 @@ public class MethodTest {
      * Testing code generation with abstract method.
      */
     @Test
-    public void abstractMethod() {
+    void abstractMethod() {
         final Method method = new Method("Associates new data with the object", "setData");
         method.addArgument("Data", "data", "The new data");
         method.makeAbstract();

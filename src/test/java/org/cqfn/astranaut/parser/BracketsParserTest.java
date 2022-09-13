@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class BracketsParserTest {
+class BracketsParserTest {
     /**
      * Source string (correct).
      */
@@ -58,7 +58,7 @@ public class BracketsParserTest {
      * Test the bracket parser with correct sequence.
      */
     @Test
-    public void correctSequence() {
+    void correctSequence() {
         final Tokenizer tokenizer = new Tokenizer(BracketsParserTest.CORRECT);
         boolean oops = false;
         try {
@@ -79,7 +79,7 @@ public class BracketsParserTest {
      * Test the bracket parser with incorrect sequence (not closed bracket).
      */
     @Test
-    public void notClosedBracket() {
+    void notClosedBracket() {
         final Tokenizer tokenizer = new Tokenizer(BracketsParserTest.UNCLOSED);
         boolean oops = false;
         try {
@@ -97,7 +97,7 @@ public class BracketsParserTest {
      * (opening bracket does not match closing).
      */
     @Test
-    public void bracketsMismatch() {
+    void bracketsMismatch() {
         final Tokenizer tokenizer = new Tokenizer(BracketsParserTest.MISMATCH);
         boolean oops = false;
         try {

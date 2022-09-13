@@ -45,7 +45,7 @@ import org.junit.jupiter.api.Test;
  * @since 0.1.5
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class AnalyzerTest {
+class AnalyzerTest {
     /**
      * The folder with test resources.
      */
@@ -126,7 +126,7 @@ public class AnalyzerTest {
      * Case with Java nodes request.
      */
     @Test
-    public void testThreeDepthHierarchyJava() {
+    void testThreeDepthHierarchyJava() {
         boolean oops = false;
         final String source = this.readTest("depth3_java_set.txt");
         final ProgramParser parser = new ProgramParser(source);
@@ -163,7 +163,7 @@ public class AnalyzerTest {
      * Case with green nodes request.
      */
     @Test
-    public void testThreeDepthHierarchyGreen() {
+    void testThreeDepthHierarchyGreen() {
         boolean oops = false;
         final ProgramParser parser = this.getSource();
         try {
@@ -192,7 +192,7 @@ public class AnalyzerTest {
      * Test for analysis of depth 3 nodes tagged names.
      */
     @Test
-    public void testThreeDepthTags() {
+    void testThreeDepthTags() {
         boolean oops = false;
         final ProgramParser parser = this.getSource();
         try {
@@ -227,7 +227,7 @@ public class AnalyzerTest {
      * Test for analysis of complex tags, 1 set.
      */
     @Test
-    public void testComplexTagsOne() {
+    void testComplexTagsOne() {
         boolean oops = false;
         try {
             final String source = this.readTest("complex_tags_1.txt");
@@ -268,7 +268,7 @@ public class AnalyzerTest {
      * Test for analysis of complex tags, 2 set.
      */
     @Test
-    public void testComplexTagsTwo() {
+    void testComplexTagsTwo() {
         boolean oops = false;
         try {
             final String source = this.readTest("complex_tags_2.txt");
@@ -310,7 +310,7 @@ public class AnalyzerTest {
      * Test for analysis of complex tags, 3 set.
      */
     @Test
-    public void testComplexTagsThree() {
+    void testComplexTagsThree() {
         boolean oops = false;
         try {
             final String source = this.readTest("complex_tags_3.txt");
@@ -352,7 +352,7 @@ public class AnalyzerTest {
      * green abstract node.
      */
     @Test
-    public void testComplexTagsOfSeveralLanguages() {
+    void testComplexTagsOfSeveralLanguages() {
         boolean oops = false;
         try {
             final String source = this.readTest("complex_langs.txt");
@@ -393,7 +393,7 @@ public class AnalyzerTest {
      * Test hierarchy of nodes in depth4_set.txt.
      */
     @Test
-    public void testFourDepthHierarchy() throws BaseException {
+    void testFourDepthHierarchy() throws BaseException {
         final Analyzer analyzer = this.getAnalyzer(AnalyzerTest.FOUR_SET);
         this.checkFourDepthHierarchy(analyzer);
     }
@@ -402,16 +402,237 @@ public class AnalyzerTest {
      * Test hierarchy of nodes in depth4_set_mixed.txt.
      */
     @Test
-    public void testFourDepthMixedHierarchy() throws BaseException {
+    void testFourDepthMixedHierarchy() throws BaseException {
         final Analyzer analyzer = this.getAnalyzer(AnalyzerTest.FOUR_MIX_SET);
         this.checkFourDepthHierarchy(analyzer);
+    }
+
+    /**
+     * Test tagged names of nodes in depth4_set.txt.
+     */
+    @Test
+    void testFourDepthTags() throws BaseException {
+        final Analyzer analyzer = this.getAnalyzer(AnalyzerTest.FOUR_SET);
+        this.checkFourDepthTags(analyzer);
+    }
+
+    /**
+     * Test tagged names of nodes in depth4_set_mixed.txt.
+     */
+    @Test
+    void testFourDepthMixedTags() throws BaseException {
+        final Analyzer analyzer = this.getAnalyzer(AnalyzerTest.FOUR_MIX_SET);
+        this.checkFourDepthTags(analyzer);
+    }
+
+    /**
+     * Test analysis of DSL rules which contain duplicated rules for one node.
+     */
+    @Test
+    void testDslWithDuplicatedRulesForNode() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("duplicated_rule_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
+            try {
+                final VertexStorage storage = new VertexStorage(
+                    vertices, program.getNamesOfAllLanguages()
+                );
+                storage.collectAndCheck();
+                final Analyzer analyzer = new Analyzer(storage);
+                analyzer.analyzeGreen();
+                for (final String language : program.getNamesOfAllLanguages()) {
+                    analyzer.analyze(language);
+                }
+            } catch (final DuplicateRule exception) {
+                oops = true;
+            }
+        } catch (final BaseException ignored) {
+        }
+        Assertions.assertTrue(oops);
+    }
+
+    /**
+     * Test analysis of DSL rules which contain a node that inherits several abstract
+     * nodes.
+     */
+    @Test
+    void testDslWithDuplicatedInheritance() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("duplicated_inheritance_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final List<Instruction<Vertex>> vertices = program.getVertices();
+            try {
+                final VertexStorage storage = new VertexStorage(
+                    vertices, program.getNamesOfAllLanguages()
+                );
+                storage.collectAndCheck();
+                final Analyzer analyzer = new Analyzer(storage);
+                analyzer.analyzeGreen();
+                for (final String language : program.getNamesOfAllLanguages()) {
+                    analyzer.analyze(language);
+                }
+            } catch (final DuplicateRule exception) {
+                oops = true;
+            }
+        } catch (final BaseException ignored) {
+        }
+        Assertions.assertTrue(oops);
+    }
+
+    /**
+     * Test finding one node that should be imported to the generated class
+     * of the specified node.
+     */
+    @Test
+    void testFindingOneNodeToBeImported() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("one_import_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final Analyzer analyzer = this.createAnalyzer(program);
+            final Set<String> imports = analyzer.getImports(
+                AnalyzerTest.D_TYPE, AnalyzerTest.JAVA_LANGUAGE
+            );
+            Assertions.assertEquals("[E]", imports.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test finding several nodes that should be imported to the generated class
+     * of the specified node.
+     */
+    @Test
+    void testFindingSeveralNodesToBeImported() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("several_imports_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final Analyzer analyzer = this.createAnalyzer(program);
+            final Set<String> imports = analyzer.getImports(
+                AnalyzerTest.D_TYPE, AnalyzerTest.JAVA_LANGUAGE
+            );
+            Assertions.assertEquals("[E, B]", imports.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test finding no nodes that should be imported to the generated class
+     * of the specified node.
+     */
+    @Test
+    void testFindingNoNodesToBeImported() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("no_imports_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final Analyzer analyzer = this.createAnalyzer(program);
+            final String expected = "[]";
+            Set<String> imports = analyzer.getImports(
+                AnalyzerTest.D_TYPE, AnalyzerTest.JAVA_LANGUAGE
+            );
+            Assertions.assertEquals(expected, imports.toString());
+            imports = analyzer.getImports(
+            AnalyzerTest.A_TYPE, ""
+            );
+            Assertions.assertEquals(expected, imports.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test analysis of DSL rules which contain a language-specific node that extends
+     * a green abstract node.
+     */
+    @Test
+    void testSetWithAbstractNodeExtension() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("green_java_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final Analyzer analyzer = this.createAnalyzer(program);
+            final List<String> btype = Arrays.asList(
+                AnalyzerTest.B_TYPE,
+                AnalyzerTest.B_TYPE,
+                AnalyzerTest.E_TYPE
+            );
+            Assertions.assertEquals(
+                btype, analyzer.getHierarchy(AnalyzerTest.B_TYPE, AnalyzerTest.JAVA_LANGUAGE)
+            );
+            final List<String> dtype = Arrays.asList(
+                AnalyzerTest.D_TYPE,
+                AnalyzerTest.B_TYPE,
+                AnalyzerTest.B_TYPE,
+                AnalyzerTest.E_TYPE
+            );
+            Assertions.assertEquals(
+                dtype, analyzer.getHierarchy(AnalyzerTest.D_TYPE, AnalyzerTest.JAVA_LANGUAGE)
+            );
+            final List<String> bgrtype = Arrays.asList(
+                AnalyzerTest.B_TYPE,
+                AnalyzerTest.E_TYPE
+            );
+            Assertions.assertEquals(bgrtype, analyzer.getHierarchy(AnalyzerTest.B_TYPE, ""));
+        } catch (final BaseException ignored) {
+            oops = false;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test analysis of DSL rules which contain different types of vertices.
+     */
+    @Test
+    void testSetWithVariousVertices() {
+        boolean oops = false;
+        try {
+            final String source = this.readTest("complex_set.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            final Program program = parser.parse();
+            final Analyzer analyzer = this.createAnalyzer(program);
+            final List<String> hierarchy = Arrays.asList(
+                AnalyzerTest.ADD_TYPE,
+                "BinaryExpression",
+                "Expression"
+            );
+            Assertions.assertEquals(
+                hierarchy, analyzer.getHierarchy(AnalyzerTest.ADD_TYPE, "")
+            );
+            final String identifier = "Identifier";
+            Assertions.assertEquals(
+                Collections.singletonList(identifier), analyzer.getHierarchy(identifier, "")
+            );
+            final String list = "ExpressionList";
+            Assertions.assertEquals(
+                Collections.singletonList(list), analyzer.getHierarchy(list, "")
+            );
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 
     /**
      * Test depth four hierarchy of nodes.
      * @param analyzer The analyzer
      */
-    public void checkFourDepthHierarchy(final Analyzer analyzer) {
+    private void checkFourDepthHierarchy(final Analyzer analyzer) {
         final List<String> atype = Collections.singletonList(AnalyzerTest.A_TYPE);
         Assertions.assertEquals(atype, analyzer.getHierarchy(AnalyzerTest.A_TYPE, ""));
         final List<String> btype = Arrays.asList(
@@ -458,28 +679,10 @@ public class AnalyzerTest {
     }
 
     /**
-     * Test tagged names of nodes in depth4_set.txt.
-     */
-    @Test
-    public void testFourDepthTags() throws BaseException {
-        final Analyzer analyzer = this.getAnalyzer(AnalyzerTest.FOUR_SET);
-        this.checkFourDepthTags(analyzer);
-    }
-
-    /**
-     * Test tagged names of nodes in depth4_set_mixed.txt.
-     */
-    @Test
-    public void testFourDepthMixedTags() throws BaseException {
-        final Analyzer analyzer = this.getAnalyzer(AnalyzerTest.FOUR_MIX_SET);
-        this.checkFourDepthTags(analyzer);
-    }
-
-    /**
      * Test tagged names of nodes with depth four hierarchy.
      * @param analyzer The analyzer
      */
-    public void checkFourDepthTags(final Analyzer analyzer) {
+    private void checkFourDepthTags(final Analyzer analyzer) {
         String list = "[{a, A, false}]";
         Assertions.assertEquals(
             list,
@@ -516,209 +719,6 @@ public class AnalyzerTest {
             list,
             analyzer.getTags(AnalyzerTest.G_TYPE, "").toString()
         );
-    }
-
-    /**
-     * Test analysis of DSL rules which contain duplicated rules for one node.
-     */
-    @Test
-    public void testDslWithDuplicatedRulesForNode() {
-        boolean oops = false;
-        try {
-            final String source = this.readTest("duplicated_rule_set.txt");
-            final ProgramParser parser = new ProgramParser(source);
-            final Program program = parser.parse();
-            final List<Instruction<Vertex>> vertices = program.getVertices();
-            try {
-                final VertexStorage storage = new VertexStorage(
-                    vertices, program.getNamesOfAllLanguages()
-                );
-                storage.collectAndCheck();
-                final Analyzer analyzer = new Analyzer(storage);
-                analyzer.analyzeGreen();
-                for (final String language : program.getNamesOfAllLanguages()) {
-                    analyzer.analyze(language);
-                }
-            } catch (final DuplicateRule exception) {
-                oops = true;
-            }
-        } catch (final BaseException ignored) {
-        }
-        Assertions.assertTrue(oops);
-    }
-
-    /**
-     * Test analysis of DSL rules which contain a node that inherits several abstract
-     * nodes.
-     */
-    @Test
-    public void testDslWithDuplicatedInheritance() {
-        boolean oops = false;
-        try {
-            final String source = this.readTest("duplicated_inheritance_set.txt");
-            final ProgramParser parser = new ProgramParser(source);
-            final Program program = parser.parse();
-            final List<Instruction<Vertex>> vertices = program.getVertices();
-            try {
-                final VertexStorage storage = new VertexStorage(
-                    vertices, program.getNamesOfAllLanguages()
-                );
-                storage.collectAndCheck();
-                final Analyzer analyzer = new Analyzer(storage);
-                analyzer.analyzeGreen();
-                for (final String language : program.getNamesOfAllLanguages()) {
-                    analyzer.analyze(language);
-                }
-            } catch (final DuplicateRule exception) {
-                oops = true;
-            }
-        } catch (final BaseException ignored) {
-        }
-        Assertions.assertTrue(oops);
-    }
-
-    /**
-     * Test finding one node that should be imported to the generated class
-     * of the specified node.
-     */
-    @Test
-    public void testFindingOneNodeToBeImported() {
-        boolean oops = false;
-        try {
-            final String source = this.readTest("one_import_set.txt");
-            final ProgramParser parser = new ProgramParser(source);
-            final Program program = parser.parse();
-            final Analyzer analyzer = this.createAnalyzer(program);
-            final Set<String> imports = analyzer.getImports(
-                AnalyzerTest.D_TYPE, AnalyzerTest.JAVA_LANGUAGE
-            );
-            Assertions.assertEquals("[E]", imports.toString());
-        } catch (final BaseException ignored) {
-            oops = true;
-        }
-        Assertions.assertFalse(oops);
-    }
-
-    /**
-     * Test finding several nodes that should be imported to the generated class
-     * of the specified node.
-     */
-    @Test
-    public void testFindingSeveralNodesToBeImported() {
-        boolean oops = false;
-        try {
-            final String source = this.readTest("several_imports_set.txt");
-            final ProgramParser parser = new ProgramParser(source);
-            final Program program = parser.parse();
-            final Analyzer analyzer = this.createAnalyzer(program);
-            final Set<String> imports = analyzer.getImports(
-                AnalyzerTest.D_TYPE, AnalyzerTest.JAVA_LANGUAGE
-            );
-            Assertions.assertEquals("[E, B]", imports.toString());
-        } catch (final BaseException ignored) {
-            oops = true;
-        }
-        Assertions.assertFalse(oops);
-    }
-
-    /**
-     * Test finding no nodes that should be imported to the generated class
-     * of the specified node.
-     */
-    @Test
-    public void testFindingNoNodesToBeImported() {
-        boolean oops = false;
-        try {
-            final String source = this.readTest("no_imports_set.txt");
-            final ProgramParser parser = new ProgramParser(source);
-            final Program program = parser.parse();
-            final Analyzer analyzer = this.createAnalyzer(program);
-            final String expected = "[]";
-            Set<String> imports = analyzer.getImports(
-                AnalyzerTest.D_TYPE, AnalyzerTest.JAVA_LANGUAGE
-            );
-            Assertions.assertEquals(expected, imports.toString());
-            imports = analyzer.getImports(
-            AnalyzerTest.A_TYPE, ""
-            );
-            Assertions.assertEquals(expected, imports.toString());
-        } catch (final BaseException ignored) {
-            oops = true;
-        }
-        Assertions.assertFalse(oops);
-    }
-
-    /**
-     * Test analysis of DSL rules which contain a language-specific node that extends
-     * a green abstract node.
-     */
-    @Test
-    public void testSetWithAbstractNodeExtension() {
-        boolean oops = false;
-        try {
-            final String source = this.readTest("green_java_set.txt");
-            final ProgramParser parser = new ProgramParser(source);
-            final Program program = parser.parse();
-            final Analyzer analyzer = this.createAnalyzer(program);
-            final List<String> btype = Arrays.asList(
-                AnalyzerTest.B_TYPE,
-                AnalyzerTest.B_TYPE,
-                AnalyzerTest.E_TYPE
-            );
-            Assertions.assertEquals(
-                btype, analyzer.getHierarchy(AnalyzerTest.B_TYPE, AnalyzerTest.JAVA_LANGUAGE)
-            );
-            final List<String> dtype = Arrays.asList(
-                AnalyzerTest.D_TYPE,
-                AnalyzerTest.B_TYPE,
-                AnalyzerTest.B_TYPE,
-                AnalyzerTest.E_TYPE
-            );
-            Assertions.assertEquals(
-                dtype, analyzer.getHierarchy(AnalyzerTest.D_TYPE, AnalyzerTest.JAVA_LANGUAGE)
-            );
-            final List<String> bgrtype = Arrays.asList(
-                AnalyzerTest.B_TYPE,
-                AnalyzerTest.E_TYPE
-            );
-            Assertions.assertEquals(bgrtype, analyzer.getHierarchy(AnalyzerTest.B_TYPE, ""));
-        } catch (final BaseException ignored) {
-            oops = false;
-        }
-        Assertions.assertFalse(oops);
-    }
-
-    /**
-     * Test analysis of DSL rules which contain different types of vertices.
-     */
-    @Test
-    public void testSetWithVariousVertices() {
-        boolean oops = false;
-        try {
-            final String source = this.readTest("complex_set.txt");
-            final ProgramParser parser = new ProgramParser(source);
-            final Program program = parser.parse();
-            final Analyzer analyzer = this.createAnalyzer(program);
-            final List<String> hierarchy = Arrays.asList(
-                AnalyzerTest.ADD_TYPE,
-                "BinaryExpression",
-                "Expression"
-            );
-            Assertions.assertEquals(
-                hierarchy, analyzer.getHierarchy(AnalyzerTest.ADD_TYPE, "")
-            );
-            final String identifier = "Identifier";
-            Assertions.assertEquals(
-                Collections.singletonList(identifier), analyzer.getHierarchy(identifier, "")
-            );
-            final String list = "ExpressionList";
-            Assertions.assertEquals(
-                Collections.singletonList(list), analyzer.getHierarchy(list, "")
-            );
-        } catch (final BaseException ignored) {
-            oops = true;
-        }
-        Assertions.assertFalse(oops);
     }
 
     /**
