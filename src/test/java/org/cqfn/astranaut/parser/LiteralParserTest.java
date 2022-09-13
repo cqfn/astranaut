@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class LiteralParserTest {
+class LiteralParserTest {
     /**
      * Valid source code.
      */
@@ -45,7 +45,7 @@ public class LiteralParserTest {
      * Test case: integer literal.
      */
     @Test
-    public void integerLiteral() {
+    void integerLiteral() {
         final boolean result = this.run(LiteralParserTest.SOURCE);
         Assertions.assertTrue(result);
     }
@@ -54,7 +54,7 @@ public class LiteralParserTest {
      * Test case: integer literal with exception.
      */
     @Test
-    public void integerLiteralWithException() {
+    void integerLiteralWithException() {
         final boolean result =
             this.run(LiteralParserTest.SOURCE.concat(", $NumberFormatException$"));
         Assertions.assertTrue(result);
@@ -64,7 +64,7 @@ public class LiteralParserTest {
      * Test case: wrong declaration.
      */
     @Test
-    public void wrongDeclaration() {
+    void wrongDeclaration() {
         final boolean result = this.run(
             "IntegerLiteral <- $int$",
             ExpectedThreeOrFourParameters.class

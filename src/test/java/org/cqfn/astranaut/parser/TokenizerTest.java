@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class TokenizerTest {
+class TokenizerTest {
     /**
      * Source string (correct).
      */
@@ -49,7 +49,7 @@ public class TokenizerTest {
      * Test the tokenizer with correct string.
      */
     @Test
-    public void correctSequence() {
+    void correctSequence() {
         final Tokenizer tokenizer = new Tokenizer(TokenizerTest.CORRECT);
         boolean oops = false;
         try {
@@ -65,7 +65,7 @@ public class TokenizerTest {
      * Test the tokenizer with incorrect string.
      */
     @Test
-    public void incorrectSequence() {
+    void incorrectSequence() {
         final Tokenizer tokenizer = new Tokenizer(TokenizerTest.INCORRECT);
         boolean oops = false;
         try {

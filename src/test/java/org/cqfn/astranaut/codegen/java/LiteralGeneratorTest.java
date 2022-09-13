@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class LiteralGeneratorTest {
+class LiteralGeneratorTest {
     /**
      * The folder with test resources.
      */
@@ -49,7 +49,7 @@ public class LiteralGeneratorTest {
      * Testing source code generation for rules that describe literals.
      */
     @Test
-    public void testLiteralGeneration() {
+    void testLiteralGeneration() {
         final Environment env = new TestEnvironment();
         final Instruction<Literal> instruction = this.createInstruction();
         final LiteralGenerator generator = new LiteralGenerator(env, instruction);

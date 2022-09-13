@@ -37,13 +37,13 @@ import org.junit.jupiter.api.io.TempDir;
  *
  * @since 0.1.5
  */
-public class InterpreterTest {
+class InterpreterTest {
     /**
      * First test.
      * @param temp A temporary directory
      */
     @Test
-    public void firstTest(@TempDir final Path temp) {
+    void firstTest(@TempDir final Path temp) {
         final boolean result = this.test("test_0", temp);
         Assertions.assertTrue(result);
     }
@@ -53,7 +53,7 @@ public class InterpreterTest {
      * @param temp A temporary directory
      */
     @Test
-    public void ellipsisTest(@TempDir final Path temp) {
+    void ellipsisTest(@TempDir final Path temp) {
         final boolean result = this.test("test_1", temp);
         Assertions.assertTrue(result);
     }

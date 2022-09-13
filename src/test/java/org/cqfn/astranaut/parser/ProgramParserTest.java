@@ -37,12 +37,12 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class ProgramParserTest {
+class ProgramParserTest {
     /**
      * Test parsed 2 instructions.
      */
     @Test
-    public void parseTwoInstructions() {
+    void parseTwoInstructions() {
         boolean oops = false;
         final String source =
             "Addition<-Expression, Expression;\njava:\nSynchronized<-Expression, StatementBlock;";
@@ -69,7 +69,7 @@ public class ProgramParserTest {
      * Test parsed code with error.
      */
     @Test
-    public void parseCodeWithError() {
+    void parseCodeWithError() {
         boolean oops = false;
         final String source =
             "Addition <- Expression, Expression;\nexpression <- Addition | Subtraction";
@@ -91,7 +91,7 @@ public class ProgramParserTest {
      * Test parsed literal.
      */
     @Test
-    public void parseLiteral() {
+    void parseLiteral() {
         boolean oops = false;
         final String source =
             "IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$;";

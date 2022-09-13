@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class CompilationUnitTest {
+class CompilationUnitTest {
     /**
      * The folder with test resources.
      */
@@ -44,7 +44,7 @@ public class CompilationUnitTest {
      * Testing code generation with compilation unit.
      */
     @Test
-    public void testCompilationUnit() {
+    void testCompilationUnit() {
         final License license = new License("LICENSE.txt");
         final Interface iface = new Interface("DSL rule", "Rule");
         final MethodDescriptor method = new MethodDescriptor(

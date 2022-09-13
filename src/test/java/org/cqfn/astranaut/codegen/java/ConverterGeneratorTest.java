@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class ConverterGeneratorTest {
+class ConverterGeneratorTest {
     /**
      * The folder with test resources.
      */
@@ -54,7 +54,7 @@ public class ConverterGeneratorTest {
      * Testing simple case.
      */
     @Test
-    public void testSimpleCase() {
+    void testSimpleCase() {
         final int result = this.testing("Variable", "converter_generator_simple.txt");
         Assertions.assertEquals(1, result);
     }
@@ -63,7 +63,7 @@ public class ConverterGeneratorTest {
      * Generate converter that uses data.
      */
     @Test
-    public void testConverterUsesData() {
+    void testConverterUsesData() {
         final int result = this.testing(
             "Variable<#13>",
             "converter_generator_with_data.txt"
@@ -75,7 +75,7 @@ public class ConverterGeneratorTest {
      * Generate converter that creates node using static string as a data.
      */
     @Test
-    public void testConverterStaticString() {
+    void testConverterStaticString() {
         final int result = this.testing(
             "Variable<\"test\">",
             "converter_generator_static_string.txt"
@@ -87,7 +87,7 @@ public class ConverterGeneratorTest {
      * Generate converter that uses children.
      */
     @Test
-    public void testConverterUsesChildren() {
+    void testConverterUsesChildren() {
         final int result = this.testing(
             "Addition(#1, #2)",
             "converter_generator_with_children.txt"
@@ -99,7 +99,7 @@ public class ConverterGeneratorTest {
      * Generate converter that uses hole as descriptor.
      */
     @Test
-    public void testConverterUsesHoleAsDescriptor() {
+    void testConverterUsesHoleAsDescriptor() {
         final int result = this.testing(
             "#19",
             "converter_generator_with_hole_as_descriptor.txt"
@@ -111,7 +111,7 @@ public class ConverterGeneratorTest {
      * Testing complex case.
      */
     @Test
-    public void testComplexCase() {
+    void testComplexCase() {
         final int result = this.testing(
             "VariableDeclaration(Modifier<\"public\">, #1, Identifier<#2>)",
             "converter_generator_complex.txt"

@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class OrdinaryNodeGeneratorTest {
+class OrdinaryNodeGeneratorTest {
     /**
      * The folder with test resources.
      */
@@ -51,7 +51,7 @@ public class OrdinaryNodeGeneratorTest {
      * Testing node generation without optional children.
      */
     @Test
-    public void testNodeWithoutOptionalChildren() {
+    void testNodeWithoutOptionalChildren() {
         final boolean result = this.testNodeGeneration(
             "Addition <- left@Expression, right@Expression;\nExpression <- Addition | Subtraction",
             "Addition",
@@ -64,7 +64,7 @@ public class OrdinaryNodeGeneratorTest {
      * Testing node generation with optional child.
      */
     @Test
-    public void testNodeWithOptionalChild() {
+    void testNodeWithOptionalChild() {
         final boolean result = this.testNodeGeneration(
             "Name <- [composition@Name], last@Identifier;",
             "Name",
@@ -77,7 +77,7 @@ public class OrdinaryNodeGeneratorTest {
      * Testing generation of node with long name.
      */
     @Test
-    public void testNodeWithLongName() {
+    void testNodeWithLongName() {
         final boolean result = this.testNodeGeneration(
             "GreaterThenOrEqualTo <- left@Expression, right@Expression;",
             "GreaterThenOrEqualTo",

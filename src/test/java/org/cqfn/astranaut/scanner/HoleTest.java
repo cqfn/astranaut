@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class HoleTest {
+class HoleTest {
     /**
      * Source string (simple case, correct).
      */
@@ -68,7 +68,7 @@ public class HoleTest {
      * Test scanner with hole marker.
      */
     @Test
-    public void correctHoleMarker() {
+    void correctHoleMarker() {
         final Scanner scanner = new Scanner(HoleTest.SIMPLE_CORRECT);
         Token token = null;
         boolean oops = false;
@@ -86,7 +86,7 @@ public class HoleTest {
      * Test scanner with incorrect hole marker.
      */
     @Test
-    public void incorrectHoleMarker() {
+    void incorrectHoleMarker() {
         final Scanner scanner = new Scanner(HoleTest.SIMPLE_INCORRECT);
         boolean oops = false;
         try {
@@ -101,7 +101,7 @@ public class HoleTest {
      * Test scanner with hole marker that contains ellipsis.
      */
     @Test
-    public void correctHoleMarkerWithEllipsis() {
+    void correctHoleMarkerWithEllipsis() {
         final Scanner scanner = new Scanner(HoleTest.ELLIPSIS_CORRECT);
         Token token = null;
         boolean oops = false;
@@ -119,7 +119,7 @@ public class HoleTest {
      * Test scanner with incorrect hole marker that contains "bad" ellipsis.
      */
     @Test
-    public void incorrectHoleMarkerWithEllipsis() {
+    void incorrectHoleMarkerWithEllipsis() {
         final Scanner scanner = new Scanner(HoleTest.WRONG_ELLIPSIS);
         boolean oops = false;
         try {

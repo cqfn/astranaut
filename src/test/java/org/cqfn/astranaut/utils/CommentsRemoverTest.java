@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.2.2
  */
-public class CommentsRemoverTest {
+class CommentsRemoverTest {
     /**
      * The folder with test resources.
      */
@@ -47,7 +47,7 @@ public class CommentsRemoverTest {
      * Test for removing of single-line comments from a DSL program.
      */
     @Test
-    public void testSingleLineCommentsRemove() {
+    void testSingleLineCommentsRemove() {
         final String expected = this.readTest("single_line_comments_expected.dsl");
         final String source = this.readTest("single_line_comments_source.dsl");
         final String actual = new CommentsRemover(source).remove();
@@ -61,7 +61,7 @@ public class CommentsRemoverTest {
      * Test for removing of multi-line comments from a DSL program.
      */
     @Test
-    public void testMultiLineCommentsRemove() {
+    void testMultiLineCommentsRemove() {
         final String expected = this.readTest("multi_line_comments_expected.dsl");
         final String source = this.readTest("multi_line_comments_source.dsl");
         final String actual = new CommentsRemover(source).remove();
@@ -75,7 +75,7 @@ public class CommentsRemoverTest {
      * Test for removing of comments from a DSL program that contains comment tokens in nodes data.
      */
     @Test
-    public void testCommentsRemoveWithCommentTokensInData() {
+    void testCommentsRemoveWithCommentTokensInData() {
         final String expected = this.readTest("tokens_in_data_expected.dsl");
         final String source = this.readTest("tokens_in_data_source.dsl");
         final String actual = new CommentsRemover(source).remove();

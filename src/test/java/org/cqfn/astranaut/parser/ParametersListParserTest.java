@@ -44,12 +44,12 @@ import org.junit.jupiter.api.Test;
  * @since 0.1.5
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class ParametersListParserTest {
+class ParametersListParserTest {
     /**
      * Test string contains one hole.
      */
     @Test
-    public void hole() {
+    void hole() {
         final Parameter parameter = this.extractOne("#1");
         Assertions.assertTrue(parameter instanceof Hole);
     }
@@ -58,7 +58,7 @@ public class ParametersListParserTest {
      * Test string contains simple name.
      */
     @Test
-    public void simpleName() {
+    void simpleName() {
         final Parameter parameter = this.extractOne("Expression");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }
@@ -67,7 +67,7 @@ public class ParametersListParserTest {
      * Test string contains tagged name.
      */
     @Test
-    public void taggedName() {
+    void taggedName() {
         final Parameter parameter = this.extractOne("left@Expression");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }
@@ -76,7 +76,7 @@ public class ParametersListParserTest {
      * Test string contains hole as a data.
      */
     @Test
-    public void holeAsData() {
+    void holeAsData() {
         final Parameter parameter = this.extractOne("literal<#1>");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }
@@ -85,7 +85,7 @@ public class ParametersListParserTest {
      * Test string contains string literal as a data.
      */
     @Test
-    public void stringData() {
+    void stringData() {
         final Parameter parameter = this.extractOne("literal<\"+\">");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }
@@ -94,7 +94,7 @@ public class ParametersListParserTest {
      * Test string contains empty data descriptor.
      */
     @Test
-    public void emptyData() {
+    void emptyData() {
         final String message = this.expectError("Test<>", EmptyDataLiteral.class);
         Assertions.assertEquals("Empty data literal: 'Test<>'", message);
     }
@@ -103,7 +103,7 @@ public class ParametersListParserTest {
      * Test string contains data descriptor with two entities.
      */
     @Test
-    public void twoDataEntities() {
+    void twoDataEntities() {
         final String message = this.expectError("Test<#1,#2>", ExpectedOnlyOneEntity.class);
         Assertions.assertEquals("Expected only one entity: 'Test<#1,#2>'", message);
     }
@@ -112,7 +112,7 @@ public class ParametersListParserTest {
      * Test string contains bad data descriptor.
      */
     @Test
-    public void badData() {
+    void badData() {
         final String message = this.expectError("Test<ABC>", ExpectedData.class);
         Assertions.assertEquals(
             "Expected a data: 'Test<#...>' or 'Test<\"...\">'",
@@ -124,7 +124,7 @@ public class ParametersListParserTest {
      * Test string contains descriptor with two parameters.
      */
     @Test
-    public void twoParameters() {
+    void twoParameters() {
         final Parameter parameter = this.extractOne("Addition(Expression, Expression)");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }
@@ -133,7 +133,7 @@ public class ParametersListParserTest {
      * Test string contains descriptor with three parameters.
      */
     @Test
-    public void threeParameters() {
+    void threeParameters() {
         final Parameter parameter = this.extractOne(
             "simpleExpression(#1, literal<\"+\">, #2)"
         );
@@ -144,7 +144,7 @@ public class ParametersListParserTest {
      * Test string contains optional descriptor.
      */
     @Test
-    public void optional() {
+    void optional() {
         final Parameter parameter = this.extractOne("[Expression]");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }
@@ -153,7 +153,7 @@ public class ParametersListParserTest {
      * Test string contains descriptor that is a list.
      */
     @Test
-    public void list() {
+    void list() {
         final Parameter parameter = this.extractOne("{Expression}");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }

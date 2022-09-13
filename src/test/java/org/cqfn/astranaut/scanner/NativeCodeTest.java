@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class NativeCodeTest {
+class NativeCodeTest {
     /**
      * Source string.
      */
@@ -48,7 +48,7 @@ public class NativeCodeTest {
      * Test scanner with string contains two identifiers.
      */
     @Test
-    public void nativeCode() {
+    void nativeCode() {
         final Scanner scanner = new Scanner(NativeCodeTest.SOURCE);
         Token token = null;
         boolean oops = false;

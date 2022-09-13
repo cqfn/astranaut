@@ -36,12 +36,12 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class InstructionParserTest {
+class InstructionParserTest {
     /**
      * Test parsed 2 instructions.
      */
     @Test
-    public void parseTwoInstructions() {
+    void parseTwoInstructions() {
         boolean oops = false;
         final Program program = new Program();
         final InstructionParser parser = new InstructionParser(program);

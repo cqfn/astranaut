@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class ListNodeGeneratorTest {
+class ListNodeGeneratorTest {
     /**
      * The folder with test resources.
      */
@@ -50,7 +50,7 @@ public class ListNodeGeneratorTest {
      * Testing source code generation for rules that describe nodes.
      */
     @Test
-    public void testNodeGeneration() {
+    void testNodeGeneration() {
         final Environment env = new TestEnvironment();
         final Instruction<Node> instruction = this.createInstruction();
         final ListNodeGenerator generator = new ListNodeGenerator(env, instruction);

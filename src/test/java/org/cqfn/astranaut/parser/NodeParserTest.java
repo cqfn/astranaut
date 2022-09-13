@@ -41,12 +41,12 @@ import org.junit.jupiter.api.Test;
  * @since 0.1.5
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class NodeParserTest {
+class NodeParserTest {
     /**
      * Test case: node with one child.
      */
     @Test
-    public void oneChild() {
+    void oneChild() {
         final boolean result = this.run("UnaryMinus <- Expression");
         Assertions.assertTrue(result);
     }
@@ -55,7 +55,7 @@ public class NodeParserTest {
      * Test case: node with two children.
      */
     @Test
-    public void twoChildren() {
+    void twoChildren() {
         final boolean result = this.run("Assignment <- LeftExpression, Expression");
         Assertions.assertTrue(result);
     }
@@ -64,7 +64,7 @@ public class NodeParserTest {
      * Test case: node with two children with tags.
      */
     @Test
-    public void twoChildrenWithTags() {
+    void twoChildrenWithTags() {
         final boolean result = this.run("Addition <- left@Epression, right@Expression");
         Assertions.assertTrue(result);
     }
@@ -73,7 +73,7 @@ public class NodeParserTest {
      * Test case: node name started with low case.
      */
     @Test
-    public void lowCaseError() {
+    void lowCaseError() {
         final boolean result = this.run(
             "unaryMinus <- expression",
             NodeNameCapitalLetter.class
@@ -85,7 +85,7 @@ public class NodeParserTest {
      * Test case: node with optional child.
      */
     @Test
-    public void optionalChild() {
+    void optionalChild() {
         final boolean result = this.run(
             "VariableDeclaration <- [type@Identifier], name@Identifier, [Expression]"
         );
@@ -96,7 +96,7 @@ public class NodeParserTest {
      * Test case: list node.
      */
     @Test
-    public void listNode() {
+    void listNode() {
         final boolean result = this.run("StatementList <- {Statement}");
         Assertions.assertTrue(result);
     }
@@ -105,7 +105,7 @@ public class NodeParserTest {
      * Test case: list node and other nodes.
      */
     @Test
-    public void listNodeAndOthers() {
+    void listNodeAndOthers() {
         final boolean result = this.run(
             "Something <- AAA, {BBB}",
             OnlyOneListDescriptor.class
@@ -117,7 +117,7 @@ public class NodeParserTest {
      * Test case: abstract node.
      */
     @Test
-    public void abstractNode() {
+    void abstractNode() {
         final boolean result = this.run(
             "Expression <- Addition | Subtraction | Multiplication | Division"
         );
@@ -128,7 +128,7 @@ public class NodeParserTest {
      * Test case: abstract node with extension.
      */
     @Test
-    public void abstractNodeWithExtension() {
+    void abstractNodeWithExtension() {
         final String source = "BinaryExpression <- & | Exponent";
         boolean oops = false;
         try {
@@ -152,7 +152,7 @@ public class NodeParserTest {
      * Test case: abstract node with several extensions.
      */
     @Test
-    public void abstractNodeWithExtensionException() {
+    void abstractNodeWithExtensionException() {
         final boolean result = this.run(
             "BinaryExpression <- & | Exponent | &"
         );
@@ -163,7 +163,7 @@ public class NodeParserTest {
      * Test case: prototype of an abstract node.
      */
     @Test
-    public void abstractNodePrototype() {
+    void abstractNodePrototype() {
         final boolean result = this.run(
             "Statement <- Return | 0"
         );
@@ -174,7 +174,7 @@ public class NodeParserTest {
      * Test case: empty node (no children and no data).
      */
     @Test
-    public void emptyNode() {
+    void emptyNode() {
         final boolean result = this.run(
             "This <- 0"
         );

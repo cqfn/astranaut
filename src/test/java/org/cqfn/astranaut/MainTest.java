@@ -40,7 +40,7 @@ import org.junit.jupiter.api.io.TempDir;
  *
  * @since 0.1.5
  */
-public class MainTest {
+class MainTest {
     /**
      * The action option as an argument example.
      */
@@ -81,7 +81,7 @@ public class MainTest {
      * @param source A temporary directory
      */
     @Test
-    public void testNoException(@TempDir final Path source) throws IOException {
+    void testNoException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
             MainTest.ACTION,
@@ -103,7 +103,7 @@ public class MainTest {
      * Test passing no option to main().
      */
     @Test
-    public void testWithException() {
+    void testWithException() {
         final String[] example = {};
         boolean caught = false;
         try {
@@ -118,7 +118,7 @@ public class MainTest {
      * Test passing the {@code --action} option with no parameters to main().
      */
     @Test
-    public void testActionWithoutParameters() {
+    void testActionWithoutParameters() {
         final String[] example = {
             MainTest.ACTION,
         };
@@ -138,7 +138,7 @@ public class MainTest {
      * Test passing the {@code --action} option with wrong argument.
      */
     @Test
-    public void testActionWithWrongArgument() {
+    void testActionWithWrongArgument() {
         final String[] example = {
             MainTest.ACTION,
             "exterminate",
@@ -162,7 +162,7 @@ public class MainTest {
      * Test passing the {@code --rules} option with no parameters to main().
      */
     @Test
-    public void testRulesWithoutParameters() {
+    void testRulesWithoutParameters() {
         final String[] example = {
             MainTest.ACTION,
             MainTest.GENERATE,
@@ -186,7 +186,7 @@ public class MainTest {
      * @param source A temporary directory
      */
     @Test
-    public void testConvertWithoutSource(@TempDir final Path source) throws IOException {
+    void testConvertWithoutSource(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
             MainTest.ACTION,

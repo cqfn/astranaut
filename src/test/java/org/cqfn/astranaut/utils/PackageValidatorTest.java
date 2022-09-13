@@ -42,7 +42,7 @@ import org.junit.jupiter.api.io.TempDir;
  *
  * @since 0.1.5
  */
-public class PackageValidatorTest {
+class PackageValidatorTest {
     /**
      * The action option as an argument example.
      */
@@ -75,7 +75,7 @@ public class PackageValidatorTest {
      * @param source A temporary directory
      */
     @Test
-    public void testPackageOptionNoException(@TempDir final Path source) throws IOException {
+    void testPackageOptionNoException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
             PackageValidatorTest.ACTION,
@@ -102,7 +102,7 @@ public class PackageValidatorTest {
      * @param source A temporary directory
      */
     @Test
-    public void testPackageOptionWithException(@TempDir final Path source) throws IOException {
+    void testPackageOptionWithException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
             PackageValidatorTest.ACTION,
@@ -128,7 +128,7 @@ public class PackageValidatorTest {
      * @param source A temporary directory
      */
     @Test
-    public void testPackageOptionWithoutParameter(@TempDir final Path source) throws IOException {
+    void testPackageOptionWithoutParameter(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
             PackageValidatorTest.ACTION,
