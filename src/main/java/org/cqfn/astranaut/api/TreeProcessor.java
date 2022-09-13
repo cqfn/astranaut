@@ -28,14 +28,14 @@ import java.util.LinkedList;
 import java.util.List;
 import org.cqfn.astranaut.core.EmptyTree;
 import org.cqfn.astranaut.core.Node;
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 import org.cqfn.astranaut.interpreter.Adapter;
 import org.cqfn.astranaut.parser.ProgramParser;
 import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Program;
 import org.cqfn.astranaut.rules.Transformation;
-import org.cqfn.astranaut.utils.FilesReader;
 
 /**
  * API for a tree processing.

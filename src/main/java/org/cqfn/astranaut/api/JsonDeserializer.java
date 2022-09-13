@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.api;
 
+import java.util.Collections;
+import org.cqfn.astranaut.core.Factory;
 import org.cqfn.astranaut.core.Node;
 
 /**
@@ -49,8 +51,10 @@ public class JsonDeserializer {
      * @return Root node of the created tree
      */
     public Node deserialize() {
-        final org.cqfn.astranaut.handlers.json.JsonDeserializer deserializer =
-            new org.cqfn.astranaut.handlers.json.JsonDeserializer(this.source);
+        final org.cqfn.astranaut.core.utils.JsonDeserializer deserializer =
+            new org.cqfn.astranaut.core.utils.JsonDeserializer(
+                this.source, language -> new Factory(Collections.emptyMap())
+            );
         return deserializer.convert();
     }
 }

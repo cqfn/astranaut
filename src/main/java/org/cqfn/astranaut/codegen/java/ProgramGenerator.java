@@ -26,13 +26,13 @@ package org.cqfn.astranaut.codegen.java;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;
+import org.cqfn.astranaut.core.utils.FilesWriter;
 import org.cqfn.astranaut.exceptions.GeneratorCouldNotWriteFile;
 import org.cqfn.astranaut.exceptions.GeneratorException;
 import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Node;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.utils.FilesWriter;
 
 /**
  * Generates source code for the whole DSL program.

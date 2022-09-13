@@ -24,7 +24,7 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.io.IOException;
-import org.cqfn.astranaut.utils.FilesReader;
+import org.cqfn.astranaut.core.utils.FilesReader;
 
 /**
  * The header that contains license.

@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.exceptions;
 
+import org.cqfn.astranaut.core.exceptions.BaseException;
+
 /**
  * Exception thrown by the visualizer.
  *

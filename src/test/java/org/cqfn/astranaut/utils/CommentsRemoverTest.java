@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.utils;
 
 import java.io.IOException;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
