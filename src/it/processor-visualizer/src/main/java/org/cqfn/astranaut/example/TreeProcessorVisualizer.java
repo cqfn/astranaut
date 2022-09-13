@@ -28,9 +28,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.cqfn.astranaut.api.TreeProcessor;
 import org.cqfn.astranaut.api.TreeVisualizer;
-import org.cqfn.astranaut.base.DraftNode;
-import org.cqfn.astranaut.base.Node;
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.DraftNode;
+import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.exceptions.WrongFileExtension;
+import org.cqfn.astranaut.exceptions.ProcessorException;
 
 /**
  * Sample class.
@@ -40,10 +41,12 @@ public class TreeProcessorVisualizer {
     /**
      * The main function.
      * @param args The command-line arguments
-     * @throws BaseException If fails
-     * @throws IOException If fails
+     * @throws ProcessorException If loading DSL rules fails
+     * @throws WrongFileExtension If visualization fails
+     * @throws IOException If an error during input or output actions occurs
      */
-    public static void main(final String... args) throws BaseException, IOException {
+    public static void main(final String... args)
+        throws IOException, WrongFileExtension, ProcessorException {
         final Node tree = createSampleTree();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRules("Data/rules.txt");
