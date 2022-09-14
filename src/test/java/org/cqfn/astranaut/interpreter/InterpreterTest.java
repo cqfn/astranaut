@@ -122,7 +122,7 @@ class InterpreterTest {
      */
     @Test
     void cannotWriteToJsonFileTest() {
-        final String path = "*wrong_path.json";
+        final String path = File.separator;
         final Interpreter interpreter = this.createInterpreter(
             "src/test/resources/interpreter/test_1_source_tree.json",
             new File(path)
