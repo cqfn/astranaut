@@ -23,8 +23,11 @@
  */
 package org.cqfn.astranaut.interpreter;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.cqfn.astranaut.core.Builder;
 import org.cqfn.astranaut.core.EmptyTree;
 import org.cqfn.astranaut.core.Factory;
@@ -81,6 +84,19 @@ public class Creator {
             }
         } else {
             result = this.createFromOrdinaryDescriptor(factory, children, data);
+        }
+        return result;
+    }
+
+    /**
+     * Returns the list of nested creators.
+     * @return The list of nested creators or an empty list if all the elements are null
+     */
+    public List<Creator> getSubs() {
+        final boolean empty = Arrays.stream(this.subs).allMatch(Objects::isNull);
+        List<Creator> result = Collections.emptyList();
+        if (!empty) {
+            result = Collections.unmodifiableList(Arrays.asList(this.subs));
         }
         return result;
     }

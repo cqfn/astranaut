@@ -24,8 +24,6 @@
 package org.cqfn.astranaut.interpreter;
 
 import java.io.File;
-import java.util.Collections;
-import org.cqfn.astranaut.core.Factory;
 import org.cqfn.astranaut.core.Node;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.core.utils.JsonDeserializer;
@@ -96,7 +94,7 @@ public class Interpreter {
                         }
                     }
             ),
-            language -> new Factory(Collections.emptyMap())
+            language -> Factory.INSTANCE
         ).convert();
         final Adapter adapter = new Adapter(this.program.getTransformations());
         final Node processed = adapter.convert(unprocessed);
