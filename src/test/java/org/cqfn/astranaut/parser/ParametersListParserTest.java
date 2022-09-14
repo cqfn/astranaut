@@ -27,7 +27,9 @@ package org.cqfn.astranaut.parser;
 import java.util.Collections;
 import java.util.List;
 import org.cqfn.astranaut.exceptions.EmptyDataLiteral;
+import org.cqfn.astranaut.exceptions.ExpectedComma;
 import org.cqfn.astranaut.exceptions.ExpectedData;
+import org.cqfn.astranaut.exceptions.ExpectedDescriptor;
 import org.cqfn.astranaut.exceptions.ExpectedOnlyOneEntity;
 import org.cqfn.astranaut.exceptions.ParserException;
 import org.cqfn.astranaut.rules.Descriptor;
@@ -61,6 +63,33 @@ class ParametersListParserTest {
     void simpleName() {
         final Parameter parameter = this.extractOne("Expression");
         Assertions.assertTrue(parameter instanceof Descriptor);
+    }
+
+    /**
+     * Test string contains optional name.
+     */
+    @Test
+    void optionalName() {
+        final Parameter parameter = this.extractOne("[Expression]");
+        Assertions.assertTrue(parameter instanceof Descriptor);
+    }
+
+    /**
+     * Test string contains optional descriptors not separated by a comma.
+     */
+    @Test
+    void optionalNotSeparated() {
+        final String message = this.expectError("[A] [B]", ExpectedComma.class);
+        Assertions.assertEquals("Expected a comma after the token: '[A]'", message);
+    }
+
+    /**
+     * Test string contains square brackets but without descriptor.
+     */
+    @Test
+    void optionalDescriptorExpected() {
+        final String message = this.expectError("[ ]", ExpectedDescriptor.class);
+        Assertions.assertEquals("Expected a descriptor: '[...]'", message);
     }
 
     /**
