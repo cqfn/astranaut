@@ -23,11 +23,16 @@
  */
 package org.cqfn.astranaut.interpreter;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import org.cqfn.astranaut.Main;
 import org.cqfn.astranaut.core.exceptions.BaseException;
 import org.cqfn.astranaut.core.utils.FilesReader;
+import org.cqfn.astranaut.exceptions.DestinationNotSpecified;
+import org.cqfn.astranaut.exceptions.InterpreterException;
+import org.cqfn.astranaut.parser.ProgramParser;
+import org.cqfn.astranaut.rules.Program;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -56,6 +61,83 @@ class InterpreterTest {
     void ellipsisTest(@TempDir final Path temp) {
         final boolean result = this.test("test_1", temp);
         Assertions.assertTrue(result);
+    }
+
+    /**
+     * Testing removing parent of subtree.
+     * @param temp A temporary directory
+     */
+    @Test
+    void removeParentTest(@TempDir final Path temp) {
+        final boolean result = this.test("test_2", temp);
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Testing running interpreter without a destination specified.
+     */
+    @Test
+    void notSpecifiedDestinationTest() {
+        final Interpreter interpreter = this.createInterpreter(
+            "rules.dsl",
+            null
+        );
+        Exception result = null;
+        try {
+            interpreter.run();
+        } catch (final InterpreterException exception) {
+            result = exception;
+        }
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(DestinationNotSpecified.INSTANCE, result);
+    }
+
+    /**
+     * Testing the exception that occurs when the interpreter cannot read
+     * the specified JSON file with a syntax tree, because the path to file is wrong.
+     */
+    @Test
+    void cannotReadJsonFileTest() {
+        final String path = "wrong_path.json";
+        final Interpreter interpreter = this.createInterpreter(
+            path,
+            new File("result.json")
+        );
+        String result = "";
+        try {
+            interpreter.run();
+        } catch (final InterpreterException exception) {
+            result = exception.getErrorMessage();
+        }
+        Assertions.assertNotNull(result);
+        final String message = String.format(
+            "Could not read the file that contains source syntax tree: %s", path
+        );
+        Assertions.assertEquals(message, result);
+    }
+
+    /**
+     * Testing the exception that occurs when the interpreter cannot read
+     * the specified JSON file with a syntax tree, because the path to file is wrong.
+     */
+    @Test
+    void cannotWriteToJsonFileTest() {
+        final String path = "*wrong_path.json";
+        final Interpreter interpreter = this.createInterpreter(
+            "src/test/resources/interpreter/test_1_source_tree.json",
+            new File(path)
+        );
+        String result = "";
+        try {
+            interpreter.run();
+        } catch (final InterpreterException exception) {
+            result = exception.getErrorMessage();
+        }
+        Assertions.assertNotNull(result);
+        final String message = String.format(
+            "Could not write file: '%s'", path
+        );
+        Assertions.assertEquals(message, result);
     }
 
     /**
@@ -93,5 +175,29 @@ class InterpreterTest {
         }
         Assertions.assertFalse(oops);
         return result;
+    }
+
+    /**
+     * Creates an interpreter instance for testing exceptions thrown by the interpreter.
+     * @param source The path to the source JSON file
+     * @param target The target JSON file
+     * @return New interpreter instance
+     */
+    private Interpreter createInterpreter(final String source, final File target) {
+        boolean oops = false;
+        Program program = null;
+        try {
+            final ProgramParser parser = new ProgramParser("X(Y<\"2\">) -> Z");
+            program = parser.parse();
+        } catch (final BaseException ignore) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        Assertions.assertNotNull(program);
+        return new Interpreter(
+            new File(source),
+            target,
+            program
+        );
     }
 }
