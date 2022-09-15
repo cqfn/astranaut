@@ -26,11 +26,13 @@ package org.cqfn.astranaut.parser;
 
 import java.util.Collections;
 import java.util.List;
+import org.cqfn.astranaut.exceptions.CantParseSequence;
 import org.cqfn.astranaut.exceptions.EmptyDataLiteral;
 import org.cqfn.astranaut.exceptions.ExpectedComma;
 import org.cqfn.astranaut.exceptions.ExpectedData;
 import org.cqfn.astranaut.exceptions.ExpectedDescriptor;
 import org.cqfn.astranaut.exceptions.ExpectedOnlyOneEntity;
+import org.cqfn.astranaut.exceptions.IncorrectUseOfBrackets;
 import org.cqfn.astranaut.exceptions.ParserException;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.Hole;
@@ -66,15 +68,6 @@ class ParametersListParserTest {
     }
 
     /**
-     * Test string contains optional name.
-     */
-    @Test
-    void optionalName() {
-        final Parameter parameter = this.extractOne("[Expression]");
-        Assertions.assertTrue(parameter instanceof Descriptor);
-    }
-
-    /**
      * Test string contains optional descriptors not separated by a comma.
      */
     @Test
@@ -84,12 +77,30 @@ class ParametersListParserTest {
     }
 
     /**
+     * Test string contains descriptors with incorrect brackets.
+     */
+    @Test
+    void incorrectBrackets() {
+        final String message = this.expectError("[A], <B>", IncorrectUseOfBrackets.class);
+        Assertions.assertEquals("Incorrect use of brackets", message);
+    }
+
+    /**
      * Test string contains square brackets but without descriptor.
      */
     @Test
     void optionalDescriptorExpected() {
         final String message = this.expectError("[ ]", ExpectedDescriptor.class);
         Assertions.assertEquals("Expected a descriptor: '[...]'", message);
+    }
+
+    /**
+     * Test string contains square brackets but without descriptor.
+     */
+    @Test
+    void unknownTokenSequence() {
+        final String message = this.expectError("Integer<\"1\"><\"2\">", CantParseSequence.class);
+        Assertions.assertEquals("Can't parse tokens sequence: 'Integer<\"1\"><\"2\">'", message);
     }
 
     /**
