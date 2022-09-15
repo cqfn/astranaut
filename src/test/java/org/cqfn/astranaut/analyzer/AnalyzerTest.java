@@ -28,14 +28,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.DuplicateRule;
+import org.cqfn.astranaut.exceptions.ExtendedNodeNotFound;
 import org.cqfn.astranaut.exceptions.GeneratorException;
 import org.cqfn.astranaut.parser.ProgramParser;
 import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Program;
 import org.cqfn.astranaut.rules.Vertex;
-import org.cqfn.astranaut.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -626,6 +627,42 @@ class AnalyzerTest {
             oops = true;
         }
         Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test exception that occurs if a green node that is extended in rules of another language
+     * is not found.
+     */
+    @Test
+    void testExtendedNodeNotFoundException() {
+        boolean oops = false;
+        Program program = null;
+        try {
+            final String source = this.readTest("extended_not_found.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            program = parser.parse();
+        } catch (final BaseException exception) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        Analyzer analyzer = null;
+        Exception thrown = null;
+        try {
+            final List<Instruction<Vertex>> vertices = program.getVertices();
+            final VertexStorage storage = new VertexStorage(
+                vertices, program.getNamesOfAllLanguages()
+            );
+            storage.collectAndCheck();
+            analyzer = new Analyzer(storage);
+            analyzer.analyzeGreen();
+            for (final String language : program.getNamesOfAllLanguages()) {
+                analyzer.analyze(language);
+            }
+        } catch (final GeneratorException exception) {
+            thrown = exception;
+        }
+        Assertions.assertNotNull(thrown);
+        Assertions.assertTrue(thrown instanceof ExtendedNodeNotFound);
     }
 
     /**

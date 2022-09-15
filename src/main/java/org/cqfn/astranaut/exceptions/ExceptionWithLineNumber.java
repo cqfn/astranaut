@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.exceptions;
 
+import org.cqfn.astranaut.core.exceptions.BaseException;
+
 /**
  * Exception with line number, wraps another exception.
  *

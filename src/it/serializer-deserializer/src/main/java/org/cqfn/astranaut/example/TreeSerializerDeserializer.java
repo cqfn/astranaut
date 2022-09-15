@@ -26,12 +26,12 @@ package org.cqfn.astranaut.example;
 import java.util.Arrays;
 import org.cqfn.astranaut.api.JsonDeserializer;
 import org.cqfn.astranaut.api.JsonSerializer;
-import org.cqfn.astranaut.base.DraftNode;
-import org.cqfn.astranaut.base.Node;
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.DraftNode;
+import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.ProcessorCouldNotWriteFile;
 import org.cqfn.astranaut.exceptions.ProcessorException;
-import org.cqfn.astranaut.utils.FilesReader;
 
 /**
  * Sample class.
@@ -42,7 +42,6 @@ public class TreeSerializerDeserializer {
      * The main function.
      * @param args The command-line arguments
      * @throws BaseException If fails
-     * @throws IOException If fails
      */
     public static void main(final String... args) throws BaseException {
         final Node tree = createSampleTree();

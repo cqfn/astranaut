@@ -30,7 +30,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import org.cqfn.astranaut.Main;
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.exceptions.BaseException;
 import org.cqfn.astranaut.utils.cli.RulesFileConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

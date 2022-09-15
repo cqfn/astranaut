@@ -25,10 +25,10 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.io.IOException;
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.parser.ProgramParser;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

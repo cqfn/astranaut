@@ -23,7 +23,7 @@
  */
 package org.cqfn.astranaut.parser;
 
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.exceptions.BaseException;
 import org.cqfn.astranaut.exceptions.ExceptionWithLineNumber;
 import org.cqfn.astranaut.exceptions.ParserException;
 import org.cqfn.astranaut.rules.Program;

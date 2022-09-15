@@ -25,14 +25,14 @@ package org.cqfn.astranaut.interpreter;
 
 import java.io.File;
 import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.utils.FilesReader;
+import org.cqfn.astranaut.core.utils.JsonDeserializer;
+import org.cqfn.astranaut.core.utils.JsonSerializer;
 import org.cqfn.astranaut.exceptions.DestinationNotSpecified;
 import org.cqfn.astranaut.exceptions.InterpreterCouldNotWriteFile;
 import org.cqfn.astranaut.exceptions.InterpreterException;
 import org.cqfn.astranaut.exceptions.SourceNotSpecified;
-import org.cqfn.astranaut.handlers.json.JsonDeserializer;
-import org.cqfn.astranaut.handlers.json.JsonSerializer;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.utils.FilesReader;
 
 /**
  * The interpreter that loads the syntax tree in Json format,
@@ -93,7 +93,8 @@ public class Interpreter {
                             );
                         }
                     }
-            )
+            ),
+            language -> Factory.INSTANCE
         ).convert();
         final Adapter adapter = new Adapter(this.program.getTransformations());
         final Node processed = adapter.convert(unprocessed);

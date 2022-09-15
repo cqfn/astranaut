@@ -24,9 +24,13 @@
 package org.cqfn.astranaut.parser;
 
 import java.util.List;
+import org.cqfn.astranaut.exceptions.ExpectedIdentifierAfterAt;
+import org.cqfn.astranaut.exceptions.ExpectedSimpleIdentifier;
+import org.cqfn.astranaut.exceptions.ExpectedTaggedName;
 import org.cqfn.astranaut.exceptions.NodeNameCapitalLetter;
 import org.cqfn.astranaut.exceptions.OnlyOneListDescriptor;
 import org.cqfn.astranaut.exceptions.ParserException;
+import org.cqfn.astranaut.exceptions.RuleCantContainHoles;
 import org.cqfn.astranaut.rules.Child;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.DescriptorAttribute;
@@ -177,6 +181,66 @@ class NodeParserTest {
     void emptyNode() {
         final boolean result = this.run(
             "This <- 0"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: non-abstract node name starts with low case.
+     */
+    @Test
+    void notCapitalizedName() {
+        final boolean result = this.run(
+            "Addition <- expression, expression",
+            NodeNameCapitalLetter.class
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: children with data.
+     */
+    @Test
+    void nameWithData() {
+        final boolean result = this.run(
+            "Addition <- Expression<\"1\">, Expression<\"2\">",
+            ExpectedTaggedName.class
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: children with data.
+     */
+    @Test
+    void holeAsChild() {
+        final boolean result = this.run(
+            "Addition <- #1, Expression",
+            RuleCantContainHoles.class
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: descendant of abstract node is nor a simple identifier.
+     */
+    @Test
+    void notSimpleNameInAbstractNode() {
+        final boolean result = this.run(
+            "Expression <- Addition<\"+\"> | Subtraction",
+            ExpectedSimpleIdentifier.class
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: identifier after '@' in tagged name is missed.
+     */
+    @Test
+    void missedIdentifierAfterAtSign() {
+        final boolean result = this.run(
+            "Addition <- left@Expressint, right@",
+            ExpectedIdentifierAfterAt.class
         );
         Assertions.assertTrue(result);
     }

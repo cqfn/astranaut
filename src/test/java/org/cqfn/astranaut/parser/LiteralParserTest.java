@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.parser;
 
+import org.cqfn.astranaut.exceptions.ExpectedNativeLiteral;
 import org.cqfn.astranaut.exceptions.ExpectedThreeOrFourParameters;
 import org.cqfn.astranaut.exceptions.ParserException;
 import org.cqfn.astranaut.rules.Literal;
@@ -57,6 +58,18 @@ class LiteralParserTest {
     void integerLiteralWithException() {
         final boolean result =
             this.run(LiteralParserTest.SOURCE.concat(", $NumberFormatException$"));
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: integer literal with unexpected token.
+     */
+    @Test
+    void nativeLiteralException() {
+        final boolean result = this.run(
+            LiteralParserTest.SOURCE.concat(", String"),
+            ExpectedNativeLiteral.class
+        );
         Assertions.assertTrue(result);
     }
 

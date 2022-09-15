@@ -50,8 +50,8 @@ public class JsonSerializer {
      * @return The tree represented as a string
      */
     public String serializeToJsonString() {
-        final org.cqfn.astranaut.handlers.json.JsonSerializer serializer =
-            new org.cqfn.astranaut.handlers.json.JsonSerializer(this.tree);
+        final org.cqfn.astranaut.core.utils.JsonSerializer serializer =
+            new org.cqfn.astranaut.core.utils.JsonSerializer(this.tree);
         return serializer.serialize();
     }
 
@@ -63,8 +63,8 @@ public class JsonSerializer {
      */
     public void serializeToJsonFile(final String filename)
         throws ProcessorCouldNotWriteFile {
-        final org.cqfn.astranaut.handlers.json.JsonSerializer serializer =
-            new org.cqfn.astranaut.handlers.json.JsonSerializer(this.tree);
+        final org.cqfn.astranaut.core.utils.JsonSerializer serializer =
+            new org.cqfn.astranaut.core.utils.JsonSerializer(this.tree);
         if (!serializer.serializeToFile(filename)) {
             throw new ProcessorCouldNotWriteFile(filename);
         }

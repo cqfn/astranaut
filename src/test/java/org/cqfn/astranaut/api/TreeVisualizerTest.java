@@ -30,7 +30,7 @@ import java.util.Arrays;
 import org.cqfn.astranaut.core.DraftNode;
 import org.cqfn.astranaut.core.EmptyTree;
 import org.cqfn.astranaut.core.Node;
-import org.cqfn.astranaut.exceptions.VisualizerException;
+import org.cqfn.astranaut.core.exceptions.WrongFileExtension;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -56,7 +56,7 @@ class TreeVisualizerTest {
         boolean oops = false;
         try {
             visualizer.visualize(new File(img.toString()));
-        } catch (final VisualizerException | IOException exception) {
+        } catch (final WrongFileExtension | IOException exception) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -74,7 +74,7 @@ class TreeVisualizerTest {
         boolean oops = false;
         try {
             visualizer.visualize(new File(img.toString()));
-        } catch (final VisualizerException | IOException exception) {
+        } catch (final WrongFileExtension | IOException exception) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -95,7 +95,7 @@ class TreeVisualizerTest {
         boolean oops = false;
         try {
             visualizer.visualize(new File(img.toString()));
-        } catch (final VisualizerException | IOException exception) {
+        } catch (final WrongFileExtension | IOException exception) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -122,7 +122,7 @@ class TreeVisualizerTest {
         boolean oops = false;
         try {
             visualizer.visualize(new File(img.toString()));
-        } catch (final VisualizerException | IOException exception) {
+        } catch (final WrongFileExtension | IOException exception) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -142,7 +142,7 @@ class TreeVisualizerTest {
         boolean oops = false;
         try {
             visualizer.visualize(new File(img.toString()));
-        } catch (final VisualizerException | IOException exception) {
+        } catch (final WrongFileExtension | IOException exception) {
             oops = true;
         }
         Assertions.assertTrue(oops);
