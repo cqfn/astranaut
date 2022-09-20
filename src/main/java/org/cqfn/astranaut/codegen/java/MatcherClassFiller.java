@@ -219,7 +219,7 @@ public class MatcherClassFiller {
             )
         );
         this.klass.addField(type);
-        if (!this.descriptor.hasEllipsisHole()) {
+        if (!this.descriptor.hasEllipsisOrTypedHole()) {
             final Field count = new Field(
                 "Expected number of child nodes",
                 MatcherClassFiller.TYPE_INT,
@@ -266,7 +266,7 @@ public class MatcherClassFiller {
         final String name = this.klass.getName();
         int count = 1;
         String common = String.format("node.belongsToGroup(%s.EXPECTED_TYPE)", name);
-        if (!this.descriptor.hasEllipsisHole()) {
+        if (!this.descriptor.hasEllipsisOrTypedHole()) {
             common = common.concat(
                 String.format("\n\t&& node.getChildCount() == %s.EXPECTED_COUNT", name)
             );

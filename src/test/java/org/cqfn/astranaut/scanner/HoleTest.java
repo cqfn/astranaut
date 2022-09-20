@@ -65,6 +65,11 @@ class HoleTest {
     private static final String WRONG_ELLIPSIS = "#0..,";
 
     /**
+     * Source string (with type, correct).
+     */
+    private static final String TYPE_CORRECT = "Modifier#0";
+
+    /**
      * Test scanner with hole marker.
      */
     @Test
@@ -128,5 +133,23 @@ class HoleTest {
             oops = true;
         }
         Assertions.assertTrue(oops);
+    }
+
+    /**
+     * Test scanner with incorrect hole marker that contains "bad" ellipsis.
+     */
+    @Test
+    void correctHoleMarkerWithType() {
+        final Scanner scanner = new Scanner(HoleTest.TYPE_CORRECT);
+        Token token = null;
+        boolean oops = false;
+        try {
+            token = scanner.getToken();
+            Assertions.assertTrue(token instanceof HoleMarker);
+            Assertions.assertEquals(token.toString(), HoleTest.TYPE_CORRECT);
+        } catch (final ParserException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }

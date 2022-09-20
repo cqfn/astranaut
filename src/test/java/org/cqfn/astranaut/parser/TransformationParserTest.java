@@ -72,6 +72,21 @@ class TransformationParserTest {
     }
 
     /**
+     * Test case: transformation with a variable size children list of same type.
+     */
+    @Test
+    void variableChildrenSizeTransformation() {
+        final boolean result = this.run(
+            String.format(
+                "%s -> %s",
+                "MethodDeclaration(Modifier#1, SimpleName, ClassType, Parameter#2)",
+                "MethodDeclaration(ModifierBlock(#1), SimpleName, ClassType, ParamBlock(#2))"
+            )
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
      * Test case: DSL line with exception.
      */
     @Test

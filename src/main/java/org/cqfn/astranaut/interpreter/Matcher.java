@@ -83,7 +83,7 @@ public final class Matcher implements org.cqfn.astranaut.core.Matcher {
      */
     private boolean checkChildCount(final Node node) {
         final boolean result;
-        if (this.descriptor.hasEllipsisHole()) {
+        if (this.descriptor.hasEllipsisOrTypedHole()) {
             result = true;
         } else {
             result = node.getChildCount() == this.descriptor.getParameters().size();
@@ -125,24 +125,9 @@ public final class Matcher implements org.cqfn.astranaut.core.Matcher {
         for (final Parameter parameter : this.descriptor.getParameters()) {
             if (parameter instanceof Hole) {
                 final Hole hole = (Hole) parameter;
-                switch (hole.getAttribute()) {
-                    case NONE:
-                        children.put(
-                            hole.getValue(),
-                            Collections.singletonList(node.getChild(index))
-                        );
-                        break;
-                    case ELLIPSIS:
-                        final int count = node.getChildCount();
-                        final List<Node> list = new ArrayList<>(count - index);
-                        for (int position = index; position < count; position += 1) {
-                            list.add(node.getChild(position));
-                        }
-                        children.put(hole.getValue(), list);
-                        break;
-                    default:
-                        break;
-                }
+                final List<Node> list = Matcher.checkAndExtractChildrenFromHole(hole, node, index);
+                children.put(hole.getValue(), list);
+                index = index + list.size();
             } else if (parameter instanceof Descriptor) {
                 final Matcher matcher;
                 if (this.subs[index] == null) {
@@ -155,9 +140,48 @@ public final class Matcher implements org.cqfn.astranaut.core.Matcher {
                 if (!result) {
                     break;
                 }
+                index = index + 1;
             }
-            index = index + 1;
         }
         return result;
+    }
+
+    /**
+     * Checks if the child nodes matches a hole, extracts the children.
+     * @param hole The hole
+     * @param node The node
+     * @param index The index of a child
+     * @return The list of extracted children
+     */
+    private static List<Node> checkAndExtractChildrenFromHole(
+        final Hole hole,
+        final Node node,
+        final int index) {
+        List<Node> list = null;
+        switch (hole.getAttribute()) {
+            case NONE:
+                list = Collections.singletonList(node.getChild(index));
+                break;
+            case ELLIPSIS:
+                final int count = node.getChildCount();
+                list = new ArrayList<>(count - index);
+                for (int position = index; position < count; position += 1) {
+                    list.add(node.getChild(position));
+                }
+                break;
+            case TYPED:
+                final int number = node.getChildCount();
+                list = new ArrayList<>(number - index);
+                for (int position = index; position < number; position += 1) {
+                    final Node child = node.getChild(position);
+                    if (hole.getType().equals(child.getTypeName())) {
+                        list.add(child);
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        return list;
     }
 }
