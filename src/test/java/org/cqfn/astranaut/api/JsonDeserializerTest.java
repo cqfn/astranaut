@@ -23,9 +23,9 @@
  */
 package org.cqfn.astranaut.api;
 
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.ProcessorException;
-import org.cqfn.astranaut.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.2
  */
-public class JsonDeserializerTest {
+class JsonDeserializerTest {
     /**
      * The type IntegerLiteral.
      */
@@ -49,7 +49,7 @@ public class JsonDeserializerTest {
      * Test for a tree deserialization from a JSON string.
      */
     @Test
-    public void testDeserialization() {
+    void testDeserialization() {
         final String file = JsonDeserializerTest.TESTS_PATH.concat("test_3_source.json");
         boolean oops = false;
         String source = "";

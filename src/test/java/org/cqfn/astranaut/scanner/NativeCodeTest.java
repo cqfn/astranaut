@@ -25,6 +25,7 @@
 package org.cqfn.astranaut.scanner;
 
 import org.cqfn.astranaut.exceptions.ParserException;
+import org.cqfn.astranaut.exceptions.UnclosedNativeCode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +34,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class NativeCodeTest {
+class NativeCodeTest {
     /**
      * Source string.
      */
@@ -48,7 +49,7 @@ public class NativeCodeTest {
      * Test scanner with string contains two identifiers.
      */
     @Test
-    public void nativeCode() {
+    void nativeCode() {
         final Scanner scanner = new Scanner(NativeCodeTest.SOURCE);
         Token token = null;
         boolean oops = false;
@@ -62,5 +63,21 @@ public class NativeCodeTest {
             oops = true;
         }
         Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Test scanner with string that contains unclosed native code.
+     */
+    @Test
+    void unclosedNativeCode() {
+        final Scanner scanner = new Scanner("$String.valueOf(#)");
+        Exception thrown = null;
+        try {
+            scanner.getToken();
+        } catch (final ParserException exception) {
+            thrown = exception;
+        }
+        Assertions.assertNotNull(thrown);
+        Assertions.assertTrue(thrown instanceof UnclosedNativeCode);
     }
 }

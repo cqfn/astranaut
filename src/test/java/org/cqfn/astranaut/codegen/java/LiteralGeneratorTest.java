@@ -25,12 +25,12 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.io.IOException;
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.parser.ProgramParser;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.rules.Statement;
-import org.cqfn.astranaut.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class LiteralGeneratorTest {
+class LiteralGeneratorTest {
     /**
      * The folder with test resources.
      */
@@ -49,21 +49,20 @@ public class LiteralGeneratorTest {
      * Testing source code generation for rules that describe literals.
      */
     @Test
-    @SuppressWarnings("PMD.CloseResource")
-    public void testLiteralGeneration() {
+    void testLiteralGeneration() {
         final Environment env = new TestEnvironment();
-        final Statement<Literal> statement = this.createStatement();
-        final LiteralGenerator generator = new LiteralGenerator(env, statement);
+        final Instruction<Literal> instruction = this.createInstruction();
+        final LiteralGenerator generator = new LiteralGenerator(env, instruction);
         final String actual = generator.generate().generate();
         final String expected = this.readTest("literal_generator.txt");
         Assertions.assertEquals(expected, actual);
     }
 
     /**
-     * Creates DSL statement.
-     * @return DSL statement
+     * Creates DSL instruction.
+     * @return DSL instruction
      */
-    private Statement<Literal> createStatement() {
+    private Instruction<Literal> createInstruction() {
         boolean oops = false;
         final String source =
             "IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$, $Exception$";

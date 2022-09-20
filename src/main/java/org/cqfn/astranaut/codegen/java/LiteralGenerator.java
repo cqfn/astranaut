@@ -24,8 +24,8 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.List;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Literal;
-import org.cqfn.astranaut.rules.Statement;
 
 /**
  * Generates source code for rules that describe literals.
@@ -34,29 +34,29 @@ import org.cqfn.astranaut.rules.Statement;
  */
 final class LiteralGenerator extends BaseGenerator {
     /**
-     * The DSL statement.
+     * The DSL instruction.
      */
-    private final Statement<Literal> statement;
+    private final Instruction<Literal> instruction;
 
     /**
      * Constructor.
      * @param env The environment required for generation.
-     * @param statement The DSL statement
+     * @param instruction The DSL instruction
      */
-    LiteralGenerator(final Environment env, final Statement<Literal> statement) {
+    LiteralGenerator(final Environment env, final Instruction<Literal> instruction) {
         super(env);
-        this.statement = statement;
+        this.instruction = instruction;
     }
 
     @Override
     public CompilationUnit generate() {
         final Environment env = this.getEnv();
-        final Literal rule = this.statement.getRule();
+        final Literal rule = this.instruction.getRule();
         final Klass klass = this.createClass(rule);
         new LiteralClassConstructor(env, rule, klass).run();
-        final String pkg = this.getPackageName(this.statement.getLanguage());
+        final String pkg = this.getPackageName(this.instruction.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
-        this.generateImports(unit);
+        LiteralGenerator.generateImports(unit);
         return unit;
     }
 
@@ -85,14 +85,14 @@ final class LiteralGenerator extends BaseGenerator {
      * Generates imports block.
      * @param unit The compilation unit
      */
-    private void generateImports(final CompilationUnit unit) {
+    private static void generateImports(final CompilationUnit unit) {
         unit.addImport("java.util.Arrays");
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
         unit.addImport("java.util.Map");
         unit.addImport("java.util.stream.Collectors");
         unit.addImport("java.util.stream.Stream");
-        final String base = this.getEnv().getBasePackage();
+        final String base = "org.cqfn.astranaut.core";
         unit.addImport(base.concat(".Builder"));
         unit.addImport(base.concat(".ChildDescriptor"));
         unit.addImport(base.concat(".EmptyFragment"));

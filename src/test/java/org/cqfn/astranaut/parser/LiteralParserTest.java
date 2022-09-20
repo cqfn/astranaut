@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.parser;
 
+import org.cqfn.astranaut.exceptions.ExpectedNativeLiteral;
 import org.cqfn.astranaut.exceptions.ExpectedThreeOrFourParameters;
 import org.cqfn.astranaut.exceptions.ParserException;
 import org.cqfn.astranaut.rules.Literal;
@@ -34,7 +35,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class LiteralParserTest {
+class LiteralParserTest {
     /**
      * Valid source code.
      */
@@ -45,7 +46,7 @@ public class LiteralParserTest {
      * Test case: integer literal.
      */
     @Test
-    public void integerLiteral() {
+    void integerLiteral() {
         final boolean result = this.run(LiteralParserTest.SOURCE);
         Assertions.assertTrue(result);
     }
@@ -54,9 +55,21 @@ public class LiteralParserTest {
      * Test case: integer literal with exception.
      */
     @Test
-    public void integerLiteralWithException() {
+    void integerLiteralWithException() {
         final boolean result =
             this.run(LiteralParserTest.SOURCE.concat(", $NumberFormatException$"));
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: integer literal with unexpected token.
+     */
+    @Test
+    void nativeLiteralException() {
+        final boolean result = this.run(
+            LiteralParserTest.SOURCE.concat(", String"),
+            ExpectedNativeLiteral.class
+        );
         Assertions.assertTrue(result);
     }
 
@@ -64,7 +77,7 @@ public class LiteralParserTest {
      * Test case: wrong declaration.
      */
     @Test
-    public void wrongDeclaration() {
+    void wrongDeclaration() {
         final boolean result = this.run(
             "IntegerLiteral <- $int$",
             ExpectedThreeOrFourParameters.class

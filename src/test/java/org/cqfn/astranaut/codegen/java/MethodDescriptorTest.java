@@ -32,12 +32,12 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class MethodDescriptorTest {
+class MethodDescriptorTest {
     /**
      * Creating simple header.
      */
     @Test
-    public void voidHeaderWithoutArgs() {
+    void voidHeaderWithoutArgs() {
         final MethodDescriptor descriptor = new MethodDescriptor(
             "This method does nothing",
             "first"
@@ -53,7 +53,7 @@ public class MethodDescriptorTest {
      * Creating header for method that return something.
      */
     @Test
-    public void nonVoidHeaderWithoutArgs() {
+    void nonVoidHeaderWithoutArgs() {
         final MethodDescriptor descriptor = new MethodDescriptor(
             "Returns something",
             "second"
@@ -69,7 +69,7 @@ public class MethodDescriptorTest {
      * Creating header for method that has an argument.
      */
     @Test
-    public void oneArgument() {
+    void oneArgument() {
         final MethodDescriptor descriptor = new MethodDescriptor(
             "Calculates something",
             "third"
@@ -85,7 +85,7 @@ public class MethodDescriptorTest {
      * Generating method signature for interface.
      */
     @Test
-    public void signatureIface() {
+    void signatureIface() {
         final MethodDescriptor descriptor = new MethodDescriptor(
             "Calculates something else",
             "calculate"
@@ -100,7 +100,7 @@ public class MethodDescriptorTest {
      * Generating method signature for method.
      */
     @Test
-    public void signatureMethod() {
+    void signatureMethod() {
         final MethodDescriptor descriptor = new MethodDescriptor(
             "Finds the maximum",
             "max"
@@ -118,7 +118,7 @@ public class MethodDescriptorTest {
      * Testing the whole descriptor.
      */
     @Test
-    public void wholeDescriptor() {
+    void wholeDescriptor() {
         final MethodDescriptor descriptor = new MethodDescriptor(
             "Kernel panic",
             "panic"

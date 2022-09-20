@@ -28,17 +28,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Node;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.rules.Statement;
 
 /**
  * Generates a factory for node creation.
  *
  * @since 0.1.5
  */
-@SuppressWarnings("PMD.CloseResource")
 public final class FactoryGenerator extends BaseGenerator {
     /**
      * The 'factory' string.
@@ -125,9 +124,9 @@ public final class FactoryGenerator extends BaseGenerator {
      * Prepares set of nodes.
      */
     private void prepareNodeSet() {
-        for (final Statement<Node> statement : this.program.getNodes()) {
-            final Node rule = statement.getRule();
-            final String lang = statement.getLanguage();
+        for (final Instruction<Node> instruction : this.program.getNodes()) {
+            final Node rule = instruction.getRule();
+            final String lang = instruction.getLanguage();
             if (rule.isOrdinary() || rule.isList()) {
                 if (lang.equals(this.language)) {
                     this.specific.add(rule.getType());
@@ -142,9 +141,9 @@ public final class FactoryGenerator extends BaseGenerator {
      * Prepares set of literals.
      */
     private void prepareLiteralSet() {
-        for (final Statement<Literal> statement : this.program.getLiterals()) {
-            final Literal rule = statement.getRule();
-            final String lang = statement.getLanguage();
+        for (final Instruction<Literal> instruction : this.program.getLiterals()) {
+            final Literal rule = instruction.getRule();
+            final String lang = instruction.getLanguage();
             if (lang.equals(this.language)) {
                 this.specific.add(rule.getType());
             } else if (lang.isEmpty() && !this.language.isEmpty()) {
@@ -257,7 +256,7 @@ public final class FactoryGenerator extends BaseGenerator {
         unit.addImport("java.util.Map");
         unit.addImport("java.util.TreeMap");
         final Environment env = this.getEnv();
-        final String base = env.getBasePackage();
+        final String base = "org.cqfn.astranaut.core";
         unit.addImport(base.concat(".Factory"));
         unit.addImport(base.concat(".Type"));
         for (final String name : this.common) {

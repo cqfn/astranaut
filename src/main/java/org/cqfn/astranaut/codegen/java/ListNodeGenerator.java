@@ -23,8 +23,8 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Node;
-import org.cqfn.astranaut.rules.Statement;
 
 /**
  * Generates source code for rules that describe list nodes.
@@ -33,29 +33,29 @@ import org.cqfn.astranaut.rules.Statement;
  */
 final class ListNodeGenerator extends BaseNodeGenerator {
     /**
-     * The DSL statement.
+     * The DSL instruction.
      */
-    private final Statement<Node> statement;
+    private final Instruction<Node> instruction;
 
     /**
      * Constructor.
      * @param env The environment required for generation.
-     * @param statement The DSL statement
+     * @param instruction The DSL instruction
      */
-    ListNodeGenerator(final Environment env, final Statement<Node> statement) {
+    ListNodeGenerator(final Environment env, final Instruction<Node> instruction) {
         super(env);
-        this.statement = statement;
+        this.instruction = instruction;
     }
 
     @Override
     public CompilationUnit generate() {
         final Environment env = this.getEnv();
-        final Node rule = this.statement.getRule();
+        final Node rule = this.instruction.getRule();
         final Klass klass = this.createClass(rule);
         new ListNodeClassConstructor(env, rule, klass).run();
-        final String pkg = this.getPackageName(this.statement.getLanguage());
+        final String pkg = this.getPackageName(this.instruction.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
-        this.generateImports(unit);
+        ListNodeGenerator.generateImports(unit);
         return unit;
     }
 
@@ -63,7 +63,7 @@ final class ListNodeGenerator extends BaseNodeGenerator {
      * Generates imports block.
      * @param unit The compilation unit
      */
-    private void generateImports(final CompilationUnit unit) {
+    private static void generateImports(final CompilationUnit unit) {
         unit.addImport("java.util.ArrayList");
         unit.addImport("java.util.Arrays");
         unit.addImport("java.util.Collections");
@@ -71,7 +71,7 @@ final class ListNodeGenerator extends BaseNodeGenerator {
         unit.addImport("java.util.Map");
         unit.addImport("java.util.stream.Collectors");
         unit.addImport("java.util.stream.Stream");
-        final String base = this.getEnv().getBasePackage();
+        final String base = "org.cqfn.astranaut.core";
         unit.addImport(base.concat(".Builder"));
         unit.addImport(base.concat(".ChildDescriptor"));
         unit.addImport(base.concat(".EmptyFragment"));

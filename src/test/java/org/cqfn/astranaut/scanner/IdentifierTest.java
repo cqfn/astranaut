@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class IdentifierTest {
+class IdentifierTest {
     /**
      * Source string.
      */
@@ -48,7 +48,7 @@ public class IdentifierTest {
      * Test scanner with string contains two identifiers.
      */
     @Test
-    public void twoIdentifiers() {
+    void twoIdentifiers() {
         final Scanner scanner = new Scanner(IdentifierTest.SOURCE);
         Token token = null;
         boolean oops = false;

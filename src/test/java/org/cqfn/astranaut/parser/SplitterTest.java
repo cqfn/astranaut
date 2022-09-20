@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class SplitterTest {
+class SplitterTest {
     /**
      * Source string.
      */
@@ -55,7 +55,7 @@ public class SplitterTest {
      * Test the tokenizer with correct string.
      */
     @Test
-    public void split() {
+    void split() {
         final Tokenizer tokenizer = new Tokenizer(SplitterTest.SOURCE);
         boolean oops = false;
         try {

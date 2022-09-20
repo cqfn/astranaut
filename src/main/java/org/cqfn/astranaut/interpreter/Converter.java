@@ -26,9 +26,9 @@ package org.cqfn.astranaut.interpreter;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.cqfn.astranaut.base.EmptyTree;
-import org.cqfn.astranaut.base.Factory;
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.EmptyTree;
+import org.cqfn.astranaut.core.Factory;
+import org.cqfn.astranaut.core.Node;
 import org.cqfn.astranaut.rules.Transformation;
 
 /**
@@ -36,7 +36,7 @@ import org.cqfn.astranaut.rules.Transformation;
  *
  * @since 0.1.5
  */
-public final class Converter implements org.cqfn.astranaut.base.Converter {
+public final class Converter implements org.cqfn.astranaut.core.Converter {
     /**
      * The matcher.
      */

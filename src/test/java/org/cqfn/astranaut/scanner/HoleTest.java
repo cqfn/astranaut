@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class HoleTest {
+class HoleTest {
     /**
      * Source string (simple case, correct).
      */
@@ -65,10 +65,15 @@ public class HoleTest {
     private static final String WRONG_ELLIPSIS = "#0..,";
 
     /**
+     * Source string (with type, correct).
+     */
+    private static final String TYPE_CORRECT = "Modifier#0";
+
+    /**
      * Test scanner with hole marker.
      */
     @Test
-    public void correctHoleMarker() {
+    void correctHoleMarker() {
         final Scanner scanner = new Scanner(HoleTest.SIMPLE_CORRECT);
         Token token = null;
         boolean oops = false;
@@ -86,7 +91,7 @@ public class HoleTest {
      * Test scanner with incorrect hole marker.
      */
     @Test
-    public void incorrectHoleMarker() {
+    void incorrectHoleMarker() {
         final Scanner scanner = new Scanner(HoleTest.SIMPLE_INCORRECT);
         boolean oops = false;
         try {
@@ -101,7 +106,7 @@ public class HoleTest {
      * Test scanner with hole marker that contains ellipsis.
      */
     @Test
-    public void correctHoleMarkerWithEllipsis() {
+    void correctHoleMarkerWithEllipsis() {
         final Scanner scanner = new Scanner(HoleTest.ELLIPSIS_CORRECT);
         Token token = null;
         boolean oops = false;
@@ -119,7 +124,7 @@ public class HoleTest {
      * Test scanner with incorrect hole marker that contains "bad" ellipsis.
      */
     @Test
-    public void incorrectHoleMarkerWithEllipsis() {
+    void incorrectHoleMarkerWithEllipsis() {
         final Scanner scanner = new Scanner(HoleTest.WRONG_ELLIPSIS);
         boolean oops = false;
         try {
@@ -128,5 +133,23 @@ public class HoleTest {
             oops = true;
         }
         Assertions.assertTrue(oops);
+    }
+
+    /**
+     * Test scanner with incorrect hole marker that contains "bad" ellipsis.
+     */
+    @Test
+    void correctHoleMarkerWithType() {
+        final Scanner scanner = new Scanner(HoleTest.TYPE_CORRECT);
+        Token token = null;
+        boolean oops = false;
+        try {
+            token = scanner.getToken();
+            Assertions.assertTrue(token instanceof HoleMarker);
+            Assertions.assertEquals(token.toString(), HoleTest.TYPE_CORRECT);
+        } catch (final ParserException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }

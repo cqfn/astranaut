@@ -24,21 +24,12 @@
 
 package org.uast.example.js;
 
-import java.util.Arrays;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.uast.example.js.rules.Rule0;
-import org.uast.example.js.rules.Rule1;
-import org.uast.example.js.rules.Rule2;
-import org.uast.example.js.rules.Rule3;
-import org.uast.example.js.rules.Rule4;
-import org.uast.example.js.rules.Rule5;
-import org.uast.example.js.rules.Rule6;
-import org.uast.example.js.rules.Rule7;
-import org.uast.example.js.rules.Rule8;
-import org.uast.example.js.rules.Rule9;
-import org.uast.uast.base.Adapter;
-import org.uast.uast.base.Converter;
+import org.cqfn.astranaut.core.Adapter;
+import org.cqfn.astranaut.core.Converter;
 
 /**
  * Adapter that converts syntax trees, prepared by the parser of the Js language.
@@ -52,6 +43,21 @@ public final class JsAdapter extends Adapter {
     public static final Adapter INSTANCE = new JsAdapter();
 
     /**
+     * The number of rules.
+     */
+    private static final int RULES_NUM = 10;
+
+    /**
+     * The prefix of a rule class name.
+     */
+    private static final String PREFIX = "org.uast.example.js.rules.Rule";
+
+    /**
+     * The name of the rule instance field.
+     */
+    private static final String RULE_INSTANCE = "INSTANCE";
+
+    /**
      * Constructor.
      */
     private JsAdapter() {
@@ -63,17 +69,19 @@ public final class JsAdapter extends Adapter {
      * @return The list of node converters
      */
     private static List<Converter> init() {
-        return Arrays.asList(
-            Rule0.INSTANCE,
-            Rule1.INSTANCE,
-            Rule2.INSTANCE,
-            Rule3.INSTANCE,
-            Rule4.INSTANCE,
-            Rule5.INSTANCE,
-            Rule6.INSTANCE,
-            Rule7.INSTANCE,
-            Rule8.INSTANCE,
-            Rule9.INSTANCE
-        );
+        final List<Converter> rules = new ArrayList<>(JsAdapter.RULES_NUM);
+        for (int index = 0; index < JsAdapter.RULES_NUM; index = index + 1) {
+            final String name = JsAdapter.PREFIX
+                .concat(Integer.toString(index));
+            try {
+                final Class<?> cls = Class.forName(name);
+                final Field instance = cls.getField(JsAdapter.RULE_INSTANCE);
+                rules.add((Converter) instance.get(null));
+            } catch (final ClassNotFoundException | IllegalAccessException
+                | NoSuchFieldException ignored) {
+                continue;
+            }
+        }
+        return rules;
     }
 }

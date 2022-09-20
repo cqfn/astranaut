@@ -37,5 +37,10 @@ public enum HoleAttribute {
     /**
      * The hole replaces all remaining children.
      */
-    ELLIPSIS
+    ELLIPSIS,
+
+    /**
+     * The hole replaces all remaining children of the specified type.
+     */
+    TYPED
 }

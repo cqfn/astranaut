@@ -39,12 +39,12 @@ import org.junit.jupiter.api.Test;
  * @since 0.1.5
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class TransformationParserTest {
+class TransformationParserTest {
     /**
      * Test case: simple transformation.
      */
     @Test
-    public void simpleTransformation() {
+    void simpleTransformation() {
         final boolean result = this.run("A -> B");
         Assertions.assertTrue(result);
     }
@@ -53,7 +53,7 @@ public class TransformationParserTest {
      * Test case: complex transformation.
      */
     @Test
-    public void complexTransformation() {
+    void complexTransformation() {
         final boolean result = this.run(
             "singleExpression(identifier(literal<#13>)) -> Identifier<#13>"
         );
@@ -64,9 +64,24 @@ public class TransformationParserTest {
      * Test case: more complex transformation.
      */
     @Test
-    public void moreComplexTransformation() {
+    void moreComplexTransformation() {
         final boolean result = this.run(
             "singleExpression(#1, literal<\"+\">, #2) -> Addition(#1, #2)"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Test case: transformation with a variable size children list of same type.
+     */
+    @Test
+    void variableChildrenSizeTransformation() {
+        final boolean result = this.run(
+            String.format(
+                "%s -> %s",
+                "MethodDeclaration(Modifier#1, SimpleName, ClassType, Parameter#2)",
+                "MethodDeclaration(ModifierBlock(#1), SimpleName, ClassType, ParamBlock(#2))"
+            )
         );
         Assertions.assertTrue(result);
     }
@@ -75,7 +90,7 @@ public class TransformationParserTest {
      * Test case: DSL line with exception.
      */
     @Test
-    public void wrongSyntax() {
+    void wrongSyntax() {
         final boolean result = this.run("A -> 123", UnknownSymbol.class);
         Assertions.assertTrue(result);
     }
@@ -84,7 +99,7 @@ public class TransformationParserTest {
      * Test case: DSL line with duplicated child hole numbers in a left part.
      */
     @Test
-    public void duplicatedChildHoleNumbersInLeft() {
+    void duplicatedChildHoleNumbersInLeft() {
         final boolean result = this.run(
             "A(#1, #1) -> B(#3)",
             ExpectedUniqueNumbers.class
@@ -96,7 +111,7 @@ public class TransformationParserTest {
      * Test case: DSL line with duplicated data hole numbers in a left part.
      */
     @Test
-    public void duplicatedDataHoleNumbersInLeft() {
+    void duplicatedDataHoleNumbersInLeft() {
         final boolean result = this.run(
             "A(B<#1>, B<#1>) -> C<#1>",
             ExpectedUniqueNumbers.class
@@ -108,7 +123,7 @@ public class TransformationParserTest {
      * Test case: DSL line with unexpected child hole number in right part.
      */
     @Test
-    public void wrongChildHoleNumbersInRight() {
+    void wrongChildHoleNumbersInRight() {
         final boolean result = this.run(
             "A(#1, #2) -> B(#3)",
             UnexpectedNumberUsed.class
@@ -120,7 +135,7 @@ public class TransformationParserTest {
      * Test case: DSL line with unexpected data hole number in right part.
      */
     @Test
-    public void wrongDataHoleNumbersInRight() {
+    void wrongDataHoleNumbersInRight() {
         final boolean result = this.run(
             "A(#1, B<#2>) -> B<#3>",
             UnexpectedNumberUsed.class
@@ -132,7 +147,7 @@ public class TransformationParserTest {
      * Test case: DSL line with duplicated child hole numbers in a right part.
      */
     @Test
-    public void duplicatedChildHoleNumbersInRight() {
+    void duplicatedChildHoleNumbersInRight() {
         final boolean result = this.run(
             "A(#1, #2) -> B(#1, #1)",
             ExpectedUniqueNumbers.class
@@ -144,7 +159,7 @@ public class TransformationParserTest {
      * Test case: DSL line with duplicated data hole numbers in a right part.
      */
     @Test
-    public void duplicatedDataHoleNumbersInRight() {
+    void duplicatedDataHoleNumbersInRight() {
         final boolean result = this.run(
             "A(B<#1>, C<#2>) -> D(E<#1>, E<#1>)",
             ExpectedUniqueNumbers.class
@@ -157,7 +172,7 @@ public class TransformationParserTest {
      *  a data hole number.
      */
     @Test
-    public void duplicatedDataHoleNumberByChildHoleNumberInRight() {
+    void duplicatedDataHoleNumberByChildHoleNumberInRight() {
         final boolean result = this.run(
             "A(B<#1>, C(#2)) -> D(E<#1>, F(#2), G(#1))",
             ExpectedUniqueNumbers.class
@@ -170,7 +185,7 @@ public class TransformationParserTest {
      *  a child hole number.
      */
     @Test
-    public void duplicatedChildHoleNumberByDataHoleNumberInRight() {
+    void duplicatedChildHoleNumberByDataHoleNumberInRight() {
         final boolean result = this.run(
             "A(B<#1>, C(#2)) -> D(E<#1>, F(#2), G<#2>)",
             ExpectedUniqueNumbers.class
@@ -182,7 +197,7 @@ public class TransformationParserTest {
      * Test case: remove parent of subtree.
      */
     @Test
-    public void removingParentOfSubtree() {
+    void removingParentOfSubtree() {
         final String source = "A(#1) -> #1";
         boolean oops = false;
         try {

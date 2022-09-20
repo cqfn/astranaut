@@ -67,6 +67,7 @@ SOFTWARE.
     <maven.compiler.target>8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <qulice.license>${project.basedir}/LICENSE.txt</qulice.license>
+    <core.version>1.0.3</core.version>
   </properties>
   <build>
     <plugins>
@@ -104,7 +105,7 @@ SOFTWARE.
       <plugin>
         <groupId>com.qulice</groupId>
         <artifactId>qulice-maven-plugin</artifactId>
-        <version>0.19.1</version>
+        <version>0.22.0</version>
         <configuration>
           <license>file:${qulice.license}</license>
           <excludes combine.children="append">
@@ -112,7 +113,6 @@ SOFTWARE.
             <exclude>pmd:/src/test/resources/.*</exclude>
             <exclude>dependencies:/src/test/resources/.*</exclude>
             <exclude>duplicatefinder:/src/test/resources/.*</exclude>
-            <exclude>dependencies:ch.qos.logback:logback-classic</exclude>
             <exclude>checkstyle:/src/it/.*</exclude>
             <exclude>pmd:.*/src/it/.*</exclude>
           </excludes>
@@ -154,19 +154,24 @@ SOFTWARE.
         <artifactId>maven-invoker-plugin</artifactId>
         <version>3.3.0</version>
         <configuration>
+          <postBuildHookScript>verify</postBuildHookScript>
           <projectsDirectory>src/it</projectsDirectory>
           <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-          <addTestClassPath>true</addTestClassPath>
+          <showErrors>true</showErrors>
           <pomIncludes>
             <pomInclude>processor-visualizer/pom.xml</pomInclude>
             <pomInclude>serializer-deserializer/pom.xml</pomInclude>
           </pomIncludes>
           <settingsFile>src/it/settings.xml</settingsFile>
+          <environmentVariables>
+            <core.version>${core.version}</core.version>
+          </environmentVariables>
         </configuration>
         <executions>
           <execution>
             <id>integration-test</id>
             <goals>
+              <goal>install</goal>
               <goal>run</goal>
             </goals>
           </execution>
@@ -191,19 +196,9 @@ SOFTWARE.
       <version>1.82</version>
     </dependency>
     <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>2.9.0</version>
-    </dependency>
-    <dependency>
-      <groupId>guru.nidi</groupId>
-      <artifactId>graphviz-java</artifactId>
-      <version>0.18.1</version>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.2.11</version>
+      <groupId>org.cqfn</groupId>
+      <artifactId>astranaut-core</artifactId>
+      <version>${core.version}</version>
     </dependency>
   </dependencies>
 </project>

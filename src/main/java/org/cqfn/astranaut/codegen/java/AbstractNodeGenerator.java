@@ -25,8 +25,8 @@ package org.cqfn.astranaut.codegen.java;
 
 import java.util.List;
 import java.util.Locale;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Node;
-import org.cqfn.astranaut.rules.Statement;
 
 /**
  * Generates source code for rules that describe abstract nodes.
@@ -35,31 +35,31 @@ import org.cqfn.astranaut.rules.Statement;
  */
 final class AbstractNodeGenerator extends BaseGenerator {
     /**
-     * The DSL statement.
+     * The DSL instruction.
      */
-    private final Statement<Node> statement;
+    private final Instruction<Node> instruction;
 
     /**
      * Constructor.
      * @param env The environment required for generation.
-     * @param statement The DSL statement
+     * @param instruction The DSL instruction
      */
-    AbstractNodeGenerator(final Environment env, final Statement<Node> statement) {
+    AbstractNodeGenerator(final Environment env, final Instruction<Node> instruction) {
         super(env);
-        this.statement = statement;
+        this.instruction = instruction;
     }
 
     @Override
     public CompilationUnit generate() {
         final Environment env = this.getEnv();
-        final Node rule = this.statement.getRule();
+        final Node rule = this.instruction.getRule();
         final String type = rule.getType();
         final Interface iface = new Interface(
             String.format("Node that describes the '%s' type", type),
             type
         );
         this.defineGettersForTaggedFields(iface);
-        final String pkg = this.getPackageName(this.statement.getLanguage());
+        final String pkg = this.getPackageName(this.instruction.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, iface);
         final List<String> hierarchy = env.getHierarchy(type);
         if (hierarchy.size() > 1) {
@@ -70,7 +70,7 @@ final class AbstractNodeGenerator extends BaseGenerator {
             }
             iface.setInterfaces(ancestor);
         } else {
-            final String base = this.getEnv().getBasePackage();
+            final String base = "org.cqfn.astranaut.core";
             unit.addImport(base.concat(".Node"));
             iface.setInterfaces("Node");
         }
@@ -82,7 +82,7 @@ final class AbstractNodeGenerator extends BaseGenerator {
      * @param iface Where to create
      */
     private void defineGettersForTaggedFields(final Interface iface) {
-        final List<TaggedChild> tags = this.getEnv().getTags(this.statement.getRule().getType());
+        final List<TaggedChild> tags = this.getEnv().getTags(this.instruction.getRule().getType());
         for (final TaggedChild child : tags) {
             if (!child.isOverridden()) {
                 final String type = child.getType();

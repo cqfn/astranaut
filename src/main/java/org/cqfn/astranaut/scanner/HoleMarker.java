@@ -44,18 +44,26 @@ public class HoleMarker implements Token {
     private final HoleAttribute attribute;
 
     /**
+     * Type of the node that is matched by a hole.
+     */
+    private final String type;
+
+    /**
      * Constructor.
      * @param value Value of the hole
      * @param attribute Attribute
+     * @param type Type of the node
      */
-    public HoleMarker(final int value, final HoleAttribute attribute) {
+    public HoleMarker(final int value, final HoleAttribute attribute, final String type) {
         this.value = value;
         this.attribute = attribute;
+        this.type = type;
     }
 
     @Override
     public final String toString() {
         final StringBuilder builder = new StringBuilder()
+            .append(this.type)
             .append('#')
             .append(this.value);
         if (this.attribute == HoleAttribute.ELLIPSIS) {
@@ -69,6 +77,6 @@ public class HoleMarker implements Token {
      * @return A hole
      */
     public Hole createHole() {
-        return new Hole(this.value, this.attribute);
+        return new Hole(this.value, this.attribute, this.type);
     }
 }

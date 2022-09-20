@@ -25,7 +25,7 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.io.IOException;
-import org.cqfn.astranaut.utils.FilesReader;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class PackageInfoTest {
+class PackageInfoTest {
     /**
      * The folder with test resources.
      */
@@ -44,7 +44,7 @@ public class PackageInfoTest {
      * Testing code generation with package info.
      */
     @Test
-    public void packageInfo() {
+    void packageInfo() {
         final License license = new License("LICENSE.txt");
         final PackageInfo info = new PackageInfo(
             license,

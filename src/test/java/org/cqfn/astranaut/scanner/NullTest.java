@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class NullTest {
+class NullTest {
     /**
      * Output example.
      */
@@ -43,7 +43,7 @@ public class NullTest {
      * Test scanner with empty string as input.
      */
     @Test
-    public void emptyStringAsInput() {
+    void emptyStringAsInput() {
         final Scanner scanner = new Scanner("");
         boolean oops = false;
         final Token token;

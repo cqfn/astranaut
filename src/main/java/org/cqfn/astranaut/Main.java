@@ -31,18 +31,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.logging.Logger;
-import org.cqfn.astranaut.analyzer.PreparedEnvironment;
+import org.cqfn.astranaut.analyzer.EnvironmentPreparator;
 import org.cqfn.astranaut.codegen.java.Environment;
 import org.cqfn.astranaut.codegen.java.License;
 import org.cqfn.astranaut.codegen.java.ProgramGenerator;
 import org.cqfn.astranaut.codegen.java.TaggedChild;
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.interpreter.Interpreter;
 import org.cqfn.astranaut.parser.ProgramParser;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.utils.FilesReader;
 import org.cqfn.astranaut.utils.cli.ActionConverter;
 import org.cqfn.astranaut.utils.cli.DestinationFileConverter;
 import org.cqfn.astranaut.utils.cli.LicenseValidator;
@@ -119,17 +118,6 @@ public final class Main {
     private String rootpkg;
 
     /**
-     * The name of the package that contains the 'Node' base interface.
-     */
-    @Parameter(
-        names = { "--base", "-b" },
-        validateWith = PackageValidator.class,
-        arity = 1,
-        description = "The name of the package that contains the 'Node' base interface"
-    )
-    private String basepkg;
-
-    /**
      * Specify the version of the implementation.
      */
     @Parameter(
@@ -182,7 +170,6 @@ public final class Main {
         this.license = "LICENSE.txt";
         this.path = "generated";
         this.rootpkg = "org.uast";
-        this.basepkg = "org.uast.uast.base";
         this.version = "";
     }
 
@@ -229,15 +216,8 @@ public final class Main {
             final ProgramParser parser = new ProgramParser(code);
             final Program program = parser.parse();
             if (this.action == Action.GENERATE) {
-                final Environment base = new EnvironmentImpl();
-                final Map<String, Environment> env = new TreeMap<>();
-                env.put("", new PreparedEnvironment(base, program.getVertices(), ""));
-                for (final String language : program.getNamesOfAllLanguages()) {
-                    env.put(
-                        language,
-                        new PreparedEnvironment(base, program.getVertices(), language)
-                    );
-                }
+                final Map<String, Environment> env =
+                    new EnvironmentPreparator(program, new Main.EnvironmentImpl()).prepare();
                 final ProgramGenerator generator = new ProgramGenerator(this.path, program, env);
                 generator.generate();
             } else if (this.action == Action.CONVERT) {
@@ -280,11 +260,6 @@ public final class Main {
         @Override
         public String getRootPackage() {
             return Main.this.rootpkg;
-        }
-
-        @Override
-        public String getBasePackage() {
-            return Main.this.basepkg;
         }
 
         @Override

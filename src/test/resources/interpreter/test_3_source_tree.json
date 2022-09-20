@@ -1,0 +1,30 @@
+{
+  "root" : {
+    "type" : "A",
+    "children": [
+      {
+        "type": "B",
+        "data": "1"
+      },
+      {
+        "type": "B",
+        "data": "2"
+      },
+      {
+        "type": "C"
+      },
+      {
+        "type": "D",
+        "data": "1"
+      },
+      {
+        "type": "D",
+        "data": "2"
+      },
+      {
+        "type": "D",
+        "data": "3"
+      }
+    ]
+  }
+}

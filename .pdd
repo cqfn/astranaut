@@ -1,0 +1,8 @@
+--source=.
+--verbose
+--exclude README.md
+--exclude src/it
+--exclude src/test/resources/**/*
+--exclude target/**/*
+--exclude .idea/**/*
+--rule min-words:10

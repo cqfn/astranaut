@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class BracketsTest {
+class BracketsTest {
     /**
      * Source code.
      */
@@ -48,7 +48,7 @@ public class BracketsTest {
      * Test scanner with string contains brackets.
      */
     @Test
-    public void brackets() {
+    void brackets() {
         final Scanner scanner = new Scanner(BracketsTest.SOURCE);
         final StringBuilder result = new StringBuilder();
         boolean oops = false;

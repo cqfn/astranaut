@@ -63,9 +63,19 @@ public class MatcherClassFiller {
     private static final String HOLE_ID_POSTFIX = "_HOLE_ID";
 
     /**
+     * The '_CHILD_ID' postfix.
+     */
+    private static final String CHILD_ID_POSTFIX = "_CHILD_ID";
+
+    /**
      * The description of field that contains a hole number.
      */
     private static final String HOLE_NUM_DESCR = "The number of the %s hole";
+
+    /**
+     * The description of field that contains a child index.
+     */
+    private static final String CHILD_ID_DESCR = "The index of the %s child";
 
     /**
      * Maximum number of predicates in one condition.
@@ -209,7 +219,7 @@ public class MatcherClassFiller {
             )
         );
         this.klass.addField(type);
-        if (!this.descriptor.hasEllipsisHole()) {
+        if (!this.descriptor.hasEllipsisOrTypedHole()) {
             final Field count = new Field(
                 "Expected number of child nodes",
                 MatcherClassFiller.TYPE_INT,
@@ -256,7 +266,7 @@ public class MatcherClassFiller {
         final String name = this.klass.getName();
         int count = 1;
         String common = String.format("node.belongsToGroup(%s.EXPECTED_TYPE)", name);
-        if (!this.descriptor.hasEllipsisHole()) {
+        if (!this.descriptor.hasEllipsisOrTypedHole()) {
             common = common.concat(
                 String.format("\n\t&& node.getChildCount() == %s.EXPECTED_COUNT", name)
             );
@@ -375,22 +385,34 @@ public class MatcherClassFiller {
         int index = 0;
         for (final Parameter parameter : this.descriptor.getParameters()) {
             if (parameter instanceof Descriptor) {
+                final String srclbl = this.children.getLabel();
+                final String source = srclbl.toUpperCase(Locale.ENGLISH)
+                    .concat(MatcherClassFiller.CHILD_ID_POSTFIX);
+                this.createMagicNumber(
+                    String.format(MatcherClassFiller.CHILD_ID_DESCR, srclbl),
+                    source,
+                    index
+                );
                 final String subclass = this.generator.generate((Descriptor) parameter);
+                final String format =
+                    "%s.INSTANCE.match(\n\tnode.getChild(%s.%s), children, data\n);";
                 if (first) {
                     code.add(
                         String.format(
-                            "boolean flag = %s.INSTANCE.match(node.getChild(%d), children, data);",
+                            "boolean flag = ".concat(format),
                             subclass,
-                            index
+                            this.klass.getName(),
+                            source
                         )
                     );
                     first = false;
                 } else {
                     code.add(
                         String.format(
-                            "flag = flag && %s.INSTANCE.match(node.getChild(%d), children, data);",
+                            "flag = flag && ".concat(format),
                             subclass,
-                            index
+                            this.klass.getName(),
+                            source
                         )
                     );
                 }
@@ -481,9 +503,9 @@ public class MatcherClassFiller {
             this.collections = true;
             final String srclbl = this.children.getLabel();
             final String source = srclbl.toUpperCase(Locale.ENGLISH)
-                .concat("_CHILD_ID");
+                .concat(MatcherClassFiller.CHILD_ID_POSTFIX);
             this.createMagicNumber(
-                String.format("The index of the %s child", srclbl),
+                String.format(MatcherClassFiller.CHILD_ID_DESCR, srclbl),
                 source,
                 index
             );

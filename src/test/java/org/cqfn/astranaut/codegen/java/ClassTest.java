@@ -25,7 +25,7 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.io.IOException;
-import org.cqfn.astranaut.utils.FilesReader;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
  * @since 0.1.5
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class ClassTest {
+class ClassTest {
     /**
      * Typical class name.
      */
@@ -80,7 +80,7 @@ public class ClassTest {
      * Generating a public class with one method.
      */
     @Test
-    public void classWithOneMethod() {
+    void classWithOneMethod() {
         final Klass klass = new Klass("Test class with one method", ClassTest.CLASS_NAME);
         klass.addMethod(this.createPublicMethod());
         final String expected = this.readTest("public_class_with_one_method.txt");
@@ -92,7 +92,7 @@ public class ClassTest {
      * Creating the whole 'real' class.
      */
     @Test
-    public void addition() {
+    void addition() {
         final Klass klass = new Klass(
             "Node that describes the 'Addition' type",
             ClassTest.STR_ADDITION
@@ -115,7 +115,7 @@ public class ClassTest {
      * Generating a public class with one method.
      */
     @Test
-    public void classWithSuppressedWarning() {
+    void classWithSuppressedWarning() {
         final Klass klass = new Klass(
             "Test class with suppressed warning",
             ClassTest.CLASS_NAME

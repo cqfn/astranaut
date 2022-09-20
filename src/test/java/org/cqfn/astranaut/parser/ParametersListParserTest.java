@@ -26,9 +26,13 @@ package org.cqfn.astranaut.parser;
 
 import java.util.Collections;
 import java.util.List;
+import org.cqfn.astranaut.exceptions.CantParseSequence;
 import org.cqfn.astranaut.exceptions.EmptyDataLiteral;
+import org.cqfn.astranaut.exceptions.ExpectedComma;
 import org.cqfn.astranaut.exceptions.ExpectedData;
+import org.cqfn.astranaut.exceptions.ExpectedDescriptor;
 import org.cqfn.astranaut.exceptions.ExpectedOnlyOneEntity;
+import org.cqfn.astranaut.exceptions.IncorrectUseOfBrackets;
 import org.cqfn.astranaut.exceptions.ParserException;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.Hole;
@@ -44,12 +48,12 @@ import org.junit.jupiter.api.Test;
  * @since 0.1.5
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class ParametersListParserTest {
+class ParametersListParserTest {
     /**
      * Test string contains one hole.
      */
     @Test
-    public void hole() {
+    void hole() {
         final Parameter parameter = this.extractOne("#1");
         Assertions.assertTrue(parameter instanceof Hole);
     }
@@ -58,16 +62,52 @@ public class ParametersListParserTest {
      * Test string contains simple name.
      */
     @Test
-    public void simpleName() {
+    void simpleName() {
         final Parameter parameter = this.extractOne("Expression");
         Assertions.assertTrue(parameter instanceof Descriptor);
+    }
+
+    /**
+     * Test string contains optional descriptors not separated by a comma.
+     */
+    @Test
+    void optionalNotSeparated() {
+        final String message = this.expectError("[A] [B]", ExpectedComma.class);
+        Assertions.assertEquals("Expected a comma after the token: '[A]'", message);
+    }
+
+    /**
+     * Test string contains descriptors with incorrect brackets.
+     */
+    @Test
+    void incorrectBrackets() {
+        final String message = this.expectError("[A], <B>", IncorrectUseOfBrackets.class);
+        Assertions.assertEquals("Incorrect use of brackets", message);
+    }
+
+    /**
+     * Test string contains square brackets but without descriptor.
+     */
+    @Test
+    void optionalDescriptorExpected() {
+        final String message = this.expectError("[ ]", ExpectedDescriptor.class);
+        Assertions.assertEquals("Expected a descriptor: '[...]'", message);
+    }
+
+    /**
+     * Test string contains square brackets but without descriptor.
+     */
+    @Test
+    void unknownTokenSequence() {
+        final String message = this.expectError("Integer<\"1\"><\"2\">", CantParseSequence.class);
+        Assertions.assertEquals("Can't parse tokens sequence: 'Integer<\"1\"><\"2\">'", message);
     }
 
     /**
      * Test string contains tagged name.
      */
     @Test
-    public void taggedName() {
+    void taggedName() {
         final Parameter parameter = this.extractOne("left@Expression");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }
@@ -76,7 +116,7 @@ public class ParametersListParserTest {
      * Test string contains hole as a data.
      */
     @Test
-    public void holeAsData() {
+    void holeAsData() {
         final Parameter parameter = this.extractOne("literal<#1>");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }
@@ -85,7 +125,7 @@ public class ParametersListParserTest {
      * Test string contains string literal as a data.
      */
     @Test
-    public void stringData() {
+    void stringData() {
         final Parameter parameter = this.extractOne("literal<\"+\">");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }
@@ -94,7 +134,7 @@ public class ParametersListParserTest {
      * Test string contains empty data descriptor.
      */
     @Test
-    public void emptyData() {
+    void emptyData() {
         final String message = this.expectError("Test<>", EmptyDataLiteral.class);
         Assertions.assertEquals("Empty data literal: 'Test<>'", message);
     }
@@ -103,7 +143,7 @@ public class ParametersListParserTest {
      * Test string contains data descriptor with two entities.
      */
     @Test
-    public void twoDataEntities() {
+    void twoDataEntities() {
         final String message = this.expectError("Test<#1,#2>", ExpectedOnlyOneEntity.class);
         Assertions.assertEquals("Expected only one entity: 'Test<#1,#2>'", message);
     }
@@ -112,7 +152,7 @@ public class ParametersListParserTest {
      * Test string contains bad data descriptor.
      */
     @Test
-    public void badData() {
+    void badData() {
         final String message = this.expectError("Test<ABC>", ExpectedData.class);
         Assertions.assertEquals(
             "Expected a data: 'Test<#...>' or 'Test<\"...\">'",
@@ -124,7 +164,7 @@ public class ParametersListParserTest {
      * Test string contains descriptor with two parameters.
      */
     @Test
-    public void twoParameters() {
+    void twoParameters() {
         final Parameter parameter = this.extractOne("Addition(Expression, Expression)");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }
@@ -133,7 +173,7 @@ public class ParametersListParserTest {
      * Test string contains descriptor with three parameters.
      */
     @Test
-    public void threeParameters() {
+    void threeParameters() {
         final Parameter parameter = this.extractOne(
             "simpleExpression(#1, literal<\"+\">, #2)"
         );
@@ -144,7 +184,7 @@ public class ParametersListParserTest {
      * Test string contains optional descriptor.
      */
     @Test
-    public void optional() {
+    void optional() {
         final Parameter parameter = this.extractOne("[Expression]");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }
@@ -153,7 +193,7 @@ public class ParametersListParserTest {
      * Test string contains descriptor that is a list.
      */
     @Test
-    public void list() {
+    void list() {
         final Parameter parameter = this.extractOne("{Expression}");
         Assertions.assertTrue(parameter instanceof Descriptor);
     }

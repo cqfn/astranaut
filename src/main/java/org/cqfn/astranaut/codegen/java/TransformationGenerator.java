@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-import org.cqfn.astranaut.rules.Statement;
+import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Transformation;
 
 /**
@@ -36,7 +36,6 @@ import org.cqfn.astranaut.rules.Transformation;
  *
  * @since 0.1.5
  */
-@SuppressWarnings("PMD.CloseResource")
 public class TransformationGenerator {
     /**
      * The environment.
@@ -46,7 +45,7 @@ public class TransformationGenerator {
     /**
      * List of rules.
      */
-    private final List<Statement<Transformation>> rules;
+    private final List<Instruction<Transformation>> rules;
 
     /**
      * Processing language.
@@ -65,7 +64,7 @@ public class TransformationGenerator {
      * @param language The processing language
      */
     public TransformationGenerator(final Environment env,
-        final List<Statement<Transformation>> rules,
+        final List<Instruction<Transformation>> rules,
         final String language) {
         this.env = env;
         this.rules = rules;
@@ -86,9 +85,9 @@ public class TransformationGenerator {
         final MatcherGenerator matchers = new MatcherGenerator(this.env, pkg);
         final ConverterGenerator converters = new ConverterGenerator(this.env, pkg);
         int count = 0;
-        for (final Statement<Transformation> stmt : this.rules) {
-            if (stmt.getLanguage().equals(this.language)) {
-                final Transformation rule = stmt.getRule();
+        for (final Instruction<Transformation> instruction : this.rules) {
+            if (instruction.getLanguage().equals(this.language)) {
+                final Transformation rule = instruction.getRule();
                 final String matcher = matchers.generate(rule.getLeft());
                 converters.generate(rule.getRight(), matcher);
                 count = count + 1;

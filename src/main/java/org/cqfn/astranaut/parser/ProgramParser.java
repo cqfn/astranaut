@@ -23,10 +23,11 @@
  */
 package org.cqfn.astranaut.parser;
 
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.exceptions.BaseException;
 import org.cqfn.astranaut.exceptions.ExceptionWithLineNumber;
 import org.cqfn.astranaut.exceptions.ParserException;
 import org.cqfn.astranaut.rules.Program;
+import org.cqfn.astranaut.utils.CommentsRemover;
 
 /**
  * Parses the whole DSL program.
@@ -53,9 +54,10 @@ public class ProgramParser {
      * @throws BaseException If source can't be parsed
      */
     public Program parse() throws BaseException {
-        final String[] lines = this.source.split(";");
+        final String code = new CommentsRemover(this.source).remove();
+        final String[] lines = code.split(";");
         final Program program = new Program();
-        final StatementParser parser = new StatementParser(program);
+        final InstructionParser parser = new InstructionParser(program);
         int number = 1;
         for (final String line : lines) {
             final String dsl = line.trim();

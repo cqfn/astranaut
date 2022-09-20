@@ -30,7 +30,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import org.cqfn.astranaut.Main;
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.exceptions.BaseException;
 import org.cqfn.astranaut.utils.cli.RulesFileConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ import org.junit.jupiter.api.io.TempDir;
  *
  * @since 0.1.5
  */
-public class RulesFileConverterTest {
+class RulesFileConverterTest {
     /**
      * The action option as an argument example.
      */
@@ -63,7 +63,7 @@ public class RulesFileConverterTest {
      * @param source A temporary directory
      */
     @Test
-    public void testWrongFileExtension(@TempDir final Path source) throws IOException {
+    void testWrongFileExtension(@TempDir final Path source) throws IOException {
         final Path file = source.resolve("example.java");
         final List<String> lines = Collections.singletonList("class A{}");
         Files.write(file, lines);
@@ -87,7 +87,7 @@ public class RulesFileConverterTest {
      * which does not exist.
      */
     @Test
-    public void testNotExistingFile() throws IOException {
+    void testNotExistingFile() throws IOException {
         final String[] example = {
             RulesFileConverterTest.ACTION,
             RulesFileConverterTest.GENERATE,

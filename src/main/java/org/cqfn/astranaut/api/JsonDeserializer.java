@@ -23,7 +23,8 @@
  */
 package org.cqfn.astranaut.api;
 
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.interpreter.Factory;
 
 /**
  * Converts a string that contains a JSON object to a tree.
@@ -49,8 +50,10 @@ public class JsonDeserializer {
      * @return Root node of the created tree
      */
     public Node deserialize() {
-        final org.cqfn.astranaut.handlers.json.JsonDeserializer deserializer =
-            new org.cqfn.astranaut.handlers.json.JsonDeserializer(this.source);
+        final org.cqfn.astranaut.core.utils.JsonDeserializer deserializer =
+            new org.cqfn.astranaut.core.utils.JsonDeserializer(
+                this.source, language -> Factory.INSTANCE
+            );
         return deserializer.convert();
     }
 }

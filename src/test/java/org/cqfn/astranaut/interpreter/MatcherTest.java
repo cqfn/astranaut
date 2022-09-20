@@ -27,8 +27,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.cqfn.astranaut.base.DraftNode;
-import org.cqfn.astranaut.base.Node;
+import org.cqfn.astranaut.core.DraftNode;
+import org.cqfn.astranaut.core.Node;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.DescriptorFactory;
 import org.cqfn.astranaut.rules.Hole;
@@ -43,12 +43,12 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class MatcherTest {
+class MatcherTest {
     /**
      * Testing the simple case, when the descriptor contains a type only.
      */
     @Test
-    public void testSimpleCase() {
+    void testSimpleCase() {
         final String type = "PublicModifier";
         final DraftNode.Constructor ctor = new DraftNode.Constructor();
         ctor.setName(type);
@@ -65,7 +65,7 @@ public class MatcherTest {
      * Testing the case when the descriptor contains a data represented as a string.
      */
     @Test
-    public void testDataMatching() {
+    void testDataMatching() {
         final String type = "literal";
         final String data = "+";
         final DraftNode.Constructor ctor = new DraftNode.Constructor();
@@ -86,7 +86,7 @@ public class MatcherTest {
      * that does not match with the node data.
      */
     @Test
-    public void testDataMismatching() {
+    void testDataMismatching() {
         final String type = "integer";
         final DraftNode.Constructor ctor = new DraftNode.Constructor();
         ctor.setName(type);
@@ -105,7 +105,7 @@ public class MatcherTest {
      * Testing the case when the descriptor contains a data represented as a hole.
      */
     @Test
-    public void testDataExtracting() {
+    void testDataExtracting() {
         final String type = "identifier";
         final String data = "x";
         final DraftNode.Constructor ctor = new DraftNode.Constructor();
@@ -114,7 +114,7 @@ public class MatcherTest {
         final Node node = ctor.createNode();
         final LabelFactory labels = new LabelFactory();
         final DescriptorFactory factory = new DescriptorFactory(labels.getLabel(), type);
-        factory.setData(new Hole(0, HoleAttribute.NONE));
+        factory.setData(new Hole(0, HoleAttribute.NONE, ""));
         final Descriptor descriptor = factory.createDescriptor();
         final Matcher matcher = new Matcher(descriptor);
         final Map<Integer, String> collection = new TreeMap<>();
@@ -129,7 +129,7 @@ public class MatcherTest {
      * a data represented as a string.
      */
     @Test
-    public void testChildrenMatching() {
+    void testChildrenMatching() {
         final String type = "simpleIdentifier";
         final String subtype = "number";
         final String data = "13";
@@ -156,7 +156,7 @@ public class MatcherTest {
      * Testing the case when the descriptor contains children represented as a hole.
      */
     @Test
-    public void testChildrenExtracting() {
+    void testChildrenExtracting() {
         final String type = "return";
         final String subtype = "stringLiteral";
         final String data = "xxx";
@@ -170,7 +170,7 @@ public class MatcherTest {
         final Node node = ctor.createNode();
         final LabelFactory labels = new LabelFactory();
         final DescriptorFactory factory = new DescriptorFactory(labels.getLabel(), type);
-        factory.addParameter(new Hole(1, HoleAttribute.NONE));
+        factory.addParameter(new Hole(1, HoleAttribute.NONE, ""));
         final Map<Integer, List<Node>> extracted = new TreeMap<>();
         final boolean result = new Matcher(factory.createDescriptor())
             .match(node, extracted, Collections.emptyMap());

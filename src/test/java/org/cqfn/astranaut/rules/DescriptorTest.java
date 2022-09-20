@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class DescriptorTest {
+class DescriptorTest {
     /**
      * Test name.
      */
@@ -47,7 +47,7 @@ public class DescriptorTest {
      * Testing factory with simple name.
      */
     @Test
-    public void simpleName() {
+    void simpleName() {
         final DescriptorFactory factory = new DescriptorFactory(
             DescriptorTest.LABEL,
             DescriptorTest.NAME
@@ -61,7 +61,7 @@ public class DescriptorTest {
      * Testing factory with tagged name.
      */
     @Test
-    public void taggedName() {
+    void taggedName() {
         final DescriptorFactory factory = new DescriptorFactory(
             DescriptorTest.LABEL,
             "left"
@@ -75,7 +75,7 @@ public class DescriptorTest {
      * Testing factory with string data.
      */
     @Test
-    public void stringData() {
+    void stringData() {
         final DescriptorFactory factory = new DescriptorFactory(
             DescriptorTest.LABEL,
             "literal"
@@ -89,12 +89,12 @@ public class DescriptorTest {
      * Testing factory with hole.
      */
     @Test
-    public void hole() {
+    void hole() {
         final DescriptorFactory factory = new DescriptorFactory(
             DescriptorTest.LABEL,
             "numericLiteral"
         );
-        factory.setData(new Hole(1, HoleAttribute.NONE));
+        factory.setData(new Hole(1, HoleAttribute.NONE, ""));
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals("numericLiteral<#1>", descriptor.toString());
     }
@@ -103,7 +103,7 @@ public class DescriptorTest {
      * Creating optional element.
      */
     @Test
-    public void optional() {
+    void optional() {
         final DescriptorFactory factory = new DescriptorFactory(
             DescriptorTest.LABEL,
             DescriptorTest.NAME
@@ -117,7 +117,7 @@ public class DescriptorTest {
      * Creating element that is a list.
      */
     @Test
-    public void list() {
+    void list() {
         final DescriptorFactory factory = new DescriptorFactory(
             DescriptorTest.LABEL,
             DescriptorTest.NAME
@@ -131,7 +131,7 @@ public class DescriptorTest {
      * Creating element with parameters.
      */
     @Test
-    public void twoParameters() {
+    void twoParameters() {
         final DescriptorFactory factory = new DescriptorFactory(
             DescriptorTest.LABEL,
             "Addition"
@@ -153,13 +153,13 @@ public class DescriptorTest {
      * Creating element with hole as a parameter.
      */
     @Test
-    public void holeAsParameter() {
+    void holeAsParameter() {
         final DescriptorFactory factory = new DescriptorFactory(
             DescriptorTest.LABEL,
             "simpleExpression"
         );
-        factory.addParameter(new Hole(1, HoleAttribute.NONE));
-        factory.addParameter(new Hole(2, HoleAttribute.NONE));
+        factory.addParameter(new Hole(1, HoleAttribute.NONE, ""));
+        factory.addParameter(new Hole(2, HoleAttribute.NONE, ""));
         final Descriptor descriptor = factory.createDescriptor();
         Assertions.assertEquals(
             "simpleExpression(#1, #2)",

@@ -31,7 +31,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import org.cqfn.astranaut.Main;
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.exceptions.BaseException;
 import org.cqfn.astranaut.utils.cli.ProjectRootValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ import org.junit.jupiter.api.io.TempDir;
  *
  * @since 0.1.5
  */
-public class ProjectRootValidatorTest {
+class ProjectRootValidatorTest {
     /**
      * The action option as an argument example.
      */
@@ -75,7 +75,7 @@ public class ProjectRootValidatorTest {
      * @param source A temporary directory
      */
     @Test
-    public void testProjectRootOptionNoException(@TempDir final Path source) throws IOException {
+    void testProjectRootOptionNoException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
             ProjectRootValidatorTest.ACTION,
@@ -101,7 +101,7 @@ public class ProjectRootValidatorTest {
      * @param source A temporary directory
      */
     @Test
-    public void testProjectRootOptionWithException(@TempDir final Path source) throws IOException {
+    void testProjectRootOptionWithException(@TempDir final Path source) throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
             ProjectRootValidatorTest.ACTION,
@@ -127,7 +127,7 @@ public class ProjectRootValidatorTest {
      * @param source A temporary directory
      */
     @Test
-    public void testProjectRootOptionWithExistingPath(@TempDir final Path source)
+    void testProjectRootOptionWithExistingPath(@TempDir final Path source)
         throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {
@@ -155,7 +155,7 @@ public class ProjectRootValidatorTest {
      * @param source A temporary directory
      */
     @Test
-    public void testProjectRootOptionWithoutParameter(@TempDir final Path source)
+    void testProjectRootOptionWithoutParameter(@TempDir final Path source)
         throws IOException {
         final Path file = this.createTempTxtFile(source);
         final String[] example = {

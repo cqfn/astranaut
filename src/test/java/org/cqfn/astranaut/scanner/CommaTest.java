@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class CommaTest {
+class CommaTest {
     /**
      * Source code.
      */
@@ -48,7 +48,7 @@ public class CommaTest {
      * Test scanner with string contains a comma.
      */
     @Test
-    public void comma() {
+    void comma() {
         final Scanner scanner = new Scanner(CommaTest.SOURCE);
         boolean oops = false;
         final Token token;

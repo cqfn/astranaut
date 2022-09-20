@@ -32,12 +32,12 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class MethodBodyTest {
+class MethodBodyTest {
     /**
      * Testing code generation with a single line.
      */
     @Test
-    public void singleLine() {
+    void singleLine() {
         final MethodBody body = new MethodBody();
         body.setCode(" return x;");
         final String code = body.generate(2);
@@ -48,7 +48,7 @@ public class MethodBodyTest {
      * Testing code generation with two lines.
      */
     @Test
-    public void twoLines() {
+    void twoLines() {
         final MethodBody body = new MethodBody();
         body.setCode("int x = 2 + 3;\nreturn x;");
         final String code = body.generate(1);
@@ -59,7 +59,7 @@ public class MethodBodyTest {
      * Testing code generation with 'if' statement.
      */
     @Test
-    public void ifStatement() {
+    void ifStatement() {
         final String expected = "if (flag) {\n    builder.append(',');\n}\n";
         final MethodBody body = new MethodBody();
         body.setCode("if (flag) { builder.append(','); }");

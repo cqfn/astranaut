@@ -96,7 +96,7 @@ public final class ConverterGenerator {
         if (filler.isLinkedListNeeded()) {
             unit.addImport("java.util.LinkedList");
         }
-        final String base = this.env.getBasePackage();
+        final String base = "org.cqfn.astranaut.core";
         if (attrib == DescriptorAttribute.NONE) {
             unit.addImport(base.concat(".Builder"));
         }

@@ -597,6 +597,53 @@ the type of the second successor is `literal`, and the second successor has the 
 string, then replace this node by another with `Addition` type, which has successors that are first and third
 successors of original node.
 
+### §15. Comments
+
+A DSL program can contain comments. 
+This functionality allows leaving notes about rules.
+You may also comment rules to disable them.
+
+The DSL supports `C-style` comments.
+
+`Single-line` comments should start with `//`.
+
+`Multi-line` comments should be placed between `/*` and `*/`.
+
+#### Examples
+
+Single-line comments:
+
+```
+// Some expressions
+
+Addition <- left@Expression, right@Expression;
+Subtraction <- left@Expression, right@Expression;
+```
+
+```
+BinaryExpression <- Addition | Subtraction; // Not completed
+```
+
+```
+Variable <- Identifier;
+// Multiplication <- left@Expression, right@Expression;
+```
+
+Multi-line comments:
+
+```
+/*
+  py:
+
+  self -> This;
+  expr(atom(literal<#1>)) -> StringLiteral<#1>;
+*/
+```
+
+```
+/*  ExpressionList <- {Expression}; */
+```
+
 ### Contributors
 
 * Ivan Kniazkov, @kniazkov

@@ -69,7 +69,13 @@ public class Scanner {
         }
         final Token result;
         if (Char.isLetter(symbol)) {
-            result = this.parseIdentifier(symbol);
+            final String identifier = this.parseIdentifier(symbol);
+            symbol = this.getChar();
+            if (symbol == '#') {
+                result = this.parseHoleMarker(identifier);
+            } else {
+                result = new Identifier(identifier);
+            }
         } else if (Char.isBracket(symbol)) {
             this.nextChar();
             result = BracketFactory.INSTANCE.getObject(symbol);
@@ -110,16 +116,16 @@ public class Scanner {
     /**
      * Parses an identifier.
      * @param first The first symbol
-     * @return A token
+     * @return An identifier string
      */
-    private Identifier parseIdentifier(final char first) {
+    private String parseIdentifier(final char first) {
         final StringBuilder builder = new StringBuilder();
         char symbol = first;
         do {
             builder.append(symbol);
             symbol = this.nextChar();
         } while (Char.isLetter(symbol) || Char.isDigit(symbol));
-        return new Identifier(builder.toString());
+        return builder.toString();
     }
 
     /**
@@ -136,7 +142,7 @@ public class Scanner {
                 result = Null.INSTANCE;
                 break;
             case '#':
-                result = this.parseHoleMarker();
+                result = this.parseHoleMarker("");
                 break;
             case '\"':
                 result = this.parseString();
@@ -172,10 +178,11 @@ public class Scanner {
 
     /**
      * Parses a hole marker.
+     * @param type The type of node identifier
      * @return A token
      * @throws ParserException Parser exception
      */
-    private HoleMarker parseHoleMarker() throws ParserException {
+    private HoleMarker parseHoleMarker(final String type) throws ParserException {
         final StringBuilder number = new StringBuilder();
         char symbol = this.nextChar();
         while (symbol >= '0' && symbol <= '9') {
@@ -198,8 +205,11 @@ public class Scanner {
                 throw IncorrectEllipsis.INSTANCE;
             }
         }
+        if (!type.isEmpty()) {
+            attribute = HoleAttribute.TYPED;
+        }
         final int value = Integer.parseInt(number.toString());
-        return new HoleMarker(value, attribute);
+        return new HoleMarker(value, attribute, type);
     }
 
     /**

@@ -25,7 +25,7 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.io.IOException;
-import org.cqfn.astranaut.utils.FilesReader;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class InterfaceTest {
+class InterfaceTest {
     /**
      * The folder with test resources.
      */
@@ -44,7 +44,7 @@ public class InterfaceTest {
      * Testing code generation with interface descriptor.
      */
     @Test
-    public void testInterface() {
+    void testInterface() {
         final Interface iface = new Interface("DSL rule", "Rule");
         final MethodDescriptor method = new MethodDescriptor(
             "Generates source code from the rule",

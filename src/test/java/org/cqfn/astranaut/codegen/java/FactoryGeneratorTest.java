@@ -25,10 +25,10 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.io.IOException;
-import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.parser.ProgramParser;
 import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
-public class FactoryGeneratorTest {
+class FactoryGeneratorTest {
     /**
      * The folder with test resources.
      */
@@ -47,7 +47,7 @@ public class FactoryGeneratorTest {
      * Testing source code generation for rules that describe nodes.
      */
     @Test
-    public void testFactoryGeneration() {
+    void testFactoryGeneration() {
         boolean oops = false;
         try {
             final String source = this.readTest("factory_generator_source.txt");

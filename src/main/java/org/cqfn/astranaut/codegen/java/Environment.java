@@ -51,12 +51,6 @@ public interface Environment {
     String getRootPackage();
 
     /**
-     * Returns the name of the package that contains the 'Node' base interface.
-     * @return The package name
-     */
-    String getBasePackage();
-
-    /**
      * Returns the "test" flag.
      * The flag means that no files will be written to the file system. The program
      * will only check the structure of the DSL and the possibility of generating files.
