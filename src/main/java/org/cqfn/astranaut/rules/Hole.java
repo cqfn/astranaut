@@ -26,7 +26,7 @@ package org.cqfn.astranaut.rules;
 import java.util.Objects;
 
 /**
- * Hole, i.e. #1, #2, etc.
+ * Hole, i.e. #1, #2, Modifier#3, etc.
  *
  * @since 0.1.5
  */
@@ -42,13 +42,20 @@ public final class Hole implements Data, Parameter {
     private final HoleAttribute attribute;
 
     /**
+     * Type of the node that is matched by a hole.
+     */
+    private final String type;
+
+    /**
      * Constructor.
      * @param value Value of the hole
      * @param attribute Attribute
+     * @param type Type of the node
      */
-    public Hole(final int value, final HoleAttribute attribute) {
+    public Hole(final int value, final HoleAttribute attribute, final String type) {
         this.value = value;
         this.attribute = attribute;
+        this.type = type;
     }
 
     /**
@@ -57,6 +64,14 @@ public final class Hole implements Data, Parameter {
      */
     public int getValue() {
         return this.value;
+    }
+
+    /**
+     * Returns the type of the hole.
+     * @return The type
+     */
+    public String getType() {
+        return this.type;
     }
 
     /**
@@ -70,6 +85,7 @@ public final class Hole implements Data, Parameter {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder()
+            .append(this.type)
             .append('#')
             .append(this.value);
         if (this.attribute == HoleAttribute.ELLIPSIS) {

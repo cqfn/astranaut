@@ -141,17 +141,18 @@ public abstract class Descriptor implements Child, Parameter {
     }
 
     /**
-     * Checks whether the descriptor has a hole with ellipsis.
+     * Checks whether the descriptor has a hole with ellipsis or a node type.
      * @return Checking result, {@code true} if the descriptor has a hole with ellipsis
      */
-    public boolean hasEllipsisHole() {
+    public boolean hasEllipsisOrTypedHole() {
         boolean result = false;
         final List<Parameter> parameters = this.getParameters();
         final ListIterator<Parameter> iterator = parameters.listIterator(parameters.size());
         while (iterator.hasPrevious()) {
             final Parameter parameter = iterator.previous();
             if (parameter instanceof Hole
-                && ((Hole) parameter).getAttribute() == HoleAttribute.ELLIPSIS) {
+                && (((Hole) parameter).getAttribute() == HoleAttribute.ELLIPSIS
+                    || ((Hole) parameter).getAttribute() == HoleAttribute.TYPED)) {
                 result = true;
                 break;
             }
