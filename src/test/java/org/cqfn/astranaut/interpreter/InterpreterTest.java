@@ -84,6 +84,16 @@ class InterpreterTest {
     }
 
     /**
+     * Testing holes with a node type, more complex case.
+     * @param temp A temporary directory
+     */
+    @Test
+    void typedHoleComplexTest(@TempDir final Path temp) {
+        final boolean result = this.test("test_4", temp);
+        Assertions.assertTrue(result);
+    }
+
+    /**
      * Testing running interpreter without a destination specified.
      */
     @Test
