@@ -43,6 +43,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
+@SuppressWarnings("PMD.TooManyMethods")
 class MatcherGeneratorTest {
     /**
      * The folder with test resources.
@@ -131,9 +132,21 @@ class MatcherGeneratorTest {
     }
 
     /**
+     * Test case: extract unknown number of children of the particular type.
+     */
+    @Test
+    void testUnknownNumberOfChildNodesWithSameType() {
+        final int result = this.testing(
+            "AAA(BBB, CCC#1, #2)",
+            "matcher_generator_extract_particular_type.txt"
+        );
+        Assertions.assertTrue(result > 0);
+    }
+
+    /**
      * Performs a test.
      * @param code Source code of descriptor
-     * @param filename The name of file that contains the expected result
+     * @param filename The name of file that contaAins the expected result
      * @return Expected generated classes number
      */
     private int testing(final String code, final String filename) {
