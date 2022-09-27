@@ -122,6 +122,7 @@ public final class Matcher implements org.cqfn.astranaut.core.Matcher {
         List<Node>> children, final Map<Integer, String> data) {
         boolean result = true;
         int index = 0;
+        int sub = 0;
         for (final Parameter parameter : this.descriptor.getParameters()) {
             if (parameter instanceof Hole) {
                 final Hole hole = (Hole) parameter;
@@ -130,11 +131,11 @@ public final class Matcher implements org.cqfn.astranaut.core.Matcher {
                 index = index + list.size();
             } else if (parameter instanceof Descriptor) {
                 final Matcher matcher;
-                if (this.subs[index] == null) {
+                if (this.subs[sub] == null) {
                     matcher = new Matcher((Descriptor) parameter);
-                    this.subs[index] = matcher;
+                    this.subs[sub] = matcher;
                 } else {
-                    matcher = this.subs[index];
+                    matcher = this.subs[sub];
                 }
                 result = matcher.match(node.getChild(index), children, data);
                 if (!result) {
@@ -142,6 +143,7 @@ public final class Matcher implements org.cqfn.astranaut.core.Matcher {
                 }
                 index = index + 1;
             }
+            sub = sub + 1;
         }
         return result;
     }
