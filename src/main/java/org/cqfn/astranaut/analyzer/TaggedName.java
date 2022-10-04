@@ -76,7 +76,7 @@ public final class TaggedName implements TaggedChild {
 
     @Override
     public String getTag() {
-        return this.tag.toLowerCase(Locale.ROOT);
+        return this.tag.toLowerCase(Locale.ENGLISH);
     }
 
     @Override
