@@ -24,6 +24,7 @@
 
 package org.cqfn.astranaut.analyzer;
 
+import java.util.Locale;
 import java.util.Objects;
 import org.cqfn.astranaut.codegen.java.TaggedChild;
 
@@ -75,7 +76,7 @@ public final class TaggedName implements TaggedChild {
 
     @Override
     public String getTag() {
-        return this.tag;
+        return this.tag.toLowerCase(Locale.ROOT);
     }
 
     @Override
