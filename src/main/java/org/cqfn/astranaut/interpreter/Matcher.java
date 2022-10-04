@@ -172,10 +172,14 @@ public final class Matcher implements org.cqfn.astranaut.core.Matcher {
             case TYPED:
                 final int number = node.getChildCount();
                 list = new ArrayList<>(number - index);
-                for (int position = index; position < number; position += 1) {
-                    final Node child = node.getChild(position);
-                    if (hole.getType().equals(child.getTypeName())) {
-                        list.add(child);
+                int position = index;
+                Node child = node.getChild(position);
+                final String type = hole.getType();
+                while (type.equals(child.getTypeName()) && position < number) {
+                    list.add(child);
+                    position += 1;
+                    if (position != number) {
+                        child = node.getChild(position);
                     }
                 }
                 break;

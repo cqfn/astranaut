@@ -499,6 +499,33 @@ public class MatcherClassFiller {
                 )
             );
             result = String.join("\n", code);
+        } else if (hole.getAttribute() == HoleAttribute.TYPED) {
+            this.alist = true;
+            final String capacity;
+            if (index == 0) {
+                capacity = "count";
+            } else {
+                capacity = String.format("count - %d", index);
+            }
+            final List<String> code = Arrays.asList(
+                "final int count = node.getChildCount();",
+                String.format("final List<Node> list = new ArrayList<>(%s);", capacity),
+                String.format(
+                    "for (int index = %d; index < count; index = index + 1) {",
+                    index
+                ),
+                "final Node child = node.getChild(index);",
+                String.format("if (\"%s\".equals(child.getTypeName())) {", hole.getType()),
+                "list.add(child);",
+                "}",
+                "}",
+                String.format(
+                    "children.put(%s.%s, list);\n",
+                    this.klass.getName(),
+                    destination
+                )
+            );
+            result = String.join("\n", code);
         } else {
             this.collections = true;
             final String srclbl = this.children.getLabel();
