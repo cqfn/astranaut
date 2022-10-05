@@ -276,22 +276,19 @@ public class Analyzer {
      */
     private void processCommonTags(final int count, final Result ancestor, final Vertex extended) {
         final Set<Node> related = new HashSet<>();
-        final Map<TaggedName, Boolean> common = new HashMap<>();
+        final Set<TaggedName> common = new HashSet<>();
         final int idx = this.findCommonTags(count, related, common);
-        if (count > 1) {
-            common.values().removeAll(Collections.singleton(false));
-        }
         if (count == idx) {
             for (final Node node : related) {
                 final Result result = this.info.get(node);
                 if (node.equals(extended) && common.isEmpty()) {
                     result.removeTags();
-                    this.updateExtendedNodeDescendants(extended, common.keySet());
+                    this.updateExtendedNodeDescendants(extended, common);
                 } else {
-                    result.setOverriddenTags(common.keySet());
+                    result.setOverriddenTags(common);
                 }
             }
-            for (final TaggedName name : common.keySet()) {
+            for (final TaggedName name : common) {
                 ancestor.addTaggedName(name.getTag(), name.getType());
             }
         }
@@ -301,33 +298,25 @@ public class Analyzer {
      * Iterates over nodes in stack to collect common tagged names.
      * @param count The count of described descendant nodes
      * @param related The set of nodes to be updated after finding common tagged names
-     * @param common The mappings of found common tagged names and the key that shows
-     *  if it was found in other nodes
+     * @param common The set of found common tagged names
      * @return The amount of processed nodes
      */
     private int findCommonTags(
         final int count,
         final Set<Node> related,
-        final Map<TaggedName, Boolean> common) {
+        final Set<TaggedName> common) {
         int idx = 0;
         while (!this.stack.empty() && idx < count) {
             idx += 1;
             final Node node = this.stack.pop();
             final Result result = this.info.get(node);
             final List<TaggedName> names = result.getTaggedNames();
-            for (final TaggedName name : names) {
-                if (idx == 1) {
-                    common.put(name, false);
-                    related.add(node);
-                    continue;
-                }
-                if (common.containsKey(name)) {
-                    common.put(name, true);
-                } else {
-                    common.put(name, false);
-                }
-                related.add(node);
+            if (idx == 1) {
+                common.addAll(names);
+            } else {
+                common.removeIf(name -> !names.contains(name));
             }
+            related.add(node);
         }
         return idx;
     }
