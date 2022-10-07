@@ -28,24 +28,6 @@
       },
       {
         "type": "Y"
-        "type": "B",
-        "data": "0"
-      },
-      {
-        "type": "C"
-      },
-      {
-        "type": "DD",
-        "children": [
-          {
-            "type": "D",
-            "data": "1"
-          },
-          {
-            "type": "D",
-            "data": "2"
-          }
-        ]
       }
     ]
   }
