@@ -26,20 +26,20 @@ package org.cqfn.astranaut.interpreter;
 import java.util.Collections;
 
 /**
- * The node factory.
+ * The default node factory that creates draft nodes.
  *
  * @since 0.1.5
  */
-public final class Factory extends org.cqfn.astranaut.core.Factory {
+public final class DefaultFactory extends org.cqfn.astranaut.core.Factory {
     /**
      * The instance.
      */
-    public static final Factory INSTANCE = new Factory();
+    public static final DefaultFactory INSTANCE = new DefaultFactory();
 
     /**
      * Constructor.
      */
-    private Factory() {
+    private DefaultFactory() {
         super(Collections.emptyMap());
     }
 }

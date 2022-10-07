@@ -27,11 +27,13 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.cqfn.astranaut.core.EmptyTree;
+import org.cqfn.astranaut.core.Factory;
 import org.cqfn.astranaut.core.Node;
 import org.cqfn.astranaut.core.exceptions.BaseException;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 import org.cqfn.astranaut.interpreter.Adapter;
+import org.cqfn.astranaut.interpreter.DefaultFactory;
 import org.cqfn.astranaut.parser.ProgramParser;
 import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Program;
@@ -49,10 +51,16 @@ public class TreeProcessor {
     private final List<Instruction<Transformation>> rules;
 
     /**
+     * The node factory.
+     */
+    private Factory factory;
+
+    /**
      * Constructor.
      */
     public TreeProcessor() {
         this.rules = new LinkedList<>();
+        this.factory = DefaultFactory.INSTANCE;
     }
 
     /**
@@ -93,12 +101,20 @@ public class TreeProcessor {
     }
 
     /**
+     * Replaces default node the node factory.
+     * @param obj The factory
+     */
+    public void setFactory(final Factory obj) {
+        this.factory = obj;
+    }
+
+    /**
      * Transforms an initial tree with the given rules.
      * @param tree The initial tree to be modified
      * @return Transformed tree
      */
     public Node transform(final Node tree) {
-        final Adapter adapter = new Adapter(this.rules);
+        final Adapter adapter = new Adapter(this.rules, this.factory);
         return adapter.convert(tree);
     }
 
@@ -121,7 +137,7 @@ public class TreeProcessor {
         int result;
         try {
             final Instruction<Transformation> rule = this.rules.get(index);
-            final Adapter adapter = new Adapter(Collections.singletonList(rule));
+            final Adapter adapter = new Adapter(Collections.singletonList(rule), this.factory);
             result =  adapter.calculateConversions(tree);
         } catch (final IndexOutOfBoundsException exception) {
             result = 0;
@@ -140,7 +156,7 @@ public class TreeProcessor {
         Node result;
         try {
             final Instruction<Transformation> rule = this.rules.get(index);
-            final Adapter adapter = new Adapter(Collections.singletonList(rule));
+            final Adapter adapter = new Adapter(Collections.singletonList(rule), this.factory);
             result =  adapter.partialConvert(variant, tree);
         } catch (final IndexOutOfBoundsException exception) {
             result = EmptyTree.INSTANCE;

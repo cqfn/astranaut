@@ -49,12 +49,13 @@ and apply them to an initial tree using `TreeProcessor`.
 The `TreeProcessor` has the following methods:
 
 1. `boolean loadRules(String filename)` - to load transformation rules from a file.
-2. `boolean loadRulesFromString(String code)` - to load transformation rules from a given string.  
-3. `Node transform(Node tree)` - to transform an input tree using loaded rules.
-4. `int countRules()` - to get an amount of loaded rules.
-5. `int calculateVariants(int index, Node tree)` - to get an amount of possible tree transformations that may be
+2. `boolean loadRulesFromString(String code)` - to load transformation rules from a given string.
+3. `void setFactory(Factory factory)` - to replace default node factory.
+4. `Node transform(Node tree)` - to transform an input tree using loaded rules.
+5. `int countRules()` - to get an amount of loaded rules.
+6. `int calculateVariants(int index, Node tree)` - to get an amount of possible tree transformations that may be
     done by applying a specified rule.
-6. `Node partialTransform(int index, int variant, Node tree)` - to apply a chosen variant of transformation to 
+7. `Node partialTransform(int index, int variant, Node tree)` - to apply a chosen variant of transformation to 
    an input tree using a specified rule.
 
 **Example:**

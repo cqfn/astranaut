@@ -94,9 +94,12 @@ public class Interpreter {
                         }
                     }
             ),
-            language -> Factory.INSTANCE
+            language -> DefaultFactory.INSTANCE
         ).convert();
-        final Adapter adapter = new Adapter(this.program.getTransformations());
+        final Adapter adapter = new Adapter(
+            this.program.getTransformations(),
+            DefaultFactory.INSTANCE
+        );
         final Node processed = adapter.convert(unprocessed);
         if (!new JsonSerializer(processed).serializeToFile(this.destination.getPath())) {
             throw new InterpreterCouldNotWriteFile(this.destination.getPath());

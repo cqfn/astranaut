@@ -59,7 +59,11 @@ class CreatorTest {
         ctor.setName("A");
         final Node node = ctor.createNode();
         children.put(1, Collections.singletonList(node));
-        final Node result = creator.create(Factory.INSTANCE, children, Collections.emptyMap());
+        final Node result = creator.create(
+            DefaultFactory.INSTANCE,
+            children,
+            Collections.emptyMap()
+        );
         Assertions.assertEquals(node, result);
     }
 
@@ -71,7 +75,7 @@ class CreatorTest {
         final Descriptor descriptor = this.parseCode("#2");
         final Creator creator = new Creator(descriptor);
         final Node result = creator.create(
-            Factory.INSTANCE, Collections.emptyMap(), Collections.emptyMap()
+            DefaultFactory.INSTANCE, Collections.emptyMap(), Collections.emptyMap()
         );
         Assertions.assertEquals(EmptyTree.INSTANCE, result);
     }
@@ -84,9 +88,9 @@ class CreatorTest {
         final Descriptor descriptor = this.parseCode("X(Y,Z)");
         final Creator creator = new Creator(descriptor);
         final List<Creator> initial = creator.getSubs();
-        creator.create(Factory.INSTANCE, Collections.emptyMap(), Collections.emptyMap());
+        creator.create(DefaultFactory.INSTANCE, Collections.emptyMap(), Collections.emptyMap());
         final List<Creator> first = creator.getSubs();
-        creator.create(Factory.INSTANCE, Collections.emptyMap(), Collections.emptyMap());
+        creator.create(DefaultFactory.INSTANCE, Collections.emptyMap(), Collections.emptyMap());
         final List<Creator> second = creator.getSubs();
         Assertions.assertNotEquals(initial, first);
         Assertions.assertEquals(first, second);
@@ -103,7 +107,7 @@ class CreatorTest {
         final Map<Integer, String> data = new TreeMap<>();
         final String value = "test";
         data.put(1, value);
-        final Node result = creator.create(Factory.INSTANCE, Collections.emptyMap(), data);
+        final Node result = creator.create(DefaultFactory.INSTANCE, Collections.emptyMap(), data);
         Assertions.assertEquals("B", result.getTypeName());
         Assertions.assertEquals(value, result.getData());
     }
