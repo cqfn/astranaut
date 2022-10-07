@@ -24,9 +24,17 @@
 package org.cqfn.astranaut.api;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import org.cqfn.astranaut.core.Builder;
+import org.cqfn.astranaut.core.ChildDescriptor;
 import org.cqfn.astranaut.core.DraftNode;
+import org.cqfn.astranaut.core.EmptyFragment;
 import org.cqfn.astranaut.core.EmptyTree;
+import org.cqfn.astranaut.core.Factory;
+import org.cqfn.astranaut.core.Fragment;
 import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.Type;
 import org.cqfn.astranaut.core.exceptions.BaseException;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.ProcessorException;
@@ -44,6 +52,11 @@ class TreeProcessorTest {
      * The type IntegerLiteral.
      */
     private static final String INT_LITERAL = "IntegerLiteral";
+
+    /**
+     * The type Number.
+     */
+    private static final String NUMBER = "Number";
 
     /**
      * The type Addition.
@@ -106,6 +119,24 @@ class TreeProcessorTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(TreeProcessorTest.INT_LITERAL, result.getTypeName());
         Assertions.assertEquals("5", result.getData());
+        Assertions.assertEquals(0, result.getChildCount());
+    }
+
+    /**
+     * Test for a tree transformation with customized factory.
+     */
+    @Test
+    void testCustomizedFactory() {
+        final Node tree = this.createSampleTree();
+        final TreeProcessor processor = new TreeProcessor();
+        processor.setFactory(new CustomFactory());
+        processor.loadRulesFromString(
+            "Addition(IntegerLiteral<\"2\">, IntegerLiteral<\"3\">) -> Number<\"5\"> ;"
+        );
+        final Node result = processor.transform(tree);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(TreeProcessorTest.NUMBER, result.getTypeName());
+        Assertions.assertEquals("5.0", result.getData());
         Assertions.assertEquals(0, result.getChildCount());
     }
 
@@ -310,5 +341,151 @@ class TreeProcessorTest {
         Assertions.assertFalse(oops);
         final JsonDeserializer deserializer = new JsonDeserializer(source);
         return deserializer.deserialize();
+    }
+
+    /**
+     * Custom factory for testing {@link TreeProcessor#setFactory(Factory)} method.
+     *
+     * @since 0.2.9
+     */
+    private static class CustomFactory extends Factory {
+        /**
+         * Constructor.
+         */
+        CustomFactory() {
+            super(Collections.singletonMap(TreeProcessorTest.NUMBER, new CustomType()));
+        }
+    }
+
+    /**
+     * The custom type for the custom factory.
+     *
+     * @since 0.2.9
+     */
+    private static class CustomType implements Type {
+        @Override
+        public String getName() {
+            return TreeProcessorTest.NUMBER;
+        }
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return Collections.singletonList(TreeProcessorTest.NUMBER);
+        }
+
+        @Override
+        public String getProperty(final String property) {
+            return "";
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new CustomBuilder();
+        }
+    }
+
+    /**
+     * The custom builder for the custom type.
+     *
+     * @since 0.2.9
+     */
+    private static class CustomBuilder implements Builder {
+        /**
+         * The fragment covered by node.
+         */
+        private Fragment fragment = EmptyFragment.INSTANCE;
+
+        /**
+         * The node value.
+         */
+        private double value;
+
+        @Override
+        public void setFragment(final Fragment obj) {
+            this.fragment = obj;
+        }
+
+        @Override
+        public boolean setData(final String string) {
+            boolean success = true;
+            try {
+                this.value = Double.parseDouble(string);
+            } catch (final NumberFormatException ignored) {
+                success = false;
+            }
+            return success;
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return false;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            return new CustomNode(this.fragment, this.value);
+        }
+    }
+
+    /**
+     * The custom node for the custom builder.
+     *
+     * @since 0.2.9
+     */
+    private static final class CustomNode implements Node {
+        /**
+         * The fragment covered by node.
+         */
+        private final Fragment fragment;
+
+        /**
+         * The node value.
+         */
+        private final double value;
+
+        /**
+         * Constructor.
+         * @param fragment The fragment covered by node
+         * @param value The node value
+         */
+        private CustomNode(final Fragment fragment, final double value) {
+            this.fragment = fragment;
+            this.value = value;
+        }
+
+        @Override
+        public Fragment getFragment() {
+            return this.fragment;
+        }
+
+        @Override
+        public Type getType() {
+            return new CustomType();
+        }
+
+        @Override
+        public String getData() {
+            return String.valueOf(this.value);
+        }
+
+        @Override
+        public int getChildCount() {
+            return 0;
+        }
+
+        @Override
+        public Node getChild(final int index) {
+            return EmptyTree.INSTANCE;
+        }
     }
 }
