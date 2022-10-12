@@ -132,21 +132,21 @@ class MatcherGeneratorTest {
     }
 
     /**
-     * Testing holes with typed.
+     * Test case: extract unknown number of children of the particular type.
      */
     @Test
-    void testHolesWithType() {
+    void testUnknownNumberOfChildNodesWithSameType() {
         final int result = this.testing(
-            "AAA(BBB#1, CCC, DDD#2)",
-            "matcher_generator_holes_with_type.txt"
+            "AAA(BBB, CCC#1, #2)",
+            "matcher_generator_extract_particular_type.txt"
         );
-        Assertions.assertEquals(2, result);
+        Assertions.assertTrue(result > 0);
     }
 
     /**
      * Performs a test.
      * @param code Source code of descriptor
-     * @param filename The name of file that contains the expected result
+     * @param filename The name of file that contaAins the expected result
      * @return Expected generated classes number
      */
     private int testing(final String code, final String filename) {

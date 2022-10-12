@@ -26,6 +26,7 @@ package org.cqfn.astranaut.interpreter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.cqfn.astranaut.core.Factory;
 import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Transformation;
 
@@ -38,9 +39,10 @@ public class Adapter extends org.cqfn.astranaut.core.Adapter {
     /**
      * Constructor.
      * @param instructions The list of transformation instructions
+     * @param factory The node factory
      */
-    public Adapter(final List<Instruction<Transformation>> instructions) {
-        super(Collections.unmodifiableList(Adapter.init(instructions)), Factory.INSTANCE);
+    public Adapter(final List<Instruction<Transformation>> instructions, final Factory factory) {
+        super(Collections.unmodifiableList(Adapter.init(instructions)), factory);
     }
 
     /**

@@ -159,30 +159,35 @@ public final class Matcher implements org.cqfn.astranaut.core.Matcher {
         final Hole hole,
         final Node node,
         final int index) {
-        List<Node> list = null;
-        switch (hole.getAttribute()) {
-            case NONE:
-                list = Collections.singletonList(node.getChild(index));
-                break;
-            case ELLIPSIS:
-                final int count = node.getChildCount();
-                list = new ArrayList<>(count - index);
-                for (int position = index; position < count; position += 1) {
-                    list.add(node.getChild(position));
-                }
-                break;
-            case TYPED:
-                final int number = node.getChildCount();
-                list = new ArrayList<>(number - index);
-                for (int position = index; position < number; position += 1) {
-                    final Node child = node.getChild(position);
-                    if (hole.getType().equals(child.getTypeName())) {
-                        list.add(child);
+        final int count = node.getChildCount();
+        List<Node> list = Collections.emptyList();
+        if (index < count) {
+            switch (hole.getAttribute()) {
+                case NONE:
+                    list = Collections.singletonList(node.getChild(index));
+                    break;
+                case ELLIPSIS:
+                    list = new ArrayList<>(count - index);
+                    for (int position = index; position < count; position += 1) {
+                        list.add(node.getChild(position));
                     }
-                }
-                break;
-            default:
-                break;
+                    break;
+                case TYPED:
+                    list = new ArrayList<>(count - index);
+                    int position = index;
+                    Node child = node.getChild(position);
+                    final String type = hole.getType();
+                    while (type.equals(child.getTypeName()) && position < count) {
+                        list.add(child);
+                        position += 1;
+                        if (position != count) {
+                            child = node.getChild(position);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
         return list;
     }

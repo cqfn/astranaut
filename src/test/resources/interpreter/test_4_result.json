@@ -1,33 +1,68 @@
 {
   "root": {
-    "type": "F",
+    "type": "Q",
     "children": [
       {
-        "type": "X",
+        "type": "F",
         "children": [
           {
-            "type": "B",
-            "data": "1"
+            "type": "X",
+            "children": [
+              {
+                "type": "B",
+                "data": "1"
+              },
+              {
+                "type": "B",
+                "data": "2"
+              },
+              {
+                "type": "B",
+                "data": "3"
+              },
+              {
+                "type": "B",
+                "data": "4"
+              }
+            ]
           },
           {
-            "type": "B",
-            "data": "2"
+            "type": "C"
           },
           {
-            "type": "B",
-            "data": "3"
-          },
-          {
-            "type": "B",
-            "data": "4"
+            "type": "Y"
           }
         ]
       },
       {
-        "type": "C"
-      },
-      {
-        "type": "Y"
+        "type": "F",
+        "children": [
+          {
+            "type": "X",
+            "children": [
+              {
+                "type": "B",
+                "data": "1"
+              },
+              {
+                "type": "B",
+                "data": "2"
+              }
+            ]
+          },
+          {
+            "type": "C"
+          },
+          {
+            "type": "Y",
+            "children": [
+              {
+                "type": "D",
+                "data": "3"
+              }
+            ]
+          }
+        ]
       }
     ]
   }
