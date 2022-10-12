@@ -96,6 +96,9 @@ public final class MatcherGenerator {
         if (filler.isArrayListNeeded()) {
             unit.addImport("java.util.ArrayList");
         }
+        if (filler.isLinkedListNeeded()) {
+            unit.addImport("java.util.LinkedList");
+        }
         final String base = "org.cqfn.astranaut.core";
         unit.addImport(base.concat(".Matcher"));
         unit.addImport(base.concat(".Node"));

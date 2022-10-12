@@ -43,6 +43,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1.5
  */
+@SuppressWarnings("PMD.TooManyMethods")
 class MatcherGeneratorTest {
     /**
      * The folder with test resources.
@@ -128,6 +129,18 @@ class MatcherGeneratorTest {
             "matcher_generator_long_condition.txt"
         );
         Assertions.assertTrue(result > 0);
+    }
+
+    /**
+     * Testing holes with typed.
+     */
+    @Test
+    void testHolesWithType() {
+        final int result = this.testing(
+            "AAA(BBB#1, CCC, DDD#2)",
+            "matcher_generator_holes_with_type.txt"
+        );
+        Assertions.assertEquals(2, result);
     }
 
     /**

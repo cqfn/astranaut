@@ -130,14 +130,17 @@ public abstract class Descriptor implements Child, Parameter {
             result = true;
         }
         if (!result) {
-            for (final Parameter parameter : this.getParameters()) {
-                if (parameter instanceof Hole) {
-                    result = true;
-                    break;
-                }
-            }
+            result = this.hasHoleWithAttribute(attribute -> true);
         }
         return result;
+    }
+
+    /**
+     * Checks whether the descriptor has a typed hole.
+     * @return Checking result, {@code true} if the descriptor has a typed hole
+     */
+    public boolean hasTypedHole() {
+        return this.hasHoleWithAttribute(attribute -> attribute == HoleAttribute.TYPED);
     }
 
     /**
@@ -145,19 +148,9 @@ public abstract class Descriptor implements Child, Parameter {
      * @return Checking result, {@code true} if the descriptor has a hole with ellipsis
      */
     public boolean hasEllipsisOrTypedHole() {
-        boolean result = false;
-        final List<Parameter> parameters = this.getParameters();
-        final ListIterator<Parameter> iterator = parameters.listIterator(parameters.size());
-        while (iterator.hasPrevious()) {
-            final Parameter parameter = iterator.previous();
-            if (parameter instanceof Hole
-                && (((Hole) parameter).getAttribute() == HoleAttribute.ELLIPSIS
-                    || ((Hole) parameter).getAttribute() == HoleAttribute.TYPED)) {
-                result = true;
-                break;
-            }
-        }
-        return result;
+        return this.hasHoleWithAttribute(
+            attribute -> attribute == HoleAttribute.ELLIPSIS || attribute == HoleAttribute.TYPED
+        );
     }
 
     @Override
@@ -211,5 +204,38 @@ public abstract class Descriptor implements Child, Parameter {
             }
             builder.append(')');
         }
+    }
+
+    /**
+     * Checks whether the descriptor has a hole with specified attribute.
+     * @param checker Checker that checks the attribute matches some criteria
+     * @return Checking result, {@code true} if the descriptor has a hole with specified attribute
+     */
+    private boolean hasHoleWithAttribute(final AttributeChecker checker) {
+        boolean result = false;
+        final List<Parameter> parameters = this.getParameters();
+        final ListIterator<Parameter> iterator = parameters.listIterator(parameters.size());
+        while (iterator.hasPrevious()) {
+            final Parameter parameter = iterator.previous();
+            if (parameter instanceof Hole && checker.check(((Hole) parameter).getAttribute())) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Checker for hole attribute.
+     *
+     * @since 0.2.8
+     */
+    private interface AttributeChecker {
+        /**
+         * Checks the attribute matches some criteria.
+         * @param attribute Attribute
+         * @return Checking result
+         */
+        boolean check(HoleAttribute attribute);
     }
 }
