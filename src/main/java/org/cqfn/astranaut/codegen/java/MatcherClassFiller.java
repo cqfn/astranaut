@@ -41,6 +41,7 @@ import org.cqfn.astranaut.utils.StringUtils;
  *
  * @since 0.1.5
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class MatcherClassFiller {
     /**
      * The 'String' type name.
@@ -63,6 +64,11 @@ public class MatcherClassFiller {
     private static final String HOLE_ID_POSTFIX = "_HOLE_ID";
 
     /**
+     * The '_HOLE_TYPE' postfix.
+     */
+    private static final String HOLE_TYPE_POSTFIX = "_HOLE_TYPE";
+
+    /**
      * The '_CHILD_ID' postfix.
      */
     private static final String CHILD_ID_POSTFIX = "_CHILD_ID";
@@ -71,6 +77,11 @@ public class MatcherClassFiller {
      * The description of field that contains a hole number.
      */
     private static final String HOLE_NUM_DESCR = "The number of the %s hole";
+
+    /**
+     * The description of field that contains a hole type.
+     */
+    private static final String HOLE_TYPE_DESCR = "The type of the %s hole";
 
     /**
      * The description of field that contains a child index.
@@ -149,6 +160,11 @@ public class MatcherClassFiller {
     private boolean alist;
 
     /**
+     * Flag indicates that the package 'java.util.LinkedList' is needed.
+     */
+    private boolean llist;
+
+    /**
      * The set of labels for naming holes.
      */
     private final LabelFactory holes;
@@ -203,6 +219,14 @@ public class MatcherClassFiller {
     }
 
     /**
+     * Returns the flag indicates that the package 'java.util.LinkedList' is needed.
+     * @return The flag
+     */
+    public boolean isLinkedListNeeded() {
+        return this.llist;
+    }
+
+    /**
      * Creates some static fields.
      */
     private void createStaticFields() {
@@ -243,11 +267,20 @@ public class MatcherClassFiller {
         method.addArgument(MatcherClassFiller.CHILDREN_TYPE, MatcherClassFiller.CHILDREN_NAME);
         method.addArgument(MatcherClassFiller.DATA_TYPE, MatcherClassFiller.DATA_NAME);
         final String condition = this.createCondition();
-        if (this.descriptor.hasHole()) {
+        if (this.descriptor.hasTypedHole()) {
+            final String extractor = this.createExtractorWithTypedHoles();
+            final String code = String.format(
+                "boolean result = %s;\n%s\nreturn result;",
+                condition,
+                extractor
+            );
+            method.setCode(code);
+        } else if (this.descriptor.hasHole()) {
+            final String extractor = this.createExtractor();
             final List<String> code = Arrays.asList(
                 String.format("final boolean result = %s;", condition),
                 "if (result) {",
-                this.createExtractor(),
+                extractor,
                 "}",
                 "return result;"
             );
@@ -296,7 +329,9 @@ public class MatcherClassFiller {
             );
             count = count + 1;
         }
-        condition.append(this.createChildChecker(count));
+        if (!this.descriptor.hasTypedHole()) {
+            condition.append(this.createChildChecker(count));
+        }
         return condition.toString();
     }
 
@@ -436,25 +471,7 @@ public class MatcherClassFiller {
             }
             index = index + 1;
         }
-        final Data data = this.descriptor.getData();
-        if (data instanceof Hole) {
-            final Hole hole = (Hole) data;
-            final String label = this.holes.getLabel();
-            final String destination = label.toUpperCase(Locale.ENGLISH)
-                .concat(MatcherClassFiller.HOLE_ID_POSTFIX);
-            this.createMagicNumber(
-                String.format(MatcherClassFiller.HOLE_NUM_DESCR, label),
-                destination,
-                hole.getValue()
-            );
-            extractor.append(
-                String.format(
-                    "data.put(%s.%s, node.getData());\n",
-                    this.klass.getName(),
-                    destination
-                )
-            );
-        }
+        extractor.append(this.formatDataExtractor());
         return extractor.toString();
     }
 
@@ -561,5 +578,140 @@ public class MatcherClassFiller {
         field.makeStaticFinal();
         field.setInitExpr(String.valueOf(value));
         this.klass.addField(field);
+    }
+
+    /**
+     * Generates the code that extracts data or (and) children from the node
+     * in case if descriptor has typed holes.
+     * @return Source code
+     */
+    private String createExtractorWithTypedHoles() {
+        final StringBuilder extractor = new StringBuilder(128);
+        this.llist = true;
+        extractor.append(
+            "final LinkedList<Node> batch = new LinkedList<>(node.getChildrenList());\n"
+        );
+        for (final Parameter parameter : this.descriptor.getParameters()) {
+            if (parameter instanceof Hole) {
+                extractor.append(this.formatIteratedHoleExtractor((Hole) parameter));
+            } else if (parameter instanceof Descriptor) {
+                final String subclass = this.generator.generate((Descriptor) parameter);
+                final List<String> code = Arrays.asList(
+                    "if (result && !batch.isEmpty()) {",
+                    String.format(
+                        "result = %s.INSTANCE.match(batch.pollFirst(), children, data);",
+                        subclass
+                    ),
+                    "} else {",
+                    "result = false;",
+                    "}\n"
+                );
+                extractor.append(String.join("\n", code));
+            }
+        }
+        extractor.append(this.formatDataExtractor());
+        return extractor.toString();
+    }
+
+    /**
+     * Formats string for the children extractor in case if hole index is unknown.
+     * @param hole The hole
+     * @return Source code
+     */
+    private String formatIteratedHoleExtractor(final Hole hole) {
+        final String dstlbl = this.holes.getLabel();
+        final String destination = dstlbl.toUpperCase(Locale.ENGLISH)
+            .concat(MatcherClassFiller.HOLE_ID_POSTFIX);
+        this.createMagicNumber(
+            String.format(MatcherClassFiller.HOLE_NUM_DESCR, dstlbl),
+            destination,
+            hole.getValue()
+        );
+        final List<String> code;
+        if (hole.getAttribute() == HoleAttribute.ELLIPSIS) {
+            code = Arrays.asList(
+                "if (result) {",
+                "final List<Node> list = new LinkedList<>();",
+                "while (!batch.isEmpty()) {",
+                "list.add(batch.pollFirst());",
+                "}",
+                String.format("children.put(%s.%s, list);", this.klass.getName(), destination),
+                "}\n"
+            );
+        } else if (hole.getAttribute() == HoleAttribute.TYPED) {
+            final String type = dstlbl.toUpperCase(Locale.ENGLISH)
+                .concat(MatcherClassFiller.HOLE_TYPE_POSTFIX);
+            final Field field = new Field(
+                String.format(MatcherClassFiller.HOLE_TYPE_DESCR, dstlbl),
+                MatcherClassFiller.TYPE_STRING,
+                type
+            );
+            field.makeStaticFinal();
+            field.setInitExpr(
+                String.format(
+                    MatcherClassFiller.STRING_IN_QUOTES,
+                    hole.getType()
+                )
+            );
+            this.klass.addField(field);
+            code = Arrays.asList(
+                "if (result) {",
+                "final List<Node> list = new LinkedList<>();",
+                "while (!batch.isEmpty()) {",
+                "final Node child = batch.pollFirst();",
+                String.format(
+                    "if (%s.%s.equals(child.getTypeName())) {",
+                    this.klass.getName(),
+                    type
+                ),
+                "list.add(child);",
+                "} else {",
+                "batch.addFirst(child);",
+                "break;",
+                "}",
+                "}",
+                String.format("children.put(%s.%s, list);", this.klass.getName(), destination),
+                "}\n"
+            );
+        } else {
+            this.collections = true;
+            code = Arrays.asList(
+                "if (result && !batch.isEmpty()) {",
+                "children.put(",
+                String.format("\t%s.%s,", this.klass.getName(), destination),
+                "\tCollections.singletonList(batch.pollFirst())",
+                ");",
+                "} else {",
+                "result = false;",
+                "}\n"
+            );
+        }
+        return String.join("\n", code);
+    }
+
+    /**
+     * Formats string for the data extractor.
+     * @return Source code
+     */
+    private String formatDataExtractor() {
+        String result = "";
+        final Data data = this.descriptor.getData();
+        if (data instanceof Hole) {
+            final Hole hole = (Hole) data;
+            final String label = this.holes.getLabel();
+            final String destination = label.toUpperCase(Locale.ENGLISH)
+                .concat(MatcherClassFiller.HOLE_ID_POSTFIX);
+            this.createMagicNumber(
+                String.format(MatcherClassFiller.HOLE_NUM_DESCR, label),
+                destination,
+                hole.getValue()
+            );
+            result = String.format(
+                "data.put(%s.%s, node.getData());\n",
+                this.klass.getName(),
+                destination
+            );
+        }
+        return result;
     }
 }

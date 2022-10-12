@@ -25,7 +25,6 @@
 package org.uast;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.Matcher;
@@ -53,14 +52,19 @@ public final class Matcher0 implements Matcher {
     private static final int FIRST_HOLE_ID = 1;
 
     /**
-     * The type of the first hole.
+     * The index of the first child.
      */
-    private static final String FIRST_HOLE_TYPE = "CCC";
+    private static final int FIRST_CHILD_ID = 0;
 
     /**
      * The number of the second hole.
      */
     private static final int SECOND_HOLE_ID = 2;
+
+    /**
+     * The index of the second child.
+     */
+    private static final int SECOND_CHILD_ID = 2;
 
     /**
      * Constructor.
@@ -72,33 +76,17 @@ public final class Matcher0 implements Matcher {
     public boolean match(final Node node,
         final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
-        boolean result = node.belongsToGroup(Matcher0.EXPECTED_TYPE);
-        final LinkedList<Node> batch = new LinkedList<>(node.getChildrenList());
-        if (result && !batch.isEmpty()) {
-            result = Matcher1.INSTANCE.match(batch.pollFirst(), children, data);
-        } else {
-            result = false;
-        }
+        final boolean result = node.belongsToGroup(Matcher0.EXPECTED_TYPE)
+            && Matcher1.INSTANCE.match(node.getChild(1), children, data);
         if (result) {
-            final List<Node> list = new LinkedList<>();
-            while (!batch.isEmpty()) {
-                final Node child = batch.pollFirst();
-                if (Matcher0.FIRST_HOLE_TYPE.equals(child.getTypeName())) {
-                    list.add(child);
-                } else {
-                    batch.addFirst(child);
-                    break;
-                }
-            }
-            children.put(Matcher0.FIRST_HOLE_ID, list);
-        }
-        if (result && !batch.isEmpty()) {
+            children.put(
+                Matcher0.FIRST_HOLE_ID,
+                Collections.singletonList(node.getChild(Matcher0.FIRST_CHILD_ID))
+            );
             children.put(
                 Matcher0.SECOND_HOLE_ID,
-                Collections.singletonList(batch.pollFirst())
+                Collections.singletonList(node.getChild(Matcher0.SECOND_CHILD_ID))
             );
-        } else {
-            result = false;
         }
         return result;
     }
@@ -149,7 +137,7 @@ public final class Matcher1 implements Matcher {
     /**
      * Expected node type.
      */
-    private static final String EXPECTED_TYPE = "BBB";
+    private static final String EXPECTED_TYPE = "CCC";
 
     /**
      * Expected number of child nodes.
