@@ -41,6 +41,7 @@ import org.cqfn.astranaut.utils.StringUtils;
  *
  * @since 0.1.5
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class MatcherClassFiller {
     /**
      * The 'String' type name.
@@ -585,14 +586,15 @@ public class MatcherClassFiller {
      * @return Source code
      */
     private String createExtractorWithTypedHoles() {
-        final StringBuilder extractor = new StringBuilder();
-        llist = true;
-        extractor.append("final LinkedList<Node> batch = new LinkedList<>(node.getChildrenList());\n");
+        final StringBuilder extractor = new StringBuilder(128);
+        this.llist = true;
+        extractor.append(
+            "final LinkedList<Node> batch = new LinkedList<>(node.getChildrenList());\n"
+        );
         for (final Parameter parameter : this.descriptor.getParameters()) {
             if (parameter instanceof Hole) {
                 extractor.append(this.formatIteratedHoleExtractor((Hole) parameter));
-            }
-            else if (parameter instanceof Descriptor) {
+            } else if (parameter instanceof Descriptor) {
                 final String subclass = this.generator.generate((Descriptor) parameter);
                 final List<String> code = Arrays.asList(
                     "if (result && !batch.isEmpty()) {",

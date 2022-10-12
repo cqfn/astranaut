@@ -24,8 +24,8 @@
 
 package org.uast;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.Matcher;
@@ -53,14 +53,14 @@ public final class Matcher0 implements Matcher {
     private static final int FIRST_HOLE_ID = 1;
 
     /**
+     * The type of the first hole.
+     */
+    private static final String FIRST_HOLE_TYPE = "CCC";
+
+    /**
      * The number of the second hole.
      */
     private static final int SECOND_HOLE_ID = 2;
-
-    /**
-     * The index of the first child.
-     */
-    private static final int FIRST_CHILD_ID = 2;
 
     /**
      * Constructor.
@@ -72,22 +72,33 @@ public final class Matcher0 implements Matcher {
     public boolean match(final Node node,
         final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
-        final boolean result = node.belongsToGroup(Matcher0.EXPECTED_TYPE)
-            && Matcher1.INSTANCE.match(node.getChild(0), children, data);
+        boolean result = node.belongsToGroup(Matcher0.EXPECTED_TYPE);
+        final LinkedList<Node> batch = new LinkedList<>(node.getChildrenList());
+        if (result && !batch.isEmpty()) {
+            result = Matcher1.INSTANCE.match(batch.pollFirst(), children, data);
+        } else {
+            result = false;
+        }
         if (result) {
-            final int count = node.getChildCount();
-            final List<Node> list = new ArrayList<>(count - 1);
-            for (int index = 1; index < count; index = index + 1) {
-                final Node child = node.getChild(index);
-                if ("CCC".equals(child.getTypeName())) {
+            final List<Node> list = new LinkedList<>();
+            while (!batch.isEmpty()) {
+                final Node child = batch.pollFirst();
+                if (Matcher0.FIRST_HOLE_TYPE.equals(child.getTypeName())) {
                     list.add(child);
+                } else {
+                    batch.addFirst(child);
+                    break;
                 }
             }
             children.put(Matcher0.FIRST_HOLE_ID, list);
+        }
+        if (result && !batch.isEmpty()) {
             children.put(
                 Matcher0.SECOND_HOLE_ID,
-                Collections.singletonList(node.getChild(Matcher0.FIRST_CHILD_ID))
+                Collections.singletonList(batch.pollFirst())
             );
+        } else {
+            result = false;
         }
         return result;
     }
