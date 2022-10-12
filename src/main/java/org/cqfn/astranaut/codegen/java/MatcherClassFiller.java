@@ -328,7 +328,9 @@ public class MatcherClassFiller {
             );
             count = count + 1;
         }
-        condition.append(this.createChildChecker(count));
+        if (!this.descriptor.hasTypedHole()) {
+            condition.append(this.createChildChecker(count));
+        }
         return condition.toString();
     }
 
@@ -468,25 +470,7 @@ public class MatcherClassFiller {
             }
             index = index + 1;
         }
-        final Data data = this.descriptor.getData();
-        if (data instanceof Hole) {
-            final Hole hole = (Hole) data;
-            final String label = this.holes.getLabel();
-            final String destination = label.toUpperCase(Locale.ENGLISH)
-                .concat(MatcherClassFiller.HOLE_ID_POSTFIX);
-            this.createMagicNumber(
-                String.format(MatcherClassFiller.HOLE_NUM_DESCR, label),
-                destination,
-                hole.getValue()
-            );
-            extractor.append(
-                String.format(
-                    "data.put(%s.%s, node.getData());\n",
-                    this.klass.getName(),
-                    destination
-                )
-            );
-        }
+        extractor.append(this.formatDataExtractor());
         return extractor.toString();
     }
 
@@ -597,54 +581,38 @@ public class MatcherClassFiller {
 
     /**
      * Generates the code that extracts data or (and) children from the node
-     * in case if descriptor has typed holes
+     * in case if descriptor has typed holes.
      * @return Source code
      */
     private String createExtractorWithTypedHoles() {
         final StringBuilder extractor = new StringBuilder();
         llist = true;
         extractor.append("final LinkedList<Node> batch = new LinkedList<>(node.getChildrenList());\n");
-        int index = 0;
         for (final Parameter parameter : this.descriptor.getParameters()) {
             if (parameter instanceof Hole) {
                 extractor.append(this.formatIteratedHoleExtractor((Hole) parameter));
             }
-            index = index + 1;
-        }
-        /*
-        int index = 0;
-        for (final Parameter parameter : this.descriptor.getParameters()) {
-            if (parameter instanceof Hole) {
-                extractor.append(this.formatHoleExtractor((Hole) parameter, index));
+            else if (parameter instanceof Descriptor) {
+                final String subclass = this.generator.generate((Descriptor) parameter);
+                final List<String> code = Arrays.asList(
+                    "if (result && !batch.isEmpty()) {",
+                    String.format(
+                        "result = %s.INSTANCE.match(batch.pollFirst(), children, data);",
+                        subclass
+                    ),
+                    "} else {",
+                    "result = false;",
+                    "}\n"
+                );
+                extractor.append(String.join("\n", code));
             }
-            index = index + 1;
         }
-        final Data data = this.descriptor.getData();
-        if (data instanceof Hole) {
-            final Hole hole = (Hole) data;
-            final String label = this.holes.getLabel();
-            final String destination = label.toUpperCase(Locale.ENGLISH)
-                .concat(MatcherClassFiller.HOLE_ID_POSTFIX);
-            this.createMagicNumber(
-                String.format(MatcherClassFiller.HOLE_NUM_DESCR, label),
-                destination,
-                hole.getValue()
-            );
-            extractor.append(
-                String.format(
-                    "data.put(%s.%s, node.getData());\n",
-                    this.klass.getName(),
-                    destination
-                )
-            );
-        }
-
-         */
+        extractor.append(this.formatDataExtractor());
         return extractor.toString();
     }
 
     /**
-     * Formats string for the children extractor in case if hole index is unknown
+     * Formats string for the children extractor in case if hole index is unknown.
      * @param hole The hole
      * @return Source code
      */
@@ -717,5 +685,31 @@ public class MatcherClassFiller {
             );
         }
         return String.join("\n", code);
+    }
+
+    /**
+     * Formats string for the data extractor.
+     * @return Source code
+     */
+    private String formatDataExtractor() {
+        String result = "";
+        final Data data = this.descriptor.getData();
+        if (data instanceof Hole) {
+            final Hole hole = (Hole) data;
+            final String label = this.holes.getLabel();
+            final String destination = label.toUpperCase(Locale.ENGLISH)
+                .concat(MatcherClassFiller.HOLE_ID_POSTFIX);
+            this.createMagicNumber(
+                String.format(MatcherClassFiller.HOLE_NUM_DESCR, label),
+                destination,
+                hole.getValue()
+            );
+            result = String.format(
+                "data.put(%s.%s, node.getData());\n",
+                this.klass.getName(),
+                destination
+            );
+        }
+        return result;
     }
 }
