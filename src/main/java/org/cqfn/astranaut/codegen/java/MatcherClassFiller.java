@@ -269,8 +269,13 @@ public class MatcherClassFiller {
         final String condition = this.createCondition();
         if (this.descriptor.hasTypedHole()) {
             final String extractor = this.createExtractorWithTypedHoles();
+            String modifier = "";
+            if (this.descriptor.hasOnlyEllipsisOrTypedHole()) {
+                modifier = "final ";
+            }
             final String code = String.format(
-                "boolean result = %s;\n%s\nreturn result;",
+                "%sboolean result = %s;\n%s\nreturn result;",
+                modifier,
                 condition,
                 extractor
             );

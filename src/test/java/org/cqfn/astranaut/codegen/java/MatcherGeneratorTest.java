@@ -144,6 +144,18 @@ class MatcherGeneratorTest {
     }
 
     /**
+     * Test case: node contains only typed holes.
+     */
+    @Test
+    void testNodeContainsOnlyTypedHoles() {
+        final int result = this.testing(
+            "AAA(BBB#1)",
+            "matcher_generator_only_holes_with_type.txt"
+        );
+        Assertions.assertTrue(result > 0);
+    }
+
+    /**
      * Performs a test.
      * @param code Source code of descriptor
      * @param filename The name of file that contaAins the expected result
