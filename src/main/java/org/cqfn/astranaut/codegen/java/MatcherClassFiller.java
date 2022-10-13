@@ -496,14 +496,16 @@ public class MatcherClassFiller {
             destination,
             hole.getValue()
         );
-        if (hole.getAttribute() == HoleAttribute.ELLIPSIS && index == 0) {
+        final HoleAttribute attribute = hole.getAttribute();
+        assert attribute != HoleAttribute.TYPED;
+        if (attribute == HoleAttribute.ELLIPSIS && index == 0) {
             result =
                 String.format(
                     "children.put(%s.%s, node.getChildrenList());\n",
                     this.klass.getName(),
                     destination
                 );
-        } else if (hole.getAttribute() == HoleAttribute.ELLIPSIS) {
+        } else if (attribute == HoleAttribute.ELLIPSIS) {
             this.alist = true;
             final List<String> code = Arrays.asList(
                 "final int count = node.getChildCount();",
@@ -516,33 +518,6 @@ public class MatcherClassFiller {
                 "}",
                 String.format(
                     "children.put(%s.%s, list);",
-                    this.klass.getName(),
-                    destination
-                )
-            );
-            result = String.join("\n", code);
-        } else if (hole.getAttribute() == HoleAttribute.TYPED) {
-            this.alist = true;
-            final String capacity;
-            if (index == 0) {
-                capacity = "count";
-            } else {
-                capacity = String.format("count - %d", index);
-            }
-            final List<String> code = Arrays.asList(
-                "final int count = node.getChildCount();",
-                String.format("final List<Node> list = new ArrayList<>(%s);", capacity),
-                String.format(
-                    "for (int index = %d; index < count; index = index + 1) {",
-                    index
-                ),
-                "final Node child = node.getChild(index);",
-                String.format("if (\"%s\".equals(child.getTypeName())) {", hole.getType()),
-                "list.add(child);",
-                "}",
-                "}",
-                String.format(
-                    "children.put(%s.%s, list);\n",
                     this.klass.getName(),
                     destination
                 )
