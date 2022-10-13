@@ -57,6 +57,11 @@ public final class Matcher0 implements Matcher {
     private static final String FIRST_HOLE_TYPE = "BBB";
 
     /**
+     * The number of the second hole.
+     */
+    private static final int SECOND_HOLE_ID = 2;
+
+    /**
      * Constructor.
      */
     private Matcher0() {
@@ -80,6 +85,13 @@ public final class Matcher0 implements Matcher {
                 }
             }
             children.put(Matcher0.FIRST_HOLE_ID, list);
+        }
+        if (result) {
+            final List<Node> list = new LinkedList<>();
+            while (!batch.isEmpty()) {
+                list.add(batch.pollFirst());
+            }
+            children.put(Matcher0.SECOND_HOLE_ID, list);
         }
         return result;
     }

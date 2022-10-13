@@ -147,9 +147,9 @@ class MatcherGeneratorTest {
      * Test case: node contains only typed holes.
      */
     @Test
-    void testNodeContainsOnlyTypedHoles() {
+    void testNodeContainsOnlyEllipsisAndTypedHoles() {
         final int result = this.testing(
-            "AAA(BBB#1)",
+            "AAA(BBB#1, #2...)",
             "matcher_generator_only_holes_with_type.txt"
         );
         Assertions.assertTrue(result > 0);
