@@ -132,7 +132,7 @@ class MatcherGeneratorTest {
     }
 
     /**
-     * Test case: node contains a child,a typed hole and a simple hole.
+     * Test case: node contains a child, a typed hole and a simple hole.
      */
     @Test
     void tesNodeContainsChildAndTypedAndSimpleHoles() {
@@ -156,7 +156,7 @@ class MatcherGeneratorTest {
     }
 
     /**
-     * Test case: node contains a child node and hole with ellipsis.
+     * Test case: node contains a child node and a hole with ellipsis.
      */
     @Test
     void testNodeContainsChildAndHoleWithEllipsis() {
