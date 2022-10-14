@@ -132,25 +132,73 @@ class MatcherGeneratorTest {
     }
 
     /**
-     * Test case: extract unknown number of children of the particular type.
+     * Test case: node contains a child, a typed hole and a simple hole.
      */
     @Test
-    void testUnknownNumberOfChildNodesWithSameType() {
+    void tesNodeContainsChildAndTypedAndSimpleHoles() {
         final int result = this.testing(
             "AAA(BBB, CCC#1, #2)",
-            "matcher_generator_extract_particular_type.txt"
+            "matcher_generator_child_and_typed_and_simple_holes.txt"
         );
         Assertions.assertTrue(result > 0);
     }
 
     /**
-     * Test case: node contains only typed holes.
+     * Test case: node contains a hole with ellipsis.
+     */
+    @Test
+    void testNodeContainsHoleWithEllipsis() {
+        final int result = this.testing(
+            "AAA(#1...)",
+            "matcher_generator_ellipsis_hole.txt"
+        );
+        Assertions.assertTrue(result > 0);
+    }
+
+    /**
+     * Test case: node contains a child node and a hole with ellipsis.
+     */
+    @Test
+    void testNodeContainsChildAndHoleWithEllipsis() {
+        final int result = this.testing(
+            "AAA(BBB, #1...)",
+            "matcher_generator_child_and_ellipsis_hole.txt"
+        );
+        Assertions.assertTrue(result > 0);
+    }
+
+    /**
+     * Test case: node contains a typed hole and a hole with ellipsis.
      */
     @Test
     void testNodeContainsOnlyEllipsisAndTypedHoles() {
         final int result = this.testing(
             "AAA(BBB#1, #2...)",
-            "matcher_generator_only_holes_with_type.txt"
+            "matcher_generator_holes_with_type_and_ellipsis.txt"
+        );
+        Assertions.assertTrue(result > 0);
+    }
+
+    /**
+     * Test case: node contains a typed hole and hole data.
+     */
+    @Test
+    void testNodeContainsTypedChildHoleAndDataHole() {
+        final int result = this.testing(
+            "AAA(BBB#1)<#2>",
+            "matcher_generator_typed_and_data_holes.txt"
+        );
+        Assertions.assertTrue(result > 0);
+    }
+
+    /**
+     * Test case: node contains a typed hole and a simple hole.
+     */
+    @Test
+    void testNodeContainsSimpleAndTypedHoles() {
+        final int result = this.testing(
+            "AAA(BBB#1, #2)",
+            "matcher_generator_simple_and_typed_holes.txt"
         );
         Assertions.assertTrue(result > 0);
     }
