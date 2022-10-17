@@ -111,6 +111,14 @@ public final class MethodDescriptor implements Entity {
     }
 
     /**
+     * Returns the name of the method.
+     * @return The name
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
      * Generates JavaDoc header.
      * @param indent Indentation from the beginning of the line
      * @return JavaDoc header

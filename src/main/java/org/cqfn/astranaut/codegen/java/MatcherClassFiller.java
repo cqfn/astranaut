@@ -100,6 +100,12 @@ public class MatcherClassFiller {
         "Checks if the children matches some structure, and extracts the data and children if so";
 
     /**
+     * Descriptor of the children checker.
+     */
+    private static final String HOLE_EXTR_DESCR =
+        "Extracts child nodes into the hole";
+
+    /**
      * Type of children collection.
      */
     private static final String CHILDREN_TYPE = "Map<Integer, List<Node>>";
@@ -133,6 +139,21 @@ public class MatcherClassFiller {
      * The 'boolean' type.
      */
     private static final String BOOLEAN_TYPE = "boolean";
+
+    /**
+     * The 'flag' name.
+     */
+    private static final String FLAG_NAME = "flag";
+
+    /**
+     * Type of batch of nodes.
+     */
+    private static final String BATCH_TYPE = "Deque<Node>";
+
+    /**
+     * Name of batch of nodes.
+     */
+    private static final String BATCH_NAME = "batch";
 
     /**
      * The generator.
@@ -569,7 +590,7 @@ public class MatcherClassFiller {
         final StringBuilder extractor = new StringBuilder(128);
         this.llist = true;
         extractor.append(
-            "final LinkedList<Node> batch = new LinkedList<>(node.getChildrenList());\n"
+            "final Deque<Node> batch = new LinkedList<>(node.getChildrenList());\n"
         );
         for (final Parameter parameter : this.descriptor.getParameters()) {
             if (parameter instanceof Hole) {
@@ -599,74 +620,39 @@ public class MatcherClassFiller {
      * @return Source code
      */
     private String formatIteratedHoleExtractor(final Hole hole) {
-        final String dstlbl = this.holes.getLabel();
-        final String destination = dstlbl.toUpperCase(Locale.ENGLISH)
+        final String result;
+        final String label = this.holes.getLabel();
+        final String destination = label.toUpperCase(Locale.ENGLISH)
             .concat(MatcherClassFiller.HOLE_ID_POSTFIX);
         this.createMagicNumber(
-            String.format(MatcherClassFiller.HOLE_NUM_DESCR, dstlbl),
+            String.format(MatcherClassFiller.HOLE_NUM_DESCR, label),
             destination,
             hole.getValue()
         );
-        final List<String> code;
+        final String format = "%s%s.%s(result, children, batch);\n";
         if (hole.getAttribute() == HoleAttribute.ELLIPSIS) {
-            code = Arrays.asList(
-                "if (result) {",
-                "final List<Node> list = new LinkedList<>();",
-                "while (!batch.isEmpty()) {",
-                "list.add(batch.pollFirst());",
-                "}",
-                String.format("children.put(%s.%s, list);", this.klass.getName(), destination),
-                "}\n"
+            result = String.format(
+                format,
+                "",
+                this.klass.getName(),
+                this.createEllipsisHoleExtractorMethod(destination, label)
             );
         } else if (hole.getAttribute() == HoleAttribute.TYPED) {
-            final String type = dstlbl.toUpperCase(Locale.ENGLISH)
-                .concat(MatcherClassFiller.HOLE_TYPE_POSTFIX);
-            final Field field = new Field(
-                String.format(MatcherClassFiller.HOLE_TYPE_DESCR, dstlbl),
-                MatcherClassFiller.TYPE_STRING,
-                type
-            );
-            field.makeStaticFinal();
-            field.setInitExpr(
-                String.format(
-                    MatcherClassFiller.STRING_IN_QUOTES,
-                    hole.getType()
-                )
-            );
-            this.klass.addField(field);
-            code = Arrays.asList(
-                "if (result) {",
-                "final List<Node> list = new LinkedList<>();",
-                "while (!batch.isEmpty()) {",
-                "final Node child = batch.pollFirst();",
-                String.format(
-                    "if (%s.%s.equals(child.getTypeName())) {",
-                    this.klass.getName(),
-                    type
-                ),
-                "list.add(child);",
-                "} else {",
-                "batch.addFirst(child);",
-                "break;",
-                "}",
-                "}",
-                String.format("children.put(%s.%s, list);", this.klass.getName(), destination),
-                "}\n"
+            result = String.format(
+                format,
+                "",
+                this.klass.getName(),
+                this.createTypedHoleExtractorMethod(destination, label, hole)
             );
         } else {
-            this.collections = true;
-            code = Arrays.asList(
-                "if (result && !batch.isEmpty()) {",
-                "children.put(",
-                String.format("\t%s.%s,", this.klass.getName(), destination),
-                "\tCollections.singletonList(batch.pollFirst())",
-                ");",
-                "} else {",
-                "result = false;",
-                "}\n"
+            result = String.format(
+                format,
+                "result = ",
+                this.klass.getName(),
+                this.createOrdinaryHoleExtractorMethod(destination, label)
             );
         }
-        return String.join("\n", code);
+        return result;
     }
 
     /**
@@ -693,5 +679,134 @@ public class MatcherClassFiller {
             );
         }
         return result;
+    }
+
+    /**
+     * Generates a method that extracts typed hole.
+     * @param destination The generated hole name
+     * @param label The hole label (i.e. "first", "second", etc)
+     * @param hole The hole itself
+     * @return The expression
+     */
+    private String createTypedHoleExtractorMethod(final String destination,
+        final String label, final Hole hole) {
+        final Method method = this.createHoleExtractorMethod(label);
+        final String type = label.toUpperCase(Locale.ENGLISH)
+            .concat(MatcherClassFiller.HOLE_TYPE_POSTFIX);
+        final Field field = new Field(
+            String.format(MatcherClassFiller.HOLE_TYPE_DESCR, label),
+            MatcherClassFiller.TYPE_STRING,
+            type
+        );
+        field.makeStaticFinal();
+        field.setInitExpr(
+            String.format(
+                MatcherClassFiller.STRING_IN_QUOTES,
+                hole.getType()
+            )
+        );
+        this.klass.addField(field);
+        final List<String> code = Arrays.asList(
+            "if (flag) {",
+            "final List<Node> list = new LinkedList<>();",
+            "while (!batch.isEmpty()) {",
+            "final Node child = batch.pollFirst();",
+            String.format(
+                "if (%s.%s.equals(child.getTypeName())) {",
+                this.klass.getName(),
+                type
+            ),
+            "list.add(child);",
+            "} else {",
+            "batch.addFirst(child);",
+            "break;",
+            "}",
+            "}",
+            String.format("children.put(%s.%s, list);", this.klass.getName(), destination),
+            "}\n"
+        );
+        method.setCode(String.join("\n", code));
+        return method.getName();
+    }
+
+    /**
+     * Generates a method that extracts hole with ellipsis.
+     * @param destination The generated hole name
+     * @param label The hole label (i.e. "first", "second", etc)
+     * @return The expression
+     */
+    private String createEllipsisHoleExtractorMethod(final String destination,
+        final String label) {
+        final Method method = this.createHoleExtractorMethod(label);
+        final List<String> code = Arrays.asList(
+            "if (flag) {",
+            "final List<Node> list = new LinkedList<>();",
+            "while (!batch.isEmpty()) {",
+            "list.add(batch.pollFirst());",
+            "}",
+            String.format("children.put(%s.%s, list);", this.klass.getName(), destination),
+            "}\n"
+        );
+        method.setCode(String.join("\n", code));
+        return method.getName();
+    }
+
+    /**
+     * Generates a method that extracts hole without attribute.
+     * @param destination The generated hole name
+     * @param label The hole label (i.e. "first", "second", etc)
+     * @return The expression
+     */
+    private String createOrdinaryHoleExtractorMethod(final String destination,
+        final String label) {
+        final Method method = this.createHoleExtractorMethod(label);
+        this.collections = true;
+        final List<String> code = Arrays.asList(
+            "boolean result = true;",
+            "if (flag && !batch.isEmpty()) {",
+            "children.put(",
+            String.format("\t%s.%s,", this.klass.getName(), destination),
+            "\tCollections.singletonList(batch.pollFirst())",
+            ");",
+            "} else {",
+            "result = false;",
+            "}",
+            "return result;\n"
+        );
+        method.setCode(String.join("\n", code));
+        method.setReturnType(MatcherClassFiller.BOOLEAN_TYPE, "Result of extraction");
+        return method.getName();
+    }
+
+    /**
+     * Generates an empty method that extracts hole.
+     * @param label The hole label (i.e. "first", "second", etc)
+     * @return The method
+     */
+    private Method createHoleExtractorMethod(final String label) {
+        final String name = String.format("%sHoleExtractor", label);
+        final Method method = new Method(
+            MatcherClassFiller.HOLE_EXTR_DESCR,
+            name
+        );
+        this.klass.addMethod(method);
+        method.makePrivate();
+        method.makeStatic();
+        method.addArgument(
+            MatcherClassFiller.BOOLEAN_TYPE,
+            MatcherClassFiller.FLAG_NAME,
+            "Node matching result"
+        );
+        method.addArgument(
+            MatcherClassFiller.CHILDREN_TYPE,
+            MatcherClassFiller.CHILDREN_NAME,
+            "Where to save children"
+        );
+        method.addArgument(
+            MatcherClassFiller.BATCH_TYPE,
+            MatcherClassFiller.BATCH_NAME,
+            "Batch of nodes"
+        );
+        return method;
     }
 }

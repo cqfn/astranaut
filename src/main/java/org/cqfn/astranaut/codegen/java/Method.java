@@ -201,6 +201,14 @@ public final class Method implements Entity {
         this.fstatic = true;
     }
 
+    /**
+     * Returns the name of the method.
+     * @return The name
+     */
+    public String getName() {
+        return this.descriptor.getName();
+    }
+
     @Override
     public String generate(final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);

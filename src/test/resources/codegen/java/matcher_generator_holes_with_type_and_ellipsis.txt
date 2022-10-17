@@ -24,6 +24,7 @@
 
 package org.uast;
 
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -72,8 +73,22 @@ public final class Matcher0 implements Matcher {
         final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
         final boolean result = node.belongsToGroup(Matcher0.EXPECTED_TYPE);
-        final LinkedList<Node> batch = new LinkedList<>(node.getChildrenList());
-        if (result) {
+        final Deque<Node> batch = new LinkedList<>(node.getChildrenList());
+        Matcher0.firstHoleExtractor(result, children, batch);
+        Matcher0.secondHoleExtractor(result, children, batch);
+        return result;
+    }
+
+    /**
+     * Extracts child nodes into the hole.
+     * @param flag Node matching result
+     * @param children Where to save children
+     * @param batch Batch of nodes
+     */
+    private static void firstHoleExtractor(final boolean flag,
+        final Map<Integer, List<Node>> children,
+        final Deque<Node> batch) {
+        if (flag) {
             final List<Node> list = new LinkedList<>();
             while (!batch.isEmpty()) {
                 final Node child = batch.pollFirst();
@@ -86,13 +101,23 @@ public final class Matcher0 implements Matcher {
             }
             children.put(Matcher0.FIRST_HOLE_ID, list);
         }
-        if (result) {
+    }
+
+    /**
+     * Extracts child nodes into the hole.
+     * @param flag Node matching result
+     * @param children Where to save children
+     * @param batch Batch of nodes
+     */
+    private static void secondHoleExtractor(final boolean flag,
+        final Map<Integer, List<Node>> children,
+        final Deque<Node> batch) {
+        if (flag) {
             final List<Node> list = new LinkedList<>();
             while (!batch.isEmpty()) {
                 list.add(batch.pollFirst());
             }
             children.put(Matcher0.SECOND_HOLE_ID, list);
         }
-        return result;
     }
 }

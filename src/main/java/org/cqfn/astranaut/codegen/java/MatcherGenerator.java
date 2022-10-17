@@ -98,6 +98,7 @@ public final class MatcherGenerator {
         }
         if (filler.isLinkedListNeeded()) {
             unit.addImport("java.util.LinkedList");
+            unit.addImport("java.util.Deque");
         }
         final String base = "org.cqfn.astranaut.core";
         unit.addImport(base.concat(".Matcher"));
