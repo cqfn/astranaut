@@ -73,7 +73,7 @@ public final class Matcher implements org.cqfn.astranaut.core.Matcher {
      * @return Checking result, {@code true} if the type matches
      */
     private boolean checkType(final Node node) {
-        return node.getType().getName().equals(this.descriptor.getType());
+        return node.belongsToGroup(this.descriptor.getType());
     }
 
     /**
