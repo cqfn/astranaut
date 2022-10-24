@@ -264,8 +264,8 @@ public class VertexStorage {
      *  contain duplications
      */
     private static void checkDuplicateInheritance(
-            final List<Vertex> common,
-            final List<Vertex> local) throws DuplicateRule {
+        final List<Vertex> common,
+        final List<Vertex> local) throws DuplicateRule {
         final List<Vertex> related = new LinkedList<>(common);
         related.addAll(local);
         final Set<String> types = new HashSet<>();

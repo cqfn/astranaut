@@ -685,7 +685,7 @@ class AnalyzerTest {
         try {
             final List<Instruction<Vertex>> vertices = program.getVertices();
             final VertexStorage storage = new VertexStorage(
-                    vertices, program.getNamesOfAllLanguages()
+                vertices, program.getNamesOfAllLanguages()
             );
             storage.collectAndCheck();
             analyzer = new Analyzer(storage);
