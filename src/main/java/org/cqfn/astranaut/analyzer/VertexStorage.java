@@ -264,8 +264,8 @@ public class VertexStorage {
      *  contain duplications
      */
     private static void checkDuplicateInheritance(
-        final List<Vertex> common,
-        final List<Vertex> local) throws DuplicateRule {
+            final List<Vertex> common,
+            final List<Vertex> local) throws DuplicateRule {
         final List<Vertex> related = new LinkedList<>(common);
         related.addAll(local);
         final Set<String> types = new HashSet<>();
@@ -274,7 +274,8 @@ public class VertexStorage {
                 final List<Descriptor> descriptors =
                     ((Disjunction) (((Node) vertex).getComposition().get(0))).getDescriptors();
                 for (final Descriptor descriptor : descriptors) {
-                    if (types.contains(descriptor.getType())) {
+                    final String type = descriptor.getType();
+                    if (types.contains(type) && !type.isEmpty()) {
                         throw new DuplicateRule(
                             new StringBuilder()
                                 .append(descriptor)
@@ -282,7 +283,7 @@ public class VertexStorage {
                                 .toString()
                         );
                     }
-                    types.add(descriptor.getType());
+                    types.add(type);
                 }
             }
         }
