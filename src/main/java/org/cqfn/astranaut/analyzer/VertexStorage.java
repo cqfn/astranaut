@@ -161,7 +161,7 @@ public class VertexStorage {
             for (final Child child : children) {
                 final Descriptor descriptor = (Descriptor) child;
                 final String name = descriptor.getType();
-                if (!this.isInSpecificVertices(name, language) && this.isInGreenVertices(name)) {
+                if (this.isInGreenVertices(name)) {
                     imports.add(name);
                 }
             }
@@ -195,23 +195,6 @@ public class VertexStorage {
             LOG.info(builder.toString());
         }
         return optional.orElse(null);
-    }
-
-    /**
-     * Checks if the specified vertex is in the list of
-     * language-specific vertices.
-     * @param type The vertex type
-     * @param language The programming language
-     * @return Checking result
-     */
-    private boolean isInSpecificVertices(final String type, final String language) {
-        boolean result = false;
-        final List<Vertex> list = this.red.get(language);
-        if (list != null) {
-            result = list.stream()
-                .anyMatch(item -> type.equals(item.getType()));
-        }
-        return result;
     }
 
     /**
