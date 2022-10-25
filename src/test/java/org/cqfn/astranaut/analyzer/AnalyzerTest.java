@@ -666,6 +666,40 @@ class AnalyzerTest {
     }
 
     /**
+     * Test case when there are several nodes in a specific language
+     * that extend green abstract nodes.
+     */
+    @Test
+    void testSeveralNodesExtendingGreenAbstract() {
+        boolean oops = false;
+        Program program = null;
+        try {
+            final String source = this.readTest("java_set_several_extensions.txt");
+            final ProgramParser parser = new ProgramParser(source);
+            program = parser.parse();
+        } catch (final BaseException exception) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        Analyzer analyzer = null;
+        try {
+            final List<Instruction<Vertex>> vertices = program.getVertices();
+            final VertexStorage storage = new VertexStorage(
+                vertices, program.getNamesOfAllLanguages()
+            );
+            storage.collectAndCheck();
+            analyzer = new Analyzer(storage);
+            analyzer.analyzeGreen();
+            for (final String language : program.getNamesOfAllLanguages()) {
+                analyzer.analyze(language);
+            }
+        } catch (final GeneratorException exception) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
      * Test depth four hierarchy of nodes.
      * @param analyzer The analyzer
      */
