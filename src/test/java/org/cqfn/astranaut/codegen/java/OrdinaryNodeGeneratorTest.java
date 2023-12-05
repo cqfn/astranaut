@@ -87,6 +87,19 @@ class OrdinaryNodeGeneratorTest {
     }
 
     /**
+     * Testing generation a node with a tag that has an uppercase letter in it.
+     */
+    @Test
+    void testTagWithCapitalLetter() {
+        final boolean result = this.testNodeGeneration(
+                "IfElse <- condition@Expression, ifBranch@Statement, elseBranch@Statement;",
+                "IfElse",
+                "tag_with_capital_letter.txt"
+        );
+        Assertions.assertTrue(result);
+    }
+
+    /**
      * Testing source code generation for rules that describe nodes.
      * @param source The source string
      * @param type Expected node type

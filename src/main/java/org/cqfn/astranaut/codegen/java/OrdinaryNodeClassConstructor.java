@@ -122,10 +122,11 @@ final class OrdinaryNodeClassConstructor extends NodeConstructor {
         for (final TaggedChild child : tags) {
             final String type = child.getType();
             final String tag = child.getTag();
+            final String variable = tag.toLowerCase(Locale.ENGLISH);
             final Field field = new Field(
                 String.format("Child with the '%s' tag", tag),
                 type,
-                tag
+                variable
             );
             klass.addField(field);
             final Method getter = new Method(
@@ -137,7 +138,7 @@ final class OrdinaryNodeClassConstructor extends NodeConstructor {
                 )
             );
             getter.setReturnType(type, "The node");
-            getter.setCode(String.format("return this.%s;", tag));
+            getter.setCode(String.format("return this.%s;", variable));
             if (child.isOverridden()) {
                 getter.makeOverridden();
             }
