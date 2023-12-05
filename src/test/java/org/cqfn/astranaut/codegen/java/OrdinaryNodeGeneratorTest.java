@@ -92,9 +92,9 @@ class OrdinaryNodeGeneratorTest {
     @Test
     void testTagWithCapitalLetter() {
         final boolean result = this.testNodeGeneration(
-                "IfElse <- condition@Expression, ifBranch@Statement, elseBranch@Statement;",
-                "IfElse",
-                "tag_with_capital_letter.txt"
+            "IfElse <- condition@Expression, ifBranch@Statement, elseBranch@Statement;",
+            "IfElse",
+            "tag_with_capital_letter.txt"
         );
         Assertions.assertTrue(result);
     }
