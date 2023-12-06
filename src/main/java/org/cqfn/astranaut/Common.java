@@ -21,46 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.codegen.java;
-
-import java.util.List;
-import org.cqfn.astranaut.rules.Node;
+package org.cqfn.astranaut;
 
 /**
- * Generates source code for rules that describe nodes.
+ * Some methods/data that could not be placed to other classes.
  *
- * @since 0.1.5
+ * @since 1.0.6
  */
-public abstract class BaseNodeGenerator extends BaseGenerator {
+public final class Common {
     /**
-     * Constructor.
-     * @param env The environment required for generation.
+     * The Astranaut version.
      */
-    BaseNodeGenerator(final Environment env) {
-        super(env);
-    }
+    public static final String VERSION = "0.2.18";
 
     /**
-     * Creates class for node construction.
-     * @param rule The rule
-     * @return The class constructor
+     * Private constructor.
      */
-    protected Klass createClass(final Node rule) {
-        final String type = rule.getType();
-        final Klass klass = new Klass(
-            String.format("Node that describes the '%s' type", type),
-            type
-        );
-        if (this.getEnv().whetherToAddGeneratorVersion()) {
-            klass.addGeneratorVersion();
-        }
-        klass.makeFinal();
-        final List<String> hierarchy = this.getEnv().getHierarchy(type);
-        if (hierarchy.size() > 1) {
-            klass.setInterfaces(hierarchy.get(1));
-        } else {
-            klass.setInterfaces("Node");
-        }
-        return klass;
+    private Common() {
     }
 }

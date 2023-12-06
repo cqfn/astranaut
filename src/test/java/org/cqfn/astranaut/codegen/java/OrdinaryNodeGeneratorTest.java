@@ -100,6 +100,26 @@ class OrdinaryNodeGeneratorTest {
     }
 
     /**
+     * Testing node generation with specified ASTranaut version.
+     */
+    @Test
+    void testNodeWithGeneratorVersion() {
+        final String source = "Subtraction <- Expression, Expression;";
+        final String type = "Subtraction";
+        final String filename = "node_with_generator_version.txt";
+        final Instruction<Node> instruction = this.createInstruction(source, type);
+        final TestEnvironment env =
+            new TestEnvironment(Collections.singletonList(instruction.getRule()));
+        env.addGeneratorVersion();
+        final OrdinaryNodeGenerator generator = new OrdinaryNodeGenerator(env, instruction);
+        final String actual = generator.generate().generate();
+        final String expected = this.readTest(filename)
+            .replace("{av}", org.cqfn.astranaut.Common.VERSION)
+            .replace("{cv}", org.cqfn.astranaut.core.Common.VERSION);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    /**
      * Testing source code generation for rules that describe nodes.
      * @param source The source string
      * @param type Expected node type
