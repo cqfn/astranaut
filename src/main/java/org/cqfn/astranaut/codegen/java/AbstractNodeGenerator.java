@@ -58,6 +58,9 @@ final class AbstractNodeGenerator extends BaseGenerator {
             String.format("Node that describes the '%s' type", type),
             type
         );
+        if (this.getEnv().whetherToAddGeneratorVersion()) {
+            iface.addGeneratorVersion();
+        }
         this.defineGettersForTaggedFields(iface);
         final String pkg = this.getPackageName(this.instruction.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, iface);
