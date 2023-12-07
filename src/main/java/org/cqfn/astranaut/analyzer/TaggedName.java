@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2022 Ivan Kniazkov
+ * Copyright (c) 2023 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,7 @@ public final class TaggedName implements TaggedChild {
 
     @Override
     public String getTag() {
-        return this.tag.toLowerCase(Locale.ENGLISH);
+        return this.tag;
     }
 
     @Override
