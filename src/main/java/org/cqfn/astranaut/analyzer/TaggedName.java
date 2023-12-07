@@ -24,7 +24,6 @@
 
 package org.cqfn.astranaut.analyzer;
 
-import java.util.Locale;
 import java.util.Objects;
 import org.cqfn.astranaut.codegen.java.TaggedChild;
 
