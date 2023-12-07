@@ -105,4 +105,9 @@ public final class PreparedEnvironment implements Environment {
     public Set<String> getImports(final String type) {
         return this.analyzer.getImports(type, this.language);
     }
+
+    @Override
+    public boolean whetherToAddGeneratorVersion() {
+        return this.base.whetherToAddGeneratorVersion();
+    }
 }
