@@ -27,10 +27,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import org.cqfn.astranaut.api.TreeProcessor;
-import org.cqfn.astranaut.api.TreeVisualizer;
 import org.cqfn.astranaut.core.DraftNode;
 import org.cqfn.astranaut.core.Node;
 import org.cqfn.astranaut.core.exceptions.WrongFileExtension;
+import org.cqfn.astranaut.core.utils.TreeVisualizer;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 
 /**
