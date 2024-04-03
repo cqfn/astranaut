@@ -32,7 +32,7 @@ public final class Common {
     /**
      * The Astranaut version.
      */
-    public static final String VERSION = "0.2.20";
+    public static final String VERSION = "0.2.21";
 
     /**
      * Private constructor.

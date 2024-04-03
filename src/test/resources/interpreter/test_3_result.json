@@ -15,9 +15,7 @@
           }
         ]
       },
-      {
-        "type": "C"
-      },
+      {"type": "C"},
       {
         "type": "DD",
         "children": [

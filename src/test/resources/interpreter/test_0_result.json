@@ -5,9 +5,7 @@
       {
         "type": "ClassOrInterfaceDeclaration",
         "children": [
-          {
-            "type": "ModifierPublic"
-          },
+          {"type": "ModifierPublic"},
           {
             "type": "SimpleName",
             "data": "Class1"
@@ -15,9 +13,7 @@
           {
             "type": "MethodDeclaration",
             "children": [
-              {
-                "type": "ModifierPublic"
-              },
+              {"type": "ModifierPublic"},
               {
                 "type": "SimpleName",
                 "data": "getValue"
