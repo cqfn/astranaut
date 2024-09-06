@@ -60,7 +60,7 @@ public class ConverterClassFiller {
     /**
      * The result node declaration.
       */
-    private static final String DECLARE_RESULT = "Node result = EmptyTree.INSTANCE;";
+    private static final String DECLARE_RESULT = "Node result = DummyNode.INSTANCE;";
 
     /**
      * The result nod return.

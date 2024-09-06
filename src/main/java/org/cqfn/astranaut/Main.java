@@ -37,7 +37,7 @@ import org.cqfn.astranaut.codegen.java.Environment;
 import org.cqfn.astranaut.codegen.java.License;
 import org.cqfn.astranaut.codegen.java.ProgramGenerator;
 import org.cqfn.astranaut.codegen.java.TaggedChild;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.interpreter.Interpreter;
 import org.cqfn.astranaut.parser.ProgramParser;
@@ -176,9 +176,9 @@ public final class Main {
     /**
      * The main function. Parses the command line.
      * @param args The command-line arguments
-     * @throws BaseException If fails
+     * @throws CoreException If fails
      */
-    public static void main(final String... args) throws BaseException {
+    public static void main(final String... args) throws CoreException {
         final Main main = new Main();
         final JCommander jcr = JCommander.newBuilder()
             .addObject(main)
@@ -193,13 +193,13 @@ public final class Main {
 
     /**
      * Runs actions.
-     * @throws BaseException If fails
+     * @throws CoreException If fails
      */
-    private void run() throws BaseException {
+    private void run() throws CoreException {
         final String rules = this.dsl.getPath();
         try {
             final String code = new FilesReader(rules).readAsString(
-                (FilesReader.CustomExceptionCreator<BaseException>) () -> new BaseException() {
+                (FilesReader.CustomExceptionCreator<CoreException>) () -> new CoreException() {
                     private static final long serialVersionUID = 574161461218410655L;
 
                     @Override
@@ -223,7 +223,7 @@ public final class Main {
             } else if (this.action == Action.CONVERT) {
                 new Interpreter(this.source, this.destination, program).run();
             }
-        } catch (final BaseException exc) {
+        } catch (final CoreException exc) {
             LOG.severe(String.format("%s, %s", exc.getInitiator(), exc.getErrorMessage()));
             throw exc;
         }

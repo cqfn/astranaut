@@ -24,7 +24,7 @@
 
 package org.uast.example.green;
 
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
  * Node that describes the 'Expression' type.

@@ -24,15 +24,15 @@
 
 package org.cqfn.astranaut.exceptions;
 
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
 
 /**
  * Base exception thrown by the generator.
  *
  * @since 0.1.5
  */
-public abstract class GeneratorException extends BaseException {
-    private static final long serialVersionUID = 2408243061613727116L;
+public abstract class GeneratorException extends CoreException {
+    private static final long serialVersionUID = -1;
 
     @Override
     public final String getInitiator() {

@@ -28,11 +28,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.cqfn.astranaut.core.Builder;
-import org.cqfn.astranaut.core.Converter;
-import org.cqfn.astranaut.core.EmptyTree;
-import org.cqfn.astranaut.core.Factory;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Converter;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.DummyNode;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
  * Converter describing DSL conversion rule.
@@ -68,7 +68,7 @@ public final class Rule0 implements Converter {
 
     @Override
     public Node convert(final Node node, final Factory factory) {
-        Node result = EmptyTree.INSTANCE;
+        Node result = DummyNode.INSTANCE;
         final Map<Integer, List<Node>> children = new TreeMap<>();
         final Map<Integer, String> data = new TreeMap<>();
         final boolean matched = Matcher0.INSTANCE.match(node, children, data);
@@ -86,7 +86,7 @@ public final class Rule0 implements Converter {
      */
     private static Node firstBuilder(final Factory factory,
         final Map<Integer, List<Node>> children) {
-        Node result = EmptyTree.INSTANCE;
+        Node result = DummyNode.INSTANCE;
         final Builder builder = factory.createBuilder(Rule0.ADDITION);
         final List<Node> list = new LinkedList<>();
         list.addAll(children.get(Rule0.FIRST_HOLE_ID));

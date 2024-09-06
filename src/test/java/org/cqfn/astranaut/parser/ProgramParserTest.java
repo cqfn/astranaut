@@ -24,7 +24,7 @@
 package org.cqfn.astranaut.parser;
 
 import java.util.List;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
 import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Program;
@@ -59,7 +59,7 @@ class ProgramParserTest {
                 "java: Synchronized <- Expression, StatementBlock",
                 list.get(1).toString()
             );
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -76,7 +76,7 @@ class ProgramParserTest {
         final ProgramParser parser = new ProgramParser(source);
         try {
             parser.parse();
-        } catch (final BaseException error) {
+        } catch (final CoreException error) {
             final String message = error.getErrorMessage();
             Assertions.assertEquals(
                 "2: Node names must start with a capital letter: 'Expression'",
@@ -104,7 +104,7 @@ class ProgramParserTest {
                 "green: IntegerLiteral <- $int$, $String.valueOf(#)$, $Integer.parseInt(#)$",
                 list.get(0).toString()
             );
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);

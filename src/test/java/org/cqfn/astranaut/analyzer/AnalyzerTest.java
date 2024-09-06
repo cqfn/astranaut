@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.DuplicateRule;
 import org.cqfn.astranaut.exceptions.ExtendedNodeNotFound;
@@ -153,7 +153,7 @@ class AnalyzerTest {
             Assertions.assertEquals(
                 atype, analyzer.getHierarchy(AnalyzerTest.A_TYPE, AnalyzerTest.JAVA_LANGUAGE)
             );
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -183,7 +183,7 @@ class AnalyzerTest {
                 AnalyzerTest.E_TYPE
             );
             Assertions.assertEquals(atype, analyzer.getHierarchy(AnalyzerTest.A_TYPE, ""));
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -218,7 +218,7 @@ class AnalyzerTest {
                 list,
                 analyzer.getTags(AnalyzerTest.E_TYPE, "").toString()
             );
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -259,7 +259,7 @@ class AnalyzerTest {
                 list,
                 analyzer.getTags(AnalyzerTest.I_TYPE, AnalyzerTest.JAVA_LANGUAGE).toString()
             );
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -301,7 +301,7 @@ class AnalyzerTest {
                 list,
                 analyzer.getTags(AnalyzerTest.I_TYPE, AnalyzerTest.JAVA_LANGUAGE).toString()
             );
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -342,7 +342,7 @@ class AnalyzerTest {
                 list,
                 analyzer.getTags(AnalyzerTest.H_TYPE, AnalyzerTest.JAVA_LANGUAGE).toString()
             );
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -384,7 +384,7 @@ class AnalyzerTest {
                 list,
                 analyzer.getTags(AnalyzerTest.I_TYPE, "py").toString()
             );
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -394,7 +394,7 @@ class AnalyzerTest {
      * Test hierarchy of nodes in depth4_set.txt.
      */
     @Test
-    void testFourDepthHierarchy() throws BaseException {
+    void testFourDepthHierarchy() throws CoreException {
         final Analyzer analyzer = this.getAnalyzer(AnalyzerTest.FOUR_SET);
         this.checkFourDepthHierarchy(analyzer);
     }
@@ -403,7 +403,7 @@ class AnalyzerTest {
      * Test hierarchy of nodes in depth4_set_mixed.txt.
      */
     @Test
-    void testFourDepthMixedHierarchy() throws BaseException {
+    void testFourDepthMixedHierarchy() throws CoreException {
         final Analyzer analyzer = this.getAnalyzer(AnalyzerTest.FOUR_MIX_SET);
         this.checkFourDepthHierarchy(analyzer);
     }
@@ -412,7 +412,7 @@ class AnalyzerTest {
      * Test tagged names of nodes in depth4_set.txt.
      */
     @Test
-    void testFourDepthTags() throws BaseException {
+    void testFourDepthTags() throws CoreException {
         final Analyzer analyzer = this.getAnalyzer(AnalyzerTest.FOUR_SET);
         this.checkFourDepthTags(analyzer);
     }
@@ -421,7 +421,7 @@ class AnalyzerTest {
      * Test tagged names of nodes in depth4_set_mixed.txt.
      */
     @Test
-    void testFourDepthMixedTags() throws BaseException {
+    void testFourDepthMixedTags() throws CoreException {
         final Analyzer analyzer = this.getAnalyzer(AnalyzerTest.FOUR_MIX_SET);
         this.checkFourDepthTags(analyzer);
     }
@@ -450,7 +450,7 @@ class AnalyzerTest {
             } catch (final DuplicateRule exception) {
                 oops = true;
             }
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
         }
         Assertions.assertTrue(oops);
     }
@@ -480,7 +480,7 @@ class AnalyzerTest {
             } catch (final DuplicateRule exception) {
                 oops = true;
             }
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
         }
         Assertions.assertTrue(oops);
     }
@@ -501,7 +501,7 @@ class AnalyzerTest {
                 AnalyzerTest.D_TYPE, AnalyzerTest.JAVA_LANGUAGE
             );
             Assertions.assertEquals("[E]", imports.toString());
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -523,7 +523,7 @@ class AnalyzerTest {
                 AnalyzerTest.D_TYPE, AnalyzerTest.JAVA_LANGUAGE
             );
             Assertions.assertEquals("[E, B]", imports.toString());
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -550,7 +550,7 @@ class AnalyzerTest {
             AnalyzerTest.A_TYPE, ""
             );
             Assertions.assertEquals(expected, imports.toString());
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -590,7 +590,7 @@ class AnalyzerTest {
                 AnalyzerTest.E_TYPE
             );
             Assertions.assertEquals(bgrtype, analyzer.getHierarchy(AnalyzerTest.B_TYPE, ""));
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = false;
         }
         Assertions.assertFalse(oops);
@@ -623,7 +623,7 @@ class AnalyzerTest {
             Assertions.assertEquals(
                 Collections.singletonList(list), analyzer.getHierarchy(list, "")
             );
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -641,7 +641,7 @@ class AnalyzerTest {
             final String source = this.readTest("extended_not_found.txt");
             final ProgramParser parser = new ProgramParser(source);
             program = parser.parse();
-        } catch (final BaseException exception) {
+        } catch (final CoreException exception) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -677,7 +677,7 @@ class AnalyzerTest {
             final String source = this.readTest("java_set_several_extensions.txt");
             final ProgramParser parser = new ProgramParser(source);
             program = parser.parse();
-        } catch (final BaseException exception) {
+        } catch (final CoreException exception) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -840,7 +840,7 @@ class AnalyzerTest {
      * Get analyzer of depth 4 nodes inheritance.
      * @param filename The name of the file with DSL code
      */
-    private Analyzer getAnalyzer(final String filename) throws BaseException {
+    private Analyzer getAnalyzer(final String filename) throws CoreException {
         final String source = this.readTest(filename);
         final ProgramParser parser = new ProgramParser(source);
         final Program program = parser.parse();

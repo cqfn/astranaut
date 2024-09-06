@@ -23,20 +23,20 @@
  */
 package org.cqfn.astranaut.exceptions;
 
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
 
 /**
  * Exception with line number, wraps another exception.
  *
  * @since 0.1.5
  */
-public final class ExceptionWithLineNumber extends BaseException {
+public final class ExceptionWithLineNumber extends CoreException {
     private static final long serialVersionUID = 8469819668823203534L;
 
     /**
      * Base exception.
      */
-    private final BaseException base;
+    private final CoreException base;
 
     /**
      * Line number.
@@ -48,7 +48,7 @@ public final class ExceptionWithLineNumber extends BaseException {
      * @param base Base exception
      * @param number Line number
      */
-    public ExceptionWithLineNumber(final BaseException base, final int number) {
+    public ExceptionWithLineNumber(final CoreException base, final int number) {
         this.base = base;
         this.number = number;
     }

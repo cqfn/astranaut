@@ -23,15 +23,15 @@
  */
 package org.cqfn.astranaut.exceptions;
 
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
 
 /**
  * Base exception thrown by the processor.
  *
  * @since 0.2
  */
-public abstract class ProcessorException extends BaseException {
-    private static final long serialVersionUID = 3256090722151087355L;
+public abstract class ProcessorException extends CoreException {
+    private static final long serialVersionUID = -1;
 
     @Override
     public final String getInitiator() {

@@ -92,7 +92,7 @@ final class LiteralGenerator extends BaseGenerator {
         unit.addImport("java.util.Map");
         unit.addImport("java.util.stream.Collectors");
         unit.addImport("java.util.stream.Stream");
-        final String base = "org.cqfn.astranaut.core";
+        final String base = "org.cqfn.astranaut.core.base";
         unit.addImport(base.concat(".Builder"));
         unit.addImport(base.concat(".ChildDescriptor"));
         unit.addImport(base.concat(".EmptyFragment"));

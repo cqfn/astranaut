@@ -96,11 +96,11 @@ public final class ConverterGenerator {
         if (filler.isLinkedListNeeded()) {
             unit.addImport("java.util.LinkedList");
         }
-        final String base = "org.cqfn.astranaut.core";
+        unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Converter");
+        final String base = "org.cqfn.astranaut.core.base";
         if (attrib == DescriptorAttribute.NONE) {
             unit.addImport(base.concat(".Builder"));
         }
-        unit.addImport(base.concat(".Converter"));
         unit.addImport(base.concat(".EmptyTree"));
         unit.addImport(base.concat(".Factory"));
         unit.addImport(base.concat(".Node"));

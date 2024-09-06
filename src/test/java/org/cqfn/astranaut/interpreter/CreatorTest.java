@@ -27,9 +27,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.cqfn.astranaut.core.DraftNode;
-import org.cqfn.astranaut.core.EmptyTree;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.base.DefaultFactory;
+import org.cqfn.astranaut.core.base.DraftNode;
+import org.cqfn.astranaut.core.base.DummyNode;
+import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.exceptions.ParserException;
 import org.cqfn.astranaut.parser.BracketsParser;
 import org.cqfn.astranaut.parser.DescriptorParser;
@@ -60,7 +61,7 @@ class CreatorTest {
         final Node node = ctor.createNode();
         children.put(1, Collections.singletonList(node));
         final Node result = creator.create(
-            DefaultFactory.INSTANCE,
+            DefaultFactory.EMPTY,
             children,
             Collections.emptyMap()
         );
@@ -75,9 +76,9 @@ class CreatorTest {
         final Descriptor descriptor = this.parseCode("#2");
         final Creator creator = new Creator(descriptor);
         final Node result = creator.create(
-            DefaultFactory.INSTANCE, Collections.emptyMap(), Collections.emptyMap()
+            DefaultFactory.EMPTY, Collections.emptyMap(), Collections.emptyMap()
         );
-        Assertions.assertEquals(EmptyTree.INSTANCE, result);
+        Assertions.assertEquals(DummyNode.INSTANCE, result);
     }
 
     /**
@@ -88,9 +89,9 @@ class CreatorTest {
         final Descriptor descriptor = this.parseCode("X(Y,Z)");
         final Creator creator = new Creator(descriptor);
         final List<Creator> initial = creator.getSubs();
-        creator.create(DefaultFactory.INSTANCE, Collections.emptyMap(), Collections.emptyMap());
+        creator.create(DefaultFactory.EMPTY, Collections.emptyMap(), Collections.emptyMap());
         final List<Creator> first = creator.getSubs();
-        creator.create(DefaultFactory.INSTANCE, Collections.emptyMap(), Collections.emptyMap());
+        creator.create(DefaultFactory.EMPTY, Collections.emptyMap(), Collections.emptyMap());
         final List<Creator> second = creator.getSubs();
         Assertions.assertNotEquals(initial, first);
         Assertions.assertEquals(first, second);
@@ -107,7 +108,7 @@ class CreatorTest {
         final Map<Integer, String> data = new TreeMap<>();
         final String value = "test";
         data.put(1, value);
-        final Node result = creator.create(DefaultFactory.INSTANCE, Collections.emptyMap(), data);
+        final Node result = creator.create(DefaultFactory.EMPTY, Collections.emptyMap(), data);
         Assertions.assertEquals("B", result.getTypeName());
         Assertions.assertEquals(value, result.getData());
     }

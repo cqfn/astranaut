@@ -26,7 +26,7 @@ package org.cqfn.astranaut.interpreter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.cqfn.astranaut.core.Factory;
+import org.cqfn.astranaut.core.base.Factory;
 import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Transformation;
 
@@ -35,7 +35,7 @@ import org.cqfn.astranaut.rules.Transformation;
  *
  * @since 0.1.5
  */
-public class Adapter extends org.cqfn.astranaut.core.Adapter {
+public class Adapter extends org.cqfn.astranaut.core.algorithms.conversion.Adapter {
     /**
      * Constructor.
      * @param instructions The list of transformation instructions
@@ -50,9 +50,9 @@ public class Adapter extends org.cqfn.astranaut.core.Adapter {
      * @param instructions The list of transformation instructions
      * @return List of converters
      */
-    private static List<org.cqfn.astranaut.core.Converter> init(
+    private static List<org.cqfn.astranaut.core.algorithms.conversion.Converter> init(
         final List<Instruction<Transformation>> instructions) {
-        final List<org.cqfn.astranaut.core.Converter> result =
+        final List<org.cqfn.astranaut.core.algorithms.conversion.Converter> result =
             new ArrayList<>(instructions.size());
         for (final Instruction<Transformation> instruction : instructions) {
             final Transformation rule = instruction.getRule();

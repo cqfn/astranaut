@@ -27,8 +27,8 @@ import java.util.Arrays;
 import org.cqfn.astranaut.api.JsonDeserializer;
 import org.cqfn.astranaut.api.JsonSerializer;
 import org.cqfn.astranaut.core.DraftNode;
-import org.cqfn.astranaut.core.Node;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.CoreException;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.ProcessorCouldNotWriteFile;
 import org.cqfn.astranaut.exceptions.ProcessorException;
@@ -41,9 +41,9 @@ public class TreeSerializerDeserializer {
     /**
      * The main function.
      * @param args The command-line arguments
-     * @throws BaseException If fails
+     * @throws CoreException If fails
      */
-    public static void main(final String... args) throws BaseException {
+    public static void main(final String... args) throws CoreException {
         final Node tree = createSampleTree();
         serialize(tree);
         final Node result = deserialize();

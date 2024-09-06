@@ -100,9 +100,8 @@ public final class MatcherGenerator {
             unit.addImport("java.util.LinkedList");
             unit.addImport("java.util.Deque");
         }
-        final String base = "org.cqfn.astranaut.core";
-        unit.addImport(base.concat(".Matcher"));
-        unit.addImport(base.concat(".Node"));
+        unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Matcher");
+        unit.addImport("org.cqfn.astranaut.core.base.Node");
         this.units.put(String.format("rules%s%s", File.separator, name), unit);
         return name;
     }

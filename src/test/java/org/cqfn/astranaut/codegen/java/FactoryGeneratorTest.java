@@ -25,7 +25,7 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.io.IOException;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.parser.ProgramParser;
 import org.cqfn.astranaut.rules.Program;
@@ -59,7 +59,7 @@ class FactoryGeneratorTest {
             final String actual = unit.generate();
             final String expected = this.readTest("factory_generator_expected.txt");
             Assertions.assertEquals(expected, actual);
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);

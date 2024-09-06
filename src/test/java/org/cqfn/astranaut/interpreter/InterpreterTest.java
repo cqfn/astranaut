@@ -27,7 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import org.cqfn.astranaut.Main;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.DestinationNotSpecified;
 import org.cqfn.astranaut.exceptions.InterpreterException;
@@ -182,7 +182,7 @@ class InterpreterTest {
         boolean oops = false;
         try {
             Main.main(args);
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         boolean result = false;
@@ -209,7 +209,7 @@ class InterpreterTest {
         try {
             final ProgramParser parser = new ProgramParser("X(Y<\"2\">) -> Z");
             program = parser.parse();
-        } catch (final BaseException ignore) {
+        } catch (final CoreException ignore) {
             oops = true;
         }
         Assertions.assertFalse(oops);
