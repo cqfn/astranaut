@@ -75,8 +75,8 @@ final class OrdinaryNodeGenerator extends BaseNodeGenerator {
         unit.addImport(base.concat(".Builder"));
         unit.addImport(base.concat(".ChildDescriptor"));
         if (!this.instruction.getRule().isEmpty()) {
-            unit.addImport(base.concat(".ChildrenMapper"));
-            unit.addImport(base.concat(".utils.ListUtils"));
+            unit.addImport("org.cqfn.astranaut.core.algorithms.NodeAllocator");
+            unit.addImport("org.cqfn.astranaut.utils.ListUtils");
         }
         unit.addImport(base.concat(".EmptyFragment"));
         unit.addImport(base.concat(".Fragment"));

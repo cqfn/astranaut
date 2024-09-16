@@ -101,7 +101,7 @@ public final class ConverterGenerator {
         if (attrib == DescriptorAttribute.NONE) {
             unit.addImport(base.concat(".Builder"));
         }
-        unit.addImport(base.concat(".EmptyTree"));
+        unit.addImport(base.concat(".DummyNode"));
         unit.addImport(base.concat(".Factory"));
         unit.addImport(base.concat(".Node"));
         this.units.put(String.format("rules%s%s", File.separator, name), unit);

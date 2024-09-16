@@ -140,7 +140,7 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
         final StringBuilder code = new StringBuilder(256);
         final String first = "final Node[] mapping = new Node[Constructor.MAX_NODE_COUNT];\n";
         final String second = String.format(
-            "final ChildrenMapper mapper =\n\tnew ChildrenMapper(%s.TYPE.getChildTypes());\n",
+            "final NodeAllocator mapper =\n\tnew NodeAllocator(%s.TYPE.getChildTypes());\n",
             this.getRule().getType()
         );
         final String third = "final boolean result = mapper.map(mapping, list);\n";
