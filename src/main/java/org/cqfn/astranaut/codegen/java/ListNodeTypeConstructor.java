@@ -92,7 +92,7 @@ final class ListNodeTypeConstructor extends NodeConstructor {
         klass.addField(field);
         final Method getter = new Method("getChildTypes");
         getter.setReturnType(ListNodeTypeConstructor.LIST_CHILD);
-        getter.setCode("return TypeImpl.CHILDREN;");
+        getter.setCode(String.format("return %s.CHILDREN;", klass.getName()));
         klass.addMethod(getter);
     }
 }

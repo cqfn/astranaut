@@ -132,18 +132,30 @@ final class OrdinaryNodeBuilderConstructor extends NodeConstructor {
     private String fillSetterForNonEmptyChildrenList() {
         final Node rule = this.getRule();
         final List<Child> composition = rule.getComposition();
+        final String brief;
+        final String name;
+        if (rule.hasOptionalChild()) {
+            brief = "The maximum number of nodes";
+            name = "MAX_NODE_COUNT";
+        } else {
+            brief = "The number of nodes";
+            name = "NODE_COUNT";
+        }
         this.createMagicNumber(
-            "The maximum number of nodes",
-            "MAX_NODE_COUNT",
+            brief,
+            name,
             composition.size()
         );
         final StringBuilder code = new StringBuilder(256);
-        final String first = "final Node[] mapping = new Node[Constructor.MAX_NODE_COUNT];\n";
+        final String first = String.format(
+            "final Node[] mapping = new Node[Constructor.%s];\n",
+            name
+        );
         final String second = String.format(
-            "final NodeAllocator mapper =\n\tnew NodeAllocator(%s.TYPE.getChildTypes());\n",
+            "final NodeAllocator allocator =\n\tnew NodeAllocator(%s.TYPE.getChildTypes());\n",
             this.getRule().getType()
         );
-        final String third = "final boolean result = mapper.map(mapping, list);\n";
+        final String third = "final boolean result = allocator.allocate(mapping, list);\n";
         code.append(first).append(second).append(third).append("if (result) { \n");
         int index = 0;
         for (final Child child : this.getRule().getComposition()) {

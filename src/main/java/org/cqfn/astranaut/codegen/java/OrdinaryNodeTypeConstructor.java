@@ -101,7 +101,7 @@ final class OrdinaryNodeTypeConstructor extends NodeConstructor {
         if (empty) {
             getter.setCode("return Collections.emptyList();");
         } else {
-            getter.setCode("return TypeImpl.CHILDREN;");
+            getter.setCode(String.format("return %s.CHILDREN;", this.getKlass().getName()));
         }
         klass.addMethod(getter);
     }
