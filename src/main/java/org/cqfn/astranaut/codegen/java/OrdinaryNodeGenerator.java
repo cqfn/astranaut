@@ -68,8 +68,7 @@ final class OrdinaryNodeGenerator extends BaseNodeGenerator {
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
         unit.addImport("java.util.Map");
-        unit.addImport("java.util.stream.Collectors");
-        unit.addImport("java.util.stream.Stream");
+        unit.addImport("org.cqfn.astranaut.core.utils.MapUtils");
         final Environment env = this.getEnv();
         final String base = "org.cqfn.astranaut.core.base";
         unit.addImport(base.concat(".Builder"));
