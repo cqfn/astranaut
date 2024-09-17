@@ -55,17 +55,20 @@ final class ListNodeGenerator extends BaseNodeGenerator {
         new ListNodeClassConstructor(env, rule, klass).run();
         final String pkg = this.getPackageName(this.instruction.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
-        ListNodeGenerator.generateImports(unit);
+        this.generateImports(unit, rule);
         return unit;
     }
 
     /**
      * Generates imports block.
      * @param unit The compilation unit
+     * @param rule The rule
      */
-    private static void generateImports(final CompilationUnit unit) {
+    private void generateImports(final CompilationUnit unit, Node rule) {
         unit.addImport("java.util.ArrayList");
-        unit.addImport("java.util.Arrays");
+        if (this.getEnv().getHierarchy(rule.getType()).size() > 1) {
+            unit.addImport("java.util.Arrays");
+        }
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
         unit.addImport("java.util.Map");
