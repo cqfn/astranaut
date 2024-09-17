@@ -23,7 +23,9 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.List;
 import org.cqfn.astranaut.rules.Instruction;
+import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Node;
 
 /**
@@ -55,16 +57,20 @@ final class OrdinaryNodeGenerator extends BaseNodeGenerator {
         new OrdinaryNodeClassConstructor(env, rule, klass).run();
         final String pkg = this.getPackageName(this.instruction.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
-        this.generateImports(unit);
+        this.generateImports(unit, rule);
         return unit;
     }
 
     /**
      * Generates imports block.
      * @param unit The compilation unit
+     * @param rule The rule
      */
-    private void generateImports(final CompilationUnit unit) {
-        unit.addImport("java.util.Arrays");
+    private void generateImports(final CompilationUnit unit, final Node rule) {
+        final List<String> hierarchy = this.getEnv().getHierarchy(rule.getType());
+        if (hierarchy.size() > 1) {
+            unit.addImport("java.util.Arrays");
+        }
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
         unit.addImport("java.util.Map");

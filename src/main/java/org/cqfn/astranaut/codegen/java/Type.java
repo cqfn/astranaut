@@ -80,7 +80,6 @@ public interface Type extends Entity {
                 .append("].\n");
         }
         builder.append(tabulation)
-            .append(tabulation)
             .append(" * @since ")
             .append(this.getVersion())
             .append('\n')

@@ -240,9 +240,9 @@ abstract class BaseConstructor {
             }
             init.append(BaseConstructor.LIST_END);
         } else {
-            init.append("Collections.singletonList(\n\t")
+            init.append("Collections.singletonList(")
                 .append(ssg.getFieldName(hierarchy.get(0)))
-                .append("\n)");
+                .append(')');
         }
         final Field field = new Field(
             "Hierarchy",
