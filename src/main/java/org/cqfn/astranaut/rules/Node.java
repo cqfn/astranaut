@@ -27,6 +27,7 @@ package org.cqfn.astranaut.rules;
 import java.util.ArrayList;
 import java.util.List;
 import org.cqfn.astranaut.codegen.java.TaggedChild;
+import org.cqfn.astranaut.utils.StringUtils;
 
 /**
  * A rule that describes node.
@@ -80,6 +81,28 @@ public final class Node extends Vertex {
             flag = true;
         }
         return builder.toString();
+    }
+
+    @Override
+    public void toStringIndented(final StringBuilder builder, final int indent) {
+        final String tabulation = StringUtils.SPACE.repeat(indent);
+        builder
+            .append(tabulation)
+            .append(type)
+            .append('\n')
+            .append(tabulation)
+            .append("<-")
+            .append('\n')
+            .append(tabulation);
+        boolean flag = false;
+        for (final Child child : this.composition) {
+            if (flag) {
+                builder.append(", ");
+            }
+            builder.append(child.toString());
+            flag = true;
+        }
+        builder.append('\n');
     }
 
     /**

@@ -23,9 +23,11 @@
  */
 package org.cqfn.astranaut.rules;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import org.cqfn.astranaut.utils.StringUtils;
 
 /**
  * Descriptor, i.e. name with tag, parameters and data.
@@ -218,6 +220,63 @@ public abstract class Descriptor implements Child, Parameter {
                 builder.append(parameter.toString());
             }
             builder.append(')');
+        }
+    }
+
+    @Override
+    public void toStringIndented(final StringBuilder builder, final int indent) {
+        final String tabulation = StringUtils.SPACE.repeat(indent);
+        builder.append(tabulation);
+        final DescriptorAttribute attribute = this.getAttribute();
+        if (attribute == DescriptorAttribute.OPTIONAL) {
+            builder.append('[');
+        } else if (attribute == DescriptorAttribute.LIST) {
+            builder.append('{');
+        }
+        final String tag = this.getTag();
+        if (!tag.isEmpty()) {
+            builder.append(tag).append('@');
+        }
+        builder.append(this.getType());
+        this.parametersToIndentedString(builder, indent);
+        final Data data = this.getData();
+        if (data.isValid()) {
+            builder.append('<').append(data.toString()).append('>');
+        }
+        if (attribute == DescriptorAttribute.OPTIONAL) {
+            builder.append(']');
+        } else if (attribute == DescriptorAttribute.LIST) {
+            builder.append('}');
+        }
+        if (attribute == DescriptorAttribute.EXT) {
+            builder.append('&');
+        }
+        if (attribute == DescriptorAttribute.HOLE) {
+            builder.append('#').append(this.getHoleNumber());
+        }
+    }
+
+    /**
+     * Builds parameters list as an indented string.
+     * @param builder String builder where to build.
+     * @param indent Current indentation
+     */
+    private void parametersToIndentedString(final StringBuilder builder, final int indent) {
+        final List<Parameter> parameters = this.getParameters();
+        if (!parameters.isEmpty()) {
+            builder.append("(\n");
+            final Iterator<Parameter> iterator = parameters.iterator();
+            for (int index = 0; index < parameters.size(); index = index + 1) {
+                final Parameter parameter = iterator.next();
+                parameter.toStringIndented(builder, indent + 2);
+                if (index < parameters.size() - 1) {
+                    builder.append(",\n");
+                }
+            }
+            builder
+                .append('\n')
+                .append(StringUtils.SPACE.repeat(indent))
+                .append(')');
         }
     }
 

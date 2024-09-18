@@ -31,4 +31,22 @@ package org.cqfn.astranaut.rules;
 public interface Parameter {
     @Override
     String toString();
+
+    /**
+     * Builds the parameter as multiple indented lines, so that it looks nice on code listings.
+     * @param builder Where to build the string
+     * @param indent Current indentation
+     */
+    void toStringIndented(StringBuilder builder, int indent);
+
+    /**
+     * Forms the rule as multiple indented lines, so that it looks nice on code listings.
+     * @param indent Initial indentation
+     * @return Indented string
+     */
+    default String toStringIndented(int indent) {
+        final StringBuilder builder = new StringBuilder();
+        this.toStringIndented(builder, indent);
+        return builder.toString();
+    }
 }

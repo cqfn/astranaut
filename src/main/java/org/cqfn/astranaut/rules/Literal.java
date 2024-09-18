@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.rules;
 
 import java.util.Objects;
+import org.cqfn.astranaut.utils.StringUtils;
 
 /**
  * A rule that describes literal.
@@ -138,6 +139,11 @@ public final class Literal extends Vertex {
             );
         }
         return result;
+    }
+
+    @Override
+    public void toStringIndented(final StringBuilder builder, final int indent) {
+        builder.append(StringUtils.SPACE.repeat(indent)).append(this.toString());
     }
 
     @Override

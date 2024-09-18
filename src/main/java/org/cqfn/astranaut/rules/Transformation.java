@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.rules;
 
+import org.cqfn.astranaut.utils.StringUtils;
+
 /**
  * A rule that describes literal.
  *
@@ -68,5 +70,20 @@ public final class Transformation implements Rule {
     @Override
     public String toString() {
         return String.format("%s -> %s", this.left.toString(), this.right.toString());
+    }
+
+    @Override
+    public void toStringIndented(final StringBuilder builder, final int indent) {
+        final String tabulation = StringUtils.SPACE.repeat(indent);
+        builder
+            .append(tabulation)
+            .append(this.left.toString())
+            .append('\n')
+            .append(tabulation)
+            .append("->")
+            .append('\n')
+            .append(tabulation)
+            .append(this.right.toString())
+            .append('\n');
     }
 }

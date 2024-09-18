@@ -78,8 +78,8 @@ public final class MatcherGenerator {
         assert descriptor.getAttribute() == DescriptorAttribute.NONE;
         final String name = this.names.getName();
         final StringBuilder brief = new StringBuilder();
-        brief.append("Checks that the node matches the following structure:\n> ");
-        brief.append(descriptor.toString());
+        brief.append("Checks that the node matches the following structure:\n");
+        brief.append(descriptor.toStringIndented(2));
         brief.append("\nand extracts the data and children");
         final Klass klass = new Klass(
             brief.toString(),
