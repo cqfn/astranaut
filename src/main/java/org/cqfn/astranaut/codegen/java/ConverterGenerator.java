@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.DescriptorAttribute;
+import org.cqfn.astranaut.rules.Transformation;
 
 /**
  * Generates converter classes.
@@ -72,15 +73,25 @@ public final class ConverterGenerator {
 
     /**
      * Generates compilation unit from descriptor.
-     * @param descriptor The descriptor
-     * @param matcher The nme of the matcher class
+     * @param rule The transformation rule
+     * @param matcher The name of the matcher class
      */
-    public void generate(final Descriptor descriptor, final String matcher) {
+    public void generate(final Transformation rule, final String matcher) {
+        final Descriptor descriptor = rule.getRight();
         final DescriptorAttribute attrib = descriptor.getAttribute();
         assert attrib == DescriptorAttribute.NONE || attrib == DescriptorAttribute.HOLE;
         final String name = this.names.getName();
+        final StringBuilder brief = new StringBuilder();
+        brief.append("Checks that the node matches the conversion rule:\n");
+        final String description = rule.toString();
+        if (description.length() < Entity.MAX_LINE_LENGTH) {
+            brief.append("  ").append(description).append('\n');
+        } else {
+            brief.append(rule.toStringIndented(2));
+        }
+        brief.append("and performs the conversion if possible");
         final Klass klass = new Klass(
-            "Converter describing DSL conversion rule",
+            brief.toString(),
             name
         );
         final ConverterClassFiller filler = new ConverterClassFiller(klass, descriptor, matcher);

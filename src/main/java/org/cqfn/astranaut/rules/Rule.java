@@ -42,11 +42,12 @@ public interface Rule {
 
     /**
      * Forms the rule as multiple indented lines, so that it looks nice on code listings.
+     * @param indent Initial indentation
      * @return Indented string
      */
-    default String toStringIndented() {
+    default String toStringIndented(final int indent) {
         final StringBuilder builder = new StringBuilder();
-        this.toStringIndented(builder, 0);
+        this.toStringIndented(builder, indent);
         return builder.toString();
     }
 }

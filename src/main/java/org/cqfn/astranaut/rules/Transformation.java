@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.rules;
 
+import com.kitfox.svg.Stop;
 import org.cqfn.astranaut.utils.StringUtils;
 
 /**
@@ -75,15 +76,11 @@ public final class Transformation implements Rule {
     @Override
     public void toStringIndented(final StringBuilder builder, final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent);
-        builder
+        this.left.toStringIndented(builder, indent);
+        builder.append('\n')
             .append(tabulation)
-            .append(this.left.toString())
-            .append('\n')
-            .append(tabulation)
-            .append("->")
-            .append('\n')
-            .append(tabulation)
-            .append(this.right.toString())
-            .append('\n');
+            .append("->\n");
+        this.right.toStringIndented(builder, indent);
+        builder.append('\n');
     }
 }

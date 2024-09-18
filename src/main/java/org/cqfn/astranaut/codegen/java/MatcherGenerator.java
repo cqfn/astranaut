@@ -79,7 +79,12 @@ public final class MatcherGenerator {
         final String name = this.names.getName();
         final StringBuilder brief = new StringBuilder();
         brief.append("Checks that the node matches the following structure:\n");
-        brief.append(descriptor.toStringIndented(2));
+        final String description = descriptor.toString();
+        if (description.length() < Entity.MAX_LINE_LENGTH) {
+            brief.append("  ").append(description);
+        } else {
+            brief.append(descriptor.toStringIndented(2));
+        }
         brief.append("\nand extracts the data and children");
         final Klass klass = new Klass(
             brief.toString(),
