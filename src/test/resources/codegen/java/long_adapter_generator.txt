@@ -33,7 +33,6 @@ import org.cqfn.astranaut.core.algorithms.conversion.Converter;
 
 /**
  * Adapter that converts syntax trees, prepared by the parser of the Js language.
- *
  * @since 1.0
  */
 public final class JsAdapter extends Adapter {
