@@ -66,10 +66,23 @@ public class LabelFactory {
     private int index;
 
     /**
+     * First label.
+     */
+    private final String first;
+
+    /**
      * Constructor.
      */
-    public LabelFactory() {
+    public LabelFactory(final String first) {
+        this.first = first;
         this.index = 0;
+    }
+
+    /**
+     * Another constructor.
+     */
+    public LabelFactory() {
+        this(null);
     }
 
     /**
@@ -80,7 +93,12 @@ public class LabelFactory {
         if (this.index == LabelFactory.LIST.size()) {
             throw new IllegalStateException();
         }
-        final String result = LabelFactory.LIST.get(this.index);
+        final String result;
+        if (index > 0 || first == null) {
+            result = LabelFactory.LIST.get(this.index);
+        } else {
+            result = first;
+        }
         this.index = this.index + 1;
         return result;
     }
