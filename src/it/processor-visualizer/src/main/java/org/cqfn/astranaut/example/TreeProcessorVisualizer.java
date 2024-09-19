@@ -27,9 +27,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import org.cqfn.astranaut.api.TreeProcessor;
-import org.cqfn.astranaut.core.DraftNode;
+import org.cqfn.astranaut.core.base.CoreException;
+import org.cqfn.astranaut.core.base.DraftNode;
 import org.cqfn.astranaut.core.base.Node;
-import org.cqfn.astranaut.core.exceptions.WrongFileExtension;
+import org.cqfn.astranaut.core.base.Tree;
 import org.cqfn.astranaut.core.utils.TreeVisualizer;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 
@@ -46,12 +47,12 @@ public class TreeProcessorVisualizer {
      * @throws IOException If an error during input or output actions occurs
      */
     public static void main(final String... args)
-        throws IOException, WrongFileExtension, ProcessorException {
+        throws IOException, CoreException, ProcessorException {
         final Node tree = createSampleTree();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRules("Data/rules.txt");
         final Node result = processor.transform(tree);
-        final TreeVisualizer visualizer = new TreeVisualizer(result);
+        final TreeVisualizer visualizer = new TreeVisualizer(new Tree(result));
         visualizer.visualize(new File("Data/tree.png"));
     }
 
