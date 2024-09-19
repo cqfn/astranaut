@@ -1,6 +1,5 @@
 /**
  * Test class with one method.
- *
  * @since 1.0
  */
 public class Test {

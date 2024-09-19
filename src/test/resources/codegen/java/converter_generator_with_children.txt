@@ -35,8 +35,9 @@ import org.cqfn.astranaut.core.base.Factory;
 import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Converter describing DSL conversion rule.
- *
+ * Checks that the node matches the conversion rule:
+ *   Addition(#1, #2) -> Addition(#1, #2)
+ * and performs the conversion if possible.
  * @since 1.0
  */
 public final class Rule0 implements Converter {
@@ -73,7 +74,7 @@ public final class Rule0 implements Converter {
         final Map<Integer, String> data = new TreeMap<>();
         final boolean matched = Matcher0.INSTANCE.match(node, children, data);
         if (matched) {
-            result = Rule0.firstBuilder(factory, children);
+            result = Rule0.createRootNode(factory, children);
         }
         return result;
     }
@@ -84,7 +85,7 @@ public final class Rule0 implements Converter {
      * @param children The collection of child nodes
      * @return A node
      */
-    private static Node firstBuilder(final Factory factory,
+    private static Node createRootNode(final Factory factory,
         final Map<Integer, List<Node>> children) {
         Node result = DummyNode.INSTANCE;
         final Builder builder = factory.createBuilder(Rule0.ADDITION);

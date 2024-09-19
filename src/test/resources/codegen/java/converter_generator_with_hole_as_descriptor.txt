@@ -33,8 +33,9 @@ import org.cqfn.astranaut.core.base.Factory;
 import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Converter describing DSL conversion rule.
- *
+ * Checks that the node matches the conversion rule:
+ *   #19 -> #19
+ * and performs the conversion if possible.
  * @since 1.0
  */
 public final class Rule0 implements Converter {
