@@ -24,11 +24,10 @@
 package org.cqfn.astranaut;
 
 /**
- * Some methods/data that could not be placed to other classes.
- *
+ * This class provides static information about the library, such as the version.
  * @since 1.0.6
  */
-public final class Common {
+public final class Info {
     /**
      * The Astranaut version.
      */
@@ -37,6 +36,6 @@ public final class Common {
     /**
      * Private constructor.
      */
-    private Common() {
+    private Info() {
     }
 }

@@ -26,14 +26,14 @@ package org.cqfn.astranaut.api;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.cqfn.astranaut.core.EmptyTree;
-import org.cqfn.astranaut.core.Factory;
-import org.cqfn.astranaut.core.Node;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
+import org.cqfn.astranaut.core.base.DefaultFactory;
+import org.cqfn.astranaut.core.base.DummyNode;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 import org.cqfn.astranaut.interpreter.Adapter;
-import org.cqfn.astranaut.interpreter.DefaultFactory;
 import org.cqfn.astranaut.parser.ProgramParser;
 import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Program;
@@ -60,7 +60,7 @@ public class TreeProcessor {
      */
     public TreeProcessor() {
         this.rules = new LinkedList<>();
-        this.factory = DefaultFactory.INSTANCE;
+        this.factory = DefaultFactory.EMPTY;
     }
 
     /**
@@ -94,7 +94,7 @@ public class TreeProcessor {
         try {
             final Program program = parser.parse();
             this.rules.addAll(program.getTransformations());
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             success = false;
         }
         return success;
@@ -159,7 +159,7 @@ public class TreeProcessor {
             final Adapter adapter = new Adapter(Collections.singletonList(rule), this.factory);
             result =  adapter.partialConvert(variant, tree);
         } catch (final IndexOutOfBoundsException exception) {
-            result = EmptyTree.INSTANCE;
+            result = DummyNode.INSTANCE;
         }
         return result;
     }

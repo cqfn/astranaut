@@ -26,16 +26,18 @@ package org.cqfn.astranaut.api;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.cqfn.astranaut.core.Builder;
-import org.cqfn.astranaut.core.ChildDescriptor;
-import org.cqfn.astranaut.core.DraftNode;
-import org.cqfn.astranaut.core.EmptyFragment;
-import org.cqfn.astranaut.core.EmptyTree;
-import org.cqfn.astranaut.core.Factory;
-import org.cqfn.astranaut.core.Fragment;
-import org.cqfn.astranaut.core.Node;
-import org.cqfn.astranaut.core.Type;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.CoreException;
+import org.cqfn.astranaut.core.base.DefaultFactory;
+import org.cqfn.astranaut.core.base.DraftNode;
+import org.cqfn.astranaut.core.base.DummyNode;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Tree;
+import org.cqfn.astranaut.core.base.Type;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 import org.junit.jupiter.api.Assertions;
@@ -95,7 +97,7 @@ class TreeProcessorTest {
         try {
             processor.loadRules(TreeProcessorTest.TESTS_PATH.concat("/test_0_rules.txt"));
             result = processor.transform(tree);
-        } catch (final BaseException exception) {
+        } catch (final CoreException exception) {
             oops = true;
         }
         Assertions.assertFalse(oops);
@@ -151,7 +153,7 @@ class TreeProcessorTest {
         final String filename = TreeProcessorTest.TESTS_PATH.concat("test_1_rules.txt");
         try {
             processor.loadRules(filename);
-        } catch (final BaseException exception) {
+        } catch (final CoreException exception) {
             oops = true;
             msg = exception.getErrorMessage();
         }
@@ -186,11 +188,11 @@ class TreeProcessorTest {
      */
     @Test
     void testCalculatingTransformationVariants() {
-        final Node initial = this.loadSampleTreeFromJson();
+        final Tree initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
         Assertions.assertEquals(1, processor.countRules());
-        final int result = processor.calculateVariants(0, initial);
+        final int result = processor.calculateVariants(0, initial.getRoot());
         Assertions.assertEquals(TreeProcessorTest.THREE, result);
     }
 
@@ -200,13 +202,13 @@ class TreeProcessorTest {
      */
     @Test
     void testCalculatingTransformationVariantsFromList() {
-        final Node initial = this.loadSampleTreeFromJson();
+        final Tree initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(
             "SimpleName<#1> -> Identifier<#1>; Addition(#1, #2) -> Subtraction(#1, #2);"
         );
         Assertions.assertEquals(2, processor.countRules());
-        final int result = processor.calculateVariants(1, initial);
+        final int result = processor.calculateVariants(1, initial.getRoot());
         Assertions.assertEquals(TreeProcessorTest.THREE, result);
     }
 
@@ -215,10 +217,10 @@ class TreeProcessorTest {
      */
     @Test
     void testPartialTransformationFirstVar() {
-        final Node initial = this.loadSampleTreeFromJson();
+        final Tree initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
-        final Node result = processor.partialTransform(0, 0, initial);
+        final Node result = processor.partialTransform(0, 0, initial.getRoot());
         Assertions.assertNotNull(result);
         final Node third = result.getChild(0);
         Assertions.assertEquals(TreeProcessorTest.ADDITION, third.getTypeName());
@@ -233,10 +235,10 @@ class TreeProcessorTest {
      */
     @Test
     void testPartialTransformationSecVar() {
-        final Node initial = this.loadSampleTreeFromJson();
+        final Tree initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
-        final Node result = processor.partialTransform(0, 1, initial);
+        final Node result = processor.partialTransform(0, 1, initial.getRoot());
         Assertions.assertNotNull(result);
         final Node third = result.getChild(0);
         Assertions.assertEquals(TreeProcessorTest.ADDITION, third.getTypeName());
@@ -251,10 +253,10 @@ class TreeProcessorTest {
      */
     @Test
     void testPartialTransformationTwoVars() {
-        final Node initial = this.loadSampleTreeFromJson();
+        final Tree initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
-        Node result = processor.partialTransform(0, 1, initial);
+        Node result = processor.partialTransform(0, 1, initial.getRoot());
         result = processor.partialTransform(0, 1, result);
         Assertions.assertNotNull(result);
         final Node third = result.getChild(0);
@@ -270,11 +272,11 @@ class TreeProcessorTest {
      */
     @Test
     void testWrongIndexOfRule() {
-        final Node initial = this.loadSampleTreeFromJson();
+        final Tree initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
-        final Node result = processor.partialTransform(4, 0, initial);
-        Assertions.assertEquals(EmptyTree.INSTANCE, result);
+        final Node result = processor.partialTransform(4, 0, initial.getRoot());
+        Assertions.assertEquals(DummyNode.INSTANCE, result);
     }
 
     /**
@@ -282,10 +284,10 @@ class TreeProcessorTest {
      */
     @Test
     void testWrongIndexOfVariant() {
-        final Node initial = this.loadSampleTreeFromJson();
+        final Tree initial = this.loadSampleTreeFromJson();
         final TreeProcessor processor = new TreeProcessor();
         processor.loadRulesFromString(TreeProcessorTest.RULE);
-        final Node result = processor.partialTransform(0, 3, initial);
+        final Node result = processor.partialTransform(0, 3, initial.getRoot());
         Assertions.assertNotNull(result);
         final Node third = result.getChild(0);
         Assertions.assertEquals(TreeProcessorTest.ADDITION, third.getTypeName());
@@ -316,7 +318,7 @@ class TreeProcessorTest {
      * Load a sample tree from JSON file for testing.
      * @return Deserialized tree
      */
-    private Node loadSampleTreeFromJson() {
+    private Tree loadSampleTreeFromJson() {
         final String file = TreeProcessorTest.TESTS_PATH.concat("test_calculation.json");
         boolean oops = false;
         String source = "";
@@ -348,7 +350,7 @@ class TreeProcessorTest {
      *
      * @since 0.2.9
      */
-    private static class CustomFactory extends Factory {
+    private static class CustomFactory extends DefaultFactory {
         /**
          * Constructor.
          */
@@ -376,11 +378,6 @@ class TreeProcessorTest {
         @Override
         public List<String> getHierarchy() {
             return Collections.singletonList(TreeProcessorTest.NUMBER);
-        }
-
-        @Override
-        public String getProperty(final String property) {
-            return "";
         }
 
         @Override
@@ -485,7 +482,7 @@ class TreeProcessorTest {
 
         @Override
         public Node getChild(final int index) {
-            return EmptyTree.INSTANCE;
+            return DummyNode.INSTANCE;
         }
     }
 }

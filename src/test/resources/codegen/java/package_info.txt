@@ -24,7 +24,6 @@
 
 /**
  * This package created for test purposes.
- *
  * @since 1.1
  */
 package org.uast.example;

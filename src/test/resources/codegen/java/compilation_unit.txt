@@ -29,7 +29,6 @@ import java.util.Map;
 
 /**
  * DSL rule.
- *
  * @since 1.0
  */
 public interface Rule {

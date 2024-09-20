@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.rules;
 
 import java.util.Objects;
+import org.cqfn.astranaut.utils.StringUtils;
 
 /**
  * Hole, i.e. #1, #2, Modifier#3, etc.
@@ -92,6 +93,17 @@ public final class Hole implements Data, Parameter {
             builder.append("...");
         }
         return builder.toString();
+    }
+
+    @Override
+    public void toStringIndented(final StringBuilder builder, final int indent) {
+        builder.append(StringUtils.SPACE.repeat(indent))
+            .append(this.type)
+            .append('#')
+            .append(this.value);
+        if (this.attribute == HoleAttribute.ELLIPSIS) {
+            builder.append("...");
+        }
     }
 
     @Override

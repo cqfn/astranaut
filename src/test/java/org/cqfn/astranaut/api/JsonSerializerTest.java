@@ -26,9 +26,9 @@ package org.cqfn.astranaut.api;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
-import org.cqfn.astranaut.core.DraftNode;
-import org.cqfn.astranaut.core.EmptyTree;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.base.DraftNode;
+import org.cqfn.astranaut.core.base.EmptyTree;
+import org.cqfn.astranaut.core.base.Tree;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.ProcessorCouldNotWriteFile;
 import org.junit.jupiter.api.Assertions;
@@ -56,11 +56,9 @@ class JsonSerializerTest {
      */
     @Test
     void testSerializationToString() {
-        final DraftNode.Constructor ctor = new DraftNode.Constructor();
-        ctor.setName("TestNode");
-        ctor.setData("value");
-        final Node tree = ctor.createNode();
-        final JsonSerializer serializer = new JsonSerializer(tree);
+        final JsonSerializer serializer = new JsonSerializer(
+            Tree.createDraft("TestNode<\"value\">")
+        );
         final String result = serializer.serializeToJsonString().replace("\r", "");
         boolean oops = false;
         String expected = "";
@@ -82,8 +80,7 @@ class JsonSerializerTest {
      */
     @Test
     void testSerializationToFile(@TempDir final Path temp) {
-        final Node tree = this.createSampleTree();
-        final JsonSerializer serializer = new JsonSerializer(tree);
+        final JsonSerializer serializer = new JsonSerializer(this.createSampleTree());
         boolean oops = false;
         String expected = "";
         String result = "";
@@ -107,8 +104,7 @@ class JsonSerializerTest {
      */
     @Test
     void testFilesWriterException() {
-        final Node tree = EmptyTree.INSTANCE;
-        final JsonSerializer serializer = new JsonSerializer(tree);
+        final JsonSerializer serializer = new JsonSerializer(EmptyTree.INSTANCE);
         boolean oops = false;
         try {
             serializer.serializeToJsonFile("/");
@@ -122,7 +118,7 @@ class JsonSerializerTest {
      * Create a simple tree for testing.
      * @return Tree
      */
-    private Node createSampleTree() {
+    private Tree createSampleTree() {
         final DraftNode.Constructor addition = new DraftNode.Constructor();
         addition.setName("Addition");
         final DraftNode.Constructor left = new DraftNode.Constructor();
@@ -132,6 +128,6 @@ class JsonSerializerTest {
         right.setName(JsonSerializerTest.INT_LITERAL);
         right.setData("3");
         addition.setChildrenList(Arrays.asList(left.createNode(), right.createNode()));
-        return addition.createNode();
+        return new Tree(addition.createNode());
     }
 }

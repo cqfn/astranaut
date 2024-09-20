@@ -34,6 +34,7 @@ import org.cqfn.astranaut.parser.DescriptorParser;
 import org.cqfn.astranaut.parser.Tokenizer;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.DescriptorAttribute;
+import org.cqfn.astranaut.rules.Transformation;
 import org.cqfn.astranaut.scanner.TokenList;
 import org.cqfn.astranaut.utils.LabelFactory;
 import org.junit.jupiter.api.Assertions;
@@ -129,7 +130,7 @@ class ConverterGeneratorTest {
         final Environment env = new TestEnvironment();
         final Descriptor descriptor = this.parseCode(code);
         final ConverterGenerator generator = new ConverterGenerator(env, "org.uast");
-        generator.generate(descriptor, "Matcher0");
+        generator.generate(new Transformation(descriptor, descriptor), "Matcher0");
         final Map<String, CompilationUnit> units = generator.getUnits();
         final String rule = String.format("rules%sRule0", File.separator);
         Assertions.assertTrue(units.containsKey(rule));

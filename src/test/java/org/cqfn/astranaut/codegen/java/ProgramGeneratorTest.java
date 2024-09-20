@@ -27,7 +27,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 import org.cqfn.astranaut.analyzer.EnvironmentPreparator;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
 import org.cqfn.astranaut.exceptions.GeneratorCouldNotWriteFile;
 import org.cqfn.astranaut.exceptions.GeneratorException;
 import org.cqfn.astranaut.parser.ProgramParser;
@@ -82,7 +82,7 @@ class ProgramGeneratorTest {
                 "StringLiteral <- $String$, $#$, $#$;"
             );
             program = parser.parse();
-        } catch (final BaseException ignore) {
+        } catch (final CoreException ignore) {
             oops = true;
         }
         Assertions.assertFalse(oops);

@@ -28,10 +28,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.cqfn.astranaut.core.Builder;
-import org.cqfn.astranaut.core.EmptyTree;
-import org.cqfn.astranaut.core.Factory;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.DummyNode;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.utils.ListUtils;
 import org.cqfn.astranaut.rules.Data;
 import org.cqfn.astranaut.rules.Descriptor;
@@ -78,7 +78,7 @@ public class Creator {
         if (this.descriptor.getAttribute() == DescriptorAttribute.HOLE) {
             final List<Node> list = children.get(this.descriptor.getHoleNumber());
             if (list == null || list.size() != 1) {
-                result = EmptyTree.INSTANCE;
+                result = DummyNode.INSTANCE;
             } else {
                 result = list.get(0);
             }

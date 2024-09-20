@@ -29,12 +29,13 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.core.Matcher;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Checks if the node matches some structure, and extracts the data and children.
- *
+ * Checks that the node matches the following structure:
+ *   AAA(BBB#1, #2)
+ * and extracts the data and children.
  * @since 1.0
  */
 public final class Matcher0 implements Matcher {

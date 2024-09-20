@@ -87,7 +87,7 @@ public final class PackageInfo implements JavaFile {
     private void generateHeader(final StringBuilder builder) {
         builder.append("/**\n * ")
             .append(this.brief)
-            .append(".\n *\n * @since ")
+            .append(".\n * @since ")
             .append(this.version)
             .append("\n */\n");
     }

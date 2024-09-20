@@ -24,7 +24,9 @@
 package org.cqfn.astranaut.interpreter;
 
 import java.io.File;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.base.DefaultFactory;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Tree;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.core.utils.JsonDeserializer;
 import org.cqfn.astranaut.core.utils.JsonSerializer;
@@ -79,7 +81,7 @@ public class Interpreter {
         if (this.destination == null) {
             throw DestinationNotSpecified.INSTANCE;
         }
-        final Node unprocessed = new JsonDeserializer(
+        final Tree unprocessed = new JsonDeserializer(
             new FilesReader(this.source.getPath()).readAsString(
                 (FilesReader.CustomExceptionCreator<InterpreterException>) ()
                     -> new InterpreterException() {
@@ -94,14 +96,14 @@ public class Interpreter {
                         }
                     }
             ),
-            language -> DefaultFactory.INSTANCE
+            language -> DefaultFactory.EMPTY
         ).convert();
         final Adapter adapter = new Adapter(
             this.program.getTransformations(),
-            DefaultFactory.INSTANCE
+            DefaultFactory.EMPTY
         );
-        final Node processed = adapter.convert(unprocessed);
-        if (!new JsonSerializer(processed).serializeToFile(this.destination.getPath())) {
+        final Node processed = adapter.convert(unprocessed.getRoot());
+        if (!new JsonSerializer(new Tree(processed)).serializeToFile(this.destination.getPath())) {
             throw new InterpreterCouldNotWriteFile(this.destination.getPath());
         }
     }

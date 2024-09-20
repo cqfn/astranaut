@@ -170,7 +170,7 @@ public final class FactoryGenerator extends BaseGenerator {
         );
         this.klass = new Klass(brief, this.classname);
         this.klass.makeFinal();
-        this.klass.setParentClass(FactoryGenerator.STR_FACTORY);
+        this.klass.setParentClass("DefaultFactory");
     }
 
     /**
@@ -256,7 +256,8 @@ public final class FactoryGenerator extends BaseGenerator {
         unit.addImport("java.util.Map");
         unit.addImport("java.util.TreeMap");
         final Environment env = this.getEnv();
-        final String base = "org.cqfn.astranaut.core";
+        final String base = "org.cqfn.astranaut.core.base";
+        unit.addImport(base.concat(".DefaultFactory"));
         unit.addImport(base.concat(".Factory"));
         unit.addImport(base.concat(".Type"));
         for (final String name : this.common) {

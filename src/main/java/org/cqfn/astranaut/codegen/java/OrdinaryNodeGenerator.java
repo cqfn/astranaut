@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.List;
 import org.cqfn.astranaut.rules.Instruction;
 import org.cqfn.astranaut.rules.Node;
 
@@ -55,28 +56,31 @@ final class OrdinaryNodeGenerator extends BaseNodeGenerator {
         new OrdinaryNodeClassConstructor(env, rule, klass).run();
         final String pkg = this.getPackageName(this.instruction.getLanguage());
         final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
-        this.generateImports(unit);
+        this.generateImports(unit, rule);
         return unit;
     }
 
     /**
      * Generates imports block.
      * @param unit The compilation unit
+     * @param rule The rule
      */
-    private void generateImports(final CompilationUnit unit) {
-        unit.addImport("java.util.Arrays");
+    private void generateImports(final CompilationUnit unit, final Node rule) {
+        final List<String> hierarchy = this.getEnv().getHierarchy(rule.getType());
+        if (hierarchy.size() > 1) {
+            unit.addImport("java.util.Arrays");
+        }
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
         unit.addImport("java.util.Map");
-        unit.addImport("java.util.stream.Collectors");
-        unit.addImport("java.util.stream.Stream");
+        unit.addImport("org.cqfn.astranaut.core.utils.MapUtils");
         final Environment env = this.getEnv();
-        final String base = "org.cqfn.astranaut.core";
+        final String base = "org.cqfn.astranaut.core.base";
         unit.addImport(base.concat(".Builder"));
         unit.addImport(base.concat(".ChildDescriptor"));
         if (!this.instruction.getRule().isEmpty()) {
-            unit.addImport(base.concat(".ChildrenMapper"));
-            unit.addImport(base.concat(".utils.ListUtils"));
+            unit.addImport("org.cqfn.astranaut.core.algorithms.NodeAllocator");
+            unit.addImport("org.cqfn.astranaut.core.utils.ListUtils");
         }
         unit.addImport(base.concat(".EmptyFragment"));
         unit.addImport(base.concat(".Fragment"));

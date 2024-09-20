@@ -60,7 +60,7 @@ public class ConverterClassFiller {
     /**
      * The result node declaration.
       */
-    private static final String DECLARE_RESULT = "Node result = EmptyTree.INSTANCE;";
+    private static final String DECLARE_RESULT = "Node result = DummyNode.INSTANCE;";
 
     /**
      * The result nod return.
@@ -114,7 +114,7 @@ public class ConverterClassFiller {
         this.root = descriptor;
         this.matcher = matcher;
         this.stg = new StaticStringGenerator(klass);
-        this.methods = new LabelFactory();
+        this.methods = new LabelFactory("root");
         this.holes = new LabelFactory();
         this.llist = false;
     }
@@ -193,7 +193,12 @@ public class ConverterClassFiller {
      */
     private CreationResult createBuildMethod(final Descriptor descriptor) {
         final String type = descriptor.getType();
-        final String name = this.methods.getLabel().concat("Builder");
+        final String label = this.methods.getLabel();
+        final String name = String.format(
+            "create%s%sNode",
+            label.substring(0, 1).toUpperCase(Locale.ENGLISH),
+            label.substring(1)
+        );
         final CreationResult result = new CreationResult(name);
         final Method method = this.createMethodObject(type, name);
         method.addArgument(

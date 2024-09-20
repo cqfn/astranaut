@@ -27,12 +27,13 @@ package org.uast;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.core.Matcher;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Checks if the node matches some structure, and extracts the data and children.
- *
+ * Checks that the node matches the following structure:
+ *   singleExpression(identifier(literal<#1>), literal<"+">, #2)
+ * and extracts the data and children.
  * @since 1.0
  */
 public final class Matcher0 implements Matcher {
@@ -113,12 +114,13 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.core.Matcher;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Checks if the node matches some structure, and extracts the data and children.
- *
+ * Checks that the node matches the following structure:
+ *   identifier(literal<#1>)
+ * and extracts the data and children.
  * @since 1.0
  */
 public final class Matcher1 implements Matcher {
@@ -181,12 +183,13 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.core.Matcher;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Checks if the node matches some structure, and extracts the data and children.
- *
+ * Checks that the node matches the following structure:
+ *   literal<#1>
+ * and extracts the data and children.
  * @since 1.0
  */
 public final class Matcher2 implements Matcher {
@@ -257,12 +260,13 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.core.Matcher;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Checks if the node matches some structure, and extracts the data and children.
- *
+ * Checks that the node matches the following structure:
+ *   literal<"+">
+ * and extracts the data and children.
  * @since 1.0
  */
 public final class Matcher3 implements Matcher {

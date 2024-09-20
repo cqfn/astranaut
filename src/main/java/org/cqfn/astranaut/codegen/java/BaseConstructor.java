@@ -53,14 +53,14 @@ abstract class BaseConstructor {
     private static final String STR_TYPE = "Type";
 
     /**
-     * The 'String' string.
-     */
-    private static final String STR_STRING = "String";
-
-    /**
      * The {@code List<String>} type.
      */
     private static final String LIST_STRING = "List<String>";
+
+    /**
+     * The {@code Map<String, String>} type.
+     */
+    private static final String MAP_STRING = "Map<String, String>";
 
     /**
      * The start of unmodifiable list declaration.
@@ -179,7 +179,8 @@ abstract class BaseConstructor {
         final Field field = new Field("The type", BaseConstructor.STR_TYPE, "TYPE");
         field.makePublic();
         field.makeStaticFinal();
-        field.setInitExpr("new TypeImpl()");
+        final String name = String.format("%sType", this.klass.getName());
+        field.setInitExpr(String.format("new %s()", name));
         this.klass.addField(field);
         final Method getter = new Method("getType");
         getter.makeOverridden();
@@ -188,7 +189,7 @@ abstract class BaseConstructor {
         this.klass.addMethod(getter);
         final Klass subclass = new Klass(
             String.format("Type descriptor of the '%s' node", this.getType()),
-            "TypeImpl"
+            name
         );
         subclass.makePrivate();
         subclass.makeStatic();
@@ -220,17 +221,23 @@ abstract class BaseConstructor {
      */
     protected void fillHierarchy(final StaticStringGenerator ssg) {
         final List<String> hierarchy = this.getEnv().getHierarchy(this.getType());
-        final StringBuilder init  = new StringBuilder(128);
-        init.append(BaseConstructor.LIST_BEGIN);
-        boolean separator = false;
-        for (final String item : hierarchy) {
-            if (separator) {
-                init.append(BaseConstructor.SEPARATOR);
+        final StringBuilder init = new StringBuilder(128);
+        if (hierarchy.size() > 1) {
+            init.append(BaseConstructor.LIST_BEGIN);
+            boolean separator = false;
+            for (final String item : hierarchy) {
+                if (separator) {
+                    init.append(BaseConstructor.SEPARATOR);
+                }
+                separator = true;
+                init.append(ssg.getFieldName(item));
             }
-            separator = true;
-            init.append(ssg.getFieldName(item));
+            init.append(BaseConstructor.LIST_END);
+        } else {
+            init.append("Collections.singletonList(")
+                .append(ssg.getFieldName(hierarchy.get(0)))
+                .append(')');
         }
-        init.append(BaseConstructor.LIST_END);
         final Field field = new Field(
             "Hierarchy",
             BaseConstructor.LIST_STRING,
@@ -242,7 +249,7 @@ abstract class BaseConstructor {
         this.klass.addField(field);
         final Method getter = new Method("getHierarchy");
         getter.setReturnType(BaseConstructor.LIST_STRING);
-        getter.setCode("return TypeImpl.HIERARCHY;");
+        getter.setCode(String.format("return %s.HIERARCHY;", this.klass.getName()));
         this.klass.addMethod(getter);
     }
 
@@ -259,24 +266,22 @@ abstract class BaseConstructor {
             color = "red";
         }
         final List<String> init = Arrays.asList(
-            "Stream.of(",
-            "new String[][] {",
-            String.format("\t{\"color\", \"%s\"},", color),
-            String.format("\t{\"language\", \"%s\"},", language),
-            "}).collect(Collectors.toMap(data -> data[0], data -> data[1]))"
+            "new MapUtils<String, String>()",
+            String.format(".put(\"color\", \"%s\")", color),
+            String.format(".put(\"language\", \"%s\")", language),
+            ".make()"
         );
         final Field field = new Field(
             "Properties",
-            "Map<String, String>",
+            BaseConstructor.MAP_STRING,
             "PROPERTIES"
         );
         field.makeStaticFinal();
         field.setInitExpr(init);
         this.klass.addField(field);
-        final Method getter = new Method("getProperty");
-        getter.addArgument(BaseConstructor.STR_STRING, "name");
-        getter.setReturnType(BaseConstructor.STR_STRING);
-        getter.setCode("return TypeImpl.PROPERTIES.getOrDefault(name, \"\");");
+        final Method getter = new Method("getProperties");
+        getter.setReturnType(BaseConstructor.MAP_STRING);
+        getter.setCode(String.format("return %s.PROPERTIES;", this.klass.getName()));
         this.klass.addMethod(getter);
     }
 

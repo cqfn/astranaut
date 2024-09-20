@@ -1,6 +1,5 @@
 /**
  * Test class with suppressed warning.
- *
  * @since 1.0
  */
 @SuppressWarnings("PMD.TooManyMethods")

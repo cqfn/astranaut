@@ -31,7 +31,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import org.cqfn.astranaut.Main;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
 import org.cqfn.astranaut.utils.cli.ProjectRootValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -89,7 +89,7 @@ class ProjectRootValidatorTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException | BaseException exc) {
+        } catch (final ParameterException | CoreException exc) {
             caught = true;
         }
         Assertions.assertFalse(caught);
@@ -114,7 +114,7 @@ class ProjectRootValidatorTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException | BaseException exc) {
+        } catch (final ParameterException | CoreException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);
@@ -142,7 +142,7 @@ class ProjectRootValidatorTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException | BaseException exc) {
+        } catch (final ParameterException | CoreException exc) {
             caught = true;
         }
         Assertions.assertFalse(caught);
@@ -169,7 +169,7 @@ class ProjectRootValidatorTest {
         boolean caught = false;
         try {
             Main.main(example);
-        } catch (final ParameterException | BaseException exc) {
+        } catch (final ParameterException | CoreException exc) {
             caught = true;
         }
         Assertions.assertTrue(caught);

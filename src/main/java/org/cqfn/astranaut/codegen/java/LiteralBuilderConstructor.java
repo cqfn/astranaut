@@ -141,6 +141,7 @@ final class LiteralBuilderConstructor extends LiteralConstructor {
         final String type = this.getRule().getType();
         method.setReturnType(type);
         final List<String> code = Arrays.asList(
+            "if (!this.isValid()) { throw new IllegalStateException(); }\n",
             String.format("final %s node = new %s();", type, type),
             "node.fragment = this.fragment;",
             "node.data = this.data;",

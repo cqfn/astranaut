@@ -23,7 +23,8 @@
  */
 package org.cqfn.astranaut.api;
 
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Tree;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 import org.junit.jupiter.api.Assertions;
@@ -73,15 +74,16 @@ class JsonDeserializerTest {
         }
         Assertions.assertFalse(oops);
         final JsonDeserializer deserializer = new JsonDeserializer(source);
-        final Node result = deserializer.deserialize();
-        Assertions.assertEquals("Addition", result.getTypeName());
-        Assertions.assertEquals("", result.getData());
-        Assertions.assertEquals(2, result.getChildCount());
-        final Node first = result.getChild(0);
+        final Tree tree = deserializer.deserialize();
+        final Node root = tree.getRoot();
+        Assertions.assertEquals("Addition", root.getTypeName());
+        Assertions.assertEquals("", root.getData());
+        Assertions.assertEquals(2, root.getChildCount());
+        final Node first = root.getChild(0);
         Assertions.assertEquals(JsonDeserializerTest.INT_LITERAL, first.getTypeName());
         Assertions.assertEquals("2", first.getData());
         Assertions.assertEquals(0, first.getChildCount());
-        final Node second = result.getChild(1);
+        final Node second = root.getChild(1);
         Assertions.assertEquals(JsonDeserializerTest.INT_LITERAL, second.getTypeName());
         Assertions.assertEquals("3", second.getData());
         Assertions.assertEquals(0, second.getChildCount());

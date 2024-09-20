@@ -205,7 +205,7 @@ public final class AdapterGenerator extends BaseGenerator {
         unit.addImport("java.util.ArrayList");
         unit.addImport("java.util.Collections");
         unit.addImport("java.util.List");
-        final String base = "org.cqfn.astranaut.core";
+        final String base = "org.cqfn.astranaut.core.algorithms.conversion";
         unit.addImport(base.concat(".Adapter"));
         unit.addImport(base.concat(".Converter"));
     }

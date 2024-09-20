@@ -26,12 +26,13 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.core.Matcher;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Checks if the node matches some structure, and extracts the data and children.
- *
+ * Checks that the node matches the following structure:
+ *   AAA(BBB, CCC, DDD, EEE, FFF)
+ * and extracts the data and children.
  * @since 1.0
  */
 public final class Matcher0 implements Matcher {
@@ -147,12 +148,13 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.core.Matcher;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Checks if the node matches some structure, and extracts the data and children.
- *
+ * Checks that the node matches the following structure:
+ *   BBB
+ * and extracts the data and children.
  * @since 1.0
  */
 public final class Matcher1 implements Matcher {
@@ -214,12 +216,13 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.core.Matcher;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Checks if the node matches some structure, and extracts the data and children.
- *
+ * Checks that the node matches the following structure:
+ *   CCC
+ * and extracts the data and children.
  * @since 1.0
  */
 public final class Matcher2 implements Matcher {
@@ -281,12 +284,13 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.core.Matcher;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Checks if the node matches some structure, and extracts the data and children.
- *
+ * Checks that the node matches the following structure:
+ *   DDD
+ * and extracts the data and children.
  * @since 1.0
  */
 public final class Matcher3 implements Matcher {
@@ -348,12 +352,13 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.core.Matcher;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Checks if the node matches some structure, and extracts the data and children.
- *
+ * Checks that the node matches the following structure:
+ *   EEE
+ * and extracts the data and children.
  * @since 1.0
  */
 public final class Matcher4 implements Matcher {
@@ -415,12 +420,13 @@ package org.uast;
 
 import java.util.List;
 import java.util.Map;
-import org.cqfn.astranaut.core.Matcher;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Checks if the node matches some structure, and extracts the data and children.
- *
+ * Checks that the node matches the following structure:
+ *   FFF
+ * and extracts the data and children.
  * @since 1.0
  */
 public final class Matcher5 implements Matcher {

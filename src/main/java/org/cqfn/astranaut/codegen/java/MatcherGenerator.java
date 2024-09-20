@@ -77,8 +77,17 @@ public final class MatcherGenerator {
     public String generate(final Descriptor descriptor) {
         assert descriptor.getAttribute() == DescriptorAttribute.NONE;
         final String name = this.names.getName();
+        final StringBuilder brief = new StringBuilder(128);
+        brief.append("Checks that the node matches the following structure:\n");
+        final String description = descriptor.toString();
+        if (description.length() < Entity.MAX_LINE_LENGTH) {
+            brief.append("  ").append(description);
+        } else {
+            brief.append(descriptor.toStringIndented(2));
+        }
+        brief.append("\nand extracts the data and children");
         final Klass klass = new Klass(
-            "Checks if the node matches some structure, and extracts the data and children",
+            brief.toString(),
             name
         );
         final MatcherClassFiller filler = new MatcherClassFiller(this, klass, descriptor);
@@ -100,9 +109,8 @@ public final class MatcherGenerator {
             unit.addImport("java.util.LinkedList");
             unit.addImport("java.util.Deque");
         }
-        final String base = "org.cqfn.astranaut.core";
-        unit.addImport(base.concat(".Matcher"));
-        unit.addImport(base.concat(".Node"));
+        unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Matcher");
+        unit.addImport("org.cqfn.astranaut.core.base.Node");
         this.units.put(String.format("rules%s%s", File.separator, name), unit);
         return name;
     }

@@ -28,15 +28,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.cqfn.astranaut.core.Builder;
-import org.cqfn.astranaut.core.Converter;
-import org.cqfn.astranaut.core.EmptyTree;
-import org.cqfn.astranaut.core.Factory;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Converter;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.DummyNode;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Converter describing DSL conversion rule.
- *
+ * Checks that the node matches the conversion rule:
+ *   VariableDeclaration(
+ *     Modifier<"public">,
+ *     #1,
+ *     Identifier<#2>
+ *   )
+ *   ->
+ *   VariableDeclaration(
+ *     Modifier<"public">,
+ *     #1,
+ *     Identifier<#2>
+ *   )
+ * and performs the conversion if possible.
  * @since 1.0
  */
 public final class Rule0 implements Converter {
@@ -73,12 +84,12 @@ public final class Rule0 implements Converter {
 
     @Override
     public Node convert(final Node node, final Factory factory) {
-        Node result = EmptyTree.INSTANCE;
+        Node result = DummyNode.INSTANCE;
         final Map<Integer, List<Node>> children = new TreeMap<>();
         final Map<Integer, String> data = new TreeMap<>();
         final boolean matched = Matcher0.INSTANCE.match(node, children, data);
         if (matched) {
-            result = Rule0.firstBuilder(factory, children, data);
+            result = Rule0.createRootNode(factory, children, data);
         }
         return result;
     }
@@ -90,15 +101,15 @@ public final class Rule0 implements Converter {
      * @param data The data
      * @return A node
      */
-    private static Node firstBuilder(final Factory factory,
+    private static Node createRootNode(final Factory factory,
         final Map<Integer, List<Node>> children,
         final Map<Integer, String> data) {
-        Node result = EmptyTree.INSTANCE;
+        Node result = DummyNode.INSTANCE;
         final Builder builder = factory.createBuilder(Rule0.VARIABLE_DECLARA);
         final List<Node> list = new LinkedList<>();
-        list.add(Rule0.secondBuilder(factory));
+        list.add(Rule0.createSecondNode(factory));
         list.addAll(children.get(Rule0.FIRST_HOLE_ID));
-        list.add(Rule0.thirdBuilder(factory, data));
+        list.add(Rule0.createThirdNode(factory, data));
         final boolean applied = builder.setChildrenList(list);
         if (applied && builder.isValid()) {
             result = builder.createNode();
@@ -111,8 +122,8 @@ public final class Rule0 implements Converter {
      * @param factory The node factory
      * @return A node
      */
-    private static Node secondBuilder(final Factory factory) {
-        Node result = EmptyTree.INSTANCE;
+    private static Node createSecondNode(final Factory factory) {
+        Node result = DummyNode.INSTANCE;
         final Builder builder = factory.createBuilder(Rule0.MODIFIER);
         final boolean set = builder.setData("public");
         if (set && builder.isValid()) {
@@ -127,8 +138,8 @@ public final class Rule0 implements Converter {
      * @param data The data
      * @return A node
      */
-    private static Node thirdBuilder(final Factory factory, final Map<Integer, String> data) {
-        Node result = EmptyTree.INSTANCE;
+    private static Node createThirdNode(final Factory factory, final Map<Integer, String> data) {
+        Node result = DummyNode.INSTANCE;
         final Builder builder = factory.createBuilder(Rule0.IDENTIFIER);
         final boolean set = builder.setData(data.get(2));
         if (set && builder.isValid()) {

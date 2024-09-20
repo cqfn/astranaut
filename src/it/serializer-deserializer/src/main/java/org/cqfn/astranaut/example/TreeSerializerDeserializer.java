@@ -26,27 +26,28 @@ package org.cqfn.astranaut.example;
 import java.util.Arrays;
 import org.cqfn.astranaut.api.JsonDeserializer;
 import org.cqfn.astranaut.api.JsonSerializer;
-import org.cqfn.astranaut.core.DraftNode;
-import org.cqfn.astranaut.core.Node;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
+import org.cqfn.astranaut.core.base.DraftNode;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Tree;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.exceptions.ProcessorCouldNotWriteFile;
 import org.cqfn.astranaut.exceptions.ProcessorException;
 
 /**
- * Sample class.
+ * Sample class....
  * @since 0.2.1
  */
 public class TreeSerializerDeserializer {
     /**
      * The main function.
      * @param args The command-line arguments
-     * @throws BaseException If fails
+     * @throws CoreException If fails
      */
-    public static void main(final String... args) throws BaseException {
-        final Node tree = createSampleTree();
-        serialize(tree);
-        final Node result = deserialize();
+    public static void main(final String... args) throws CoreException {
+        final Node root = createSampleTree();
+        serialize(root);
+        final Tree result = deserialize();
         System.out.println(new JsonSerializer(result).serializeToJsonString());
     }
 
@@ -55,9 +56,9 @@ public class TreeSerializerDeserializer {
      * @param tree The tree to be converted
      * @throws ProcessorCouldNotWriteFile If fails
      */
-    private static void serialize(final Node tree)
+    private static void serialize(final Node root)
             throws ProcessorCouldNotWriteFile {
-        final JsonSerializer serializer = new JsonSerializer(tree);
+        final JsonSerializer serializer = new JsonSerializer(new Tree(root));
         serializer.serializeToJsonFile("Data/tree.json");
     }
 
@@ -66,7 +67,7 @@ public class TreeSerializerDeserializer {
      * @return The result tree
      * @throws ProcessorException If fails
      */
-    private static Node deserialize() throws ProcessorException {
+    private static Tree deserialize() throws ProcessorException {
         String source =  new FilesReader("Data/tree.json").readAsString(
             (FilesReader.CustomExceptionCreator<ProcessorException>) ()
                     -> new ProcessorException() {

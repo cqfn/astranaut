@@ -23,7 +23,7 @@
  */
 package org.cqfn.astranaut.api;
 
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.base.Tree;
 import org.cqfn.astranaut.exceptions.ProcessorCouldNotWriteFile;
 
 /**
@@ -35,13 +35,13 @@ public class JsonSerializer {
     /**
      * The root node of the tree to be converted.
      */
-    private final Node tree;
+    private final Tree tree;
 
     /**
      * Constructor.
      * @param tree The tree to be converted
      */
-    public JsonSerializer(final Node tree) {
+    public JsonSerializer(final Tree tree) {
         this.tree = tree;
     }
 

@@ -24,14 +24,14 @@
 
 package org.cqfn.astranaut.exceptions;
 
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.core.base.CoreException;
 
 /**
  * Base exception thrown by the parser.
  *
  * @since 0.1.5
  */
-public abstract class ParserException extends BaseException {
+public abstract class ParserException extends CoreException {
     private static final long serialVersionUID = 8708357998656415803L;
 
     @Override

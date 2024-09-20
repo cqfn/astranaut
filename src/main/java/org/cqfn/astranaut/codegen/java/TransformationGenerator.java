@@ -89,7 +89,7 @@ public class TransformationGenerator {
             if (instruction.getLanguage().equals(this.language)) {
                 final Transformation rule = instruction.getRule();
                 final String matcher = matchers.generate(rule.getLeft());
-                converters.generate(rule.getRight(), matcher);
+                converters.generate(rule, matcher);
                 count = count + 1;
             }
         }

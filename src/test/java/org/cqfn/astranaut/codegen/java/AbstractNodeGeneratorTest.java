@@ -27,7 +27,8 @@ package org.cqfn.astranaut.codegen.java;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import org.cqfn.astranaut.core.exceptions.BaseException;
+import org.cqfn.astranaut.Info;
+import org.cqfn.astranaut.core.base.CoreException;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.parser.ProgramParser;
 import org.cqfn.astranaut.rules.Instruction;
@@ -63,8 +64,8 @@ class AbstractNodeGeneratorTest {
         final AbstractNodeGenerator generator = new AbstractNodeGenerator(env, instruction);
         final String actual = generator.generate().generate();
         final String expected = this.readTest(filename)
-            .replace("{av}", org.cqfn.astranaut.Common.VERSION)
-            .replace("{cv}", org.cqfn.astranaut.core.Common.VERSION);
+            .replace("{av}", Info.VERSION)
+            .replace("{cv}", org.cqfn.astranaut.core.Info.VERSION);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -85,7 +86,7 @@ class AbstractNodeGeneratorTest {
                     return instruction;
                 }
             }
-        } catch (final BaseException ignored) {
+        } catch (final CoreException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);

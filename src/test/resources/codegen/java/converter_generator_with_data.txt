@@ -27,15 +27,16 @@ package org.uast;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.cqfn.astranaut.core.Builder;
-import org.cqfn.astranaut.core.Converter;
-import org.cqfn.astranaut.core.EmptyTree;
-import org.cqfn.astranaut.core.Factory;
-import org.cqfn.astranaut.core.Node;
+import org.cqfn.astranaut.core.algorithms.conversion.Converter;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.DummyNode;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Converter describing DSL conversion rule.
- *
+ * Checks that the node matches the conversion rule:
+ *   Variable<#13> -> Variable<#13>
+ * and performs the conversion if possible.
  * @since 1.0
  */
 public final class Rule0 implements Converter {
@@ -57,12 +58,12 @@ public final class Rule0 implements Converter {
 
     @Override
     public Node convert(final Node node, final Factory factory) {
-        Node result = EmptyTree.INSTANCE;
+        Node result = DummyNode.INSTANCE;
         final Map<Integer, List<Node>> children = new TreeMap<>();
         final Map<Integer, String> data = new TreeMap<>();
         final boolean matched = Matcher0.INSTANCE.match(node, children, data);
         if (matched) {
-            result = Rule0.firstBuilder(factory, data);
+            result = Rule0.createRootNode(factory, data);
         }
         return result;
     }
@@ -73,8 +74,8 @@ public final class Rule0 implements Converter {
      * @param data The data
      * @return A node
      */
-    private static Node firstBuilder(final Factory factory, final Map<Integer, String> data) {
-        Node result = EmptyTree.INSTANCE;
+    private static Node createRootNode(final Factory factory, final Map<Integer, String> data) {
+        Node result = DummyNode.INSTANCE;
         final Builder builder = factory.createBuilder(Rule0.VARIABLE);
         final boolean set = builder.setData(data.get(13));
         if (set && builder.isValid()) {
