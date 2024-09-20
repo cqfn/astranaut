@@ -34,7 +34,6 @@ import org.cqfn.astranaut.parser.DescriptorParser;
 import org.cqfn.astranaut.parser.Tokenizer;
 import org.cqfn.astranaut.rules.Descriptor;
 import org.cqfn.astranaut.rules.DescriptorAttribute;
-import org.cqfn.astranaut.rules.Rule;
 import org.cqfn.astranaut.rules.Transformation;
 import org.cqfn.astranaut.scanner.TokenList;
 import org.cqfn.astranaut.utils.LabelFactory;

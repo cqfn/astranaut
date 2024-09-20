@@ -25,7 +25,6 @@ package org.cqfn.astranaut.codegen.java;
 
 import java.util.List;
 import org.cqfn.astranaut.rules.Instruction;
-import org.cqfn.astranaut.rules.Literal;
 import org.cqfn.astranaut.rules.Node;
 
 /**

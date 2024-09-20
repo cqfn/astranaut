@@ -70,7 +70,7 @@ public final class Node extends Vertex {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder(128);
         builder.append(this.type).append(" <- ");
         boolean flag = false;
         for (final Child child : this.composition) {
@@ -88,11 +88,10 @@ public final class Node extends Vertex {
         final String tabulation = StringUtils.SPACE.repeat(indent);
         builder
             .append(tabulation)
-            .append(type)
+            .append(this.type)
             .append('\n')
             .append(tabulation)
-            .append("<-")
-            .append('\n')
+            .append("<-\n")
             .append(tabulation);
         boolean flag = false;
         for (final Child child : this.composition) {

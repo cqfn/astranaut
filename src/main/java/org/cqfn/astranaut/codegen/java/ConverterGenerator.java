@@ -81,7 +81,7 @@ public final class ConverterGenerator {
         final DescriptorAttribute attrib = descriptor.getAttribute();
         assert attrib == DescriptorAttribute.NONE || attrib == DescriptorAttribute.HOLE;
         final String name = this.names.getName();
-        final StringBuilder brief = new StringBuilder();
+        final StringBuilder brief = new StringBuilder(128);
         brief.append("Checks that the node matches the conversion rule:\n");
         final String description = rule.toString();
         if (description.length() < Entity.MAX_LINE_LENGTH) {

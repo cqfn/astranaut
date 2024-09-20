@@ -77,7 +77,7 @@ public final class MatcherGenerator {
     public String generate(final Descriptor descriptor) {
         assert descriptor.getAttribute() == DescriptorAttribute.NONE;
         final String name = this.names.getName();
-        final StringBuilder brief = new StringBuilder();
+        final StringBuilder brief = new StringBuilder(128);
         brief.append("Checks that the node matches the following structure:\n");
         final String description = descriptor.toString();
         if (description.length() < Entity.MAX_LINE_LENGTH) {

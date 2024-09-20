@@ -76,7 +76,7 @@ public interface Type extends Entity {
             builder.append(tabulation)
                 .append(" * ")
                 .append(line)
-                .append("\n");
+                .append('\n');
         }
         if (this.whetherToAddGeneratorVersion()) {
             builder.append(tabulation)

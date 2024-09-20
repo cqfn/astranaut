@@ -24,7 +24,6 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -52,11 +51,6 @@ abstract class BaseConstructor {
      * The 'Type' string.
      */
     private static final String STR_TYPE = "Type";
-
-    /**
-     * The 'String' string.
-     */
-    private static final String STR_STRING = "String";
 
     /**
      * The {@code List<String>} type.

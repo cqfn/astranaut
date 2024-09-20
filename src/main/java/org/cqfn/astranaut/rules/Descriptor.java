@@ -203,28 +203,8 @@ public abstract class Descriptor implements Child, Parameter {
         return builder.toString();
     }
 
-    /**
-     * Builds parameters list as a string.
-     * @param builder String builder where to build.
-     */
-    private void parametersToString(final StringBuilder builder) {
-        final List<Parameter> parameters = this.getParameters();
-        if (!parameters.isEmpty()) {
-            boolean flag = false;
-            builder.append('(');
-            for (final Parameter parameter : parameters) {
-                if (flag) {
-                    builder.append(", ");
-                }
-                flag = true;
-                builder.append(parameter.toString());
-            }
-            builder.append(')');
-        }
-    }
-
     @Override
-    public void toStringIndented(final StringBuilder builder, final int indent) {
+    public final void toStringIndented(final StringBuilder builder, final int indent) {
         final String tabulation = StringUtils.SPACE.repeat(indent);
         builder.append(tabulation);
         final DescriptorAttribute attribute = this.getAttribute();
@@ -253,6 +233,26 @@ public abstract class Descriptor implements Child, Parameter {
         }
         if (attribute == DescriptorAttribute.HOLE) {
             builder.append('#').append(this.getHoleNumber());
+        }
+    }
+
+    /**
+     * Builds parameters list as a string.
+     * @param builder String builder where to build.
+     */
+    private void parametersToString(final StringBuilder builder) {
+        final List<Parameter> parameters = this.getParameters();
+        if (!parameters.isEmpty()) {
+            boolean flag = false;
+            builder.append('(');
+            for (final Parameter parameter : parameters) {
+                if (flag) {
+                    builder.append(", ");
+                }
+                flag = true;
+                builder.append(parameter.toString());
+            }
+            builder.append(')');
         }
     }
 

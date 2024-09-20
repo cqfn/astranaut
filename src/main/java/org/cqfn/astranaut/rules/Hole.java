@@ -96,7 +96,7 @@ public final class Hole implements Data, Parameter {
     }
 
     @Override
-    public void toStringIndented(StringBuilder builder, int indent) {
+    public void toStringIndented(final StringBuilder builder, final int indent) {
         builder.append(StringUtils.SPACE.repeat(indent))
             .append(this.type)
             .append('#')

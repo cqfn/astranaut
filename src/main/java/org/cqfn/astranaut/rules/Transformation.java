@@ -23,7 +23,6 @@
  */
 package org.cqfn.astranaut.rules;
 
-import com.kitfox.svg.Stop;
 import org.cqfn.astranaut.utils.StringUtils;
 
 /**

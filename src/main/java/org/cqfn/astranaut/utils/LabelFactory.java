@@ -72,6 +72,7 @@ public class LabelFactory {
 
     /**
      * Constructor.
+     * @param first First label
      */
     public LabelFactory(final String first) {
         this.first = first;
@@ -94,10 +95,10 @@ public class LabelFactory {
             throw new IllegalStateException();
         }
         final String result;
-        if (index > 0 || first == null) {
+        if (this.index > 0 || this.first == null) {
             result = LabelFactory.LIST.get(this.index);
         } else {
-            result = first;
+            result = this.first;
         }
         this.index = this.index + 1;
         return result;

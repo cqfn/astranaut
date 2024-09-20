@@ -64,7 +64,7 @@ final class ListNodeGenerator extends BaseNodeGenerator {
      * @param unit The compilation unit
      * @param rule The rule
      */
-    private void generateImports(final CompilationUnit unit, Node rule) {
+    private void generateImports(final CompilationUnit unit, final Node rule) {
         unit.addImport("java.util.ArrayList");
         if (this.getEnv().getHierarchy(rule.getType()).size() > 1) {
             unit.addImport("java.util.Arrays");
