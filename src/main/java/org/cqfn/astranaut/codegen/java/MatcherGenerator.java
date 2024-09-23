@@ -58,6 +58,12 @@ public final class MatcherGenerator {
     private final Map<String, CompilationUnit> units;
 
     /**
+     * Previously created matchers, so that we don't have to create them again
+     * if they already exist.
+     */
+    private final Map<String, String> cache;
+
+    /**
      * Constructor.
      * @param env The environment.
      * @param pkg The package name.
@@ -67,6 +73,7 @@ public final class MatcherGenerator {
         this.pkg = pkg;
         this.names = new ClassNameGenerator("Matcher");
         this.units = new TreeMap<>();
+        this.cache = new TreeMap<>();
     }
 
     /**
@@ -75,6 +82,32 @@ public final class MatcherGenerator {
      * @return The name of generated class
      */
     public String generate(final Descriptor descriptor) {
+        final String result;
+        final String key = descriptor.toString();
+        if (this.cache.containsKey(key)) {
+            result = this.cache.get(key);
+        } else {
+            result = this.create(descriptor);
+            this.cache.put(key, result);
+        }
+        return result;
+    }
+
+    /**
+     * Returns generated units.
+     * @return The collection
+     */
+    public Map<String, CompilationUnit> getUnits() {
+        return Collections.unmodifiableMap(this.units);
+    }
+
+    /**
+     * Generates a compilation unit from a descriptor if no such descriptor
+     * was previously generated.
+     * @param descriptor The descriptor
+     * @return The name of generated class
+     */
+    private String create(final Descriptor descriptor) {
         assert descriptor.getAttribute() == DescriptorAttribute.NONE;
         final String name = this.names.getName();
         final StringBuilder brief = new StringBuilder(128);
@@ -115,11 +148,4 @@ public final class MatcherGenerator {
         return name;
     }
 
-    /**
-     * Returns generated units.
-     * @return The collection
-     */
-    public Map<String, CompilationUnit> getUnits() {
-        return Collections.unmodifiableMap(this.units);
-    }
 }

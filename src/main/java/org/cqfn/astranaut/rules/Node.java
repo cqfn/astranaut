@@ -36,6 +36,11 @@ import org.cqfn.astranaut.utils.StringUtils;
  */
 public final class Node extends Vertex {
     /**
+     * String representation of the node.
+     */
+    private String string;
+
+    /**
      * Left part.
      */
     private final String type;
@@ -70,17 +75,10 @@ public final class Node extends Vertex {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder(128);
-        builder.append(this.type).append(" <- ");
-        boolean flag = false;
-        for (final Child child : this.composition) {
-            if (flag) {
-                builder.append(", ");
-            }
-            builder.append(child.toString());
-            flag = true;
+        if (this.string == null) {
+            this.string = this.asString();
         }
-        return builder.toString();
+        return this.string;
     }
 
     @Override
@@ -217,5 +215,23 @@ public final class Node extends Vertex {
     @Override
     public int compareTo(final Vertex obj) {
         return this.toString().compareTo(obj.toString());
+    }
+
+    /**
+     * Creates string representation of the node
+     * @return String representation of the node
+     */
+    private String asString() {
+        final StringBuilder builder = new StringBuilder(128);
+        builder.append(this.type).append(" <- ");
+        boolean flag = false;
+        for (final Child child : this.composition) {
+            if (flag) {
+                builder.append(", ");
+            }
+            builder.append(child.toString());
+            flag = true;
+        }
+        return builder.toString();
     }
 }
