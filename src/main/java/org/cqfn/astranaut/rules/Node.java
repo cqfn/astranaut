@@ -218,7 +218,7 @@ public final class Node extends Vertex {
     }
 
     /**
-     * Creates string representation of the node
+     * Creates string representation of the node.
      * @return String representation of the node
      */
     private String asString() {

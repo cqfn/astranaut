@@ -220,7 +220,7 @@ public abstract class Descriptor implements Child, Parameter {
      * Represents the descriptor as a string.
      * @return String representation of the descriptor
      */
-    private final String asString() {
+    private String asString() {
         final StringBuilder builder = new StringBuilder();
         final DescriptorAttribute attribute = this.getAttribute();
         if (attribute == DescriptorAttribute.OPTIONAL) {
