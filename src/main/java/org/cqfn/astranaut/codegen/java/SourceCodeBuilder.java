@@ -43,12 +43,12 @@ public final class SourceCodeBuilder {
 
     /**
      * Adds one or more lines of source code with the specified indentation.
-     * @param indentation Indentation
+     * @param indent Indentation
      * @param text Program text
      */
-    public void add(final int indentation, final String text) {
+    public void add(final int indent, final String text) {
         for (final String line : text.split("\n")) {
-            this.lines.add(new Line(indentation, line));
+            this.lines.add(new Line(indent, line));
         }
     }
 
@@ -69,7 +69,7 @@ public final class SourceCodeBuilder {
         /**
          * Indentation.
          */
-        private final int indentation;
+        private final int indent;
 
         /**
          * Program text.
@@ -78,11 +78,11 @@ public final class SourceCodeBuilder {
 
         /**
          * Constructor.
-         * @param indentation Indentation
+         * @param indent Indentation
          * @param text Program text
          */
-        private Line(final int indentation, final String text) {
-            this.indentation = indentation;
+        private Line(final int indent, final String text) {
+            this.indent = indent;
             this.text = text;
         }
 
@@ -91,7 +91,7 @@ public final class SourceCodeBuilder {
          * @param builder Where to build
          */
         void build(final StringBuilder builder) {
-            for (int counter = 0; counter < this.indentation; counter = counter + 1) {
+            for (int counter = 0; counter < this.indent; counter = counter + 1) {
                 builder.append(SourceCodeBuilder.TABULATION);
             }
             builder.append(this.text).append('\n');
