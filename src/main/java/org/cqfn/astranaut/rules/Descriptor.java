@@ -37,6 +37,11 @@ import org.cqfn.astranaut.utils.StringUtils;
  */
 public abstract class Descriptor implements Child, Parameter {
     /**
+     * This descriptor as a string.
+     */
+    private String string;
+
+    /**
      * Returns the attribute of descriptor.
      * @return The attribute
      */
@@ -172,35 +177,10 @@ public abstract class Descriptor implements Child, Parameter {
 
     @Override
     public final String toString() {
-        final StringBuilder builder = new StringBuilder();
-        final DescriptorAttribute attribute = this.getAttribute();
-        if (attribute == DescriptorAttribute.OPTIONAL) {
-            builder.append('[');
-        } else if (attribute == DescriptorAttribute.LIST) {
-            builder.append('{');
+        if (this.string == null) {
+            this.string = this.asString();
         }
-        final String tag = this.getTag();
-        if (!tag.isEmpty()) {
-            builder.append(tag).append('@');
-        }
-        builder.append(this.getType());
-        this.parametersToString(builder);
-        final Data data = this.getData();
-        if (data.isValid()) {
-            builder.append('<').append(data.toString()).append('>');
-        }
-        if (attribute == DescriptorAttribute.OPTIONAL) {
-            builder.append(']');
-        } else if (attribute == DescriptorAttribute.LIST) {
-            builder.append('}');
-        }
-        if (attribute == DescriptorAttribute.EXT) {
-            builder.append('&');
-        }
-        if (attribute == DescriptorAttribute.HOLE) {
-            builder.append('#').append(this.getHoleNumber());
-        }
-        return builder.toString();
+        return this.string;
     }
 
     @Override
@@ -234,6 +214,42 @@ public abstract class Descriptor implements Child, Parameter {
         if (attribute == DescriptorAttribute.HOLE) {
             builder.append('#').append(this.getHoleNumber());
         }
+    }
+
+    /**
+     * Represents the descriptor as a string.
+     * @return String representation of the descriptor
+     */
+    private String asString() {
+        final StringBuilder builder = new StringBuilder();
+        final DescriptorAttribute attribute = this.getAttribute();
+        if (attribute == DescriptorAttribute.OPTIONAL) {
+            builder.append('[');
+        } else if (attribute == DescriptorAttribute.LIST) {
+            builder.append('{');
+        }
+        final String tag = this.getTag();
+        if (!tag.isEmpty()) {
+            builder.append(tag).append('@');
+        }
+        builder.append(this.getType());
+        this.parametersToString(builder);
+        final Data data = this.getData();
+        if (data.isValid()) {
+            builder.append('<').append(data.toString()).append('>');
+        }
+        if (attribute == DescriptorAttribute.OPTIONAL) {
+            builder.append(']');
+        } else if (attribute == DescriptorAttribute.LIST) {
+            builder.append('}');
+        }
+        if (attribute == DescriptorAttribute.EXT) {
+            builder.append('&');
+        }
+        if (attribute == DescriptorAttribute.HOLE) {
+            builder.append('#').append(this.getHoleNumber());
+        }
+        return builder.toString();
     }
 
     /**
