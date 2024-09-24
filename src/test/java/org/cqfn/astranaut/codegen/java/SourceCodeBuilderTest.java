@@ -21,62 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.rules;
+package org.cqfn.astranaut.codegen.java;
 
-import java.util.Collections;
-import java.util.List;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
- * Decorator wrapping hole as a descriptor.
- *
- * @since 0.2.2
+ * Tests covering {@link SourceCodeBuilder}class.
+ * @since 1.0.0
  */
-public final class HoleDecorator extends Descriptor {
-    /**
-     * The decorated hole.
-     */
-    private final Hole hole;
-
-    /**
-     * Constructor.
-     * @param hole The decorated hole
-     */
-    public HoleDecorator(final Hole hole) {
-        this.hole = hole;
-    }
-
-    @Override
-    public DescriptorAttribute getAttribute() {
-        return DescriptorAttribute.HOLE;
-    }
-
-    @Override
-    public String getTag() {
-        return "";
-    }
-
-    @Override
-    public String getLabel() {
-        return "";
-    }
-
-    @Override
-    public String getType() {
-        return "";
-    }
-
-    @Override
-    public List<Parameter> getParameters() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Data getData() {
-        return InvalidData.INSTANCE;
-    }
-
-    @Override
-    public int getHoleNumber() {
-        return this.hole.getValue();
+class SourceCodeBuilderTest {
+    @Test
+    void addDelimitedLine() {
+        final SourceCodeBuilder code = new SourceCodeBuilder();
+        code.add(2, "abcd\nefg");
+        final String actual = code.toString();
+        final String expected = "        abcd\n        efg\n";
+        Assertions.assertEquals(expected, actual);
     }
 }

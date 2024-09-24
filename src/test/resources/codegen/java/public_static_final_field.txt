@@ -1,4 +1,0 @@
-/**
- * The type of the node.
- */
-public static final Type TYPE = new TypeImpl();

@@ -23,8 +23,8 @@
  */
 
 /**
- * This package contains classes responsible for launching the tool.
- *
- * @since 0.1.5
+ * This package contains the classes responsible for launching the application
+ *  in command line mode.
+ * @since 1.0.0
  */
 package org.cqfn.astranaut;

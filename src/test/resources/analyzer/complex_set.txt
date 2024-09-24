@@ -1,8 +1,0 @@
-Identifier <- $String$, $#$, $#$;
-
-Addition <- left@Expression, right@Expression;
-Subtraction <- left@Expression, right@Expression;
-BinaryExpression <- Addition | Subtraction;
-Expression <- BinaryExpression | Variable;
-Variable <- Identifier;
-ExpressionList <- {Expression};
