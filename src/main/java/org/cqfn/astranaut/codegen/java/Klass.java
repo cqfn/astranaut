@@ -37,7 +37,7 @@ public class Klass {
      * Constructor.
      * @param name Name of the class.
      */
-    public Klass(String name) {
+    public Klass(final String name) {
         this.name = name;
     }
 
