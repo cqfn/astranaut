@@ -34,6 +34,11 @@ public class Klass {
     private final String name;
 
     /**
+     * Flag indicating that the generated class is public.
+     */
+    private boolean fpublic;
+
+    /**
      * Constructor.
      * @param name Name of the class.
      */
@@ -48,8 +53,18 @@ public class Klass {
      */
     public void build(final int indent, final SourceCodeBuilder code) {
         final StringBuilder header = new StringBuilder();
+        if (this.fpublic) {
+            header.append("public ");
+        }
         header.append("class ").append(this.name).append(" {");
         code.add(indent, header.toString());
         code.add(indent, "}");
+    }
+
+    /**
+     * Makes the class public.
+     */
+    public void makePublic() {
+        this.fpublic = true;
     }
 }
