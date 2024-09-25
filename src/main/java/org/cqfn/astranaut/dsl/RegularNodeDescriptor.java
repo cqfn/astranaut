@@ -23,43 +23,48 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.interpreter.RegularBuilder;
 
 /**
- * A descriptor of a regular node, that is, a node that may have a limited number
+ * Descriptor of a regular node, that is, a node that may have a limited number
  *  of some child nodes and no data.
  * @since 1.0.0
  */
-public final class RegularNodeDescriptor implements Rule {
+public final class RegularNodeDescriptor implements NodeDescriptor {
     /**
-     * Type of node (left side of the rule).
+     * Name of the type of the node (left side of the rule).
      */
-    private final String type;
+    private final String name;
 
     /**
-     * List of child node descriptors (right side of the rule).
+     * List of extended child node descriptors (right side of the rule).
      */
-    private final List<ChildDescriptor> children;
+    private final List<ChildDescriptorExt> children;
 
     /**
      * Constructor.
-     * @param type Type of node
+     * @param type Name of the type of the node
      * @param children List of child node descriptors
      */
-    public RegularNodeDescriptor(final String type, final List<ChildDescriptor> children) {
-        this.type = type;
-        this.children = children;
+    public RegularNodeDescriptor(final String type, final List<ChildDescriptorExt> children) {
+        this.name = type;
+        this.children = Collections.unmodifiableList(children);
     }
 
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append(this.type).append(" <- ");
+        builder.append(this.name).append(" <- ");
         if (this.children.isEmpty()) {
             builder.append('0');
         } else {
             boolean flag = false;
-            for (final ChildDescriptor child : this.children) {
+            for (final ChildDescriptorExt child : this.children) {
                 if (flag) {
                     builder.append(", ");
                 }
@@ -68,5 +73,34 @@ public final class RegularNodeDescriptor implements Rule {
             }
         }
         return builder.toString();
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public List<ChildDescriptor> getChildTypes() {
+        return this.children.stream().map(ChildDescriptorExt::toSimpleDescriptor)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns list of extended child node descriptors.
+     * @return List of child node descriptors
+     */
+    public List<ChildDescriptorExt> getExtChildTypes() {
+        return this.children;
+    }
+
+    @Override
+    public List<String> getHierarchy() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Builder createBuilder() {
+        return new RegularBuilder(this);
     }
 }

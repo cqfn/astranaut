@@ -21,41 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
-
-import java.util.Arrays;
-import java.util.Collections;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link RegularNodeDescriptor} class.
+ * This package contains test set covering the DSL interpreter.
  * @since 1.0.0
  */
-class RegularNodeDescriptorTest {
-    @Test
-    void nodeWithoutChildren() {
-        final RegularNodeDescriptor rule = new RegularNodeDescriptor(
-            "This",
-            Collections.emptyList()
-        );
-        final String actual = rule.toString();
-        final String expected = "This <- 0";
-        Assertions.assertEquals(expected, actual);
-    }
-
-    @Test
-    void nodeWithVarietyOfChildren() {
-        final RegularNodeDescriptor rule = new RegularNodeDescriptor(
-            "Variable",
-            Arrays.asList(
-                new ChildDescriptorExt(true, "", "Type"),
-                new ChildDescriptorExt(false, "name", "Identifier"),
-                new ChildDescriptorExt(true, "init", "Expression")
-            )
-        );
-        final String actual = rule.toString();
-        final String expected = "Variable <- [Type], name@Identifier, [init@Expression]";
-        Assertions.assertEquals(expected, actual);
-    }
-}
+package org.cqfn.astranaut.interpreter;

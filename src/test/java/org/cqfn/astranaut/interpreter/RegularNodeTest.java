@@ -21,41 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.interpreter;
 
-import java.util.Arrays;
 import java.util.Collections;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.DummyNode;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link RegularNodeDescriptor} class.
+ * Tests covering {@link RegularNode} and {@link RegularBuilder} classes.
  * @since 1.0.0
  */
-class RegularNodeDescriptorTest {
+class RegularNodeTest {
     @Test
     void nodeWithoutChildren() {
-        final RegularNodeDescriptor rule = new RegularNodeDescriptor(
-            "This",
+        final String name = "This";
+        final RegularNodeDescriptor descriptor = new RegularNodeDescriptor(
+            name,
             Collections.emptyList()
         );
-        final String actual = rule.toString();
-        final String expected = "This <- 0";
-        Assertions.assertEquals(expected, actual);
-    }
-
-    @Test
-    void nodeWithVarietyOfChildren() {
-        final RegularNodeDescriptor rule = new RegularNodeDescriptor(
-            "Variable",
-            Arrays.asList(
-                new ChildDescriptorExt(true, "", "Type"),
-                new ChildDescriptorExt(false, "name", "Identifier"),
-                new ChildDescriptorExt(true, "init", "Expression")
-            )
+        final Builder builder = descriptor.createBuilder();
+        Assertions.assertTrue(builder.isValid());
+        builder.setFragment(EmptyFragment.INSTANCE);
+        Assertions.assertTrue(builder.setData(""));
+        Assertions.assertFalse(builder.setData("test"));
+        Assertions.assertTrue(builder.setChildrenList(Collections.emptyList()));
+        Assertions.assertFalse(
+            builder.setChildrenList(Collections.singletonList(DummyNode.INSTANCE))
         );
-        final String actual = rule.toString();
-        final String expected = "Variable <- [Type], name@Identifier, [init@Expression]";
-        Assertions.assertEquals(expected, actual);
+        final Node node = builder.createNode();
+        Assertions.assertSame(descriptor, node.getType());
+        Assertions.assertEquals(name, node.getTypeName());
+        Assertions.assertEquals("", node.getData());
+        Assertions.assertEquals(0, node.getChildCount());
     }
 }

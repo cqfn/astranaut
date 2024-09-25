@@ -23,52 +23,12 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import org.cqfn.astranaut.core.base.Type;
+
 /**
- * Child node descriptor.
+ * Node descriptor. Uniquely identifies the type of node in the node hierarchy
+ *  described by DSL rules.
  * @since 1.0.0
  */
-public final class ChildDescriptor {
-    /**
-     * Flag indicating that the child node is optional.
-     */
-    private final boolean optional;
-
-    /**
-     * Tag, that is, a name that uniquely identifies this particular child node.
-     */
-    private final String tag;
-
-    /**
-     * Type of child node as a string.
-     */
-    private final String type;
-
-    /**
-     * Constructor.
-     *
-     * @param optional Flag indicating that the child node is optional
-     * @param tag Tag
-     * @param type Type of child node as a string
-     */
-    public ChildDescriptor(final boolean optional, final String tag, final String type) {
-        this.optional = optional;
-        this.tag = tag;
-        this.type = type;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        if (this.optional) {
-            builder.append('[');
-        }
-        if (!this.tag.isEmpty()) {
-            builder.append(this.tag).append('@');
-        }
-        builder.append(this.type);
-        if (this.optional) {
-            builder.append(']');
-        }
-        return builder.toString();
-    }
+public interface NodeDescriptor extends Rule, Type {
 }
