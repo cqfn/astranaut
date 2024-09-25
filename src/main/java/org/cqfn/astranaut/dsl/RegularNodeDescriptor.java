@@ -35,12 +35,7 @@ import org.cqfn.astranaut.interpreter.RegularBuilder;
  *  of some child nodes and no data.
  * @since 1.0.0
  */
-public final class RegularNodeDescriptor implements NodeDescriptor {
-    /**
-     * Name of the type of the node (left side of the rule).
-     */
-    private final String name;
-
+public final class RegularNodeDescriptor extends NodeDescriptor {
     /**
      * List of extended child node descriptors (right side of the rule).
      */
@@ -48,18 +43,18 @@ public final class RegularNodeDescriptor implements NodeDescriptor {
 
     /**
      * Constructor.
-     * @param type Name of the type of the node
+     * @param name Name of the type of the node
      * @param children List of child node descriptors
      */
-    public RegularNodeDescriptor(final String type, final List<ChildDescriptorExt> children) {
-        this.name = type;
+    public RegularNodeDescriptor(final String name, final List<ChildDescriptorExt> children) {
+        super(name);
         this.children = Collections.unmodifiableList(children);
     }
 
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append(this.name).append(" <- ");
+        builder.append(this.getName()).append(" <- ");
         if (this.children.isEmpty()) {
             builder.append('0');
         } else {
@@ -76,11 +71,6 @@ public final class RegularNodeDescriptor implements NodeDescriptor {
     }
 
     @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
     public List<ChildDescriptor> getChildTypes() {
         return this.children.stream().map(ChildDescriptorExt::toSimpleDescriptor)
             .collect(Collectors.toList());
@@ -92,11 +82,6 @@ public final class RegularNodeDescriptor implements NodeDescriptor {
      */
     public List<ChildDescriptorExt> getExtChildTypes() {
         return this.children;
-    }
-
-    @Override
-    public List<String> getHierarchy() {
-        return Collections.emptyList();
     }
 
     @Override

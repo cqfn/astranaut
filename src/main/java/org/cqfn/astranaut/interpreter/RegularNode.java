@@ -73,4 +73,9 @@ final class RegularNode implements Node {
     public Node getChild(final int index) {
         return this.children.get(index);
     }
+
+    @Override
+    public String toString() {
+        return Node.toString(this);
+    }
 }
