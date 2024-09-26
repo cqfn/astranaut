@@ -35,7 +35,7 @@ import org.cqfn.astranaut.interpreter.RegularBuilder;
  *  of some child nodes and no data.
  * @since 1.0.0
  */
-public final class RegularNodeDescriptor extends NodeDescriptor {
+public final class RegularNodeDescriptor extends NonAbstractNodeDescriptor {
     /**
      * List of extended child node descriptors (right side of the rule).
      */

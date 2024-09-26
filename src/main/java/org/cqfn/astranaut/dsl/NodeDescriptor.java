@@ -28,15 +28,13 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import org.cqfn.astranaut.core.base.Type;
 
 /**
  * Node descriptor. Uniquely identifies the type of node in the node hierarchy
  *  described by DSL rules.
  * @since 1.0.0
  */
-public abstract class NodeDescriptor implements Rule, Type {
+public abstract class NodeDescriptor implements Rule {
     /**
      * Name of the type of the node (left side of the rule).
      */
@@ -47,7 +45,7 @@ public abstract class NodeDescriptor implements Rule, Type {
      *  from which this node inherits. Multiple inheritance is allowed,
      *  respectively.
      */
-    private final List<NodeDescriptor> bases;
+    private final List<AbstractNodeDescriptor> bases;
 
     /**
      * Constructor.
@@ -58,15 +56,12 @@ public abstract class NodeDescriptor implements Rule, Type {
         this.bases = new ArrayList<>(1);
     }
 
-    @Override
+    /**
+     * Returns the name of the type of the node (i.e. left side of the rule).
+     * @return Type name
+     */
     public final String getName() {
         return this.name;
-    }
-
-    @Override
-    public final List<String> getHierarchy() {
-        return this.getTopology().stream().map(NodeDescriptor::getName)
-            .collect(Collectors.toList());
     }
 
     /**
@@ -74,7 +69,7 @@ public abstract class NodeDescriptor implements Rule, Type {
      *  from which this node inherits.
      * @param descriptor Base descriptor
      */
-    public void addBaseDescriptor(final NodeDescriptor descriptor) {
+    public void addBaseDescriptor(final AbstractNodeDescriptor descriptor) {
         if (this.checkForCycle(descriptor)) {
             throw new IllegalArgumentException("Adding this descriptor would create a cycle.");
         }

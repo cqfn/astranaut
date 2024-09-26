@@ -28,6 +28,7 @@ import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.DummyNode;
 import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
 import org.cqfn.astranaut.dsl.ChildDescriptorExt;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 import org.junit.jupiter.api.Assertions;
@@ -63,20 +64,20 @@ class RegularNodeTest {
 
     @Test
     void nodeWithOneObligatoryChild() {
-        final RegularNodeDescriptor expression = new RegularNodeDescriptor(
-            "Expression",
-            Collections.emptyList()
-        );
-        final RegularNodeDescriptor boolexpr = new RegularNodeDescriptor(
-            "BooleanExpression",
-            Collections.emptyList()
-        );
-        boolexpr.addBaseDescriptor(expression);
         final String name = "True";
         final RegularNodeDescriptor constant = new RegularNodeDescriptor(
             name,
             Collections.emptyList()
         );
+        final AbstractNodeDescriptor boolexpr = new AbstractNodeDescriptor(
+            "BooleanExpression",
+            Collections.singletonList(constant.getName())
+        );
+        final AbstractNodeDescriptor expression = new AbstractNodeDescriptor(
+            "Expression",
+            Collections.singletonList(boolexpr.getName())
+        );
+        boolexpr.addBaseDescriptor(expression);
         constant.addBaseDescriptor(boolexpr);
         final Node child = constant.createBuilder().createNode();
         final RegularNodeDescriptor stmt = new RegularNodeDescriptor(
