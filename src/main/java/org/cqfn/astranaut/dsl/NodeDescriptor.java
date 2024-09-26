@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
  * Node descriptor. Uniquely identifies the type of node in the node hierarchy
@@ -68,10 +69,11 @@ public abstract class NodeDescriptor implements Rule {
      * Adds a base descriptor, that is, the descriptor of the abstract node
      *  from which this node inherits.
      * @param descriptor Base descriptor
+     * @throws CycleException If a loop in the inheritance hierarchy occurs when adding
      */
-    public void addBaseDescriptor(final AbstractNodeDescriptor descriptor) {
+    public void addBaseDescriptor(final AbstractNodeDescriptor descriptor) throws CycleException {
         if (this.checkForCycle(descriptor)) {
-            throw new IllegalArgumentException("Adding this descriptor would create a cycle.");
+            throw new CycleException(descriptor);
         }
         this.bases.add(descriptor);
     }
@@ -122,6 +124,43 @@ public abstract class NodeDescriptor implements Rule {
             }
             topology.add(0, this);
             visited.add(this);
+        }
+    }
+
+    /**
+     * Exception: 'Adding this descriptor would create a cycle'.
+     * @since 1.0.0
+     */
+    private static final class CycleException extends BaseException {
+        /**
+         * Version identifier.
+         */
+        private static final long serialVersionUID = -1;
+
+        /**
+         * Descriptor.
+         */
+        private final NodeDescriptor descriptor;
+
+        /**
+         * Constructor.
+         * @param descriptor Descriptor
+         */
+        private CycleException(final NodeDescriptor descriptor) {
+            this.descriptor = descriptor;
+        }
+
+        @Override
+        public String getInitiator() {
+            return "Parser";
+        }
+
+        @Override
+        public String getErrorMessage() {
+            return String.format(
+                "Adding this descriptor would create a cycle: '%s'",
+                this.descriptor.toString()
+            );
         }
     }
 }

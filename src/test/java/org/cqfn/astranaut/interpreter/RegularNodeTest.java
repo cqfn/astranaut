@@ -31,6 +31,7 @@ import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
 import org.cqfn.astranaut.dsl.ChildDescriptorExt;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
+import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -77,8 +78,14 @@ class RegularNodeTest {
             "Expression",
             Collections.singletonList(boolexpr.getName())
         );
-        boolexpr.addBaseDescriptor(expression);
-        constant.addBaseDescriptor(boolexpr);
+        boolean oops = false;
+        try {
+            boolexpr.addBaseDescriptor(expression);
+            constant.addBaseDescriptor(boolexpr);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
         final Node child = constant.createBuilder().createNode();
         final RegularNodeDescriptor stmt = new RegularNodeDescriptor(
             "StatementExpression",
