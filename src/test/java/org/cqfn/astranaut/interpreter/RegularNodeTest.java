@@ -65,28 +65,6 @@ class RegularNodeTest {
 
     @Test
     void nodeWithOneObligatoryChild() {
-        final String name = "True";
-        final RegularNodeDescriptor constant = new RegularNodeDescriptor(
-            name,
-            Collections.emptyList()
-        );
-        final AbstractNodeDescriptor boolexpr = new AbstractNodeDescriptor(
-            "BooleanExpression",
-            Collections.singletonList(constant.getName())
-        );
-        final AbstractNodeDescriptor expression = new AbstractNodeDescriptor(
-            "Expression",
-            Collections.singletonList(boolexpr.getName())
-        );
-        boolean oops = false;
-        try {
-            boolexpr.addBaseDescriptor(expression);
-            constant.addBaseDescriptor(boolexpr);
-        } catch (final BaseException ignored) {
-            oops = true;
-        }
-        Assertions.assertFalse(oops);
-        final Node child = constant.createBuilder().createNode();
         final RegularNodeDescriptor stmt = new RegularNodeDescriptor(
             "StatementExpression",
             Collections.singletonList(
@@ -106,12 +84,41 @@ class RegularNodeTest {
         );
         Assertions.assertFalse(builder.isValid());
         Assertions.assertTrue(
-            builder.setChildrenList(Collections.singletonList(child))
+            builder.setChildrenList(
+                Collections.singletonList(RegularNodeTest.createTestExpression())
+            )
         );
         Assertions.assertTrue(builder.isValid());
         final Node node = builder.createNode();
         Assertions.assertEquals(1, node.getChildCount());
-        Assertions.assertEquals(name, node.getChild(0).getTypeName());
         Assertions.assertEquals("StatementExpression(True)", node.toString());
+    }
+
+    /**
+     * Creates a node that is an "expression" in node hierarchy.
+     * @return A node
+     */
+    private static Node createTestExpression() {
+        final RegularNodeDescriptor constant = new RegularNodeDescriptor(
+            "True",
+            Collections.emptyList()
+        );
+        final AbstractNodeDescriptor boolexpr = new AbstractNodeDescriptor(
+            "BooleanExpression",
+            Collections.singletonList(constant.getName())
+        );
+        final AbstractNodeDescriptor expression = new AbstractNodeDescriptor(
+            "Expression",
+            Collections.singletonList(boolexpr.getName())
+        );
+        boolean oops = false;
+        try {
+            boolexpr.addBaseDescriptor(expression);
+            constant.addBaseDescriptor(boolexpr);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        return constant.createBuilder().createNode();
     }
 }
