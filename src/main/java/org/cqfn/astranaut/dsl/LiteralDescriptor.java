@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.cqfn.astranaut.core.base.Builder;
@@ -83,7 +84,7 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append(this.getName()).append(" <- ").append(this.type);
+        builder.append(this.getName()).append(" <- '").append(this.type).append('\'');
         if (!this.initial.isEmpty()) {
             builder.append(LiteralDescriptor.DELIMITER).append(this.initial).append('\'');
         }
@@ -245,22 +246,35 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
 
         @Override
         public String toString() {
-            final StringBuilder builder = new StringBuilder();
-            builder.append(this.name).append(" <- ").append(this.type);
-            if (!this.initial.isEmpty()) {
-                builder.append(LiteralDescriptor.DELIMITER).append(this.initial).append('\'');
+            return String.format(
+                "%s <- %s",
+                this.name,
+                String.join(
+                    ", ",
+                    Arrays.asList(
+                        Constructor.format(this.type),
+                        Constructor.format(this.initial),
+                        Constructor.format(this.serializer),
+                        Constructor.format(this.parser),
+                        Constructor.format(this.exception)
+                    )
+                )
+            );
+        }
+
+        /**
+         * Formats a parameter for pretty stringification of constructor data.
+         * @param parameter Parameter
+         * @return Formatted parameter
+         */
+        private static String format(final String parameter) {
+            final String result;
+            if (parameter.isEmpty()) {
+                result = "?";
+            } else {
+                result = String.format("'%s'", parameter);
             }
-            if (!this.serializer.isEmpty()) {
-                builder.append(LiteralDescriptor.DELIMITER)
-                    .append(this.serializer)
-                    .append("', '")
-                    .append(this.parser)
-                    .append('\'');
-            }
-            if (!this.exception.isEmpty()) {
-                builder.append(LiteralDescriptor.DELIMITER).append(this.exception).append('\'');
-            }
-            return builder.toString();
+            return result;
         }
     }
 }
