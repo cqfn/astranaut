@@ -49,4 +49,59 @@ class LiteralDescriptorTest {
         final LiteralDescriptor descriptor = ctor.create();
         Assertions.assertEquals("Identifier <- 'String'", descriptor.toString());
     }
+
+    @Test
+    void nameAndInit() {
+        final LiteralDescriptor.Constructor ctor =
+            new LiteralDescriptor.Constructor("StringLiteral");
+        ctor.setType("String");
+        ctor.setInitial("\"\"");
+        Assertions.assertTrue(ctor.isValid());
+        Assertions.assertEquals(
+            "StringLiteral <- 'String', '\"\"', ?, ?, ?",
+            ctor.toString()
+        );
+        final LiteralDescriptor descriptor = ctor.create();
+        Assertions.assertEquals(
+            "StringLiteral <- 'String', '\"\"'",
+            descriptor.toString()
+        );
+    }
+
+    @Test
+    void nameInitSerializerParser() {
+        final LiteralDescriptor.Constructor ctor =
+            new LiteralDescriptor.Constructor("IntegerLiteral");
+        ctor.setType("int");
+        ctor.setInitial("0");
+        ctor.setSerializer("String.valueOf(#)");
+        ctor.setParser("Integer.parseInt(#)");
+        Assertions.assertTrue(ctor.isValid());
+        Assertions.assertEquals(
+            "IntegerLiteral <- 'int', '0', 'String.valueOf(#)', 'Integer.parseInt(#)', ?",
+            ctor.toString()
+        );
+        final LiteralDescriptor descriptor = ctor.create();
+        Assertions.assertEquals(
+            "IntegerLiteral <- 'int', '0', 'String.valueOf(#)', 'Integer.parseInt(#)'",
+            descriptor.toString()
+        );
+    }
+
+    @Test
+    void fullDescriptor() {
+        final LiteralDescriptor.Constructor ctor =
+            new LiteralDescriptor.Constructor("RealNumberLiteral");
+        ctor.setType("double");
+        ctor.setInitial("0.0");
+        ctor.setSerializer("String.valueOf(#)");
+        ctor.setParser("Double.parseDouble(#)");
+        ctor.setException("NumberFormatException");
+        Assertions.assertTrue(ctor.isValid());
+        final String expected =
+            "RealNumberLiteral <- 'double', '0.0', 'String.valueOf(#)', 'Double.parseDouble(#)', 'NumberFormatException'";
+        Assertions.assertEquals(expected, ctor.toString());
+        final LiteralDescriptor descriptor = ctor.create();
+        Assertions.assertEquals(expected, descriptor.toString());
+    }
 }
