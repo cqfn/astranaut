@@ -104,4 +104,40 @@ class LiteralDescriptorTest {
         final LiteralDescriptor descriptor = ctor.create();
         Assertions.assertEquals(expected, descriptor.toString());
     }
+
+    @Test
+    void serializerWithoutInit() {
+        final LiteralDescriptor.Constructor ctor = new LiteralDescriptor.Constructor("X");
+        ctor.setType("a");
+        ctor.setSerializer("b");
+        Assertions.assertFalse(ctor.isValid());
+    }
+
+    @Test
+    void serializerWithoutParser() {
+        final LiteralDescriptor.Constructor ctor = new LiteralDescriptor.Constructor("X");
+        ctor.setType("a");
+        ctor.setInitial("b");
+        ctor.setSerializer("c");
+        Assertions.assertFalse(ctor.isValid());
+    }
+
+    @Test
+    void parserWithoutSerializer() {
+        final LiteralDescriptor.Constructor ctor = new LiteralDescriptor.Constructor("X");
+        ctor.setType("a");
+        ctor.setInitial("b");
+        ctor.setParser("c");
+        Assertions.assertFalse(ctor.isValid());
+    }
+
+
+    @Test
+    void exceptionWithoutParser() {
+        final LiteralDescriptor.Constructor ctor = new LiteralDescriptor.Constructor("X");
+        ctor.setType("a");
+        ctor.setInitial("b");
+        ctor.setException("c");
+        Assertions.assertFalse(ctor.isValid());
+    }
 }
