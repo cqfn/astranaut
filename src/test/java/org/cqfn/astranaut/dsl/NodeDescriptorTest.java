@@ -23,7 +23,9 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -61,5 +63,44 @@ class NodeDescriptorTest {
             );
         }
         Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void nodeWithMultipleInheritance() {
+        boolean oops = false;
+        final AbstractNodeDescriptor first = new AbstractNodeDescriptor(
+            "A",
+            Arrays.asList("B", "C")
+        );
+        final AbstractNodeDescriptor second = new AbstractNodeDescriptor(
+            "B",
+            Collections.singletonList("D")
+        );
+        final AbstractNodeDescriptor third = new AbstractNodeDescriptor(
+            "C",
+            Collections.singletonList("E")
+        );
+        final AbstractNodeDescriptor fourth = new AbstractNodeDescriptor(
+            "D",
+            Collections.singletonList("E")
+        );
+        final RegularNodeDescriptor fifth = new RegularNodeDescriptor(
+            "E",
+            Collections.emptyList()
+        );
+        try {
+            second.addBaseDescriptor(first);
+            third.addBaseDescriptor(first);
+            fourth.addBaseDescriptor(second);
+            fifth.addBaseDescriptor(fourth);
+            fifth.addBaseDescriptor(third);
+        } catch (final BaseException exception) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        final List<String> hierarchy = fifth.getHierarchy();
+        final String expected = "E, D, B, C, A";
+        final String actual = String.join(", ", hierarchy);
+        Assertions.assertEquals(expected, actual);
     }
 }

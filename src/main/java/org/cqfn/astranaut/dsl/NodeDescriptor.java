@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import org.cqfn.astranaut.exceptions.BaseException;
 
@@ -119,7 +120,10 @@ public abstract class NodeDescriptor implements Rule {
     private void buildTopology(final List<NodeDescriptor> topology,
         final Set<NodeDescriptor> visited) {
         if (!visited.contains(this)) {
-            for (final NodeDescriptor base : this.bases) {
+            final ListIterator<AbstractNodeDescriptor> iterator =
+                this.bases.listIterator(this.bases.size());
+            while (iterator.hasPrevious()) {
+                final NodeDescriptor base = iterator.previous();
                 base.buildTopology(topology, visited);
             }
             topology.add(0, this);
