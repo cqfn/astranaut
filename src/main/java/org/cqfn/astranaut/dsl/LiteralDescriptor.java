@@ -216,7 +216,7 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
                 if (this.initial.isEmpty() && !this.serializer.isEmpty()) {
                     break;
                 }
-                if (this.serializer.isEmpty() && !this.parser.isEmpty()) {
+                if (this.serializer.isEmpty() ^ this.parser.isEmpty()) {
                     break;
                 }
                 if (this.parser.isEmpty() && !this.exception.isEmpty()) {

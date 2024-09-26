@@ -131,7 +131,6 @@ class LiteralDescriptorTest {
         Assertions.assertFalse(ctor.isValid());
     }
 
-
     @Test
     void exceptionWithoutParser() {
         final LiteralDescriptor.Constructor ctor = new LiteralDescriptor.Constructor("X");
