@@ -21,59 +21,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.interpreter;
+package org.cqfn.astranaut.dsl;
 
-import org.cqfn.astranaut.core.base.Node;
-import org.cqfn.astranaut.core.base.Type;
-import org.cqfn.astranaut.dsl.LiteralDescriptor;
+import java.util.Collections;
+import java.util.List;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.interpreter.ListBuilder;
 
 /**
- * Literal, that is, a node that has data and no child nodes.
+ * Descriptor of a list node, that is, one that can contain an unlimited number of child nodes
+ *  of the same type.
  * @since 1.0.0
  */
-final class Literal implements Node {
+public final class ListNodeDescriptor extends NonAbstractNodeDescriptor {
     /**
-     * Descriptor resulting from parsing a DSL rule.
+     * Name of the children node type.
      */
-    private final LiteralDescriptor descriptor;
-
-    /**
-     * Node data.
-     */
-    private final String data;
+    private final String type;
 
     /**
      * Constructor.
-     * @param descriptor Descriptor resulting from parsing a DSL rule
-     * @param data Node data
+     * @param name Name of the type of the node (left side of the rule)
+     * @param type Name of the children node type
      */
-    Literal(final LiteralDescriptor descriptor, final String data) {
-        this.descriptor = descriptor;
-        this.data = data;
+    public ListNodeDescriptor(final String name, final String type) {
+        super(name);
+        this.type = type;
+    }
+
+    /**
+     * Returns the name of the children node type.
+     * @return Name of the children node type
+     */
+    public String getChildType() {
+        return this.type;
     }
 
     @Override
-    public Type getType() {
-        return this.descriptor;
-    }
-
-    @Override
-    public String getData() {
-        return this.data;
-    }
-
-    @Override
-    public int getChildCount() {
-        return 0;
-    }
-
-    @Override
-    public Node getChild(final int index) {
-        throw new IndexOutOfBoundsException();
+    public List<ChildDescriptor> getChildTypes() {
+        return Collections.singletonList(new ChildDescriptor(this.type));
     }
 
     @Override
     public String toString() {
-        return Node.toString(this);
+        return String.format("%s <- {%s}", this.getName(), this.type);
+    }
+
+    @Override
+    public Builder createBuilder() {
+        return new ListBuilder(this);
     }
 }

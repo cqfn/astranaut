@@ -23,57 +23,73 @@
  */
 package org.cqfn.astranaut.interpreter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
-import org.cqfn.astranaut.core.base.Type;
-import org.cqfn.astranaut.dsl.LiteralDescriptor;
+import org.cqfn.astranaut.dsl.ListNodeDescriptor;
 
 /**
- * Literal, that is, a node that has data and no child nodes.
+ * Builder that builds list nodes.
  * @since 1.0.0
  */
-final class Literal implements Node {
+public final class ListBuilder implements Builder {
     /**
      * Descriptor resulting from parsing a DSL rule.
      */
-    private final LiteralDescriptor descriptor;
+    private final ListNodeDescriptor descriptor;
 
     /**
-     * Node data.
+     * Current set of child nodes.
      */
-    private final String data;
+    private List<Node> children;
 
     /**
      * Constructor.
      * @param descriptor Descriptor resulting from parsing a DSL rule
-     * @param data Node data
      */
-    Literal(final LiteralDescriptor descriptor, final String data) {
+    public ListBuilder(final ListNodeDescriptor descriptor) {
         this.descriptor = descriptor;
-        this.data = data;
+        this.children = Collections.emptyList();
     }
 
     @Override
-    public Type getType() {
-        return this.descriptor;
+    @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
+    public void setFragment(final Fragment fragment) {
     }
 
     @Override
-    public String getData() {
-        return this.data;
+    public boolean setData(final String data) {
+        return data.isEmpty();
     }
 
     @Override
-    public int getChildCount() {
-        return 0;
+    public boolean setChildrenList(final List<Node> list) {
+        boolean result = true;
+        for (final Node child : list) {
+            result = child.belongsToGroup(this.descriptor.getChildType());
+            if (!result) {
+                break;
+            }
+        }
+        if (result) {
+            this.children = Collections.unmodifiableList(new ArrayList<>(list));
+        }
+        return result;
     }
 
     @Override
-    public Node getChild(final int index) {
-        throw new IndexOutOfBoundsException();
+    public boolean isValid() {
+        return true;
     }
 
     @Override
-    public String toString() {
-        return Node.toString(this);
+    public Node createNode() {
+        if (!this.isValid()) {
+            throw new IllegalStateException();
+        }
+        return new ListNode(this.descriptor, this.children);
     }
 }

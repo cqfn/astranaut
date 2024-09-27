@@ -23,7 +23,6 @@
  */
 package org.cqfn.astranaut.interpreter;
 
-import java.util.Collections;
 import java.util.List;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -51,7 +50,7 @@ final class RegularNode implements Node {
      */
     RegularNode(final RegularNodeDescriptor descriptor, final List<Node> children) {
         this.descriptor = descriptor;
-        this.children = Collections.unmodifiableList(children);
+        this.children = children;
     }
 
     @Override

@@ -23,33 +23,34 @@
  */
 package org.cqfn.astranaut.interpreter;
 
+import java.util.List;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
-import org.cqfn.astranaut.dsl.LiteralDescriptor;
+import org.cqfn.astranaut.dsl.ListNodeDescriptor;
 
 /**
- * Literal, that is, a node that has data and no child nodes.
+ * List node, that is, one that can contain an unlimited number of child nodes of the same type.
  * @since 1.0.0
  */
-final class Literal implements Node {
+final class ListNode implements Node {
     /**
      * Descriptor resulting from parsing a DSL rule.
      */
-    private final LiteralDescriptor descriptor;
+    private final ListNodeDescriptor descriptor;
 
     /**
-     * Node data.
+     * List of child nodes.
      */
-    private final String data;
+    private final List<Node> children;
 
     /**
      * Constructor.
      * @param descriptor Descriptor resulting from parsing a DSL rule
-     * @param data Node data
+     * @param children List of child nodes
      */
-    Literal(final LiteralDescriptor descriptor, final String data) {
+    ListNode(final ListNodeDescriptor descriptor, final List<Node> children) {
         this.descriptor = descriptor;
-        this.data = data;
+        this.children = children;
     }
 
     @Override
@@ -59,17 +60,17 @@ final class Literal implements Node {
 
     @Override
     public String getData() {
-        return this.data;
+        return "";
     }
 
     @Override
     public int getChildCount() {
-        return 0;
+        return this.children.size();
     }
 
     @Override
     public Node getChild(final int index) {
-        throw new IndexOutOfBoundsException();
+        return this.children.get(index);
     }
 
     @Override
