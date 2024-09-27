@@ -79,12 +79,13 @@ class ListNodeTest {
         Assertions.assertTrue(
             builder.setChildrenList(Arrays.asList(child, child, child))
         );
+        Assertions.assertTrue(builder.isValid());
         final Node node = builder.createNode();
         Assertions.assertEquals(
             "StatementBlock(Empty, Empty, Empty)",
             node.toString()
         );
-        List<ChildDescriptor> children = node.getType().getChildTypes();
+        final List<ChildDescriptor> children = node.getType().getChildTypes();
         Assertions.assertEquals(1, children.size());
         Assertions.assertEquals(stmt.getName(), children.get(0).getType());
     }
