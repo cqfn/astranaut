@@ -87,9 +87,6 @@ public final class ListBuilder implements Builder {
 
     @Override
     public Node createNode() {
-        if (!this.isValid()) {
-            throw new IllegalStateException();
-        }
         return new ListNode(this.descriptor, this.children);
     }
 }
