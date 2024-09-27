@@ -44,7 +44,7 @@ class LiteralTest {
         ctor.setType("String");
         final String initial = "abc";
         ctor.setInitial(initial);
-        final LiteralDescriptor descriptor = ctor.create();
+        final LiteralDescriptor descriptor = ctor.createDescriptor();
         Assertions.assertEquals(initial, descriptor.getInitial());
         final Builder builder = descriptor.createBuilder();
         Assertions.assertTrue(builder.isValid());

@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.interpreter;
 
+import java.util.Arrays;
 import java.util.Collections;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.DummyNode;
@@ -30,6 +31,7 @@ import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
 import org.cqfn.astranaut.dsl.ChildDescriptorExt;
+import org.cqfn.astranaut.dsl.LiteralDescriptor;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
@@ -40,6 +42,16 @@ import org.junit.jupiter.api.Test;
  * @since 1.0.0
  */
 class RegularNodeTest {
+    /**
+     * The 'Expression' type.
+     */
+    private static final String EXPRESSION_TYPE = "Expression";
+
+    /**
+     * The 'Identifier' type.
+     */
+    private static final String IDENTIFIER_TYPE = "Identifier";
+
     @Test
     void nodeWithoutChildren() {
         final String name = "This";
@@ -68,7 +80,7 @@ class RegularNodeTest {
         final RegularNodeDescriptor stmt = new RegularNodeDescriptor(
             "StatementExpression",
             Collections.singletonList(
-                new ChildDescriptorExt(false, "", "Expression")
+                new ChildDescriptorExt(false, "", RegularNodeTest.EXPRESSION_TYPE)
             )
         );
         final Builder builder = stmt.createBuilder();
@@ -85,7 +97,7 @@ class RegularNodeTest {
         Assertions.assertFalse(builder.isValid());
         Assertions.assertTrue(
             builder.setChildrenList(
-                Collections.singletonList(RegularNodeTest.createTestExpression())
+                Collections.singletonList(RegularNodeTest.createBooleanExpression())
             )
         );
         Assertions.assertTrue(builder.isValid());
@@ -94,11 +106,51 @@ class RegularNodeTest {
         Assertions.assertEquals("StatementExpression(True)", node.toString());
     }
 
+    @Test
+    void nodeWithThreeChildren() {
+        final RegularNodeDescriptor stmt = new RegularNodeDescriptor(
+            "VariableDeclaration",
+            Arrays.asList(
+                new ChildDescriptorExt(true, "type", RegularNodeTest.IDENTIFIER_TYPE),
+                new ChildDescriptorExt(false, "name", RegularNodeTest.IDENTIFIER_TYPE),
+                new ChildDescriptorExt(true, "init", RegularNodeTest.EXPRESSION_TYPE)
+            )
+        );
+        final Builder builder = stmt.createBuilder();
+        Assertions.assertFalse(builder.isValid());
+        Assertions.assertFalse(builder.setChildrenList(Collections.emptyList()));
+        final Node type = RegularNodeTest.createIdentifier("boolean");
+        final Node name = RegularNodeTest.createIdentifier("value");
+        final Node init = RegularNodeTest.createBooleanExpression();
+        Assertions.assertFalse(builder.setChildrenList(Collections.singletonList(init)));
+        Assertions.assertTrue(builder.setChildrenList(Collections.singletonList(name)));
+        final Node first = builder.createNode();
+        Assertions.assertEquals(
+            "VariableDeclaration(Identifier<\"value\">)",
+            first.toString()
+        );
+        Assertions.assertTrue(builder.setChildrenList(Arrays.asList(name, init)));
+        final Node second = builder.createNode();
+        Assertions.assertEquals(
+            "VariableDeclaration(Identifier<\"value\">, True)",
+            second.toString()
+        );
+        Assertions.assertTrue(builder.setChildrenList(Arrays.asList(init, name)));
+        final Node third = builder.createNode();
+        Assertions.assertEquals(third.toString(), second.toString());
+        Assertions.assertTrue(builder.setChildrenList(Arrays.asList(type, name, init)));
+        final Node fourth = builder.createNode();
+        Assertions.assertEquals(
+            "VariableDeclaration(Identifier<\"boolean\">, Identifier<\"value\">, True)",
+            fourth.toString()
+        );
+    }
+
     /**
      * Creates a node that is an "expression" in node hierarchy.
      * @return A node
      */
-    private static Node createTestExpression() {
+    private static Node createBooleanExpression() {
         final RegularNodeDescriptor constant = new RegularNodeDescriptor(
             "True",
             Collections.emptyList()
@@ -108,7 +160,7 @@ class RegularNodeTest {
             Collections.singletonList(constant.getName())
         );
         final AbstractNodeDescriptor expression = new AbstractNodeDescriptor(
-            "Expression",
+            RegularNodeTest.EXPRESSION_TYPE,
             Collections.singletonList(boolexpr.getName())
         );
         boolean oops = false;
@@ -120,5 +172,20 @@ class RegularNodeTest {
         }
         Assertions.assertFalse(oops);
         return constant.createBuilder().createNode();
+    }
+
+    /**
+     * Creates a node that is an "identifier" in node hierarchy.
+     * @param value Value of the identifier
+     * @return A node
+     */
+    private static Node createIdentifier(final String value) {
+        final LiteralDescriptor.Constructor ctor = new LiteralDescriptor.Constructor(
+            RegularNodeTest.IDENTIFIER_TYPE
+        );
+        ctor.setType("String");
+        final Builder builder = ctor.createDescriptor().createBuilder();
+        builder.setData(value);
+        return builder.createNode();
     }
 }

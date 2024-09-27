@@ -36,7 +36,7 @@ class LiteralDescriptorTest {
         final LiteralDescriptor.Constructor ctor =
             new LiteralDescriptor.Constructor("Invalid");
         Assertions.assertFalse(ctor.isValid());
-        Assertions.assertThrows(IllegalStateException.class, ctor::create);
+        Assertions.assertThrows(IllegalStateException.class, ctor::createDescriptor);
     }
 
     @Test
@@ -46,7 +46,7 @@ class LiteralDescriptorTest {
         ctor.setType("String");
         Assertions.assertTrue(ctor.isValid());
         Assertions.assertEquals("Identifier <- 'String', ?, ?, ?, ?", ctor.toString());
-        final LiteralDescriptor descriptor = ctor.create();
+        final LiteralDescriptor descriptor = ctor.createDescriptor();
         Assertions.assertEquals("Identifier <- 'String'", descriptor.toString());
     }
 
@@ -61,7 +61,7 @@ class LiteralDescriptorTest {
             "StringLiteral <- 'String', '\"\"', ?, ?, ?",
             ctor.toString()
         );
-        final LiteralDescriptor descriptor = ctor.create();
+        final LiteralDescriptor descriptor = ctor.createDescriptor();
         Assertions.assertEquals(
             "StringLiteral <- 'String', '\"\"'",
             descriptor.toString()
@@ -81,7 +81,7 @@ class LiteralDescriptorTest {
             "IntegerLiteral <- 'int', '0', 'String.valueOf(#)', 'Integer.parseInt(#)', ?",
             ctor.toString()
         );
-        final LiteralDescriptor descriptor = ctor.create();
+        final LiteralDescriptor descriptor = ctor.createDescriptor();
         Assertions.assertEquals(
             "IntegerLiteral <- 'int', '0', 'String.valueOf(#)', 'Integer.parseInt(#)'",
             descriptor.toString()
@@ -101,7 +101,7 @@ class LiteralDescriptorTest {
         final String expected =
             "RealNumberLiteral <- 'double', '0.0', 'String.valueOf(#)', 'Double.parseDouble(#)', 'NumberFormatException'";
         Assertions.assertEquals(expected, ctor.toString());
-        final LiteralDescriptor descriptor = ctor.create();
+        final LiteralDescriptor descriptor = ctor.createDescriptor();
         Assertions.assertEquals(expected, descriptor.toString());
     }
 

@@ -69,7 +69,7 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
      * Constructor.
      * @param name Name of the type of the node (left side of the rule)
      */
-    public LiteralDescriptor(final String name) {
+    private LiteralDescriptor(final String name) {
         super(name);
     }
 
@@ -231,7 +231,7 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
          * Checks that all data is valid and, if so, creates a new descriptor with that data.
          * @return A new literal descriptor
          */
-        public LiteralDescriptor create() {
+        public LiteralDescriptor createDescriptor() {
             if (!this.isValid()) {
                 throw new IllegalStateException();
             }
