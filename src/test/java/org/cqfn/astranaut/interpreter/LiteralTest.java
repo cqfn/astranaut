@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
  * Tests covering {@link Literal} and {@link LiteralBuilder} classes.
  * @since 1.0.0
  */
-public class LiteralTest {
+class LiteralTest {
     @Test
     void testBaseInterface() {
         final LiteralDescriptor.Constructor ctor =
