@@ -71,4 +71,9 @@ public final class Literal implements Node {
     public Node getChild(final int index) {
         throw new IndexOutOfBoundsException();
     }
+
+    @Override
+    public String toString() {
+        return Node.toString(this);
+    }
 }
