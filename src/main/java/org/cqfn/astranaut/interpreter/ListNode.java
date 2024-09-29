@@ -21,50 +21,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.codegen.java;
+package org.cqfn.astranaut.interpreter;
+
+import java.util.List;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.astranaut.dsl.ListNodeDescriptor;
 
 /**
- * Describes a Java class and allows to generate source code for it.
+ * List node, that is, one that can contain an unlimited number of child nodes of the same type.
  * @since 1.0.0
  */
-public class Klass {
+final class ListNode implements Node {
     /**
-     * Name of the class.
+     * Descriptor resulting from parsing a DSL rule.
      */
-    private final String name;
+    private final ListNodeDescriptor descriptor;
 
     /**
-     * Flag indicating that the generated class is public.
+     * List of child nodes.
      */
-    private boolean fpublic;
+    private final List<Node> children;
 
     /**
      * Constructor.
-     * @param name Name of the class.
+     * @param descriptor Descriptor resulting from parsing a DSL rule
+     * @param children List of child nodes
      */
-    public Klass(final String name) {
-        this.name = name;
+    ListNode(final ListNodeDescriptor descriptor, final List<Node> children) {
+        this.descriptor = descriptor;
+        this.children = children;
     }
 
-    /**
-     * Builds the source code for this class.
-     * @param indent Initial indentation
-     * @param code Source code builder
-     */
-    public void build(final int indent, final SourceCodeBuilder code) {
-        final StringBuilder header = new StringBuilder();
-        if (this.fpublic) {
-            header.append("public ");
-        }
-        header.append("class ").append(this.name).append(" {");
-        code.add(indent, header.toString());
-        code.add(indent, "}");
+    @Override
+    public Type getType() {
+        return this.descriptor;
     }
 
-    /**
-     * Makes the class public.
-     */
-    public void makePublic() {
-        this.fpublic = true;
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return this.children.size();
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
+    }
+
+    @Override
+    public String toString() {
+        return Node.toString(this);
     }
 }

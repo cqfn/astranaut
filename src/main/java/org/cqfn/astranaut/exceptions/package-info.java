@@ -21,22 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.codegen.java;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link SourceCodeBuilder} class.
+ * This package contains classes with exceptions that may be thrown during the operation
+ *  of a parser, generator, interpreter or other project module.
  * @since 1.0.0
  */
-class SourceCodeBuilderTest {
-    @Test
-    void addDelimitedLine() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        code.add(2, "abcd\nefg");
-        final String actual = code.toString();
-        final String expected = "        abcd\n        efg\n";
-        Assertions.assertEquals(expected, actual);
-    }
-}
+package org.cqfn.astranaut.exceptions;

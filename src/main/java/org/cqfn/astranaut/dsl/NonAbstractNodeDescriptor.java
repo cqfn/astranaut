@@ -21,22 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.codegen.java;
+package org.cqfn.astranaut.dsl;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.cqfn.astranaut.core.base.Type;
 
 /**
- * Tests covering {@link SourceCodeBuilder} class.
+ * Descriptor of a non-abstract node, that is, a node that can be instantiated.
+ *  No other nodes inherit from this kind of node. During Java code generation, the final
+ *  classes are produced from such a descriptor. In addition, these descriptors support the
+ *  {@link Type} interface for use in the interpreter.
  * @since 1.0.0
  */
-class SourceCodeBuilderTest {
-    @Test
-    void addDelimitedLine() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        code.add(2, "abcd\nefg");
-        final String actual = code.toString();
-        final String expected = "        abcd\n        efg\n";
-        Assertions.assertEquals(expected, actual);
+public abstract class NonAbstractNodeDescriptor extends NodeDescriptor implements Type {
+    /**
+     * Constructor.
+     * @param name Name of the type of the node (left side of the rule)
+     */
+    public NonAbstractNodeDescriptor(final String name) {
+        super(name);
+    }
+
+    @Override
+    public final List<String> getHierarchy() {
+        return this.getTopology().stream().map(NodeDescriptor::getName)
+            .collect(Collectors.toList());
     }
 }

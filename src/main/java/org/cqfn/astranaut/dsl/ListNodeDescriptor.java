@@ -21,50 +21,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.codegen.java;
+package org.cqfn.astranaut.dsl;
+
+import java.util.Collections;
+import java.util.List;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.interpreter.ListBuilder;
 
 /**
- * Describes a Java class and allows to generate source code for it.
+ * Descriptor of a list node, that is, one that can contain an unlimited number of child nodes
+ *  of the same type.
  * @since 1.0.0
  */
-public class Klass {
+public final class ListNodeDescriptor extends NonAbstractNodeDescriptor {
     /**
-     * Name of the class.
+     * Name of the children node type.
      */
-    private final String name;
-
-    /**
-     * Flag indicating that the generated class is public.
-     */
-    private boolean fpublic;
+    private final String type;
 
     /**
      * Constructor.
-     * @param name Name of the class.
+     * @param name Name of the type of the node (left side of the rule)
+     * @param type Name of the children node type
      */
-    public Klass(final String name) {
-        this.name = name;
+    public ListNodeDescriptor(final String name, final String type) {
+        super(name);
+        this.type = type;
     }
 
     /**
-     * Builds the source code for this class.
-     * @param indent Initial indentation
-     * @param code Source code builder
+     * Returns the name of the children node type.
+     * @return Name of the children node type
      */
-    public void build(final int indent, final SourceCodeBuilder code) {
-        final StringBuilder header = new StringBuilder();
-        if (this.fpublic) {
-            header.append("public ");
-        }
-        header.append("class ").append(this.name).append(" {");
-        code.add(indent, header.toString());
-        code.add(indent, "}");
+    public String getChildType() {
+        return this.type;
     }
 
-    /**
-     * Makes the class public.
-     */
-    public void makePublic() {
-        this.fpublic = true;
+    @Override
+    public List<ChildDescriptor> getChildTypes() {
+        return Collections.singletonList(new ChildDescriptor(this.type));
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s <- {%s}", this.getName(), this.type);
+    }
+
+    @Override
+    public Builder createBuilder() {
+        return new ListBuilder(this);
     }
 }

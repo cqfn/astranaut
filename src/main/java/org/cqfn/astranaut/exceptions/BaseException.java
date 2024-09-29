@@ -21,22 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.codegen.java;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+package org.cqfn.astranaut.exceptions;
 
 /**
- * Tests covering {@link SourceCodeBuilder} class.
+ * Base exception.
  * @since 1.0.0
  */
-class SourceCodeBuilderTest {
-    @Test
-    void addDelimitedLine() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        code.add(2, "abcd\nefg");
-        final String actual = code.toString();
-        final String expected = "        abcd\n        efg\n";
-        Assertions.assertEquals(expected, actual);
-    }
+public abstract class BaseException extends Exception {
+    /**
+     * Version identifier.
+     */
+    private static final long serialVersionUID = -1;
+
+    /**
+     * Returns initiator name, i.e. module that thrown the exception.
+     * @return A name
+     */
+    public abstract String getInitiator();
+
+    /**
+     * Returns error message.
+     * @return A message
+     */
+    public abstract String getErrorMessage();
 }

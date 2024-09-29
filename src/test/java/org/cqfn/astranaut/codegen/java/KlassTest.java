@@ -33,11 +33,22 @@ import org.junit.jupiter.api.Test;
 class KlassTest {
     @Test
     void simpleEmptyClass() {
-        final Klass klass = new Klass("Test");
         final SourceCodeBuilder builder = new SourceCodeBuilder();
+        final Klass klass = new Klass("Test0");
         klass.build(0, builder);
         final String actual = builder.toString();
-        final String expected = "class Test {\n}\n";
+        final String expected = "class Test0 {\n}\n";
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void simplePublicEmptyClass() {
+        final SourceCodeBuilder builder = new SourceCodeBuilder();
+        final Klass klass = new Klass("Test1");
+        klass.makePublic();
+        klass.build(0, builder);
+        final String actual = builder.toString();
+        final String expected = "public class Test1 {\n}\n";
         Assertions.assertEquals(expected, actual);
     }
 }

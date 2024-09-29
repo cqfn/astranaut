@@ -21,22 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.codegen.java;
+package org.cqfn.astranaut.dsl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link SourceCodeBuilder} class.
+ * Tests covering {@link ListNodeDescriptor} class.
  * @since 1.0.0
  */
-class SourceCodeBuilderTest {
+class ListNodeDescriptorTest {
     @Test
-    void addDelimitedLine() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        code.add(2, "abcd\nefg");
-        final String actual = code.toString();
-        final String expected = "        abcd\n        efg\n";
+    void testBaseInterface() {
+        final ListNodeDescriptor rule = new ListNodeDescriptor(
+            "Modifiers",
+            "Modifier"
+        );
+        final String actual = rule.toString();
+        final String expected = "Modifiers <- {Modifier}";
         Assertions.assertEquals(expected, actual);
     }
 }

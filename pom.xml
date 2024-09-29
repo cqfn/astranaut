@@ -157,5 +157,10 @@ SOFTWARE.
       <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.cqfn</groupId>
+      <artifactId>astranaut-core</artifactId>
+      <version>${core.version}</version>
+    </dependency>
   </dependencies>
 </project>

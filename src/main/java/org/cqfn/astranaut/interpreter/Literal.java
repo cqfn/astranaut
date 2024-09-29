@@ -21,22 +21,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.codegen.java;
+package org.cqfn.astranaut.interpreter;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.astranaut.dsl.LiteralDescriptor;
 
 /**
- * Tests covering {@link SourceCodeBuilder} class.
+ * Literal, that is, a node that has data and no child nodes.
  * @since 1.0.0
  */
-class SourceCodeBuilderTest {
-    @Test
-    void addDelimitedLine() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        code.add(2, "abcd\nefg");
-        final String actual = code.toString();
-        final String expected = "        abcd\n        efg\n";
-        Assertions.assertEquals(expected, actual);
+final class Literal implements Node {
+    /**
+     * Descriptor resulting from parsing a DSL rule.
+     */
+    private final LiteralDescriptor descriptor;
+
+    /**
+     * Node data.
+     */
+    private final String data;
+
+    /**
+     * Constructor.
+     * @param descriptor Descriptor resulting from parsing a DSL rule
+     * @param data Node data
+     */
+    Literal(final LiteralDescriptor descriptor, final String data) {
+        this.descriptor = descriptor;
+        this.data = data;
+    }
+
+    @Override
+    public Type getType() {
+        return this.descriptor;
+    }
+
+    @Override
+    public String getData() {
+        return this.data;
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public String toString() {
+        return Node.toString(this);
     }
 }
