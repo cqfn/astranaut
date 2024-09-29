@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import org.cqfn.astranaut.exceptions.BaseException;
+
 /**
  * Describes a Java class and allows to generate source code for it.
  * @since 1.0.0
@@ -50,8 +52,9 @@ public class Klass {
      * Builds the source code for this class.
      * @param indent Initial indentation
      * @param code Source code builder
+     * @throws BaseException If there are any problems during code generation
      */
-    public void build(final int indent, final SourceCodeBuilder code) {
+    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         final StringBuilder header = new StringBuilder();
         if (this.fpublic) {
             header.append("public ");

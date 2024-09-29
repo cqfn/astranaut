@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -34,9 +35,15 @@ class SourceCodeBuilderTest {
     @Test
     void addDelimitedLine() {
         final SourceCodeBuilder code = new SourceCodeBuilder();
-        code.add(2, "abcd\nefg");
-        final String actual = code.toString();
-        final String expected = "        abcd\n        efg\n";
-        Assertions.assertEquals(expected, actual);
+        boolean oops = false;
+        try {
+            code.add(2, "abcd\nefg");
+            final String actual = code.toString();
+            final String expected = "        abcd\n        efg\n";
+            Assertions.assertEquals(expected, actual);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }

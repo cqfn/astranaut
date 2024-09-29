@@ -25,12 +25,18 @@ package org.cqfn.astranaut.codegen.java;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
  * Source code builder. Creates source code from indented lines.
  * @since 1.0.0
  */
 public final class SourceCodeBuilder {
+    /**
+     * Maximum length of one line of source code.
+     */
+    public static final int MAX_LINE_LENGTH = 100;
+
     /**
      * One tab used as an indentation unit (four spaces).
      */
@@ -45,8 +51,13 @@ public final class SourceCodeBuilder {
      * Adds one or more lines of source code with the specified indentation.
      * @param indent Indentation
      * @param text Program text
+     * @throws CodeLineIsTooLong If source code line is too long
      */
-    public void add(final int indent, final String text) {
+    public void add(final int indent, final String text) throws CodeLineIsTooLong {
+        final int length = indent * SourceCodeBuilder.TABULATION.length() + text.length() + 1;
+        if (length >= SourceCodeBuilder.MAX_LINE_LENGTH) {
+            throw new CodeLineIsTooLong(text);
+        }
         for (final String line : text.split("\n")) {
             this.lines.add(new Line(indent, line));
         }
@@ -95,6 +106,43 @@ public final class SourceCodeBuilder {
                 builder.append(SourceCodeBuilder.TABULATION);
             }
             builder.append(this.text).append('\n');
+        }
+    }
+
+    /**
+     * Exception 'The line of code is too long'.
+     * @since 1.0.0
+     */
+    private static final class CodeLineIsTooLong extends BaseException {
+        /**
+         * Version identifier.
+         */
+        private static final long serialVersionUID = -1;
+
+        /**
+         * Text of a source code line that is too long.
+         */
+        private final String text;
+
+        /**
+         * Constructor.
+         * @param text Text of a source code line that is too long
+         */
+        private CodeLineIsTooLong(final String text) {
+            this.text = text;
+        }
+
+        @Override
+        public String getInitiator() {
+            return "Codegen";
+        }
+
+        @Override
+        public String getErrorMessage() {
+            return String.format(
+                "The line of code is too long: '%s...'",
+                this.text.trim().substring(0, 19)
+            );
         }
     }
 }

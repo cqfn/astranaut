@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,22 +34,36 @@ import org.junit.jupiter.api.Test;
 class KlassTest {
     @Test
     void simpleEmptyClass() {
-        final SourceCodeBuilder builder = new SourceCodeBuilder();
         final Klass klass = new Klass("Test0");
-        klass.build(0, builder);
-        final String actual = builder.toString();
-        final String expected = "class Test0 {\n}\n";
-        Assertions.assertEquals(expected, actual);
+        final boolean result = this.testCodegen(klass, "class Test0 {\n}\n");
+        Assertions.assertTrue(result);
     }
 
     @Test
     void simplePublicEmptyClass() {
-        final SourceCodeBuilder builder = new SourceCodeBuilder();
         final Klass klass = new Klass("Test1");
         klass.makePublic();
-        klass.build(0, builder);
-        final String actual = builder.toString();
-        final String expected = "public class Test1 {\n}\n";
-        Assertions.assertEquals(expected, actual);
+        final boolean result = this.testCodegen(klass, "public class Test1 {\n}\n");
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Tests the source code generation from an object describing a class.
+     * @param klass Object describing a class
+     * @param expected Expected generated code
+     * @return Test result, {@code true} if the generated code matches the expected code
+     */
+    private boolean testCodegen(final Klass klass, final String expected) {
+        boolean oops = false;
+        boolean equals = false;
+        try {
+            final SourceCodeBuilder builder = new SourceCodeBuilder();
+            klass.build(0, builder);
+            final String actual = builder.toString();
+            equals = expected.equals(actual);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        return !oops && equals;
     }
 }
