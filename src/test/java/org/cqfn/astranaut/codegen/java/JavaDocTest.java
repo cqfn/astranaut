@@ -23,27 +23,62 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Arrays;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link Package} class.
+ * Tests covering {@link JavaDoc} class.
  * @since 1.0.0
  */
-class PackageTest {
+class JavaDocTest {
     @Test
-    void codegen() {
-        final Package pkg = new Package("org.cqfn.astranaut", "codegen/java");
+    void shortBrief() {
+        final JavaDoc entity = new JavaDoc("This class doesn't do anything.");
         final SourceCodeBuilder code = new SourceCodeBuilder();
         boolean oops = false;
         try {
-            pkg.build(0, code);
+            entity.build(0, code);
         } catch (final BaseException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
-        final String expected = "package org.cqfn.astranaut.codegen.java;\n";
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/*",
+                " * This class doesn't do anything.",
+                " */",
+                ""
+            )
+        );
+        Assertions.assertEquals(expected, code.toString());
+    }
+
+    @Test
+    void longBriefWithoutDot() {
+        final String brief =
+            "This entity does nothing.    It was added specifically to demonstrate how the code generator handles large descriptions by splitting them into separate lines";
+        final JavaDoc entity = new JavaDoc(brief);
+        final SourceCodeBuilder code = new SourceCodeBuilder();
+        boolean oops = false;
+        try {
+            entity.build(2, code);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "        /*",
+                "         * This entity does nothing. It was added specifically to demonstrate how the code",
+                "         *  generator handles large descriptions by splitting them into separate lines.",
+                "         */",
+                ""
+            )
+        );
         Assertions.assertEquals(expected, code.toString());
     }
 }

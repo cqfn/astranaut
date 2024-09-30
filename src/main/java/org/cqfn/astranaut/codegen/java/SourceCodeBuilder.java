@@ -40,7 +40,7 @@ public final class SourceCodeBuilder {
     /**
      * One tab used as an indentation unit (four spaces).
      */
-    private static final String TABULATION = "    ";
+    public static final String TABULATION = "    ";
 
     /**
      * Indented source code lines.
