@@ -23,46 +23,51 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.List;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * Describes a Java class and allows to generate source code for it.
+ * Entity representing the text of some license added to the beginning of each generated file.
  * @since 1.0.0
  */
-public final class Klass implements ClassOrInterface {
+public final class License implements Entity {
     /**
-     * Name of the class.
+     * Text of the license, broken down line by line.
      */
-    private final String name;
-
-    /**
-     * Flag indicating that the generated class is public.
-     */
-    private boolean fpublic;
+    private final String[] lines;
 
     /**
      * Constructor.
-     * @param name Name of the class.
+     * @param text Text of the license
      */
-    public Klass(final String name) {
-        this.name = name;
+    public License(final String text) {
+        this.lines = License.prepareText(text);
     }
 
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
-        final StringBuilder header = new StringBuilder();
-        if (this.fpublic) {
-            header.append("public ");
+        code.add(indent, "/*");
+        for (int index = 0; index < this.lines.length; index = index + 1) {
+            if (this.lines[index].isEmpty()) {
+                code.add(indent, " *");
+            } else {
+                code.add(indent, String.format(" * %s", this.lines[index]));
+            }
         }
-        header.append("class ").append(this.name).append(" {");
-        code.add(indent, header.toString());
-        code.add(indent, "}");
+        code.add(indent, " */");
     }
 
     /**
-     * Makes the class public.
+     * Prepares the license text by breaking it line by line and removing spaces
+     *  at the beginning and end of each line.
+     * @param text Text of the license
+     * @return Text of the license, broken down line by line
      */
-    public void makePublic() {
-        this.fpublic = true;
+    private static String[] prepareText(final String text) {
+        final String[] array = text.trim().replace("\r", "").split("\n");
+        for (int index = 0; index < array.length; index = index + 1) {
+            array[index] = array[index].trim();
+        }
+        return array;
     }
 }

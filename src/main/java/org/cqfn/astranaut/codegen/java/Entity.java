@@ -26,43 +26,15 @@ package org.cqfn.astranaut.codegen.java;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * Describes a Java class and allows to generate source code for it.
+ * Some entity from which Java code can be generated.
  * @since 1.0.0
  */
-public final class Klass implements ClassOrInterface {
+public interface Entity {
     /**
-     * Name of the class.
+     * Builds Java source code from the entity.
+     * @param indent Code indentation. Each generated line will be indented as follows
+     * @param code Source code builder
+     * @throws BaseException If there are any problems during code generation
      */
-    private final String name;
-
-    /**
-     * Flag indicating that the generated class is public.
-     */
-    private boolean fpublic;
-
-    /**
-     * Constructor.
-     * @param name Name of the class.
-     */
-    public Klass(final String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
-        final StringBuilder header = new StringBuilder();
-        if (this.fpublic) {
-            header.append("public ");
-        }
-        header.append("class ").append(this.name).append(" {");
-        code.add(indent, header.toString());
-        code.add(indent, "}");
-    }
-
-    /**
-     * Makes the class public.
-     */
-    public void makePublic() {
-        this.fpublic = true;
-    }
+    void build(int indent, SourceCodeBuilder code) throws BaseException;
 }

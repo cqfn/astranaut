@@ -23,46 +23,9 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
-import org.cqfn.astranaut.exceptions.BaseException;
-
 /**
- * Describes a Java class and allows to generate source code for it.
+ * An entity that represents a Java class or interface.
  * @since 1.0.0
  */
-public final class Klass implements ClassOrInterface {
-    /**
-     * Name of the class.
-     */
-    private final String name;
-
-    /**
-     * Flag indicating that the generated class is public.
-     */
-    private boolean fpublic;
-
-    /**
-     * Constructor.
-     * @param name Name of the class.
-     */
-    public Klass(final String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
-        final StringBuilder header = new StringBuilder();
-        if (this.fpublic) {
-            header.append("public ");
-        }
-        header.append("class ").append(this.name).append(" {");
-        code.add(indent, header.toString());
-        code.add(indent, "}");
-    }
-
-    /**
-     * Makes the class public.
-     */
-    public void makePublic() {
-        this.fpublic = true;
-    }
+public interface ClassOrInterface extends Entity {
 }

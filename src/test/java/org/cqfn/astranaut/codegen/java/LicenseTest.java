@@ -23,46 +23,48 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Arrays;
 import org.cqfn.astranaut.exceptions.BaseException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
- * Describes a Java class and allows to generate source code for it.
+ * Tests covering {@link License} class.
  * @since 1.0.0
  */
-public final class Klass implements ClassOrInterface {
-    /**
-     * Name of the class.
-     */
-    private final String name;
-
-    /**
-     * Flag indicating that the generated class is public.
-     */
-    private boolean fpublic;
-
-    /**
-     * Constructor.
-     * @param name Name of the class.
-     */
-    public Klass(final String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
-        final StringBuilder header = new StringBuilder();
-        if (this.fpublic) {
-            header.append("public ");
+class LicenseTest {
+    @Test
+    void codegen() {
+        final String text = String.join(
+            "\n",
+            Arrays.asList(
+                "   ",
+                " Copyright (c) 2016 John Doe ",
+                "",
+                "  This work is licensed under the terms of the MIT license ",
+                ""
+            )
+        );
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/*",
+                " * Copyright (c) 2016 John Doe",
+                " *",
+                " * This work is licensed under the terms of the MIT license",
+                " */",
+                ""
+            )
+        );
+        final License license = new License(text);
+        final SourceCodeBuilder code = new SourceCodeBuilder();
+        boolean oops = false;
+        try {
+            license.build(0, code);
+        } catch (final BaseException ignored) {
+            oops = true;
         }
-        header.append("class ").append(this.name).append(" {");
-        code.add(indent, header.toString());
-        code.add(indent, "}");
-    }
-
-    /**
-     * Makes the class public.
-     */
-    public void makePublic() {
-        this.fpublic = true;
+        Assertions.assertFalse(oops);
+        Assertions.assertEquals(expected, code.toString());
     }
 }
