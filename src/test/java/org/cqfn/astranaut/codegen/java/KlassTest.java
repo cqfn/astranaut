@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Arrays;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,16 +35,58 @@ import org.junit.jupiter.api.Test;
 class KlassTest {
     @Test
     void simpleEmptyClass() {
-        final Klass klass = new Klass("Test0");
-        final boolean result = this.testCodegen(klass, "class Test0 {\n}\n");
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/*",
+                " * Empty class.",
+                " */",
+                "class Test0 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test0", "Empty class");
+        final boolean result = this.testCodegen(klass, expected);
         Assertions.assertTrue(result);
     }
 
     @Test
     void simplePublicEmptyClass() {
-        final Klass klass = new Klass("Test1");
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/*",
+                " * Public empty class.",
+                " */",
+                "public class Test1 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test1", "Public empty class");
         klass.makePublic();
-        final boolean result = this.testCodegen(klass, "public class Test1 {\n}\n");
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void withVersionNumber() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/*",
+                " * Class with version number.",
+                " * @since 1.0.0",
+                " */",
+                "class Test2 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test2", "Class with version number");
+        klass.setVersion("1.0.0");
+        final boolean result = this.testCodegen(klass, expected);
         Assertions.assertTrue(result);
     }
 

@@ -36,6 +36,11 @@ public final class Klass implements ClassOrInterface {
     private final String name;
 
     /**
+     * Documentation.
+     */
+    private final JavaDoc doc;
+
+    /**
      * Flag indicating that the generated class is public.
      */
     private boolean fpublic;
@@ -43,20 +48,19 @@ public final class Klass implements ClassOrInterface {
     /**
      * Constructor.
      * @param name Name of the class.
+     * @param brief Brief description of the class
      */
-    public Klass(final String name) {
+    public Klass(final String name, final String brief) {
         this.name = name;
+        this.doc = new JavaDoc(brief);
     }
 
-    @Override
-    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
-        final StringBuilder header = new StringBuilder();
-        if (this.fpublic) {
-            header.append("public ");
-        }
-        header.append("class ").append(this.name).append(" {");
-        code.add(indent, header.toString());
-        code.add(indent, "}");
+    /**
+     * Sets the version number. It will be added to JavaDoc.
+     * @param value Version number
+     */
+    public void setVersion(final String value) {
+        this.doc.setVersion(value);
     }
 
     /**
@@ -64,5 +68,17 @@ public final class Klass implements ClassOrInterface {
      */
     public void makePublic() {
         this.fpublic = true;
+    }
+
+    @Override
+    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
+        this.doc.build(indent, code);
+        final StringBuilder header = new StringBuilder();
+        if (this.fpublic) {
+            header.append("public ");
+        }
+        header.append("class ").append(this.name).append(" {");
+        code.add(indent, header.toString());
+        code.add(indent, "}");
     }
 }
