@@ -101,11 +101,16 @@ public final class SourceCodeBuilder {
          * Builds the source code.
          * @param builder Where to build
          */
+        @SuppressWarnings("PMD.InefficientEmptyStringCheck")
         void build(final StringBuilder builder) {
-            for (int counter = 0; counter < this.indent; counter = counter + 1) {
-                builder.append(SourceCodeBuilder.TABULATION);
+            if (this.text.trim().isEmpty()) {
+                builder.append('\n');
+            } else {
+                for (int counter = 0; counter < this.indent; counter = counter + 1) {
+                    builder.append(SourceCodeBuilder.TABULATION);
+                }
+                builder.append(this.text).append('\n');
             }
-            builder.append(this.text).append('\n');
         }
     }
 
