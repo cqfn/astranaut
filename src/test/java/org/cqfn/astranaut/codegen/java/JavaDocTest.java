@@ -81,4 +81,29 @@ class JavaDocTest {
         );
         Assertions.assertEquals(expected, code.toString());
     }
+
+    @Test
+    void withVersionNumber() {
+        final JavaDoc entity = new JavaDoc("This entity has a version number.");
+        entity.setVersion("1.0.0");
+        final SourceCodeBuilder code = new SourceCodeBuilder();
+        boolean oops = false;
+        try {
+            entity.build(0, code);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/*",
+                " * This entity has a version number.",
+                " * @since 1.0.0",
+                " */",
+                ""
+            )
+        );
+        Assertions.assertEquals(expected, code.toString());
+    }
 }

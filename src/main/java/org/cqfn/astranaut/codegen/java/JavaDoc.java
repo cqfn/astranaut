@@ -39,6 +39,11 @@ public final class JavaDoc implements Entity {
     private final String brief;
 
     /**
+     * Version number.
+     */
+    private String version;
+
+    /**
      * Constructor.
      * @param brief Brief description of the entity
      */
@@ -47,11 +52,35 @@ public final class JavaDoc implements Entity {
             .replaceAll("[\\n\\t]+", " ")
             .replaceAll("\\s+", " ")
             .trim();
+        this.version = "";
+    }
+
+    /**
+     * Sets the version number.
+     * @param value Version number
+     */
+    public void setVersion(final String value) {
+        this.version = value.trim();
     }
 
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         code.add(indent, "/*");
+        this.buildBrief(indent, code);
+        if (!this.version.isEmpty()) {
+            code.add(indent, String.format(" * @since %s", this.version));
+        }
+        code.add(indent, " */");
+    }
+
+    /**
+     * Generates a short description of the entity, breaking it into lines so that the line length
+     *  does not exceed the maximum value.
+     * @param indent Code indentation. Each generated line will be indented as follows
+     * @param code Source code builder
+     * @throws BaseException If there are any problems during code generation
+     */
+    private void buildBrief(final int indent, final SourceCodeBuilder code) throws BaseException {
         final String[] words;
         if (this.brief.endsWith(".")) {
             words = this.brief.split(" ");
@@ -79,6 +108,5 @@ public final class JavaDoc implements Entity {
         while (iterator.hasNext()) {
             code.add(indent, String.format(" *  %s", iterator.next()));
         }
-        code.add(indent, " */");
     }
 }
