@@ -46,4 +46,22 @@ class SourceCodeBuilderTest {
         }
         Assertions.assertFalse(oops);
     }
+
+    @Test
+    void addingALineThatIsTooLong() {
+        final SourceCodeBuilder code = new SourceCodeBuilder();
+        boolean oops = false;
+        final int length = SourceCodeBuilder.MAX_LINE_LENGTH + 1;
+        try {
+            code.add(0, new String(new char[length]).replace('\0', '#'));
+        } catch (final BaseException exception) {
+            oops = true;
+            Assertions.assertEquals("Codegen", exception.getInitiator());
+            Assertions.assertEquals(
+                "The line of code is too long: '###################...'",
+                exception.getErrorMessage()
+            );
+        }
+        Assertions.assertTrue(oops);
+    }
 }

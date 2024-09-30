@@ -54,11 +54,11 @@ public final class SourceCodeBuilder {
      * @throws CodeLineIsTooLong If source code line is too long
      */
     public void add(final int indent, final String text) throws CodeLineIsTooLong {
-        final int length = indent * SourceCodeBuilder.TABULATION.length() + text.length() + 1;
-        if (length >= SourceCodeBuilder.MAX_LINE_LENGTH) {
-            throw new CodeLineIsTooLong(text);
-        }
         for (final String line : text.split("\n")) {
+            final int length = indent * SourceCodeBuilder.TABULATION.length() + line.length() + 1;
+            if (length >= SourceCodeBuilder.MAX_LINE_LENGTH) {
+                throw new CodeLineIsTooLong(text);
+            }
             this.lines.add(new Line(indent, line));
         }
     }
