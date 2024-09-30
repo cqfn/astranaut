@@ -23,7 +23,6 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
-import java.util.List;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
