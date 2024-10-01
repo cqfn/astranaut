@@ -90,6 +90,25 @@ class KlassTest {
         Assertions.assertTrue(result);
     }
 
+    @Test
+    void implementsTwoInterfaces() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class implementing interfaces.",
+                " */",
+                "class Test3 implements Test4, Test5 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test3", "Class implementing interfaces");
+        klass.setImplementsList("Test4", "Test5");
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
     /**
      * Tests the source code generation from an object describing a class.
      * @param klass Object describing a class

@@ -91,7 +91,6 @@ public final class CompilationUnit implements Entity {
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.license.build(indent, code);
-        code.add(indent, "");
         this.pkg.build(indent, code);
         code.add(indent, "");
         if (!this.imports.isEmpty()) {

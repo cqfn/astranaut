@@ -52,12 +52,14 @@ public final class RegularNodeGenerator implements RuleGenerator {
         final String brief = String.format("Node describing the '%s' type.", name);
         final Klass node = new Klass(name, brief);
         node.makePublic();
+        node.setImplementsList("Node");
         node.setVersion(context.getVersion());
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
             node
         );
+        unit.addImport("org.cqfn.astranaut.core.base.Node");
         return Collections.singleton(unit);
     }
 }

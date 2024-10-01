@@ -43,7 +43,12 @@ public final class Klass implements ClassOrInterface {
     /**
      * Flag indicating that the generated class is public.
      */
-    private boolean fpublic;
+    private boolean publik;
+
+    /**
+     * A list of interfaces that this class implements.
+     */
+    private String[] implementz;
 
     /**
      * Constructor.
@@ -53,6 +58,7 @@ public final class Klass implements ClassOrInterface {
     public Klass(final String name, final String brief) {
         this.name = name;
         this.doc = new JavaDoc(brief);
+        this.implementz = new String[0];
     }
 
     /**
@@ -67,17 +73,37 @@ public final class Klass implements ClassOrInterface {
      * Makes the class public.
      */
     public void makePublic() {
-        this.fpublic = true;
+        this.publik = true;
+    }
+
+    /**
+     * Sets the list of interfaces that this class implements.
+     * @param names Interface names
+     */
+    public void setImplementsList(final String... names) {
+        this.implementz = names.clone();
     }
 
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.doc.build(indent, code);
         final StringBuilder header = new StringBuilder();
-        if (this.fpublic) {
+        if (this.publik) {
             header.append("public ");
         }
-        header.append("class ").append(this.name).append(" {");
+        header.append("class ").append(this.name);
+        if (this.implementz.length > 0) {
+            header.append(" implements ");
+            boolean flag = false;
+            for (final String iface : this.implementz) {
+                if (flag) {
+                    header.append(", ");
+                }
+                flag = true;
+                header.append(iface);
+            }
+        }
+        header.append(" {");
         code.add(indent, header.toString());
         code.add(indent, "}");
     }
