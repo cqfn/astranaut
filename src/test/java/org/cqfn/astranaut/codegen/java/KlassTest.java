@@ -129,6 +129,25 @@ class KlassTest {
         Assertions.assertTrue(result);
     }
 
+    @Test
+    void simpleStaticEmptyClass() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Static empty class.",
+                " */",
+                "static class Test7 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test7", "Static empty class");
+        klass.makeStatic();
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
     /**
      * Tests the source code generation from an object describing a class.
      * @param klass Object describing a class

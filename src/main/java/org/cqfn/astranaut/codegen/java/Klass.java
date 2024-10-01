@@ -51,6 +51,11 @@ public final class Klass implements ClassOrInterface {
     private boolean protekted;
 
     /**
+     * Flag indicating that the generated class is static.
+     */
+    private boolean statik;
+
+    /**
      * A list of interfaces that this class implements.
      */
     private String[] implementz;
@@ -91,6 +96,13 @@ public final class Klass implements ClassOrInterface {
     }
 
     /**
+     * Makes the class static.
+     */
+    public void makeStatic() {
+        this.statik = true;
+    }
+
+    /**
      * Sets the list of interfaces that this class implements.
      * @param names Interface names
      */
@@ -106,6 +118,9 @@ public final class Klass implements ClassOrInterface {
             header.append("public ");
         } else if (this.protekted) {
             header.append("protected ");
+        }
+        if (this.statik) {
+            header.append("static ");
         }
         header.append("class ").append(this.name);
         if (this.implementz.length > 0) {
