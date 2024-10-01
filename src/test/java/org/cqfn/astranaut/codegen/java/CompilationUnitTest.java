@@ -36,7 +36,7 @@ class CompilationUnitTest {
     @Test
     void withoutImports() {
         final License license = new License("Copyright (c) 2024 John Doe");
-        final Package pkg = new Package("org.cqfn.astranaut.test");
+        final Package pkg = new Package("org.cqfn.astranaut.test0");
         final Klass klass = new Klass("Test0", "This class does nothing.");
         klass.setVersion("0.0.1");
         final CompilationUnit unit = new CompilationUnit(license, pkg, klass);
@@ -47,7 +47,7 @@ class CompilationUnitTest {
                 " * Copyright (c) 2024 John Doe",
                 " */",
                 "",
-                "package org.cqfn.astranaut.test;",
+                "package org.cqfn.astranaut.test0;",
                 "",
                 "/**",
                 " * This class does nothing.",
@@ -57,6 +57,47 @@ class CompilationUnitTest {
                 "}",
                 ""
             )
+        );
+        boolean oops = false;
+        String actual = "";
+        try {
+            actual = unit.generateJavaCode();
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void withImports() {
+        final License license = new License("Copyright (c) 2024 Jane Doe");
+        final Package pkg = new Package("org.cqfn.astranaut.test1");
+        final Klass klass = new Klass("Test1", "This class needs imports.");
+        klass.setVersion("0.0.2");
+        final CompilationUnit unit = new CompilationUnit(license, pkg, klass);
+        unit.addImport("org.cqfn.astranaut.core.base.Node");
+        unit.addImport("java.util.Arrays");
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/*",
+                " * Copyright (c) 2024 Jane Doe",
+                " */",
+                "",
+                "package org.cqfn.astranaut.test1;",
+                "",
+                "import java.util.Arrays;",
+                "import org.cqfn.astranaut.core.base.Node;",
+                "",
+                "/**",
+                " * This class needs imports.",
+                " * @since 0.0.2",
+                " */",
+                "class Test1 {",
+                "}",
+                ""
+                )
         );
         boolean oops = false;
         String actual = "";

@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Set;
+import java.util.TreeSet;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -41,6 +43,11 @@ public final class CompilationUnit implements Entity {
     private final Package pkg;
 
     /**
+     * Set of imports.
+     */
+    private final Set<String> imports;
+
+    /**
      * Class or interface.
      */
     private final ClassOrInterface coi;
@@ -54,6 +61,7 @@ public final class CompilationUnit implements Entity {
     public CompilationUnit(final License license, final Package pkg, final ClassOrInterface coi) {
         this.license = license;
         this.pkg = pkg;
+        this.imports = new TreeSet<>();
         this.coi = coi;
     }
 
@@ -68,12 +76,29 @@ public final class CompilationUnit implements Entity {
         return code.toString();
     }
 
+    /**
+     * Adds the name of the imported class to the list.
+     * @param klass Full name of the imported class
+     */
+    public void addImport(final String klass) {
+        if (klass.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        this.imports.add(klass);
+    }
+
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.license.build(indent, code);
         code.add(indent, "");
         this.pkg.build(indent, code);
         code.add(indent, "");
+        if (!this.imports.isEmpty()) {
+            for (final String klass : this.imports) {
+                code.add(indent, String.format("import %s;", klass));
+            }
+            code.add(indent, "");
+        }
         this.coi.build(indent, code);
     }
 }
