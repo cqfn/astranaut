@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
  * Tests covering {@link Klass} class.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class KlassTest {
     @Test
     void simpleEmptyClass() {
@@ -105,6 +106,25 @@ class KlassTest {
         );
         final Klass klass = new Klass("Test3", "Class implementing interfaces");
         klass.setImplementsList("Test4", "Test5");
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void simpleProtectedEmptyClass() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Protected empty class.",
+                " */",
+                "protected class Test6 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test6", "Protected empty class");
+        klass.makeProtected();
         final boolean result = this.testCodegen(klass, expected);
         Assertions.assertTrue(result);
     }

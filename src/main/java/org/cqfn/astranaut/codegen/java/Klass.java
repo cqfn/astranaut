@@ -46,6 +46,11 @@ public final class Klass implements ClassOrInterface {
     private boolean publik;
 
     /**
+     * Flag indicating that the generated class is protected.
+     */
+    private boolean protekted;
+
+    /**
      * A list of interfaces that this class implements.
      */
     private String[] implementz;
@@ -74,6 +79,15 @@ public final class Klass implements ClassOrInterface {
      */
     public void makePublic() {
         this.publik = true;
+        this.protekted = true;
+    }
+
+    /**
+     * Makes the class protected.
+     */
+    public void makeProtected() {
+        this.publik = false;
+        this.protekted = true;
     }
 
     /**
@@ -87,9 +101,11 @@ public final class Klass implements ClassOrInterface {
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.doc.build(indent, code);
-        final StringBuilder header = new StringBuilder();
+        final StringBuilder header = new StringBuilder(128);
         if (this.publik) {
             header.append("public ");
+        } else if (this.protekted) {
+            header.append("protected ");
         }
         header.append("class ").append(this.name);
         if (this.implementz.length > 0) {
