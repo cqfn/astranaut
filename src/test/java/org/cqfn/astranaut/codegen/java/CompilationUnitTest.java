@@ -76,6 +76,7 @@ class CompilationUnitTest {
         final Klass klass = new Klass("Test1", "This class needs imports.");
         klass.setVersion("0.0.2");
         final CompilationUnit unit = new CompilationUnit(license, pkg, klass);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> unit.addImport("  "));
         unit.addImport("org.cqfn.astranaut.core.base.Node");
         unit.addImport("java.util.Arrays");
         final String expected = String.join(

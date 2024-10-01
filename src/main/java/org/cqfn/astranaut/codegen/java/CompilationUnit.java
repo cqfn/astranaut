@@ -81,10 +81,11 @@ public final class CompilationUnit implements Entity {
      * @param klass Full name of the imported class
      */
     public void addImport(final String klass) {
-        if (klass.isEmpty()) {
+        final String value = klass.trim();
+        if (value.isEmpty()) {
             throw new IllegalArgumentException();
         }
-        this.imports.add(klass);
+        this.imports.add(value);
     }
 
     @Override
