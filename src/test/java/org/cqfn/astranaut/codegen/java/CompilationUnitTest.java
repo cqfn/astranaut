@@ -29,42 +29,43 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link License} class.
+ * Tests covering {@link CompilationUnit} class.
  * @since 1.0.0
  */
-class LicenseTest {
+class CompilationUnitTest {
     @Test
-    void codegen() {
-        final String text = String.join(
-            "\n",
-            Arrays.asList(
-                "   ",
-                " Copyright (c) 2024 John Doe ",
-                "",
-                "  This work is licensed under the terms of the MIT license ",
-                ""
-            )
-        );
+    void withoutImports() {
+        final License license = new License("Copyright (c) 2024 John Doe");
+        final Package pkg = new Package("org.cqfn.astranaut.test");
+        final Klass klass = new Klass("Test0", "This class does nothing.");
+        klass.setVersion("0.0.1");
+        final CompilationUnit unit = new CompilationUnit(license, pkg, klass);
         final String expected = String.join(
             "\n",
             Arrays.asList(
                 "/*",
                 " * Copyright (c) 2024 John Doe",
-                " *",
-                " * This work is licensed under the terms of the MIT license",
                 " */",
+                "",
+                "package org.cqfn.astranaut.test;",
+                "",
+                "/**",
+                " * This class does nothing.",
+                " * @since 0.0.1",
+                " */",
+                "class Test0 {",
+                "}",
                 ""
             )
         );
-        final License license = new License(text);
-        final SourceCodeBuilder code = new SourceCodeBuilder();
         boolean oops = false;
+        String actual = "";
         try {
-            license.build(0, code);
+            actual = unit.generateJavaCode();
         } catch (final BaseException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
-        Assertions.assertEquals(expected, code.toString());
+        Assertions.assertEquals(expected, actual);
     }
 }

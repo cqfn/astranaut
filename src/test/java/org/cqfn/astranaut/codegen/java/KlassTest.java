@@ -38,7 +38,7 @@ class KlassTest {
         final String expected = String.join(
             "\n",
             Arrays.asList(
-                "/*",
+                "/**",
                 " * Empty class.",
                 " */",
                 "class Test0 {",
@@ -56,7 +56,7 @@ class KlassTest {
         final String expected = String.join(
             "\n",
             Arrays.asList(
-                "/*",
+                "/**",
                 " * Public empty class.",
                 " */",
                 "public class Test1 {",
@@ -75,7 +75,7 @@ class KlassTest {
         final String expected = String.join(
             "\n",
             Arrays.asList(
-                "/*",
+                "/**",
                 " * Class with version number.",
                 " * @since 1.0.0",
                 " */",

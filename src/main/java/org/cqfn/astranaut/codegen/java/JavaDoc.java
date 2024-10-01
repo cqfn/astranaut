@@ -65,7 +65,7 @@ public final class JavaDoc implements Entity {
 
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
-        code.add(indent, "/*");
+        code.add(indent, "/**");
         this.buildBrief(indent, code);
         if (!this.version.isEmpty()) {
             code.add(indent, String.format(" * @since %s", this.version));

@@ -47,7 +47,7 @@ class JavaDocTest {
         final String expected = String.join(
             "\n",
             Arrays.asList(
-                "/*",
+                "/**",
                 " * This class doesn't do anything.",
                 " */",
                 ""
@@ -72,7 +72,7 @@ class JavaDocTest {
         final String expected = String.join(
             "\n",
             Arrays.asList(
-                "        /*",
+                "        /**",
                 "         * This entity does nothing. It was added specifically to demonstrate how the code",
                 "         *  generator handles large descriptions by splitting them into separate lines.",
                 "         */",
@@ -97,7 +97,7 @@ class JavaDocTest {
         final String expected = String.join(
             "\n",
             Arrays.asList(
-                "/*",
+                "/**",
                 " * This entity has a version number.",
                 " * @since 1.0.0",
                 " */",
