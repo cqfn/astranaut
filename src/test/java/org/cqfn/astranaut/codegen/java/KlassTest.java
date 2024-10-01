@@ -148,6 +148,37 @@ class KlassTest {
         Assertions.assertTrue(result);
     }
 
+    @Test
+    void classWithNestedClasses() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with nested classes.",
+                " */",
+                "class Test8 {",
+                "    /**",
+                "     * First nested class.",
+                "     */",
+                "    class Test9 {",
+                "    }",
+                "",
+                "    /**",
+                "     * Second nested class.",
+                "     */",
+                "    class Test10 {",
+                "    }",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test8", "Class with nested classes");
+        klass.addNested(new Klass("Test9", "First nested class"));
+        klass.addNested(new Klass("Test10", "Second nested class"));
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
     /**
      * Tests the source code generation from an object describing a class.
      * @param klass Object describing a class

@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -61,6 +63,11 @@ public final class Klass implements ClassOrInterface {
     private String[] implementz;
 
     /**
+     * List of nested classes and interfaces.
+     */
+    private final List<ClassOrInterface> nested;
+
+    /**
      * Constructor.
      * @param name Name of the class.
      * @param brief Brief description of the class
@@ -69,6 +76,7 @@ public final class Klass implements ClassOrInterface {
         this.name = name;
         this.doc = new JavaDoc(brief);
         this.implementz = new String[0];
+        this.nested = new ArrayList<>(0);
     }
 
     /**
@@ -110,6 +118,14 @@ public final class Klass implements ClassOrInterface {
         this.implementz = names.clone();
     }
 
+    /**
+     * Adds a nested class or interface.
+     * @param coi Class or interface
+     */
+    public void addNested(final ClassOrInterface coi) {
+        this.nested.add(coi);
+    }
+
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.doc.build(indent, code);
@@ -136,6 +152,14 @@ public final class Klass implements ClassOrInterface {
         }
         header.append(" {");
         code.add(indent, header.toString());
+        boolean flag = false;
+        for (final ClassOrInterface coi : this.nested) {
+            if (flag) {
+                code.add(indent, "");
+            }
+            flag = true;
+            coi.build(indent + 1, code);
+        }
         code.add(indent, "}");
     }
 }
