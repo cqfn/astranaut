@@ -28,7 +28,7 @@ import java.util.List;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * Describes a Java class and allows to generate source code for it.
+ * Describes a Java class and generates source code for it.
  * @since 1.0.0
  */
 public final class Klass implements ClassOrInterface {
