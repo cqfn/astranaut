@@ -179,6 +179,25 @@ class KlassTest {
         Assertions.assertTrue(result);
     }
 
+    @Test
+    void simpleStaticPrivateClass() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Private empty class.",
+                " */",
+                "private class Test11 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test11", "Private empty class");
+        klass.makePrivate();
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
     /**
      * Tests the source code generation from an object describing a class.
      * @param klass Object describing a class

@@ -45,22 +45,27 @@ public final class Klass implements ClassOrInterface {
     /**
      * Flag indicating that the generated class is public.
      */
-    private boolean publik;
+    private boolean pub;
 
     /**
      * Flag indicating that the generated class is protected.
      */
-    private boolean protekted;
+    private boolean prt;
+
+    /**
+     * Flag indicating that the generated class is private.
+     */
+    private boolean pvt;
 
     /**
      * Flag indicating that the generated class is static.
      */
-    private boolean statik;
+    private boolean stat;
 
     /**
      * A list of interfaces that this class implements.
      */
-    private String[] implementz;
+    private String[] impl;
 
     /**
      * List of nested classes and interfaces.
@@ -75,7 +80,7 @@ public final class Klass implements ClassOrInterface {
     public Klass(final String name, final String brief) {
         this.name = name;
         this.doc = new JavaDoc(brief);
-        this.implementz = new String[0];
+        this.impl = new String[0];
         this.nested = new ArrayList<>(0);
     }
 
@@ -91,23 +96,34 @@ public final class Klass implements ClassOrInterface {
      * Makes the class public.
      */
     public void makePublic() {
-        this.publik = true;
-        this.protekted = true;
+        this.pub = true;
+        this.prt = false;
+        this.pvt = false;
     }
 
     /**
      * Makes the class protected.
      */
     public void makeProtected() {
-        this.publik = false;
-        this.protekted = true;
+        this.pub = false;
+        this.prt = true;
+        this.pvt = false;
+    }
+
+    /**
+     * Makes the class private.
+     */
+    public void makePrivate() {
+        this.pub = false;
+        this.prt = false;
+        this.pvt = true;
     }
 
     /**
      * Makes the class static.
      */
     public void makeStatic() {
-        this.statik = true;
+        this.stat = true;
     }
 
     /**
@@ -115,7 +131,7 @@ public final class Klass implements ClassOrInterface {
      * @param names Interface names
      */
     public void setImplementsList(final String... names) {
-        this.implementz = names.clone();
+        this.impl = names.clone();
     }
 
     /**
@@ -129,29 +145,7 @@ public final class Klass implements ClassOrInterface {
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.doc.build(indent, code);
-        final StringBuilder header = new StringBuilder(128);
-        if (this.publik) {
-            header.append("public ");
-        } else if (this.protekted) {
-            header.append("protected ");
-        }
-        if (this.statik) {
-            header.append("static ");
-        }
-        header.append("class ").append(this.name);
-        if (this.implementz.length > 0) {
-            header.append(" implements ");
-            boolean flag = false;
-            for (final String iface : this.implementz) {
-                if (flag) {
-                    header.append(", ");
-                }
-                flag = true;
-                header.append(iface);
-            }
-        }
-        header.append(" {");
-        code.add(indent, header.toString());
+        code.add(indent, this.composeHeader());
         boolean flag = false;
         for (final ClassOrInterface coi : this.nested) {
             if (flag) {
@@ -161,5 +155,37 @@ public final class Klass implements ClassOrInterface {
             coi.build(indent + 1, code);
         }
         code.add(indent, "}");
+    }
+
+    /**
+     * Composes the header of the class.
+     * @return Class header
+     */
+    private String composeHeader() {
+        final StringBuilder header = new StringBuilder(128);
+        if (this.pub) {
+            header.append("public ");
+        } else if (this.prt) {
+            header.append("protected ");
+        } else if (this.pvt) {
+            header.append("private ");
+        }
+        if (this.stat) {
+            header.append("static ");
+        }
+        header.append("class ").append(this.name);
+        if (this.impl.length > 0) {
+            header.append(" implements ");
+            boolean flag = false;
+            for (final String iface : this.impl) {
+                if (flag) {
+                    header.append(", ");
+                }
+                flag = true;
+                header.append(iface);
+            }
+        }
+        header.append(" {");
+        return header.toString();
     }
 }
