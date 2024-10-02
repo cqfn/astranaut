@@ -56,6 +56,7 @@ public final class RegularNodeGenerator implements RuleGenerator {
         node.setVersion(context.getVersion());
         node.addNested(this.createTypeClass(context));
         node.addNested(this.createBuilderClass(context));
+        this.fillNodeClass(node);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
@@ -66,6 +67,18 @@ public final class RegularNodeGenerator implements RuleGenerator {
         unit.addImport(base.concat("Type"));
         unit.addImport(base.concat("Builder"));
         return Collections.singleton(unit);
+    }
+
+    /**
+     * Fills the class describing the node with fields and methods.
+     * @param node Class describing the node
+     */
+    private void fillNodeClass(final Klass node) {
+        final Field name = new Field("String", "NAME", "Name of the type");
+        name.makePublic();
+        name.makeStatic();
+        name.makeFinal(String.format("\"%s\"", this.rule.getName()));
+        node.addField(name);
     }
 
     /**

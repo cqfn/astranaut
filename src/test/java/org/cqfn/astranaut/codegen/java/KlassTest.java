@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  * Tests covering {@link Klass} class.
  * @since 1.0.0
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 class KlassTest {
     @Test
     void simpleEmptyClass() {
@@ -213,6 +213,59 @@ class KlassTest {
         );
         final Klass klass = new Klass("Test12", "Final empty class");
         klass.makeFinal();
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void classWithFields() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with fields.",
+                " */",
+                "class Test13 {",
+                "    /**",
+                "     * Fourth field.",
+                "     */",
+                "    public static final String fourth = \"test\";",
+                "",
+                "    /**",
+                "     * Third field.",
+                "     */",
+                "    private static final String third = \"test\";",
+                "",
+                "    /**",
+                "     * Second field.",
+                "     */",
+                "    public String second;",
+                "",
+                "    /**",
+                "     * First field.",
+                "     */",
+                "    private String first;",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test13", "Class with fields");
+        final Field first = new Field("String", "first", "First field");
+        first.makePrivate();
+        klass.addField(first);
+        final Field second = new Field("String", "second", "Second field");
+        second.makePublic();
+        klass.addField(second);
+        final Field third = new Field("String", "third", "Third field");
+        third.makePrivate();
+        third.makeStatic();
+        third.makeFinal("\"test\"");
+        klass.addField(third);
+        final Field fourth = new Field("String", "fourth", "Fourth field");
+        fourth.makePublic();
+        fourth.makeStatic();
+        fourth.makeFinal("\"test\"");
+        klass.addField(fourth);
         final boolean result = this.testCodegen(klass, expected);
         Assertions.assertTrue(result);
     }

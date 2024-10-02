@@ -13,6 +13,11 @@ import org.cqfn.astranaut.core.base.Type;
  */
 public class This implements Node {
     /**
+     * Name of the type.
+     */
+    public static final String NAME = "This";
+
+    /**
      * Type implementation describing 'This' nodes.
      * @since 1.0.0
      */

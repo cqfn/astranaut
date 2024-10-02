@@ -139,6 +139,25 @@ public final class Field implements Entity {
         this.initial = value;
     }
 
+    /**
+     * Returns the priority of the field.
+     *  Fields with higher priority are placed at the beginning of classes.
+     * @return Priority of the field
+     */
+    public int getPriority() {
+        final int priority;
+        if (this.stat && this.pub) {
+            priority = 4;
+        } else if (this.stat) {
+            priority = 3;
+        } else if (this.pub) {
+            priority = 2;
+        } else {
+            priority = 1;
+        }
+        return priority;
+    }
+
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.doc.build(indent, code);
