@@ -52,6 +52,7 @@ public final class RegularNodeGenerator implements RuleGenerator {
         final String brief = String.format("Node of the '%s' type.", name);
         final Klass node = new Klass(name, brief);
         node.makePublic();
+        node.makeFinal();
         node.setImplementsList("Node");
         node.setVersion(context.getVersion());
         node.addNested(this.createTypeClass(context));
@@ -74,11 +75,17 @@ public final class RegularNodeGenerator implements RuleGenerator {
      * @param node Class describing the node
      */
     private void fillNodeClass(final Klass node) {
-        final Field name = new Field("String", "NAME", "Name of the type");
-        name.makePublic();
-        name.makeStatic();
-        name.makeFinal(String.format("\"%s\"", this.rule.getName()));
-        node.addField(name);
+        final String name = this.rule.getName();
+        final Field typename = new Field("String", "NAME", "Name of the type");
+        typename.makePublic();
+        typename.makeStatic();
+        typename.makeFinal(String.format("\"%s\"", name));
+        node.addField(typename);
+        final Field typeobj = new Field("Type", "TYPE", "Type of the node");
+        typeobj.makePublic();
+        typeobj.makeStatic();
+        typeobj.makeFinal(String.format("new %sType()", name));
+        node.addField(typeobj);
     }
 
     /**
