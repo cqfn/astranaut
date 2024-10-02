@@ -63,6 +63,11 @@ public final class Klass implements ClassOrInterface {
     private boolean stat;
 
     /**
+     * Flag indicating that the generated class is final.
+     */
+    private boolean fin;
+
+    /**
      * A list of interfaces that this class implements.
      */
     private String[] impl;
@@ -127,6 +132,13 @@ public final class Klass implements ClassOrInterface {
     }
 
     /**
+     * Makes the class final.
+     */
+    public void makeFinal() {
+        this.fin = true;
+    }
+
+    /**
      * Sets the list of interfaces that this class implements.
      * @param names Interface names
      */
@@ -172,6 +184,9 @@ public final class Klass implements ClassOrInterface {
         }
         if (this.stat) {
             header.append("static ");
+        }
+        if (this.fin) {
+            header.append("final ");
         }
         header.append("class ").append(this.name);
         if (this.impl.length > 0) {

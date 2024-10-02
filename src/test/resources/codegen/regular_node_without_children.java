@@ -3,16 +3,26 @@
  */
 package org.cqfn.astranaut.test;
 
+import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
 
 /**
- * Node describing the 'This' type.
+ * Node of the 'This' type.
  * @since 1.0.0
  */
 public class This implements Node {
     /**
-     * Type of the 'This' node.
+     * Type implementation describing 'This' nodes.
+     * @since 1.0.0
      */
-    protected static class ThisType {
+    private static final class ThisType implements Type {
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'This' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
     }
 }

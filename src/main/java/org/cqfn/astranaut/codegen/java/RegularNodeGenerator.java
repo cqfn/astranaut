@@ -49,24 +49,60 @@ public final class RegularNodeGenerator implements RuleGenerator {
     @Override
     public Set<CompilationUnit> createUnits(final Context context) {
         final String name = this.rule.getName();
-        final String brief = String.format("Node describing the '%s' type.", name);
+        final String brief = String.format("Node of the '%s' type.", name);
         final Klass node = new Klass(name, brief);
         node.makePublic();
         node.setImplementsList("Node");
         node.setVersion(context.getVersion());
-        final Klass type = new Klass(
-            String.format("%sType", name),
-            String.format("Type of the '%s' node.", name)
-        );
-        type.makeProtected();
-        type.makeStatic();
-        node.addNested(type);
+        node.addNested(this.createTypeClass(context));
+        node.addNested(this.createBuilderClass(context));
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
             node
         );
-        unit.addImport("org.cqfn.astranaut.core.base.Node");
+        final String base = "org.cqfn.astranaut.core.base.";
+        unit.addImport(base.concat("Node"));
+        unit.addImport(base.concat("Type"));
+        unit.addImport(base.concat("Builder"));
         return Collections.singleton(unit);
+    }
+
+    /**
+     * Creates a nested class that implements the node type.
+     * @param context Context
+     * @return Class description
+     */
+    private Klass createTypeClass(final Context context) {
+        final String name = this.rule.getName();
+        final Klass type = new Klass(
+            String.format("%sType", name),
+            String.format("Type implementation describing '%s' nodes.", name)
+        );
+        type.makePrivate();
+        type.makeStatic();
+        type.makeFinal();
+        type.setImplementsList("Type");
+        type.setVersion(context.getVersion());
+        return type;
+    }
+
+    /**
+     * Creates a nested class that implements the node builder.
+     * @param context Context
+     * @return Class description
+     */
+    private Klass createBuilderClass(final Context context) {
+        final String name = this.rule.getName();
+        final Klass builder = new Klass(
+            String.format("Constructor"),
+            String.format("Constructor (builder) that creates nodes of the '%s' type.", name)
+        );
+        builder.makePublic();
+        builder.makeStatic();
+        builder.makeFinal();
+        builder.setImplementsList("Builder");
+        builder.setVersion(context.getVersion());
+        return builder;
     }
 }

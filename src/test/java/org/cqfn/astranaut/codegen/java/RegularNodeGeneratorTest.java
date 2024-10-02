@@ -48,8 +48,8 @@ class RegularNodeGeneratorTest extends CodegenTest {
         try {
             final String code = units.iterator().next().generateJavaCode();
             Assertions.assertEquals(
-                code,
-                this.loadStringResource("regular_node_without_children.java")
+                this.loadStringResource("regular_node_without_children.java"),
+                code
             );
         } catch (final BaseException ignored) {
             oops = true;
