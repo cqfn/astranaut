@@ -54,6 +54,13 @@ public final class RegularNodeGenerator implements RuleGenerator {
         node.makePublic();
         node.setImplementsList("Node");
         node.setVersion(context.getVersion());
+        final Klass type = new Klass(
+            String.format("%sType", name),
+            String.format("Type of the '%s' node.", name)
+        );
+        type.makeProtected();
+        type.makeStatic();
+        node.addNested(type);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),

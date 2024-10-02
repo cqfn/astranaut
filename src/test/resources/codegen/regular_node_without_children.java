@@ -10,4 +10,9 @@ import org.cqfn.astranaut.core.base.Node;
  * @since 1.0.0
  */
 public class This implements Node {
+    /**
+     * Type of the 'This' node.
+     */
+    protected static class ThisType {
+    }
 }
