@@ -218,40 +218,83 @@ public final class Method implements Entity {
     /**
      * Separates the method body by indented lines.
      * @return List of indented lines (key is line, value is indentation)
+     * @throws SyntaxErrorInSourceCode If the method body contains an error that could be detected
+     *  at this stage
      */
-    public List<Pair<String, Integer>> splitBodyByLines() {
+    public List<Pair<String, Integer>> splitBodyByLines() throws SyntaxErrorInSourceCode {
         final List<Pair<String, Integer>> list = new ArrayList<>(0);
         int indent = 0;
         for (final String line : this.body.split("\n")) {
             String tail = line.trim();
             while (!tail.isEmpty()) {
+                int extra = 0;
+                if (tail.charAt(0) == '.') {
+                    extra = 1;
+                }
                 int index = tail.indexOf('{');
                 if (index >= 0) {
-                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), indent));
+                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), indent + extra));
                     indent = indent + 1;
                     tail = tail.substring(index + 1).trim();
                     continue;
                 }
                 index = tail.indexOf(';');
                 if (index >= 0) {
-                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), indent));
+                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), indent + extra));
                     tail = tail.substring(index + 1).trim();
                     continue;
                 }
                 index = tail.indexOf('}');
                 if (index > 0) {
-                    list.add(new Pair<>(tail.substring(0, index).trim(), indent));
+                    throw new SyntaxErrorInSourceCode(tail);
                 }
-                if (index >= 0) {
+                if (index == 0) {
                     indent = indent - 1;
                     list.add(new Pair<>("}", indent));
                     tail = tail.substring(index + 1).trim();
                     continue;
                 }
-                list.add(new Pair<>(tail, indent));
+                list.add(new Pair<>(tail, indent + extra));
                 tail = "";
             }
         }
         return list;
+    }
+
+    /**
+     * Exception 'Syntax error in source code'.
+     * @since 1.0.0
+     */
+    private static final class SyntaxErrorInSourceCode extends BaseException {
+        /**
+         * Version identifier.
+         */
+        private static final long serialVersionUID = -1;
+
+        /**
+         * Text of a source code that contains an error.
+         */
+        private final String text;
+
+        /**
+         * Constructor.
+         * @param text Text of a source code that contains an error.
+         */
+        private SyntaxErrorInSourceCode(final String text) {
+            this.text = text;
+        }
+
+        @Override
+        public String getInitiator() {
+            return "Codegen";
+        }
+
+        @Override
+        public String getErrorMessage() {
+            return String.format(
+                "Syntax error in source code: '%s'",
+                this.text.trim()
+            );
+        }
     }
 }

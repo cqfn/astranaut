@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  * Tests covering {@link Method} class.
  * @since 1.0.0
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 class MethodTest {
     @Test
     void simpleMethod() {
@@ -179,7 +179,7 @@ class MethodTest {
     }
 
     @Test
-    void  methodWithMultilineBody() {
+    void methodWithMultilineBody() {
         final String expected = String.join(
             "\n",
             Arrays.asList(
@@ -204,6 +204,59 @@ class MethodTest {
         method.setBody("   if (true) { System.out.println(\"it works!\"); } \n return; ");
         final boolean result = this.testCodegen(method, expected);
         Assertions.assertTrue(result);
+    }
+
+    @Test
+    void methodWithMultilineStatement() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Method with multi-line body.",
+                " */",
+                "public void doSomething() {",
+                "    if (true) {",
+                "        final StringBuilder builder = new StringBuilder();",
+                "        builder.append('a')",
+                "            .append('b')",
+                "            .append('c');",
+                "        System.out.println(builder.toString());",
+                "    }",
+                "    return;",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method(
+            "void",
+            "doSomething",
+            "Method with multi-line body"
+        );
+        method.makePublic();
+        method.setBody(
+            "if (true) { final StringBuilder builder = new StringBuilder(); builder.append('a')\n.append('b')\n.append('c');  System.out.println(builder.toString()); } \n return; "
+        );
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void methodWithSyntaxError() {
+        final Method method = new Method("void", "doSomething");
+        method.setBody("if (true) { aaa }");
+        final SourceCodeBuilder builder = new SourceCodeBuilder();
+        boolean oops = false;
+        try {
+            method.build(0, builder);
+        } catch (final BaseException exception) {
+            oops = true;
+            Assertions.assertEquals("Codegen", exception.getInitiator());
+            Assertions.assertEquals(
+                "Syntax error in source code: 'aaa }'",
+                exception.getErrorMessage()
+            );
+        }
+        Assertions.assertTrue(oops);
     }
 
     /**

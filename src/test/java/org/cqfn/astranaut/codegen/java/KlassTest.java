@@ -282,43 +282,43 @@ class KlassTest {
                 "    /**",
                 "     * Fourth method.",
                 "     */",
-                "    public String fourth() {",
+                "    public void fourth() {",
                 "    }",
                 "",
                 "    /**",
                 "     * Third method.",
                 "     */",
-                "    public static String third() {",
+                "    public static void third() {",
                 "    }",
                 "",
                 "    /**",
                 "     * Second method.",
                 "     */",
-                "    private String second() {",
+                "    private void second() {",
                 "    }",
                 "",
                 "    /**",
                 "     * First method.",
                 "     */",
-                "    private static String first() {",
+                "    private static void first() {",
                 "    }",
                 "}",
                 ""
             )
         );
         final Klass klass = new Klass("Test14", "Class with methods");
-        final Method first = new Method("String", "first", "First method");
+        final Method first = new Method("void", "first", "First method");
         first.makePrivate();
         first.makeStatic();
         klass.addMethod(first);
-        final Method second = new Method("String", "second", "Second method");
+        final Method second = new Method("void", "second", "Second method");
         second.makePrivate();
         klass.addMethod(second);
-        final Method third = new Method("String", "third", "Third method");
+        final Method third = new Method("void", "third", "Third method");
         third.makePublic();
         third.makeStatic();
         klass.addMethod(third);
-        final Method fourth = new Method("String", "fourth", "Fourth method");
+        final Method fourth = new Method("void", "fourth", "Fourth method");
         fourth.makePublic();
         klass.addMethod(fourth);
         final boolean result = this.testCodegen(klass, expected);
