@@ -65,6 +65,7 @@ public final class RegularNodeGenerator implements RuleGenerator {
         );
         final String base = "org.cqfn.astranaut.core.base.";
         unit.addImport(base.concat("Node"));
+        unit.addImport(base.concat("Fragment"));
         unit.addImport(base.concat("Type"));
         unit.addImport(base.concat("Builder"));
         return Collections.singleton(unit);
@@ -75,8 +76,27 @@ public final class RegularNodeGenerator implements RuleGenerator {
      * @param node Class describing the node
      */
     private void fillNodeClass(final Klass node) {
+        RegularNodeGenerator.createFragmentFieldAndGetter(node);
         this.createTypeFieldAndGetter(node);
         RegularNodeGenerator.createDataGetter(node);
+    }
+
+    /**
+     * Creates a field and a method related to the fragment.
+     * @param node Class describing the node
+     */
+    private static void createFragmentFieldAndGetter(final Klass node) {
+        final Field field = new Field(
+            "Fragment",
+            "fragment",
+            "Fragment of source code that is associated with the node."
+        );
+        field.makePrivate();
+        node.addField(field);
+        final Method getter = new Method("Fragment", "getFragment");
+        getter.makePublic();
+        getter.setBody("return this.fragment;");
+        node.addMethod(getter);
     }
 
     /**

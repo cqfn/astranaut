@@ -4,6 +4,7 @@
 package org.cqfn.astranaut.test;
 
 import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
 
@@ -21,6 +22,16 @@ public final class This implements Node {
      * Type of the node.
      */
     public static final Type TYPE = new ThisType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
 
     @Override
     public Type getType() {
