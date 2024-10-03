@@ -23,45 +23,48 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import org.cqfn.astranaut.exceptions.BaseException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link SourceCodeBuilder} class.
+ * Entity representing the name of a Java package.
  * @since 1.0.0
  */
-class SourceCodeBuilderTest {
-    @Test
-    void addDelimitedLine() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        boolean oops = false;
-        try {
-            code.add(2, "abcd\nefg");
-            final String actual = code.toString();
-            final String expected = "        abcd\n        efg\n";
-            Assertions.assertEquals(expected, actual);
-        } catch (final BaseException ignored) {
-            oops = true;
-        }
-        Assertions.assertFalse(oops);
+public final class Package implements Entity {
+    /**
+     * Full name of the Java package.
+     */
+    private final String name;
+
+    /**
+     * Constructor.
+     * @param parts Parts of the package name
+     */
+    public Package(final String... parts) {
+        this.name = Package.prepareName(parts);
     }
 
-    @Test
-    void addingALineThatIsTooLong() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        boolean oops = false;
-        final int length = SourceCodeBuilder.MAX_LINE_LENGTH + 1;
-        try {
-            code.add(0, new String(new char[length]).replace('\0', '#'));
-        } catch (final BaseException exception) {
-            oops = true;
-            Assertions.assertEquals("Codegen", exception.getInitiator());
-            Assertions.assertEquals(
-                "The line of code is too long: '###################...'",
-                exception.getErrorMessage()
-            );
+    @Override
+    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
+        code.add(indent, String.format("package %s;", this.name));
+    }
+
+    /**
+     * Prepares the name of the package from the parts.
+     * @param parts Parts of the package name
+     * @return Full name of the Java package
+     */
+    private static String prepareName(final String... parts) {
+        final List<String> list = new LinkedList<>();
+        for (final String part : parts) {
+            final String prepared = part
+                .trim()
+                .replace('\\', '.')
+                .replace('/', '.');
+            list.addAll(Arrays.asList(prepared.split("\\.")));
         }
-        Assertions.assertTrue(oops);
+        return String.join(".", list);
     }
 }

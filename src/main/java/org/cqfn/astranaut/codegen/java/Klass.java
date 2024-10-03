@@ -23,48 +23,233 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.cqfn.astranaut.exceptions.BaseException;
+
 /**
- * Describes a Java class and allows to generate source code for it.
+ * Describes a Java class and generates source code for it.
  * @since 1.0.0
  */
-public class Klass {
+public final class Klass implements ClassOrInterface {
     /**
      * Name of the class.
      */
     private final String name;
 
     /**
+     * Documentation.
+     */
+    private final JavaDoc doc;
+
+    /**
      * Flag indicating that the generated class is public.
      */
-    private boolean fpublic;
+    private boolean pub;
+
+    /**
+     * Flag indicating that the generated class is protected.
+     */
+    private boolean prt;
+
+    /**
+     * Flag indicating that the generated class is private.
+     */
+    private boolean pvt;
+
+    /**
+     * Flag indicating that the generated class is static.
+     */
+    private boolean stat;
+
+    /**
+     * Flag indicating that the generated class is final.
+     */
+    private boolean fin;
+
+    /**
+     * A list of interfaces that this class implements.
+     */
+    private String[] impl;
+
+    /**
+     * List of fields.
+     */
+    private final List<Field> fields;
+
+    /**
+     * List of methods.
+     */
+    private final List<Method> methods;
+
+    /**
+     * List of nested classes and interfaces.
+     */
+    private final List<ClassOrInterface> nested;
 
     /**
      * Constructor.
      * @param name Name of the class.
+     * @param brief Brief description of the class
      */
-    public Klass(final String name) {
+    public Klass(final String name, final String brief) {
         this.name = name;
+        this.doc = new JavaDoc(brief);
+        this.impl = new String[0];
+        this.fields = new ArrayList<>(0);
+        this.methods = new ArrayList<>(0);
+        this.nested = new ArrayList<>(0);
     }
 
     /**
-     * Builds the source code for this class.
-     * @param indent Initial indentation
-     * @param code Source code builder
+     * Sets the version number. It will be added to JavaDoc.
+     * @param value Version number
      */
-    public void build(final int indent, final SourceCodeBuilder code) {
-        final StringBuilder header = new StringBuilder();
-        if (this.fpublic) {
-            header.append("public ");
-        }
-        header.append("class ").append(this.name).append(" {");
-        code.add(indent, header.toString());
-        code.add(indent, "}");
+    public void setVersion(final String value) {
+        this.doc.setVersion(value);
     }
 
     /**
      * Makes the class public.
      */
     public void makePublic() {
-        this.fpublic = true;
+        this.pub = true;
+        this.prt = false;
+        this.pvt = false;
+    }
+
+    /**
+     * Makes the class protected.
+     */
+    public void makeProtected() {
+        this.pub = false;
+        this.prt = true;
+        this.pvt = false;
+    }
+
+    /**
+     * Makes the class private.
+     */
+    public void makePrivate() {
+        this.pub = false;
+        this.prt = false;
+        this.pvt = true;
+    }
+
+    /**
+     * Makes the class static.
+     */
+    public void makeStatic() {
+        this.stat = true;
+    }
+
+    /**
+     * Makes the class final.
+     */
+    public void makeFinal() {
+        this.fin = true;
+    }
+
+    /**
+     * Sets the list of interfaces that this class implements.
+     * @param names Interface names
+     */
+    public void setImplementsList(final String... names) {
+        this.impl = names.clone();
+    }
+
+    /**
+     * Adds a field.
+     * @param field Field
+     */
+    public void addField(final Field field) {
+        this.fields.add(field);
+    }
+
+    /**
+     * Adds a method.
+     * @param method Method
+     */
+    public void addMethod(final Method method) {
+        this.methods.add(method);
+    }
+
+    /**
+     * Adds a nested class or interface.
+     * @param coi Class or interface
+     */
+    public void addNested(final ClassOrInterface coi) {
+        this.nested.add(coi);
+    }
+
+    @Override
+    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
+        this.doc.build(indent, code);
+        code.add(indent, this.composeHeader());
+        boolean flag = false;
+        final List<Field> flist = this.fields.stream()
+            .sorted((left, right) -> Integer.compare(right.getPriority(), left.getPriority()))
+            .collect(Collectors.toList());
+        for (final Field field : flist) {
+            if (flag) {
+                code.add(indent, "");
+            }
+            flag = true;
+            field.build(indent + 1, code);
+        }
+        final List<Method> mlist = this.methods.stream()
+            .sorted((left, right) -> Integer.compare(right.getPriority(), left.getPriority()))
+            .collect(Collectors.toList());
+        for (final Method method : mlist) {
+            if (flag) {
+                code.add(indent, "");
+            }
+            flag = true;
+            method.build(indent + 1, code);
+        }
+        for (final ClassOrInterface coi : this.nested) {
+            if (flag) {
+                code.add(indent, "");
+            }
+            flag = true;
+            coi.build(indent + 1, code);
+        }
+        code.add(indent, "}");
+    }
+
+    /**
+     * Composes the header of the class.
+     * @return Class header
+     */
+    private String composeHeader() {
+        final StringBuilder header = new StringBuilder(128);
+        if (this.pub) {
+            header.append("public ");
+        } else if (this.prt) {
+            header.append("protected ");
+        } else if (this.pvt) {
+            header.append("private ");
+        }
+        if (this.stat) {
+            header.append("static ");
+        }
+        if (this.fin) {
+            header.append("final ");
+        }
+        header.append("class ").append(this.name);
+        if (this.impl.length > 0) {
+            header.append(" implements ");
+            boolean flag = false;
+            for (final String iface : this.impl) {
+                if (flag) {
+                    header.append(", ");
+                }
+                flag = true;
+                header.append(iface);
+            }
+        }
+        header.append(" {");
+        return header.toString();
     }
 }

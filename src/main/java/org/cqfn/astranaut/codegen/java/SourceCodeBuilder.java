@@ -25,6 +25,7 @@ package org.cqfn.astranaut.codegen.java;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
  * Source code builder. Creates source code from indented lines.
@@ -32,9 +33,14 @@ import java.util.List;
  */
 public final class SourceCodeBuilder {
     /**
+     * Maximum length of one line of source code.
+     */
+    public static final int MAX_LINE_LENGTH = 100;
+
+    /**
      * One tab used as an indentation unit (four spaces).
      */
-    private static final String TABULATION = "    ";
+    public static final String TABULATION = "    ";
 
     /**
      * Indented source code lines.
@@ -45,9 +51,14 @@ public final class SourceCodeBuilder {
      * Adds one or more lines of source code with the specified indentation.
      * @param indent Indentation
      * @param text Program text
+     * @throws CodeLineIsTooLong If source code line is too long
      */
-    public void add(final int indent, final String text) {
+    public void add(final int indent, final String text) throws CodeLineIsTooLong {
         for (final String line : text.split("\n")) {
+            final int length = indent * SourceCodeBuilder.TABULATION.length() + line.length() + 1;
+            if (length >= SourceCodeBuilder.MAX_LINE_LENGTH) {
+                throw new CodeLineIsTooLong(text);
+            }
             this.lines.add(new Line(indent, line));
         }
     }
@@ -90,11 +101,53 @@ public final class SourceCodeBuilder {
          * Builds the source code.
          * @param builder Where to build
          */
+        @SuppressWarnings("PMD.InefficientEmptyStringCheck")
         void build(final StringBuilder builder) {
-            for (int counter = 0; counter < this.indent; counter = counter + 1) {
-                builder.append(SourceCodeBuilder.TABULATION);
+            if (this.text.trim().isEmpty()) {
+                builder.append('\n');
+            } else {
+                for (int counter = 0; counter < this.indent; counter = counter + 1) {
+                    builder.append(SourceCodeBuilder.TABULATION);
+                }
+                builder.append(this.text).append('\n');
             }
-            builder.append(this.text).append('\n');
+        }
+    }
+
+    /**
+     * Exception 'The line of code is too long'.
+     * @since 1.0.0
+     */
+    private static final class CodeLineIsTooLong extends BaseException {
+        /**
+         * Version identifier.
+         */
+        private static final long serialVersionUID = -1;
+
+        /**
+         * Text of a source code line that is too long.
+         */
+        private final String text;
+
+        /**
+         * Constructor.
+         * @param text Text of a source code line that is too long
+         */
+        private CodeLineIsTooLong(final String text) {
+            this.text = text;
+        }
+
+        @Override
+        public String getInitiator() {
+            return "Codegen";
+        }
+
+        @Override
+        public String getErrorMessage() {
+            return String.format(
+                "The line of code is too long: '%s...'",
+                this.text.trim().substring(0, 19)
+            );
         }
     }
 }

@@ -108,7 +108,11 @@ SOFTWARE.
         <version>0.22.0</version>
         <configuration>
           <license>file:${qulice.license}</license>
-          <excludes>
+          <excludes combine.children="append">
+            <exclude>checkstyle:/src/test/resources/.*</exclude>
+            <exclude>pmd:/src/test/resources/.*</exclude>
+            <exclude>dependencies:/src/test/resources/.*</exclude>
+            <exclude>duplicatefinder:/src/test/resources/.*</exclude>
             <exclude>dependencies:ch.qos.logback:logback-classic</exclude>
           </excludes>
         </configuration>

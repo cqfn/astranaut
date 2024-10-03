@@ -23,45 +23,37 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Collections;
+import java.util.Set;
+import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link SourceCodeBuilder} class.
+ * Tests covering {@link RegularNodeGenerator} class.
  * @since 1.0.0
  */
-class SourceCodeBuilderTest {
+class RegularNodeGeneratorTest extends CodegenTest {
     @Test
-    void addDelimitedLine() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
+    void nodeWithoutChildren() {
+        final RegularNodeDescriptor rule = new RegularNodeDescriptor(
+            "This",
+            Collections.emptyList()
+        );
+        final RegularNodeGenerator generator = new RegularNodeGenerator(rule);
+        final Set<CompilationUnit> units = generator.createUnits(this.createContext());
+        Assertions.assertEquals(1, units.size());
         boolean oops = false;
         try {
-            code.add(2, "abcd\nefg");
-            final String actual = code.toString();
-            final String expected = "        abcd\n        efg\n";
-            Assertions.assertEquals(expected, actual);
+            final String code = units.iterator().next().generateJavaCode();
+            Assertions.assertEquals(
+                this.loadStringResource("regular_node_without_children.java"),
+                code
+            );
         } catch (final BaseException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
-    }
-
-    @Test
-    void addingALineThatIsTooLong() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        boolean oops = false;
-        final int length = SourceCodeBuilder.MAX_LINE_LENGTH + 1;
-        try {
-            code.add(0, new String(new char[length]).replace('\0', '#'));
-        } catch (final BaseException exception) {
-            oops = true;
-            Assertions.assertEquals("Codegen", exception.getInitiator());
-            Assertions.assertEquals(
-                "The line of code is too long: '###################...'",
-                exception.getErrorMessage()
-            );
-        }
-        Assertions.assertTrue(oops);
     }
 }

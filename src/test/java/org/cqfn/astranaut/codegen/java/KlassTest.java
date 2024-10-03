@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Arrays;
+import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,25 +32,316 @@ import org.junit.jupiter.api.Test;
  * Tests covering {@link Klass} class.
  * @since 1.0.0
  */
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 class KlassTest {
     @Test
     void simpleEmptyClass() {
-        final SourceCodeBuilder builder = new SourceCodeBuilder();
-        final Klass klass = new Klass("Test0");
-        klass.build(0, builder);
-        final String actual = builder.toString();
-        final String expected = "class Test0 {\n}\n";
-        Assertions.assertEquals(expected, actual);
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Empty class.",
+                " */",
+                "class Test0 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test0", "Empty class");
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
     }
 
     @Test
     void simplePublicEmptyClass() {
-        final SourceCodeBuilder builder = new SourceCodeBuilder();
-        final Klass klass = new Klass("Test1");
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Public empty class.",
+                " */",
+                "public class Test1 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test1", "Public empty class");
         klass.makePublic();
-        klass.build(0, builder);
-        final String actual = builder.toString();
-        final String expected = "public class Test1 {\n}\n";
-        Assertions.assertEquals(expected, actual);
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void withVersionNumber() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with version number.",
+                " * @since 1.0.0",
+                " */",
+                "class Test2 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test2", "Class with version number");
+        klass.setVersion("1.0.0");
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void implementsTwoInterfaces() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class implementing interfaces.",
+                " */",
+                "class Test3 implements Test4, Test5 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test3", "Class implementing interfaces");
+        klass.setImplementsList("Test4", "Test5");
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void simpleProtectedEmptyClass() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Protected empty class.",
+                " */",
+                "protected class Test6 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test6", "Protected empty class");
+        klass.makeProtected();
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void simpleStaticEmptyClass() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Static empty class.",
+                " */",
+                "static class Test7 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test7", "Static empty class");
+        klass.makeStatic();
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void classWithNestedClasses() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with nested classes.",
+                " */",
+                "class Test8 {",
+                "    /**",
+                "     * First nested class.",
+                "     */",
+                "    class Test9 {",
+                "    }",
+                "",
+                "    /**",
+                "     * Second nested class.",
+                "     */",
+                "    class Test10 {",
+                "    }",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test8", "Class with nested classes");
+        klass.addNested(new Klass("Test9", "First nested class"));
+        klass.addNested(new Klass("Test10", "Second nested class"));
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void simpleStaticPrivateClass() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Private empty class.",
+                " */",
+                "private class Test11 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test11", "Private empty class");
+        klass.makePrivate();
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void simpleStaticFinalClass() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Final empty class.",
+                " */",
+                "final class Test12 {",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test12", "Final empty class");
+        klass.makeFinal();
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void classWithFields() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with fields.",
+                " */",
+                "class Test13 {",
+                "    /**",
+                "     * Fourth field.",
+                "     */",
+                "    public static final String fourth = \"test\";",
+                "",
+                "    /**",
+                "     * Third field.",
+                "     */",
+                "    private static final String third = \"test\";",
+                "",
+                "    /**",
+                "     * Second field.",
+                "     */",
+                "    public String second;",
+                "",
+                "    /**",
+                "     * First field.",
+                "     */",
+                "    private String first;",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test13", "Class with fields");
+        final Field first = new Field("String", "first", "First field");
+        first.makePrivate();
+        klass.addField(first);
+        final Field second = new Field("String", "second", "Second field");
+        second.makePublic();
+        klass.addField(second);
+        final Field third = new Field("String", "third", "Third field");
+        third.makePrivate();
+        third.makeStatic();
+        third.makeFinal("\"test\"");
+        klass.addField(third);
+        final Field fourth = new Field("String", "fourth", "Fourth field");
+        fourth.makePublic();
+        fourth.makeStatic();
+        fourth.makeFinal("\"test\"");
+        klass.addField(fourth);
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void classWithMethods() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with methods.",
+                " */",
+                "class Test14 {",
+                "    /**",
+                "     * Fourth method.",
+                "     */",
+                "    public void fourth() {",
+                "    }",
+                "",
+                "    /**",
+                "     * Third method.",
+                "     */",
+                "    public static void third() {",
+                "    }",
+                "",
+                "    /**",
+                "     * Second method.",
+                "     */",
+                "    private void second() {",
+                "    }",
+                "",
+                "    /**",
+                "     * First method.",
+                "     */",
+                "    private static void first() {",
+                "    }",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test14", "Class with methods");
+        final Method first = new Method("void", "first", "First method");
+        first.makePrivate();
+        first.makeStatic();
+        klass.addMethod(first);
+        final Method second = new Method("void", "second", "Second method");
+        second.makePrivate();
+        klass.addMethod(second);
+        final Method third = new Method("void", "third", "Third method");
+        third.makePublic();
+        third.makeStatic();
+        klass.addMethod(third);
+        final Method fourth = new Method("void", "fourth", "Fourth method");
+        fourth.makePublic();
+        klass.addMethod(fourth);
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Tests the source code generation from an object describing a class.
+     * @param klass Object describing a class
+     * @param expected Expected generated code
+     * @return Test result, {@code true} if the generated code matches the expected code
+     */
+    private boolean testCodegen(final Klass klass, final String expected) {
+        boolean oops = false;
+        boolean equals = false;
+        try {
+            final SourceCodeBuilder builder = new SourceCodeBuilder();
+            klass.build(0, builder);
+            final String actual = builder.toString();
+            equals = expected.equals(actual);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        return !oops && equals;
     }
 }

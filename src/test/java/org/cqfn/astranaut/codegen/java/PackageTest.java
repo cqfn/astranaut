@@ -28,40 +28,22 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link SourceCodeBuilder} class.
+ * Tests covering {@link Package} class.
  * @since 1.0.0
  */
-class SourceCodeBuilderTest {
+class PackageTest {
     @Test
-    void addDelimitedLine() {
+    void codegen() {
+        final Package pkg = new Package("org.cqfn.astranaut", "codegen/java");
         final SourceCodeBuilder code = new SourceCodeBuilder();
         boolean oops = false;
         try {
-            code.add(2, "abcd\nefg");
-            final String actual = code.toString();
-            final String expected = "        abcd\n        efg\n";
-            Assertions.assertEquals(expected, actual);
+            pkg.build(0, code);
         } catch (final BaseException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
-    }
-
-    @Test
-    void addingALineThatIsTooLong() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        boolean oops = false;
-        final int length = SourceCodeBuilder.MAX_LINE_LENGTH + 1;
-        try {
-            code.add(0, new String(new char[length]).replace('\0', '#'));
-        } catch (final BaseException exception) {
-            oops = true;
-            Assertions.assertEquals("Codegen", exception.getInitiator());
-            Assertions.assertEquals(
-                "The line of code is too long: '###################...'",
-                exception.getErrorMessage()
-            );
-        }
-        Assertions.assertTrue(oops);
+        final String expected = "package org.cqfn.astranaut.codegen.java;\n";
+        Assertions.assertEquals(expected, code.toString());
     }
 }

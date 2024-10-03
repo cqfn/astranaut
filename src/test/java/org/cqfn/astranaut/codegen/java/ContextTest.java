@@ -23,45 +23,24 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
-import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link SourceCodeBuilder} class.
+ * Tests covering {@link Context} class.
  * @since 1.0.0
  */
-class SourceCodeBuilderTest {
+class ContextTest {
     @Test
-    void addDelimitedLine() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        boolean oops = false;
-        try {
-            code.add(2, "abcd\nefg");
-            final String actual = code.toString();
-            final String expected = "        abcd\n        efg\n";
-            Assertions.assertEquals(expected, actual);
-        } catch (final BaseException ignored) {
-            oops = true;
-        }
-        Assertions.assertFalse(oops);
-    }
-
-    @Test
-    void addingALineThatIsTooLong() {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        boolean oops = false;
-        final int length = SourceCodeBuilder.MAX_LINE_LENGTH + 1;
-        try {
-            code.add(0, new String(new char[length]).replace('\0', '#'));
-        } catch (final BaseException exception) {
-            oops = true;
-            Assertions.assertEquals("Codegen", exception.getInitiator());
-            Assertions.assertEquals(
-                "The line of code is too long: '###################...'",
-                exception.getErrorMessage()
-            );
-        }
-        Assertions.assertTrue(oops);
+    void testBaseInterface() {
+        final Context.Constructor ctor = new Context.Constructor();
+        Assertions.assertThrows(IllegalStateException.class, ctor::createContext);
+        ctor.setLicense(new License("Copyright (c) 2024 John Doe"));
+        Assertions.assertThrows(IllegalStateException.class, ctor::createContext);
+        ctor.setPackage(new Package("org.cqfn.astranaut.test"));
+        Assertions.assertThrows(IllegalStateException.class, ctor::createContext);
+        ctor.setVersion("1.0.0");
+        final Context ctx = ctor.createContext();
+        Assertions.assertNotNull(ctx);
     }
 }
