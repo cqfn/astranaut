@@ -43,6 +43,16 @@ public final class This implements Node {
         return "";
     }
 
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
     /**
      * Type implementation describing 'This' nodes.
      * @since 1.0.0

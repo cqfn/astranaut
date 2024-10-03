@@ -79,6 +79,7 @@ public final class RegularNodeGenerator implements RuleGenerator {
         RegularNodeGenerator.createFragmentFieldAndGetter(node);
         this.createTypeFieldAndGetter(node);
         RegularNodeGenerator.createDataGetter(node);
+        RegularNodeGenerator.createChildrenFieldAndGetter(node);
     }
 
     /**
@@ -129,6 +130,22 @@ public final class RegularNodeGenerator implements RuleGenerator {
         final Method getter = new Method("String", "getData");
         getter.makePublic();
         getter.setBody("return \"\";");
+        node.addMethod(getter);
+    }
+
+    /**
+     * Generates fields and methods related to children.
+     * @param node Class describing the node
+     */
+    private static void createChildrenFieldAndGetter(final Klass node) {
+        final Method count = new Method("int", "getChildCount");
+        count.makePublic();
+        count.setBody("return 0;");
+        node.addMethod(count);
+        final Method getter = new Method("Node", "getChild");
+        getter.makePublic();
+        getter.addArgument("int", "index");
+        getter.setBody("throw new IndexOutOfBoundsException();");
         node.addMethod(getter);
     }
 
