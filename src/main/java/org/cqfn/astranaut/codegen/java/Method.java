@@ -46,6 +46,11 @@ public final class Method implements Entity {
     private final JavaDoc doc;
 
     /**
+     * Flag indicating that the generated method is overridden.
+     */
+    private final boolean over;
+
+    /**
      * Flag indicating that the generated method is public.
      */
     private boolean pub;
@@ -71,6 +76,15 @@ public final class Method implements Entity {
     private boolean fin;
 
     /**
+     * Constructor of overridden method.
+     * @param ret Type of the method.
+     * @param name Name of the method.
+     */
+    public Method(final String ret, final String name) {
+        this(ret, name, "");
+    }
+
+    /**
      * Constructor.
      * @param ret Type of the method.
      * @param name Name of the method.
@@ -80,6 +94,7 @@ public final class Method implements Entity {
         this.ret = ret;
         this.name = name;
         this.doc = new JavaDoc(brief);
+        this.over = brief.isEmpty();
     }
 
     /**
@@ -144,7 +159,12 @@ public final class Method implements Entity {
 
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
-        this.doc.build(indent, code);
+        if (this.doc.hasNonEmptyBrief()) {
+            this.doc.build(indent, code);
+        }
+        if (this.over) {
+            code.add(indent, "@Override");
+        }
         final StringBuilder header = new StringBuilder(128);
         if (this.pub) {
             header.append("public ");

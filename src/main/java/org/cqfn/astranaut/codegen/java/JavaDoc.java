@@ -63,6 +63,14 @@ public final class JavaDoc implements Entity {
         this.version = value.trim();
     }
 
+    /**
+     * Returns a flag whether the document has a non-empty brief content.
+     * @return Flag
+     */
+    public boolean hasNonEmptyBrief() {
+        return !this.brief.isEmpty();
+    }
+
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         code.add(indent, "/**");

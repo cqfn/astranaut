@@ -147,6 +147,23 @@ class MethodTest {
         Assertions.assertTrue(result);
     }
 
+    @Test
+    void overriddenMethod() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "@Override",
+                "public String toString() {",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method("String", "toString");
+        method.makePublic();
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
     /**
      * Tests the source code generation from an object describing a method.
      * @param method Object describing a method
