@@ -241,6 +241,29 @@ class MethodTest {
     }
 
     @Test
+    void methodWithArguments() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Method with arguments.",
+                " */",
+                "static int max(final int first, final int second) {",
+                "    return first > second ? first : second;",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method("int", "max", "Method with arguments");
+        method.makeStatic();
+        method.addArgument("int", "first");
+        method.addArgument("int", "second");
+        method.setBody("return first > second ? first : second;");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
     void methodWithSyntaxError() {
         final Method method = new Method("void", "doSomething");
         method.setBody("if (true) { aaa }");

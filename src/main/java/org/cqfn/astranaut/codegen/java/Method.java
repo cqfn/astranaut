@@ -79,6 +79,11 @@ public final class Method implements Entity {
     private boolean fin;
 
     /**
+     * List of method arguments (where key is type, value is name).
+     */
+    private final List<Pair<String, String>> args;
+
+    /**
      * Body of the method.
      */
     private String body;
@@ -103,6 +108,7 @@ public final class Method implements Entity {
         this.name = name;
         this.doc = new JavaDoc(brief);
         this.over = brief.isEmpty();
+        this.args = new ArrayList<>(0);
         this.body = "";
     }
 
@@ -148,6 +154,15 @@ public final class Method implements Entity {
     }
 
     /**
+     * Adds an argument to the method.
+     * @param type Type of the argument
+     * @param identifier Name of the argument
+     */
+    public void addArgument(final String type, final String identifier) {
+        this.args.add(new Pair<>(type, identifier));
+    }
+
+    /**
      * Sets the body of the method.
      * @param text Method body source code
      */
@@ -182,6 +197,16 @@ public final class Method implements Entity {
         if (this.over) {
             code.add(indent, "@Override");
         }
+        code.add(indent, this.composeHeader());
+        this.buildBody(indent + 1, code);
+        code.add(indent, "}");
+    }
+
+    /**
+     * Composes the header (signature) of the method.
+     * @return Method header
+     */
+    private String composeHeader() {
         final StringBuilder header = new StringBuilder(128);
         if (this.pub) {
             header.append("public ");
@@ -196,10 +221,17 @@ public final class Method implements Entity {
         if (this.fin) {
             header.append("final ");
         }
-        header.append(this.ret).append(' ').append(this.name).append("() {");
-        code.add(indent, header.toString());
-        this.buildBody(indent + 1, code);
-        code.add(indent, "}");
+        header.append(this.ret).append(' ').append(this.name).append('(');
+        boolean flag = false;
+        for (final Pair<String, String> arg : this.args) {
+            if (flag) {
+                header.append(", ");
+            }
+            flag = true;
+            header.append("final ").append(arg.getKey()).append(' ').append(arg.getValue());
+        }
+        header.append(") {");
+        return header.toString();
     }
 
     /**
@@ -208,7 +240,7 @@ public final class Method implements Entity {
      * @param code Source code builder
      * @throws BaseException If there are any problems during code generation
      */
-    public void buildBody(final int indent, final SourceCodeBuilder code) throws BaseException {
+    private void buildBody(final int indent, final SourceCodeBuilder code) throws BaseException {
         final List<Pair<String, Integer>> lines = this.splitBodyByLines();
         for (final Pair<String, Integer> line : lines) {
             code.add(indent + line.getValue(), line.getKey());
@@ -217,11 +249,11 @@ public final class Method implements Entity {
 
     /**
      * Separates the method body by indented lines.
-     * @return List of indented lines (key is line, value is indentation)
+     * @return List of indented lines (where key is line, value is indentation)
      * @throws SyntaxErrorInSourceCode If the method body contains an error that could be detected
      *  at this stage
      */
-    public List<Pair<String, Integer>> splitBodyByLines() throws SyntaxErrorInSourceCode {
+    private List<Pair<String, Integer>> splitBodyByLines() throws SyntaxErrorInSourceCode {
         final List<Pair<String, Integer>> list = new ArrayList<>(0);
         int indent = 0;
         for (final String line : this.body.split("\n")) {
