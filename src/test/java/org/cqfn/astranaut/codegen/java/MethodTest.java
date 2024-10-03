@@ -43,11 +43,13 @@ class MethodTest {
                 " * Simple method.",
                 " */",
                 "String getData() {",
+                "    return \"\";",
                 "}",
                 ""
             )
         );
         final Method method = new Method("String", "getData", "Simple method");
+        method.setBody("return \"\";");
         final boolean result = this.testCodegen(method, expected);
         Assertions.assertTrue(result);
     }
@@ -61,12 +63,14 @@ class MethodTest {
                 " * Public method.",
                 " */",
                 "public String getData() {",
+                "    return \"\";",
                 "}",
                 ""
             )
         );
         final Method method = new Method("String", "getData", "Public method");
         method.makePublic();
+        method.setBody("return \"\";");
         final boolean result = this.testCodegen(method, expected);
         Assertions.assertTrue(result);
     }
@@ -80,12 +84,14 @@ class MethodTest {
                 " * Protected method.",
                 " */",
                 "protected String getData() {",
+                "    return \"\";",
                 "}",
                 ""
             )
         );
         final Method method = new Method("String", "getData", "Protected method");
         method.makeProtected();
+        method.setBody("return \"\";");
         final boolean result = this.testCodegen(method, expected);
         Assertions.assertTrue(result);
     }
@@ -99,12 +105,14 @@ class MethodTest {
                 " * Private method.",
                 " */",
                 "private String getData() {",
+                "    return \"\";",
                 "}",
                 ""
             )
         );
         final Method method = new Method("String", "getData", "Private method");
         method.makePrivate();
+        method.setBody("return \"\";");
         final boolean result = this.testCodegen(method, expected);
         Assertions.assertTrue(result);
     }
@@ -118,12 +126,14 @@ class MethodTest {
                 " * Static method.",
                 " */",
                 "static String getData() {",
+                "    return \"\";",
                 "}",
                 ""
             )
         );
         final Method method = new Method("String", "getData", "Static method");
         method.makeStatic();
+        method.setBody("return \"\";");
         final boolean result = this.testCodegen(method, expected);
         Assertions.assertTrue(result);
     }
@@ -137,12 +147,14 @@ class MethodTest {
                 " * Final method.",
                 " */",
                 "final String getData() {",
+                "    return \"\";",
                 "}",
                 ""
             )
         );
         final Method method = new Method("String", "getData", "Final method");
         method.makeFinal();
+        method.setBody("return \"\";");
         final boolean result = this.testCodegen(method, expected);
         Assertions.assertTrue(result);
     }
@@ -154,12 +166,42 @@ class MethodTest {
             Arrays.asList(
                 "@Override",
                 "public String toString() {",
+                "    return \"\";",
                 "}",
                 ""
             )
         );
         final Method method = new Method("String", "toString");
         method.makePublic();
+        method.setBody("return \"\";");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void  methodWithMultilineBody() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Method with multi-line body.",
+                " */",
+                "public void doSomething() {",
+                "    if (true) {",
+                "        System.out.println(\"it works!\");",
+                "    }",
+                "    return;",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method(
+            "void",
+            "doSomething",
+            "Method with multi-line body"
+        );
+        method.makePublic();
+        method.setBody("   if (true) { System.out.println(\"it works!\"); } \n return; ");
         final boolean result = this.testCodegen(method, expected);
         Assertions.assertTrue(result);
     }

@@ -23,6 +23,9 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.cqfn.astranaut.core.utils.Pair;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -76,6 +79,11 @@ public final class Method implements Entity {
     private boolean fin;
 
     /**
+     * Body of the method.
+     */
+    private String body;
+
+    /**
      * Constructor of overridden method.
      * @param ret Type of the method.
      * @param name Name of the method.
@@ -95,6 +103,7 @@ public final class Method implements Entity {
         this.name = name;
         this.doc = new JavaDoc(brief);
         this.over = brief.isEmpty();
+        this.body = "";
     }
 
     /**
@@ -136,6 +145,14 @@ public final class Method implements Entity {
      */
     public void makeFinal() {
         this.fin = true;
+    }
+
+    /**
+     * Sets the body of the method.
+     * @param text Method body source code
+     */
+    public void setBody(final String text) {
+        this.body = text;
     }
 
     /**
@@ -181,6 +198,60 @@ public final class Method implements Entity {
         }
         header.append(this.ret).append(' ').append(this.name).append("() {");
         code.add(indent, header.toString());
+        this.buildBody(indent + 1, code);
         code.add(indent, "}");
+    }
+
+    /**
+     * Generates the body of the method. Splits it into lines and indents it properly.
+     * @param indent Code indentation. Each generated line will be indented as follows
+     * @param code Source code builder
+     * @throws BaseException If there are any problems during code generation
+     */
+    public void buildBody(final int indent, final SourceCodeBuilder code) throws BaseException {
+        final List<Pair<String, Integer>> lines = this.splitBodyByLines();
+        for (final Pair<String, Integer> line : lines) {
+            code.add(indent + line.getValue(), line.getKey());
+        }
+    }
+
+    /**
+     * Separates the method body by indented lines.
+     * @return List of indented lines (key is line, value is indentation)
+     */
+    public List<Pair<String, Integer>> splitBodyByLines() {
+        final List<Pair<String, Integer>> list = new ArrayList<>(0);
+        int indent = 0;
+        for (final String line : this.body.split("\n")) {
+            String tail = line.trim();
+            while (!tail.isEmpty()) {
+                int index = tail.indexOf('{');
+                if (index >= 0) {
+                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), indent));
+                    indent = indent + 1;
+                    tail = tail.substring(index + 1).trim();
+                    continue;
+                }
+                index = tail.indexOf(';');
+                if (index >= 0) {
+                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), indent));
+                    tail = tail.substring(index + 1).trim();
+                    continue;
+                }
+                index = tail.indexOf('}');
+                if (index > 0) {
+                    list.add(new Pair<>(tail.substring(0, index).trim(), indent));
+                }
+                if (index >= 0) {
+                    indent = indent - 1;
+                    list.add(new Pair<>("}", indent));
+                    tail = tail.substring(index + 1).trim();
+                    continue;
+                }
+                list.add(new Pair<>(tail, indent));
+                tail = "";
+            }
+        }
+        return list;
     }
 }
