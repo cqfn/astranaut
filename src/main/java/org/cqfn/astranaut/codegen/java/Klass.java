@@ -79,6 +79,11 @@ public final class Klass implements ClassOrInterface {
     private final List<Field> fields;
 
     /**
+     * List of methods.
+     */
+    private final List<Method> methods;
+
+    /**
      * List of nested classes and interfaces.
      */
     private final List<ClassOrInterface> nested;
@@ -93,6 +98,7 @@ public final class Klass implements ClassOrInterface {
         this.doc = new JavaDoc(brief);
         this.impl = new String[0];
         this.fields = new ArrayList<>(0);
+        this.methods = new ArrayList<>(0);
         this.nested = new ArrayList<>(0);
     }
 
@@ -162,6 +168,14 @@ public final class Klass implements ClassOrInterface {
     }
 
     /**
+     * Adds a method.
+     * @param method Method
+     */
+    public void addMethod(final Method method) {
+        this.methods.add(method);
+    }
+
+    /**
      * Adds a nested class or interface.
      * @param coi Class or interface
      */
@@ -174,15 +188,25 @@ public final class Klass implements ClassOrInterface {
         this.doc.build(indent, code);
         code.add(indent, this.composeHeader());
         boolean flag = false;
-        final List<Field> sorted = this.fields.stream()
+        final List<Field> flist = this.fields.stream()
             .sorted((left, right) -> Integer.compare(right.getPriority(), left.getPriority()))
             .collect(Collectors.toList());
-        for (final Field field : sorted) {
+        for (final Field field : flist) {
             if (flag) {
                 code.add(indent, "");
             }
             flag = true;
             field.build(indent + 1, code);
+        }
+        final List<Method> mlist = this.methods.stream()
+            .sorted((left, right) -> Integer.compare(right.getPriority(), left.getPriority()))
+            .collect(Collectors.toList());
+        for (final Method method : mlist) {
+            if (flag) {
+                code.add(indent, "");
+            }
+            flag = true;
+            method.build(indent + 1, code);
         }
         for (final ClassOrInterface coi : this.nested) {
             if (flag) {

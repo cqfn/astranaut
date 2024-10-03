@@ -270,6 +270,61 @@ class KlassTest {
         Assertions.assertTrue(result);
     }
 
+    @Test
+    void classWithMethods() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with methods.",
+                " */",
+                "class Test14 {",
+                "    /**",
+                "     * Fourth method.",
+                "     */",
+                "    public String fourth() {",
+                "    }",
+                "",
+                "    /**",
+                "     * Third method.",
+                "     */",
+                "    public static String third() {",
+                "    }",
+                "",
+                "    /**",
+                "     * Second method.",
+                "     */",
+                "    private String second() {",
+                "    }",
+                "",
+                "    /**",
+                "     * First method.",
+                "     */",
+                "    private static String first() {",
+                "    }",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test14", "Class with methods");
+        final Method first = new Method("String", "first", "First method");
+        first.makePrivate();
+        first.makeStatic();
+        klass.addMethod(first);
+        final Method second = new Method("String", "second", "Second method");
+        second.makePrivate();
+        klass.addMethod(second);
+        final Method third = new Method("String", "third", "Third method");
+        third.makePublic();
+        third.makeStatic();
+        klass.addMethod(third);
+        final Method fourth = new Method("String", "fourth", "Fourth method");
+        fourth.makePublic();
+        klass.addMethod(fourth);
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
     /**
      * Tests the source code generation from an object describing a class.
      * @param klass Object describing a class
