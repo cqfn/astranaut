@@ -22,6 +22,16 @@ public final class This implements Node {
      */
     public static final Type TYPE = new ThisType();
 
+    @Override
+    public Type getType() {
+        return This.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
     /**
      * Type implementation describing 'This' nodes.
      * @since 1.0.0

@@ -75,17 +75,41 @@ public final class RegularNodeGenerator implements RuleGenerator {
      * @param node Class describing the node
      */
     private void fillNodeClass(final Klass node) {
+        this.createTypeFieldAndGetter(node);
+        RegularNodeGenerator.createDataGetter(node);
+    }
+
+    /**
+     * Creates fields and a method related to the type.
+     * @param node Class describing the node
+     */
+    private void createTypeFieldAndGetter(final Klass node) {
         final String name = this.rule.getName();
         final Field typename = new Field("String", "NAME", "Name of the type");
         typename.makePublic();
         typename.makeStatic();
         typename.makeFinal(String.format("\"%s\"", name));
         node.addField(typename);
-        final Field typeobj = new Field("Type", "TYPE", "Type of the node");
-        typeobj.makePublic();
-        typeobj.makeStatic();
-        typeobj.makeFinal(String.format("new %sType()", name));
-        node.addField(typeobj);
+        final Field object = new Field("Type", "TYPE", "Type of the node");
+        object.makePublic();
+        object.makeStatic();
+        object.makeFinal(String.format("new %sType()", name));
+        node.addField(object);
+        final Method getter = new Method("Type", "getType");
+        getter.makePublic();
+        getter.setBody(String.format("return %s.TYPE;", name));
+        node.addMethod(getter);
+    }
+
+    /**
+     * Creates the 'getData()' method.
+     * @param node Class describing the node
+     */
+    private static void createDataGetter(final Klass node) {
+        final Method getter = new Method("String", "getData");
+        getter.makePublic();
+        getter.setBody("return \"\";");
+        node.addMethod(getter);
     }
 
     /**
