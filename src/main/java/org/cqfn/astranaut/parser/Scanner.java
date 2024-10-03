@@ -99,9 +99,7 @@ public final class Scanner {
      * @return A symbol
      */
     private char nextSymbol() {
-        if (this.index < this.line.length()) {
-            this.index = this.index + 1;
-        }
+        this.index = this.index + 1;
         return this.getSymbol();
     }
 
