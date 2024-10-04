@@ -66,6 +66,7 @@ class ScannerTest {
         try {
             final Token token = scanner.getToken();
             Assertions.assertTrue(token instanceof Comma);
+            Assertions.assertEquals(",", token.toString());
         } catch (final BaseException ignored) {
             oops = true;
         }
