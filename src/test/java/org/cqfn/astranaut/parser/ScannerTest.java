@@ -60,6 +60,38 @@ class ScannerTest {
     }
 
     @Test
+    void comma() {
+        final Scanner scanner = new Scanner(" , ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof Comma);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void identifiersSeparatedByComma() {
+        final Scanner scanner = new Scanner(" AssignableExpression, Expression ");
+        boolean oops = false;
+        try {
+            Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof Identifier);
+            token = scanner.getToken();
+            Assertions.assertTrue(token instanceof Comma);
+            token = scanner.getToken();
+            Assertions.assertTrue(token instanceof Identifier);
+            token = scanner.getToken();
+            Assertions.assertNull(token);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
     void unknownSymbol() {
         final Scanner scanner = new Scanner(" ` ");
         boolean oops = false;

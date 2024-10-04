@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.parser;
 
+import java.util.Map;
+import org.cqfn.astranaut.core.utils.MapUtils;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -30,6 +32,14 @@ import org.cqfn.astranaut.exceptions.BaseException;
  * @since 1.0.0
  */
 public final class Scanner {
+    /**
+     * Collection of tokens representing a single character.
+     */
+    private static final Map<Character, SingleCharToken> TOKENS =
+        new MapUtils<Character, SingleCharToken>()
+            .put(',', Comma.INSTANCE)
+            .make();
+
     /**
      * Line of DSL code.
      */
@@ -56,26 +66,31 @@ public final class Scanner {
      * @throws BaseException If the scanner cannot extract the next token
      */
     public Token getToken() throws BaseException {
-        char symbol = this.getSymbol();
-        while (Character.isWhitespace(symbol)) {
-            symbol = this.nextSymbol();
+        char chr = this.getChar();
+        while (Character.isWhitespace(chr)) {
+            chr = this.nextChar();
         }
         final Token token;
         do {
-            if (symbol == '\0') {
+            if (chr == '\0') {
                 token = null;
                 break;
             }
-            if (Character.isLetter(symbol)) {
+            if (Scanner.TOKENS.containsKey(chr)) {
+                this.nextChar();
+                token = Scanner.TOKENS.get(chr);
+                break;
+            }
+            if (Character.isLetter(chr)) {
                 final StringBuilder builder = new StringBuilder();
                 do {
-                    builder.append(symbol);
-                    symbol = this.nextSymbol();
-                } while (Character.isLetterOrDigit(symbol));
+                    builder.append(chr);
+                    chr = this.nextChar();
+                } while (Character.isLetterOrDigit(chr));
                 token = new Identifier(builder.toString());
                 break;
             }
-            throw new UnknownSymbol(symbol);
+            throw new UnknownSymbol(chr);
         } while (false);
         return token;
     }
@@ -84,23 +99,23 @@ public final class Scanner {
      * Returns the current symbol.
      * @return A symbol
      */
-    private char getSymbol() {
-        final char symbol;
+    private char getChar() {
+        final char chr;
         if (this.index < this.line.length()) {
-            symbol = this.line.charAt(this.index);
+            chr = this.line.charAt(this.index);
         } else {
-            symbol = '\0';
+            chr = '\0';
         }
-        return symbol;
+        return chr;
     }
 
     /**
      * Returns the next symbol.
      * @return A symbol
      */
-    private char nextSymbol() {
+    private char nextChar() {
         this.index = this.index + 1;
-        return this.getSymbol();
+        return this.getChar();
     }
 
     /**
@@ -116,14 +131,14 @@ public final class Scanner {
         /**
          * Symbol that cannot be processed by the parser.
          */
-        private final char symbol;
+        private final char chr;
 
         /**
          * Constructor.
-         * @param symbol Symbol that cannot be processed by the parser.
+         * @param chr Symbol that cannot be processed by the parser.
          */
-        private UnknownSymbol(final char symbol) {
-            this.symbol = symbol;
+        private UnknownSymbol(final char chr) {
+            this.chr = chr;
         }
 
         @Override
@@ -133,7 +148,7 @@ public final class Scanner {
 
         @Override
         public String getErrorMessage() {
-            return String.format("Unknown symbol: '%c'", this.symbol);
+            return String.format("Unknown symbol: '%c'", this.chr);
         }
     }
 }
