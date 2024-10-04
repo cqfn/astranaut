@@ -100,6 +100,7 @@ class ScannerTest {
             Token token = scanner.getToken();
             Assertions.assertTrue(token instanceof Number);
             Assertions.assertEquals(13, ((Number) token).getValue());
+            Assertions.assertEquals("13", token.toString());
             token = scanner.getToken();
             Assertions.assertTrue(token instanceof Number);
             Assertions.assertTrue(token instanceof Zero);
