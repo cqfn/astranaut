@@ -92,6 +92,24 @@ class ScannerTest {
     }
 
     @Test
+    void number() {
+        final Scanner scanner = new Scanner("13 0");
+        boolean oops = false;
+        try {
+            Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof Number);
+            Assertions.assertEquals(13, ((Number) token).getValue());
+            token = scanner.getToken();
+            Assertions.assertTrue(token instanceof Number);
+            Assertions.assertTrue(token instanceof Zero);
+            Assertions.assertEquals(0, ((Zero) token).getValue());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
     void unknownSymbol() {
         final Scanner scanner = new Scanner(" ` ");
         boolean oops = false;

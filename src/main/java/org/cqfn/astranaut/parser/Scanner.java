@@ -82,12 +82,11 @@ public final class Scanner {
                 break;
             }
             if (Character.isLetter(chr)) {
-                final StringBuilder builder = new StringBuilder();
-                do {
-                    builder.append(chr);
-                    chr = this.nextChar();
-                } while (Character.isLetterOrDigit(chr));
-                token = new Identifier(builder.toString());
+                token = this.parseIdentifier(chr);
+                break;
+            }
+            if (Character.isDigit(chr)) {
+                token = this.parseNumber(chr);
                 break;
             }
             throw new UnknownSymbol(chr);
@@ -116,6 +115,42 @@ public final class Scanner {
     private char nextChar() {
         this.index = this.index + 1;
         return this.getChar();
+    }
+
+    /**
+     * Parses a sequence of characters as an identifier.
+     * @param first First character
+     * @return A token
+     */
+    private Token parseIdentifier(final char first) {
+        char chr = first;
+        final StringBuilder builder = new StringBuilder();
+        do {
+            builder.append(chr);
+            chr = this.nextChar();
+        } while (Character.isLetterOrDigit(chr));
+        return new Identifier(builder.toString());
+    }
+
+    /**
+     * Parses a sequence of characters as an integer.
+     * @param first First character
+     * @return A token
+     */
+    private Token parseNumber(final char first) {
+        char chr = first;
+        int value = 0;
+        do {
+            value = value * 10 + chr - '0';
+            chr = this.nextChar();
+        } while (Character.isDigit(chr));
+        final Token token;
+        if (value == 0) {
+            token = Zero.INSTANCE;
+        } else {
+            token = new Number(value);
+        }
+        return token;
     }
 
     /**
