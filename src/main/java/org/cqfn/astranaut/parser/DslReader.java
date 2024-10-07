@@ -98,6 +98,8 @@ public final class DslReader {
             final FilesReader reader = new FilesReader(absolute);
             final String code = reader.readAsString(
                 (FilesReader.CustomExceptionCreator<BaseException>) () -> new BaseException() {
+                    private static final long serialVersionUID = -1;
+
                     @Override
                     public String getInitiator() {
                         return "Parser";
