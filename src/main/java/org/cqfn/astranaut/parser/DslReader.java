@@ -141,7 +141,8 @@ public final class DslReader {
         if (trimmed.isEmpty()) {
             this.lines = new String[0];
         } else {
-            this.lines = trimmed.split("\n");
+            final CommentsRemover remover = new CommentsRemover(code);
+            this.lines = remover.getUncommentedCode().split("\n");
         }
         this.current = 0;
     }

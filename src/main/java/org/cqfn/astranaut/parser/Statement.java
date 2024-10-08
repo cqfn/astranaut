@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.parser;
 
+import java.io.File;
+
 /**
  * Some statement from the DSL source code.
  * @since 1.0.0
@@ -61,7 +63,7 @@ public final class Statement {
     public String getLocation() {
         final StringBuilder builder = new StringBuilder();
         if (!this.filename.isEmpty()) {
-            builder.append(this.filename).append(", ");
+            builder.append(new File(this.filename).getName()).append(", ");
         }
         builder.append(this.begin);
         if (this.begin != this.end) {

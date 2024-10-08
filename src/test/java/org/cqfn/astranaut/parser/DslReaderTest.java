@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.parser;
 
+import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +48,32 @@ class DslReaderTest {
         );
         stmt = reader.getStatement();
         Assertions.assertEquals("4: Expression <- This | Addition", stmt.toString());
+        stmt = reader.getStatement();
+        Assertions.assertNull(stmt);
+    }
+
+    @Test
+    void readFile() {
+        final DslReader reader = new DslReader();
+        boolean oops = false;
+        try {
+            reader.readFile("src/test/resources/dsl/simple.dsl");
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        Statement stmt = reader.getStatement();
+        Assertions.assertEquals("simple.dsl, 5: This <- 0", stmt.toString());
+        stmt = reader.getStatement();
+        Assertions.assertEquals(
+            "simple.dsl, 7-9: Addition <- left@Expression, right@Expression",
+            stmt.toString()
+        );
+        stmt = reader.getStatement();
+        Assertions.assertEquals(
+            "simple.dsl, 9: Expression <- This | Addition",
+            stmt.toString()
+        );
         stmt = reader.getStatement();
         Assertions.assertNull(stmt);
     }
