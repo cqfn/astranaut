@@ -23,6 +23,9 @@
  */
 package org.cqfn.astranaut.parser;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,21 +38,27 @@ import org.junit.jupiter.api.Test;
 class DslReaderTest {
     @Test
     void parseString() {
-        final String code =
-            "This <- 0;\nAddition\n<-\nleft@Expression, right@Expression;Expression <- This | Addition";
-        final DslReader reader = new DslReader();
-        reader.setSourceCode(code);
-        Statement stmt = reader.getStatement();
-        Assertions.assertEquals("1: This <- 0", stmt.toString());
-        stmt = reader.getStatement();
-        Assertions.assertEquals(
-            "2-4: Addition <- left@Expression, right@Expression",
-            stmt.toString()
-        );
-        stmt = reader.getStatement();
-        Assertions.assertEquals("4: Expression <- This | Addition", stmt.toString());
-        stmt = reader.getStatement();
-        Assertions.assertNull(stmt);
+        boolean oops = false;
+        try {
+            final String code =
+                "This <- 0;\nAddition\n<-\nleft@Expression, right@Expression;Expression <- This | Addition";
+            final DslReader reader = new DslReader();
+            reader.setSourceCode(code);
+            Statement stmt = reader.getStatement();
+            Assertions.assertEquals("1: This <- 0", stmt.toString());
+            stmt = reader.getStatement();
+            Assertions.assertEquals(
+                "2-4: Addition <- left@Expression, right@Expression",
+                stmt.toString()
+            );
+            stmt = reader.getStatement();
+            Assertions.assertEquals("4: Expression <- This | Addition", stmt.toString());
+            stmt = reader.getStatement();
+            Assertions.assertNull(stmt);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 
     @Test
@@ -58,23 +67,91 @@ class DslReaderTest {
         boolean oops = false;
         try {
             reader.readFile("src/test/resources/dsl/simple.dsl");
+            Statement stmt = reader.getStatement();
+            Assertions.assertEquals("simple.dsl, 5: This <- 0", stmt.toString());
+            stmt = reader.getStatement();
+            Assertions.assertEquals(
+                "simple.dsl, 7-9: Addition <- left@Expression, right@Expression",
+                stmt.toString()
+            );
+            stmt = reader.getStatement();
+            Assertions.assertEquals(
+                "simple.dsl, 9: Expression <- This | Addition",
+                stmt.toString()
+            );
+            stmt = reader.getStatement();
+            Assertions.assertNull(stmt);
         } catch (final BaseException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
-        Statement stmt = reader.getStatement();
-        Assertions.assertEquals("simple.dsl, 5: This <- 0", stmt.toString());
-        stmt = reader.getStatement();
-        Assertions.assertEquals(
-            "simple.dsl, 7-9: Addition <- left@Expression, right@Expression",
-            stmt.toString()
-        );
-        stmt = reader.getStatement();
-        Assertions.assertEquals(
-            "simple.dsl, 9: Expression <- This | Addition",
-            stmt.toString()
-        );
-        stmt = reader.getStatement();
-        Assertions.assertNull(stmt);
+    }
+
+    @Test
+    void parseNothing() {
+        final DslReader reader = new DslReader();
+        reader.setSourceCode("");
+        boolean oops = false;
+        try {
+            final Statement stmt = reader.getStatement();
+            Assertions.assertNull(stmt);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void readNonexistentFile() {
+        final DslReader reader = new DslReader();
+        boolean oops = false;
+        try {
+            reader.readFile("file.that.does.not.exist.dsl");
+        } catch (final BaseException exception) {
+            oops = true;
+            Assertions.assertEquals("Parser", exception.getInitiator());
+            Assertions.assertEquals(
+                "Can't read 'file.that.does.not.exist.dsl'",
+                exception.getErrorMessage()
+            );
+        }
+        Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void readFileContainingImports() {
+        final DslReader reader = new DslReader();
+        boolean oops = false;
+        try {
+            reader.readFile("src/test/resources/dsl/method_calls.dsl");
+            final Set<String> expected = new TreeSet<>(
+                Arrays.asList(
+                    "IntegerLiteral",
+                    "StringLiteral",
+                    "Literal",
+                    "Addition",
+                    "Subtraction",
+                    "BinaryOperation",
+                    "Expression",
+                    "ExpressionList",
+                    "Identifier",
+                    "MethodCall"
+                )
+            );
+            Statement stmt = reader.getStatement();
+            while (stmt != null) {
+                for (final String name : expected) {
+                    if (stmt.getCode().startsWith(name)) {
+                        expected.remove(name);
+                        break;
+                    }
+                }
+                stmt = reader.getStatement();
+            }
+            Assertions.assertTrue(expected.isEmpty());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }

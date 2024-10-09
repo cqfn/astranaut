@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.parser;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
@@ -112,14 +113,16 @@ public final class DslReader {
                 }
             );
             this.setFileNameAndSourceCode(absolute, code);
+            this.files.add(absolute);
         }
     }
 
     /**
      * Reads and returns the next statement.
      * @return Statement or {@code null} if there are no more statements
+     * @throws BaseException If some error occurred while extracting the next statement
      */
-    public Statement getStatement() {
+    public Statement getStatement() throws BaseException {
         Statement stmt = null;
         if (this.imported != null) {
             stmt = this.imported.getStatement();
@@ -150,8 +153,9 @@ public final class DslReader {
     /**
      * Extracts the next statement.
      * @return Statement or {@code null} if there are no more statements
+     * @throws BaseException If some error occurred while extracting the next statement
      */
-    private Statement extractStatement() {
+    private Statement extractStatement() throws BaseException {
         final Statement.Constructor ctor = new Statement.Constructor();
         ctor.setFilename(this.filename);
         final StringBuilder builder = new StringBuilder();
@@ -181,9 +185,37 @@ public final class DslReader {
         final Statement stmt;
         if (code.isEmpty()) {
             stmt = null;
+        } else if (code.startsWith("import ")) {
+            final String name = code.substring(7).trim();
+            stmt = this.getStatementFromImportedFile(name);
         } else {
             ctor.setCode(code);
             stmt = ctor.createStatement();
+        }
+        return stmt;
+    }
+
+    /**
+     * Gets the next statement from the imported file.
+     *  If the file does not contain statements, gets the next statement from the current file.
+     * @param name Imported file name
+     * @return Statement or {@code null} if there are no more statements
+     * @throws BaseException If some error occurred while extracting the next statement
+     */
+    private Statement getStatementFromImportedFile(final String name) throws BaseException {
+        final String absolute;
+        final File file = new File(name);
+        if (file.isAbsolute()) {
+            absolute = name;
+        } else {
+            final File parent = new File(this.filename).getParentFile();
+            absolute = new File(parent, name).getAbsolutePath();
+        }
+        this.imported = new DslReader(this.files);
+        this.imported.readFile(absolute);
+        Statement stmt = this.imported.getStatement();
+        if (stmt == null) {
+            stmt = this.extractStatement();
         }
         return stmt;
     }
