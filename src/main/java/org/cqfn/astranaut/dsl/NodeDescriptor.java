@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Set;
 import org.cqfn.astranaut.exceptions.BaseException;
 
@@ -37,6 +38,11 @@ import org.cqfn.astranaut.exceptions.BaseException;
  * @since 1.0.0
  */
 public abstract class NodeDescriptor implements Rule {
+    /**
+     * Name of the programming language for which this node descriptor is described.
+     */
+    private String language;
+
     /**
      * Name of the type of the node (left side of the rule).
      */
@@ -54,8 +60,22 @@ public abstract class NodeDescriptor implements Rule {
      * @param name Name of the type of the node (left side of the rule)
      */
     public NodeDescriptor(final String name) {
+        this.language = "";
         this.name = name;
         this.bases = new ArrayList<>(1);
+    }
+
+    /**
+     * Sets the name of the programming language for which this node descriptor is described.
+     * @param value Name of the programming language
+     */
+    public void setLanguage(final String value) {
+        this.language = value.toLowerCase(Locale.ENGLISH);
+    }
+
+    @Override
+    public final String getLanguage() {
+        return this.language;
     }
 
     /**

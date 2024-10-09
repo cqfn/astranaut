@@ -103,4 +103,15 @@ class NodeDescriptorTest {
         final String actual = String.join(", ", hierarchy);
         Assertions.assertEquals(expected, actual);
     }
+
+    @Test
+    void language() {
+        final RegularNodeDescriptor descriptor = new RegularNodeDescriptor(
+            "Null",
+            Collections.emptyList()
+        );
+        Assertions.assertEquals("", descriptor.getLanguage());
+        descriptor.setLanguage("Java");
+        Assertions.assertEquals("java", descriptor.getLanguage());
+    }
 }
