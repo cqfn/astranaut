@@ -23,12 +23,15 @@
  */
 package org.cqfn.astranaut.parser;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
+import org.cqfn.astranaut.core.utils.FilesWriter;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Tests covering {@link DslReader} class.
@@ -138,6 +141,40 @@ class DslReaderTest {
                     "MethodCall"
                 )
             );
+            Statement stmt = reader.getStatement();
+            while (stmt != null) {
+                for (final String name : expected) {
+                    if (stmt.getCode().startsWith(name)) {
+                        expected.remove(name);
+                        break;
+                    }
+                }
+                stmt = reader.getStatement();
+            }
+            Assertions.assertTrue(expected.isEmpty());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void readFileWhereImportHasAbsolutePath(final @TempDir Path dir) {
+        final String imported = dir.resolve("imported.dsl").toAbsolutePath().toString();
+        FilesWriter writer = new FilesWriter(imported);
+        boolean okay = writer.writeStringNoExcept("D <- E, F;");
+        Assertions.assertTrue(okay);
+        final String main = dir.resolve("main.dsl").toAbsolutePath().toString();
+        writer = new FilesWriter(main);
+        okay = writer.writeStringNoExcept(
+            String.format("import %s;\nA <- B, C;", imported)
+        );
+        Assertions.assertTrue(okay);
+        final DslReader reader = new DslReader();
+        boolean oops = false;
+        try {
+            reader.readFile(main);
+            final Set<String> expected = new TreeSet<>(Arrays.asList("A", "D"));
             Statement stmt = reader.getStatement();
             while (stmt != null) {
                 for (final String name : expected) {
