@@ -35,6 +35,11 @@ import org.junit.jupiter.api.Test;
  */
 @SuppressWarnings("PMD.CloseResource")
 class NodeDescriptionParsingTest {
+    /**
+     * Some name for a fake programming language, for testing purposes.
+     */
+    private static final String LANGUAGE = "common";
+
     @Test
     void nodeWithoutChildren() {
         final String code = "This <- 0";
@@ -46,6 +51,81 @@ class NodeDescriptionParsingTest {
             0,
             ((RegularNodeDescriptor) descriptor).getExtChildTypes().size()
         );
+    }
+
+    @Test
+    void tooManySeparators() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("AAA <- BBB <- CCC")
+        );
+        boolean oops = false;
+        try {
+            parser.parseDescriptor();
+        } catch (final BaseException exception) {
+            oops = true;
+            Assertions.assertEquals("Parser", exception.getInitiator());
+            Assertions.assertEquals(
+                "test.dsl, 1: One and only one '<-' separator is allowed",
+                exception.getErrorMessage()
+            );
+        }
+        Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void missingName() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(" <- BBB")
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void badName() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("13 <- BBB")
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void missingRightPart() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("AAA <-")
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void tokensAfterZero() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("AAA <- 0, BBB")
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void inappropriateToken() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("AAA <- 13")
+        );
+        boolean oops = false;
+        try {
+            parser.parseDescriptor();
+        } catch (final BaseException exception) {
+            oops = true;
+            Assertions.assertEquals(
+                "test.dsl, 1: Inappropriate token: '13'",
+                exception.getErrorMessage()
+            );
+        }
+        Assertions.assertTrue(oops);
     }
 
     /**
@@ -60,13 +140,31 @@ class NodeDescriptionParsingTest {
         NodeDescriptor descriptor = null;
         try {
             final Statement stmt = reader.getStatement();
-            final NodeDescriptorParser parser = new NodeDescriptorParser("common", stmt);
+            final NodeDescriptorParser parser = new NodeDescriptorParser(
+                NodeDescriptionParsingTest.LANGUAGE,
+                stmt
+            );
             descriptor = parser.parseDescriptor();
         } catch (final BaseException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
         Assertions.assertNotNull(descriptor);
+        Assertions.assertEquals(NodeDescriptionParsingTest.LANGUAGE, descriptor.getLanguage());
         return descriptor;
+    }
+
+    /**
+     * Creates statement from DSL source code.
+     * @param code DSL source code
+     * @return Statement
+     */
+    private Statement createStatement(final String code) {
+        final Statement.Constructor ctor = new Statement.Constructor();
+        ctor.setFilename("test.dsl");
+        ctor.setBegin(1);
+        ctor.setEnd(1);
+        ctor.setCode(code);
+        return ctor.createStatement();
     }
 }
