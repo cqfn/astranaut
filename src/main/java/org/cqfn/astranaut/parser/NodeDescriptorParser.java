@@ -60,14 +60,14 @@ public class NodeDescriptorParser {
     public NodeDescriptor parseDescriptor() throws ParsingException {
         final Location loc = this.stmt.getLocation();
         final String[] parts = this.stmt.getCode().split("<-");
-        if (parts.length != 2) {
+        if (parts.length < 2) {
+            throw new CommonParsingException(loc, "Invalid descriptor");
+        }
+        if (parts.length > 2) {
             throw new CommonParsingException(loc, "One and only one '<-' separator is allowed");
         }
         final Scanner scanner = new Scanner(loc, parts[1]);
         final Token first = scanner.getToken();
-        if (first == null) {
-            throw new CommonParsingException(loc, "There is no description of child nodes");
-        }
         final NodeDescriptor result;
         if (first instanceof Zero) {
             final String name = this.parseName(parts[0]);

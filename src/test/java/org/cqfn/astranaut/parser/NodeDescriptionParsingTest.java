@@ -92,6 +92,15 @@ class NodeDescriptionParsingTest {
     }
 
     @Test
+    void nameWithExtraToken() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("AAA, BBB <- CCC")
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
     void missingRightPart() {
         final NodeDescriptorParser parser = new NodeDescriptorParser(
             NodeDescriptionParsingTest.LANGUAGE,
