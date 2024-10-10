@@ -23,8 +23,7 @@
  */
 
 /**
- * This package contains the DSL interpreter.
- *
- * @since 0.1.5
+ * This package contains the DSL interpreter, as well as the auxiliary structures.
+ * @since 1.0.0
  */
 package org.cqfn.astranaut.interpreter;

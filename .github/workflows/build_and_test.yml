@@ -2,9 +2,13 @@ name: Build and test
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+      - v1
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
+      - v1
 
 jobs:
   build:
@@ -21,7 +25,8 @@ jobs:
         cache: maven
     - name: Maven Build and Verify
       run: mvn -B clean verify
-    - uses: codecov/codecov-action@v2
+    - uses: codecov/codecov-action@v4
       with:
-        name: Code coverage report
-        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./target/site/jacoco/jacoco.xml
+        fail_ci_if_error: true

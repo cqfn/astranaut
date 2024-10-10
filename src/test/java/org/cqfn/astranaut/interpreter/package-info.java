@@ -23,8 +23,7 @@
  */
 
 /**
- * This package contains tests for the interpreter.
- *
- * @since 0.1.5
+ * This package contains test set covering the DSL interpreter.
+ * @since 1.0.0
  */
 package org.cqfn.astranaut.interpreter;

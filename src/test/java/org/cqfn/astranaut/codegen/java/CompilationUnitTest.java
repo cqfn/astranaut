@@ -21,69 +21,91 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astranaut.codegen.java;
 
-import java.io.IOException;
-import org.cqfn.astranaut.core.utils.FilesReader;
+import java.util.Arrays;
+import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link CompilationUnit} class.
- *
- * @since 0.1.5
+ * Tests covering {@link CompilationUnit} class.
+ * @since 1.0.0
  */
 class CompilationUnitTest {
-    /**
-     * The folder with test resources.
-     */
-    private static final String TESTS_PATH = "src/test/resources/codegen/java/";
-
-    /**
-     * Testing code generation with compilation unit.
-     */
     @Test
-    void testCompilationUnit() {
-        final License license = new License("LICENSE.txt");
-        final Interface iface = new Interface("DSL rule", "Rule");
-        final MethodDescriptor method = new MethodDescriptor(
-            "Generates source code from the rule",
-            "generate"
+    void withoutImports() {
+        final License license = new License("Copyright (c) 2024 John Doe");
+        final Package pkg = new Package("org.cqfn.astranaut.test0");
+        final Klass klass = new Klass("Test0", "This class does nothing.");
+        klass.setVersion("0.0.1");
+        final CompilationUnit unit = new CompilationUnit(license, pkg, klass);
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/*",
+                " * Copyright (c) 2024 John Doe",
+                " */",
+                "package org.cqfn.astranaut.test0;",
+                "",
+                "/**",
+                " * This class does nothing.",
+                " * @since 0.0.1",
+                " */",
+                "class Test0 {",
+                "}",
+                ""
+            )
         );
-        method.addArgument(
-            "Map<String, String>",
-            "opt",
-            "The options set"
-        );
-        iface.addMethod(method);
-        final CompilationUnit unit = new CompilationUnit(
-            license,
-            "org.cqfn.astgen.codegen.java",
-            iface
-        );
-        unit.addImport("java.util.Map");
-        unit.addImport("java.util.Collections");
-        final String expected = this.readTest("compilation_unit.txt");
-        final String actual = unit.generate();
-        Assertions.assertEquals(expected, actual);
-    }
-
-    /**
-     * Reads test source from the file.
-     * @param name The file name
-     * @return Test source
-     */
-    private String readTest(final String name) {
-        String result = "";
         boolean oops = false;
+        String actual = "";
         try {
-            result = new FilesReader(CompilationUnitTest.TESTS_PATH.concat(name))
-                .readAsString();
-        } catch (final IOException ignored) {
+            actual = unit.generateJavaCode();
+        } catch (final BaseException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
-        return result;
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void withImports() {
+        final License license = new License("Copyright (c) 2024 Jane Doe");
+        final Package pkg = new Package("org.cqfn.astranaut.test1");
+        final Klass klass = new Klass("Test1", "This class needs imports.");
+        klass.setVersion("0.0.2");
+        final CompilationUnit unit = new CompilationUnit(license, pkg, klass);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> unit.addImport("  "));
+        unit.addImport("org.cqfn.astranaut.core.base.Node");
+        unit.addImport("java.util.Arrays");
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/*",
+                " * Copyright (c) 2024 Jane Doe",
+                " */",
+                "package org.cqfn.astranaut.test1;",
+                "",
+                "import java.util.Arrays;",
+                "import org.cqfn.astranaut.core.base.Node;",
+                "",
+                "/**",
+                " * This class needs imports.",
+                " * @since 0.0.2",
+                " */",
+                "class Test1 {",
+                "}",
+                ""
+                )
+        );
+        boolean oops = false;
+        String actual = "";
+        try {
+            actual = unit.generateJavaCode();
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        Assertions.assertEquals(expected, actual);
     }
 }

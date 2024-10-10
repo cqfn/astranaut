@@ -23,8 +23,7 @@
  */
 
 /**
- * Parser that parses token sequence and creates rule objects.
- *
- * @since 0.1.5
+ * This package contains parser of the Astranaut domain-specific language.
+ * @since 1.0.0
  */
 package org.cqfn.astranaut.parser;

@@ -1,9 +1,0 @@
-B <- d@N, f@N;
-C <- d@N, h@N;
-
-N <- 0;
-
-java:
-
-A <- & | I;
-I <- l@N, r@N;

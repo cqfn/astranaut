@@ -1,8 +1,0 @@
-D <- a@A, e@E;
-E <- D | K;
-G <- a@A, e@E;
-B <- E | F;
-A <- B | C;
-F <- a@A, e@E;
-C <- G | H;
-H <- a@A, E;

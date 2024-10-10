@@ -1,7 +1,0 @@
-A <- E, E;
-C <- E, E;
-B <- A | C;
-
-java:
-F <- G, G;
-D <- F, F;

@@ -23,93 +23,50 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
-import java.io.IOException;
-import org.cqfn.astranaut.core.utils.FilesReader;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * The header that contains license.
- *
- * @since 0.1.5
+ * Entity representing the text of some license added to the beginning of each generated file.
+ * @since 1.0.0
  */
-public final class License {
+public final class License implements Entity {
     /**
-     * The file name.
+     * Text of the license, broken down line by line.
      */
-    private final String file;
-
-    /**
-     * Flag indicating that the object is in an invalid state.
-     */
-    private boolean invalid;
-
-    /**
-     * The file content.
-     */
-    private String data;
+    private final String[] lines;
 
     /**
      * Constructor.
-     * @param file The name of the file that contains license
+     * @param text Text of the license
      */
-    public License(final String file) {
-        this.file = file;
-        this.invalid = false;
-        this.data = "";
+    public License(final String text) {
+        this.lines = License.prepareText(text);
     }
 
-    /**
-     * Checks the license file is valid.
-     * @return Checking result
-     */
-    public boolean isValid() {
-        this.init();
-        return !this.invalid;
-    }
-
-    /**
-     * Generates source code.
-     * @return Source code
-     */
-    public String generate() {
-        this.init();
-        return this.data;
-    }
-
-    /**
-     * Reads a file and prepares data.
-     */
-    private void init() {
-        if (!this.invalid && this.data.isEmpty()) {
-            final FilesReader reader = new FilesReader(this.file);
-            try {
-                final String content = reader.readAsString().trim();
-                if (content.isEmpty()) {
-                    this.invalid = true;
-                } else {
-                    this.prepare(content);
-                }
-            } catch (final IOException ignored) {
-                this.invalid = true;
-            }
-        }
-    }
-
-    /**
-     * Prepares the data.
-     * @param content The file content
-     */
-    private void prepare(final String content) {
-        final String[] lines = content.split("\n");
-        final StringBuilder builder = new StringBuilder();
-        builder.append("/*\n");
-        for (final String line : lines) {
-            if (line.isEmpty()) {
-                builder.append(" *\n");
+    @Override
+    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
+        code.add(indent, "/*");
+        for (int index = 0; index < this.lines.length; index = index + 1) {
+            if (this.lines[index].isEmpty()) {
+                code.add(indent, " *");
             } else {
-                builder.append(" * ").append(line).append('\n');
+                code.add(indent, String.format(" * %s", this.lines[index]));
             }
         }
-        builder.append(" */\n\n");
-        this.data = builder.toString();
+        code.add(indent, " */");
+    }
+
+    /**
+     * Prepares the license text by breaking it line by line and removing spaces
+     *  at the beginning and end of each line.
+     * @param text Text of the license
+     * @return Text of the license, broken down line by line
+     */
+    private static String[] prepareText(final String text) {
+        final String[] array = text.trim().replace("\r", "").split("\n");
+        for (int index = 0; index < array.length; index = index + 1) {
+            array[index] = array[index].trim();
+        }
+        return array;
     }
 }

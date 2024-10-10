@@ -23,26 +23,18 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import org.cqfn.astranaut.exceptions.BaseException;
+
 /**
- * Some entity of the Java language.
- *
- * @since 0.1.5
+ * Some entity from which Java code can be generated.
+ * @since 1.0.0
  */
 public interface Entity {
     /**
-     * The tabulation size, i.e. number of repeated spaces.
+     * Builds Java source code from the entity.
+     * @param indent Code indentation. Each generated line will be indented as follows
+     * @param code Source code builder
+     * @throws BaseException If there are any problems during code generation
      */
-    int TAB_SIZE = 4;
-
-    /**
-     * The maximum line length.
-     */
-    int MAX_LINE_LENGTH = 100;
-
-    /**
-     * Generates source code.
-     * @param indent Indentation from the beginning of the line
-     * @return Java source code
-     */
-    String generate(int indent);
+    void build(int indent, SourceCodeBuilder code) throws BaseException;
 }

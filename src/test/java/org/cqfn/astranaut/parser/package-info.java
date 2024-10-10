@@ -23,8 +23,7 @@
  */
 
 /**
- * This package contains tests for parser.
- *
- * @since 0.1.5
+ * This package contains test set covering parser of the Astranaut domain-specific language.
+ * @since 1.0.0
  */
 package org.cqfn.astranaut.parser;

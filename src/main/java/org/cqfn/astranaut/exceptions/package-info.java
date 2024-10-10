@@ -23,8 +23,8 @@
  */
 
 /**
- * This package contains classes for custom exceptions.
- *
- * @since 0.1.5
+ * This package contains classes with exceptions that may be thrown during the operation
+ *  of a parser, generator, interpreter or other project module.
+ * @since 1.0.0
  */
 package org.cqfn.astranaut.exceptions;

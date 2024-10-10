@@ -23,8 +23,7 @@
  */
 
 /**
- * This package contains tests for basic classes.
- *
- * @since 0.1.5
+ * This package contains tests for Astranaut project.
+ * @since 1.0.0
  */
 package org.cqfn.astranaut;

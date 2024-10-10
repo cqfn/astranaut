@@ -23,8 +23,8 @@
  */
 
 /**
- * This package contains everything you need to generate code in the Java programming language.
- *
- * @since 0.1.5
+ * This package contains a code generator that creates source code
+ *  in the Java programming language.
+ * @since 1.0.0
  */
 package org.cqfn.astranaut.codegen.java;

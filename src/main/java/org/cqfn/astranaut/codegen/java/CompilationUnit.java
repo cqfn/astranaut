@@ -23,73 +23,82 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
-import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * Java compilation unit.
- *
- * @since 0.1.5
+ * Compilation unit, that is, whatever is needed to generate a Java source file.
+ * @since 1.0.0
  */
-public final class CompilationUnit implements JavaFile {
+public final class CompilationUnit implements Entity {
     /**
-     * The license.
+     * License.
      */
     private final License license;
 
     /**
-     * The package name.
+     * Package.
      */
-    private final String pkg;
+    private final Package pkg;
 
     /**
-     * The imports block.
+     * Set of imports.
      */
-    private final Imports imports;
+    private final Set<String> imports;
 
     /**
-     * The type, i.e. interface or class description.
+     * Class or interface.
      */
-    private final Type type;
+    private final ClassOrInterface coi;
 
     /**
      * Constructor.
-     * @param license The license
-     * @param pkg The package name
-     * @param type The type, i.e. interface or class description
+     * @param license License.
+     * @param pkg Package.
+     * @param coi Class or interface.
      */
-    public CompilationUnit(final License license, final String pkg, final Type type) {
-        this.license = Objects.requireNonNull(license);
-        this.pkg = Objects.requireNonNull(pkg);
-        this.imports = new Imports();
-        this.type = Objects.requireNonNull(type);
+    public CompilationUnit(final License license, final Package pkg, final ClassOrInterface coi) {
+        this.license = license;
+        this.pkg = pkg;
+        this.imports = new TreeSet<>();
+        this.coi = coi;
     }
 
     /**
-     * Adds import dependency.
-     * @param item The dependency
+     * Generates the source code of the compilation unit as a string.
+     * @return Source code of the compilation unit
+     * @throws BaseException If there are any problems during code generation
      */
-    public void addImport(final String item) {
-        this.imports.addItem(item);
+    public String generateJavaCode() throws BaseException {
+        final SourceCodeBuilder code = new SourceCodeBuilder();
+        this.build(0, code);
+        return code.toString();
+    }
+
+    /**
+     * Adds the name of the imported class to the list.
+     * @param klass Full name of the imported class
+     */
+    public void addImport(final String klass) {
+        final String value = klass.trim();
+        if (value.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        this.imports.add(value);
     }
 
     @Override
-    public void setVersion(final String version) {
-        this.type.setVersion(version);
-    }
-
-    @Override
-    public String generate() {
-        final StringBuilder builder = new StringBuilder(256);
-        if (this.license.isValid()) {
-            builder.append(this.license.generate());
+    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
+        this.license.build(indent, code);
+        this.pkg.build(indent, code);
+        code.add(indent, "");
+        if (!this.imports.isEmpty()) {
+            for (final String klass : this.imports) {
+                code.add(indent, String.format("import %s;", klass));
+            }
+            code.add(indent, "");
         }
-        if (!this.pkg.isEmpty()) {
-            builder.append("package ").append(this.pkg).append(";\n\n");
-        }
-        if (this.imports.hasItems()) {
-            builder.append(this.imports.generate());
-        }
-        builder.append(this.type.generate(0));
-        return builder.toString();
+        this.coi.build(indent, code);
     }
 }

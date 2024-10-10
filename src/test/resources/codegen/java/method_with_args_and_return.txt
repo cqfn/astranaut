@@ -1,9 +1,0 @@
-    /**
-     * Finds the sum of two numbers.
-     * @param aaa First number
-     * @param bbb Second number
-     * @return The sum
-     */
-    public int test(final int aaa, final int bbb) {
-        return aaa + bbb;
-    }
