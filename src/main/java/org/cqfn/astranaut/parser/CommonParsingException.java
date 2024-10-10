@@ -21,19 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.parser;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * Common parsing exception, suitable for most cases where the error message
+ *  is generated from a string.
  * @since 1.0.0
  */
-public interface Rule {
+public final class CommonParsingException extends ParsingException {
     /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * Version identifier.
      */
-    String getLanguage();
+    private static final long serialVersionUID = -1;
+
+    /**
+     * Error message.
+     */
+    private final String message;
+
+    /**
+     * Constructor.
+     * @param loc Location of the code where the error was found
+     * @param message Error message
+     */
+    protected CommonParsingException(final Location loc, final String message) {
+        super(loc);
+        this.message = message;
+    }
 
     @Override
-    String toString();
+    public String getReason() {
+        return this.message;
+    }
 }

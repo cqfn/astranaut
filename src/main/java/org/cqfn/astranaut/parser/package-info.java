@@ -21,19 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * This package contains parser of the Astranaut domain-specific language.
  * @since 1.0.0
  */
-public interface Rule {
-    /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
-     */
-    String getLanguage();
-
-    @Override
-    String toString();
-}
+package org.cqfn.astranaut.parser;

@@ -21,19 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.parser;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * Token representing a comma.
  * @since 1.0.0
  */
-public interface Rule {
+public final class Comma extends SingleCharToken {
     /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * The instance.
      */
-    String getLanguage();
+    public static final SingleCharToken INSTANCE = new Comma();
+
+    /**
+     * Private constructor.
+     */
+    private Comma() {
+    }
 
     @Override
-    String toString();
+    public char getChar() {
+        return ',';
+    }
 }

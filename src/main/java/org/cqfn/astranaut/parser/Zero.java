@@ -21,19 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.parser;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * Token representing zero.
  * @since 1.0.0
  */
-public interface Rule {
+public final class Zero extends Number {
     /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * The instance.
      */
-    String getLanguage();
+    public static final Token INSTANCE = new Zero();
 
-    @Override
-    String toString();
+    /**
+     * Constructor.
+     */
+    private Zero() {
+        super(0);
+    }
 }

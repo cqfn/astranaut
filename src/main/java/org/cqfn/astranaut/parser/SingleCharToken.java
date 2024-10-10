@@ -21,19 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.parser;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * Token that represents only one character.
  * @since 1.0.0
  */
-public interface Rule {
+public abstract class SingleCharToken extends Token {
     /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * Returns the character represented by the token.
+     * @return Character
      */
-    String getLanguage();
+    public abstract char getChar();
 
     @Override
-    String toString();
+    public final String toString() {
+        return String.valueOf(this.getChar());
+    }
 }

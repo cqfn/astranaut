@@ -21,19 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.parser;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * Removes comments from the DSL code.
  * @since 1.0.0
  */
-public interface Rule {
+public class CommentsRemover {
     /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * Source code in DSL, possibly containing comments.
      */
-    String getLanguage();
+    private final String code;
 
-    @Override
-    String toString();
+    /**
+     * Constructor.
+     * @param code Source code in DSL, possibly containing comments
+     */
+    public CommentsRemover(final String code) {
+        this.code = code;
+    }
+
+    /**
+     * Return the source code with all comments (single and multi-line) replaced by spaces.
+     * @return Uncommented source code
+     */
+    public String getUncommentedCode() {
+        final String regex = "(?s)/\\*.*?\\*/|//.*?(?=\n|$)";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(this.code);
+        final StringBuffer result = new StringBuffer();
+        while (matcher.find()) {
+            final String match = matcher.group();
+            final String replacement = match.replaceAll("[^\\n]", " ");
+            matcher.appendReplacement(result, replacement);
+        }
+        matcher.appendTail(result);
+        return result.toString();
+    }
 }

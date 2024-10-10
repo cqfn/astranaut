@@ -21,19 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.parser;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * Token representing an identifier.
  * @since 1.0.0
  */
-public interface Rule {
+public final class Identifier extends Token {
     /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * Value of identifier.
      */
-    String getLanguage();
+    private final String value;
+
+    /**
+     * Constructor.
+     * @param value Value of identifier
+     */
+    public Identifier(final String value) {
+        this.value = value;
+    }
 
     @Override
-    String toString();
+    public String toString() {
+        return this.value;
+    }
 }

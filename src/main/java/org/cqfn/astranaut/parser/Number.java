@@ -21,19 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.parser;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * Token representing an integer number.
  * @since 1.0.0
  */
-public interface Rule {
+public class Number extends Token {
     /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * Value of the number.
      */
-    String getLanguage();
+    private final int value;
+
+    /**
+     * Constructor.
+     * @param value Value of the number
+     */
+    public Number(final int value) {
+        this.value = value;
+    }
+
+    /**
+     * Returns value of the number.
+     * @return Value of the number
+     */
+    public int getValue() {
+        return this.value;
+    }
 
     @Override
-    String toString();
+    public final String toString() {
+        return String.valueOf(this.value);
+    }
 }
