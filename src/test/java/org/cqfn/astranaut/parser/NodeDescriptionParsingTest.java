@@ -86,7 +86,7 @@ class NodeDescriptionParsingTest {
     void badName() {
         final NodeDescriptorParser parser = new NodeDescriptorParser(
             NodeDescriptionParsingTest.LANGUAGE,
-            this.createStatement("13 <- BBB")
+            this.createStatement("13 <- 0")
         );
         Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
     }
@@ -95,7 +95,7 @@ class NodeDescriptionParsingTest {
     void nameWithExtraToken() {
         final NodeDescriptorParser parser = new NodeDescriptorParser(
             NodeDescriptionParsingTest.LANGUAGE,
-            this.createStatement("AAA, BBB <- CCC")
+            this.createStatement("AAA, BBB <- 0")
         );
         Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
     }
