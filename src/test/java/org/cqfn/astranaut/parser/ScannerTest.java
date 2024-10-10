@@ -32,9 +32,14 @@ import org.junit.jupiter.api.Test;
  * @since 1.0.0
  */
 class ScannerTest {
+    /**
+     * Fake location of DSL code.
+     */
+    private static final Location LOCATION = new Location("test.dsl", 1, 1);
+
     @Test
     void noTokens() {
-        final Scanner scanner = new Scanner("   ");
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, "   ");
         boolean oops = false;
         try {
             final Token token = scanner.getToken();
@@ -47,7 +52,7 @@ class ScannerTest {
 
     @Test
     void identifier() {
-        final Scanner scanner = new Scanner(" Expression ");
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " Expression ");
         boolean oops = false;
         try {
             final Token token = scanner.getToken();
@@ -61,7 +66,7 @@ class ScannerTest {
 
     @Test
     void comma() {
-        final Scanner scanner = new Scanner(" , ");
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " , ");
         boolean oops = false;
         try {
             final Token token = scanner.getToken();
@@ -75,7 +80,10 @@ class ScannerTest {
 
     @Test
     void identifiersSeparatedByComma() {
-        final Scanner scanner = new Scanner(" AssignableExpression, Expression ");
+        final Scanner scanner = new Scanner(
+            ScannerTest.LOCATION,
+            " AssignableExpression, Expression "
+        );
         boolean oops = false;
         try {
             Token token = scanner.getToken();
@@ -94,7 +102,7 @@ class ScannerTest {
 
     @Test
     void number() {
-        final Scanner scanner = new Scanner("13 0");
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, "13 0");
         boolean oops = false;
         try {
             Token token = scanner.getToken();
@@ -113,14 +121,17 @@ class ScannerTest {
 
     @Test
     void unknownSymbol() {
-        final Scanner scanner = new Scanner(" ` ");
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " ` ");
         boolean oops = false;
         try {
             scanner.getToken();
         } catch (final BaseException exception) {
             oops = true;
             Assertions.assertEquals("Parser", exception.getInitiator());
-            Assertions.assertEquals("Unknown symbol: '`'", exception.getErrorMessage());
+            Assertions.assertEquals(
+                "test.dsl, 1: Unknown symbol: '`'",
+                exception.getErrorMessage()
+            );
         }
         Assertions.assertTrue(oops);
     }

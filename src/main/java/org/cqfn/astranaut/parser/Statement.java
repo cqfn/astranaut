@@ -23,27 +23,15 @@
  */
 package org.cqfn.astranaut.parser;
 
-import java.io.File;
-
 /**
  * Some statement from the DSL source code.
  * @since 1.0.0
  */
 public final class Statement {
     /**
-     * Name of the file in which the statement is described.
+     * Location of the statement.
      */
-    private String filename;
-
-    /**
-     * Number of the first line of the statement.
-     */
-    private int begin;
-
-    /**
-     * Number of the last line of the statement.
-     */
-    private int end;
+    private Location location;
 
     /**
      * Source code of the statement.
@@ -57,19 +45,11 @@ public final class Statement {
     }
 
     /**
-     * Returns the location of the statement as a string.
+     * Returns the location of the statement.
      * @return Location of the statement
      */
-    public String getLocation() {
-        final StringBuilder builder = new StringBuilder();
-        if (!this.filename.isEmpty()) {
-            builder.append(new File(this.filename).getName()).append(", ");
-        }
-        builder.append(this.begin);
-        if (this.begin != this.end) {
-            builder.append('-').append(this.end);
-        }
-        return builder.toString();
+    public Location getLocation() {
+        return this.location;
     }
 
     /**
@@ -85,7 +65,7 @@ public final class Statement {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append(this.getLocation()).append(": ").append(this.getCode());
+        builder.append(this.getLocation().toString()).append(": ").append(this.getCode());
         return builder.toString();
     }
 
@@ -166,9 +146,7 @@ public final class Statement {
                 throw new IllegalStateException();
             }
             final Statement stmt = new Statement();
-            stmt.filename = this.filename;
-            stmt.begin = this.begin;
-            stmt.end = this.end;
+            stmt.location = new Location(this.filename, this.begin, this.end);
             stmt.code = this.code;
             return stmt;
         }

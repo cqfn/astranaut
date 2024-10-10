@@ -25,7 +25,6 @@ package org.cqfn.astranaut.parser;
 
 import java.util.Map;
 import org.cqfn.astranaut.core.utils.MapUtils;
-import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
  * Scanner splits the DSL line into tokens.
@@ -41,6 +40,11 @@ public final class Scanner {
             .make();
 
     /**
+     * Location of DSL code.
+     */
+    private final Location loc;
+
+    /**
      * Line of DSL code.
      */
     private final String line;
@@ -52,9 +56,11 @@ public final class Scanner {
 
     /**
      * Constructor.
+     * @param loc Location of DSL code
      * @param line Line of DSL code
      */
-    public Scanner(final String line) {
+    public Scanner(final Location loc, final String line) {
+        this.loc = loc;
         this.line = line;
         this.index = 0;
     }
@@ -63,9 +69,9 @@ public final class Scanner {
      * Extracts the next token from the line. If the line has ended (no more tokens),
      *  returns {@code null}.
      * @return A token
-     * @throws BaseException If the scanner cannot extract the next token
+     * @throws ParsingException If the scanner cannot extract the next token
      */
-    public Token getToken() throws BaseException {
+    public Token getToken() throws ParsingException {
         char chr = this.getChar();
         while (Character.isWhitespace(chr)) {
             chr = this.nextChar();
@@ -89,7 +95,7 @@ public final class Scanner {
                 token = this.parseNumber(chr);
                 break;
             }
-            throw new UnknownSymbol(chr);
+            throw new UnknownSymbol(this.loc, chr);
         } while (false);
         return token;
     }
@@ -157,7 +163,7 @@ public final class Scanner {
      * Exception 'Unknown symbol'.
      * @since 1.0.0
      */
-    private static final class UnknownSymbol extends BaseException {
+    private static final class UnknownSymbol extends ParsingException {
         /**
          * Version identifier.
          */
@@ -170,19 +176,16 @@ public final class Scanner {
 
         /**
          * Constructor.
+         * @param loc Location of the code where the error was found
          * @param chr Symbol that cannot be processed by the parser.
          */
-        private UnknownSymbol(final char chr) {
+        private UnknownSymbol(final Location loc, final char chr) {
+            super(loc);
             this.chr = chr;
         }
 
         @Override
-        public String getInitiator() {
-            return "Parser";
-        }
-
-        @Override
-        public String getErrorMessage() {
+        public String getReason() {
             return String.format("Unknown symbol: '%c'", this.chr);
         }
     }

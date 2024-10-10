@@ -40,7 +40,7 @@ class StatementTest {
         ctor.setEnd(3);
         ctor.setCode("  This\n<-\n  0");
         final Statement stmt = ctor.createStatement();
-        Assertions.assertEquals("test.dsl, 1-3", stmt.getLocation());
+        Assertions.assertEquals("test.dsl, 1-3", stmt.getLocation().toString());
         Assertions.assertEquals("This <- 0", stmt.getCode());
         Assertions.assertEquals("test.dsl, 1-3: This <- 0", stmt.toString());
     }
@@ -53,7 +53,7 @@ class StatementTest {
         final String code = "Addition <- left@expression, right@expression";
         ctor.setCode(code);
         final Statement stmt = ctor.createStatement();
-        Assertions.assertEquals("1", stmt.getLocation());
+        Assertions.assertEquals("1", stmt.getLocation().toString());
         Assertions.assertEquals(code, stmt.getCode());
         Assertions.assertEquals("1: ".concat(code), stmt.toString());
     }
