@@ -54,8 +54,21 @@ class StatementTest {
         ctor.setCode(code);
         final Statement stmt = ctor.createStatement();
         Assertions.assertEquals("1", stmt.getLocation().toString());
+        Assertions.assertEquals("", stmt.getLanguage());
         Assertions.assertEquals(code, stmt.getCode());
         Assertions.assertEquals("1: ".concat(code), stmt.toString());
+    }
+
+    @Test
+    void statementWithLanguage() {
+        final Statement.Constructor ctor = new Statement.Constructor();
+        ctor.setBegin(1);
+        ctor.setEnd(1);
+        final String code = "java: Synchronized <- StatementBlock";
+        ctor.setCode(code);
+        final Statement stmt = ctor.createStatement();
+        Assertions.assertEquals("java", stmt.getLanguage());
+        Assertions.assertEquals("Synchronized <- StatementBlock", stmt.getCode());
     }
 
     @Test
