@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import org.cqfn.astranaut.codegen.java.RuleGenerator;
 
 /**
  * The descriptor of an abstract node, that is, a node from which other nodes
@@ -66,6 +67,11 @@ public final class AbstractNodeDescriptor extends NodeDescriptor {
             builder.append(" | ?");
         }
         return builder.toString();
+    }
+
+    @Override
+    public RuleGenerator createGenerator() {
+        return null;
     }
 
     /**

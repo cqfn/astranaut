@@ -23,8 +23,19 @@
  */
 package org.cqfn.astranaut.cli;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
+import org.cqfn.astranaut.codegen.java.CompilationUnit;
+import org.cqfn.astranaut.codegen.java.Context;
+import org.cqfn.astranaut.codegen.java.License;
+import org.cqfn.astranaut.codegen.java.Package;
+import org.cqfn.astranaut.codegen.java.RuleGenerator;
+import org.cqfn.astranaut.core.utils.FilesWriter;
+import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.Rule;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
  * Generates source code from the described rules.
@@ -32,6 +43,39 @@ import org.cqfn.astranaut.dsl.Rule;
  */
 public final class Generate implements Action {
     @Override
-    public void perform(final List<Rule> rules, final List<String> args) {
+    public void perform(final List<Rule> rules, final List<String> args) throws BaseException {
+        final ArgumentParser options = new ArgumentParser();
+        options.parse(args);
+        final License license = new License("Copyright 2024 John Doe");
+        final Package pkg = new Package("tree");
+        final Context.Constructor cctor = new Context.Constructor();
+        cctor.setLicense(license);
+        cctor.setPackage(pkg);
+        cctor.setVersion("1.0.0");
+        final Context context = cctor.createContext();
+        for (final Rule rule : rules) {
+            final String subfolder = "nodes";
+            String language = rule.getLanguage();
+            if (language.isEmpty()) {
+                language = "common";
+            }
+            final File folder = Paths.get(options.getOutput(), language, subfolder).toFile();
+            folder.mkdirs();
+            final RuleGenerator generator = rule.createGenerator();
+            if (generator != null) {
+                final Set<CompilationUnit> units = generator.createUnits(context);
+                for (final CompilationUnit unit : units) {
+                    final String code = unit.generateJavaCode();
+                    new FilesWriter(
+                        new File(
+                            folder,
+                            ((NodeDescriptor) rule).getName().concat(".java")
+                        )
+                        .getAbsolutePath()
+                    )
+                        .writeStringNoExcept(code);
+                }
+            }
+        }
     }
 }

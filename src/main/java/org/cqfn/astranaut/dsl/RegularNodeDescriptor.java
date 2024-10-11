@@ -26,6 +26,8 @@ package org.cqfn.astranaut.dsl;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.cqfn.astranaut.codegen.java.RegularNodeGenerator;
+import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
 import org.cqfn.astranaut.interpreter.RegularBuilder;
@@ -68,6 +70,11 @@ public final class RegularNodeDescriptor extends NonAbstractNodeDescriptor {
             }
         }
         return builder.toString();
+    }
+
+    @Override
+    public RuleGenerator createGenerator() {
+        return new RegularNodeGenerator(this);
     }
 
     @Override

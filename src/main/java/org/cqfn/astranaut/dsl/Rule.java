@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import org.cqfn.astranaut.codegen.java.RuleGenerator;
+
 /**
  * One rule of the DSL language. Describes either a node or a transformation.
  * @since 1.0.0
@@ -36,4 +38,10 @@ public interface Rule {
 
     @Override
     String toString();
+
+    /**
+     * Creates a suitable generator that generates Java code.
+     * @return Generator
+     */
+    RuleGenerator createGenerator();
 }
