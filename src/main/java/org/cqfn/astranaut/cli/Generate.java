@@ -47,7 +47,7 @@ public final class Generate implements Action {
         final ArgumentParser options = new ArgumentParser();
         options.parse(args);
         final License license = new License(options.getLicence());
-        final Package pkg = new Package("tree");
+        final Package pkg = new Package(options.getPackage());
         final Context.Constructor cctor = new Context.Constructor();
         cctor.setLicense(license);
         cctor.setPackage(pkg);

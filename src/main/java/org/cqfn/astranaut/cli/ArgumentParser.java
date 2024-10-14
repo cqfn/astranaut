@@ -45,6 +45,11 @@ public class ArgumentParser {
     private String licence;
 
     /**
+     * Package name.
+     */
+    private String pkg;
+
+    /**
      * Constructor.
      */
     public ArgumentParser() {
@@ -54,6 +59,7 @@ public class ArgumentParser {
             LocalDate.now().getYear(),
             System.getProperty("user.name")
         );
+        this.pkg = "ast";
     }
 
     /**
@@ -83,6 +89,18 @@ public class ArgumentParser {
                             }
                         }
                     );
+            } else if (arg.equals("--package") || arg.equals("-p")) {
+                final String name = ArgumentParser.parseString(arg, iterator);
+                final String pattern = "^[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*$";
+                if (!name.matches(pattern)) {
+                    throw  new CommonCliException(
+                        String.format(
+                            "The string '%s' is not a valid Java package name",
+                            name
+                        )
+                    );
+                }
+                this.pkg = name;
             }
         }
     }
@@ -101,6 +119,14 @@ public class ArgumentParser {
      */
     public String getLicence() {
         return this.licence;
+    }
+
+    /**
+     * Returns the name of the packet. This name will be used in the generated files.
+     * @return Package name
+     */
+    public String getPackage() {
+        return this.pkg;
     }
 
     /**
