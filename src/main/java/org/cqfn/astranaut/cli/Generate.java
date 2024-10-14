@@ -46,7 +46,7 @@ public final class Generate implements Action {
     public void perform(final List<Rule> rules, final List<String> args) throws BaseException {
         final ArgumentParser options = new ArgumentParser();
         options.parse(args);
-        final License license = new License("Copyright 2024 John Doe");
+        final License license = new License(options.getLicence());
         final Package pkg = new Package("tree");
         final Context.Constructor cctor = new Context.Constructor();
         cctor.setLicense(license);

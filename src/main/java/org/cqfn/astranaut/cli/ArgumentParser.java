@@ -23,8 +23,10 @@
  */
 package org.cqfn.astranaut.cli;
 
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
+import org.cqfn.astranaut.core.utils.FilesReader;
 
 /**
  * Parses command line arguments.
@@ -38,10 +40,20 @@ public class ArgumentParser {
     private String output;
 
     /**
+     * License text.
+     */
+    private String licence;
+
+    /**
      * Constructor.
      */
     public ArgumentParser() {
         this.output = "output";
+        this.licence = String.format(
+            "Copyright (c) %d %s",
+            LocalDate.now().getYear(),
+            System.getProperty("user.name")
+        );
     }
 
     /**
@@ -55,6 +67,22 @@ public class ArgumentParser {
             final String arg = iterator.next();
             if (arg.equals("--output") || arg.equals("-o")) {
                 this.output = ArgumentParser.parseString(arg, iterator);
+            } else if (arg.equals("--license") || arg.equals("-l")) {
+                final String name = ArgumentParser.parseString(arg, iterator);
+                this.licence = new FilesReader(name)
+                    .readAsString(
+                        new FilesReader.CustomExceptionCreator<CliException>() {
+                            @Override
+                            public CliException create() {
+                                return new CommonCliException(
+                                    String.format(
+                                        "Can't read the license file '%s'",
+                                        name
+                                    )
+                                );
+                            }
+                        }
+                    );
             }
         }
     }
@@ -65,6 +93,14 @@ public class ArgumentParser {
      */
     public String getOutput() {
         return this.output;
+    }
+
+    /**
+     * Returns the text of the license to be added to the generated files.
+     * @return License text.
+     */
+    public String getLicence() {
+        return this.licence;
     }
 
     /**
