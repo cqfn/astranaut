@@ -26,6 +26,7 @@ package org.cqfn.astranaut.parser;
 import java.util.ArrayList;
 import java.util.List;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
+import org.cqfn.astranaut.dsl.Program;
 import org.cqfn.astranaut.dsl.Rule;
 import org.cqfn.astranaut.exceptions.BaseException;
 
@@ -50,10 +51,10 @@ public class ProgramParser {
     /**
      * Parses a program written in the DSL language.
      * @param reader Reader that reads the DSL source code and separates it into statements
-     * @return List of rules read from the DSL source code
+     * @return Entire program
      * @throws BaseException If there is an error in the program
      */
-    public List<Rule> parse(final DslReader reader) throws BaseException {
+    public Program parse(final DslReader reader) throws BaseException {
         final List<Rule> list = new ArrayList<>(0);
         Statement stmt = reader.getStatement();
         while (stmt != null) {
@@ -74,6 +75,6 @@ public class ProgramParser {
             }
             stmt = reader.getStatement();
         }
-        return list;
+        return new Program(list);
     }
 }

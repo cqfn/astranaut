@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -38,11 +39,6 @@ public final class Program {
     private final List<Rule> all;
 
     /**
-     * List of all languages for which at least one rule is described.
-     */
-    private Set<String> languages;
-
-    /**
      * Constructor.
      * @param all List of all rules
      */
@@ -55,17 +51,43 @@ public final class Program {
      * @return A list containing at least one element
      */
     public Set<String> getAllLanguages() {
-        if (this.languages == null) {
-            this.languages = new TreeSet<>();
-            for (final Rule rule : this.all) {
-                final String language = rule.getLanguage();
-                if (language.isEmpty()) {
-                    this.languages.add("common");
-                } else {
-                    this.languages.add(language);
-                }
+        final Set<String> list = new TreeSet<>();
+        for (final Rule rule : this.all) {
+            list.add(Program.fixLanguage(rule.getLanguage()));
+        }
+        return list;
+    }
+
+    /**
+     * Returns a list of node descriptors for one language.
+     * @param name Language name
+     * @return List of node descriptors for this language
+     */
+    public List<NodeDescriptor> getNodeDescriptorsForLanguage(final String name) {
+        final String fixed = Program.fixLanguage(name);
+        final List<NodeDescriptor> list = new ArrayList<>(0);
+        for (final Rule rule : this.all) {
+            if (rule instanceof NodeDescriptor
+                && Program.fixLanguage(rule.getLanguage()).equals(fixed)) {
+                list.add((NodeDescriptor) rule);
             }
         }
-        return this.languages;
+        return list;
+    }
+
+    /**
+     * Fixes the language name, so that an empty name becomes “common”.
+     *  This gives us a non-empty folder and package name.
+     * @param name Language name
+     * @return Fixed language name
+     */
+    private static String fixLanguage(final String name) {
+        final String result;
+        if (name.isEmpty()) {
+            result = "common";
+        } else {
+            result = name;
+        }
+        return result;
     }
 }

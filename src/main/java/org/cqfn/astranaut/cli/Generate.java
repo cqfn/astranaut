@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.cli;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +35,7 @@ import org.cqfn.astranaut.codegen.java.Package;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.utils.FilesWriter;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
-import org.cqfn.astranaut.dsl.Rule;
+import org.cqfn.astranaut.dsl.Program;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -42,25 +43,62 @@ import org.cqfn.astranaut.exceptions.BaseException;
  * @since 1.0.0
  */
 public final class Generate implements Action {
+    /**
+     * Command line options.
+     */
+    private final ArgumentParser options;
+
+    /**
+     * License object (required for all generated files).
+     */
+    private License license;
+
+    /**
+     * Base package object.
+     */
+    private Package basepkg;
+
+    /**
+     * Path to the folder where files and folders are generated.
+     */
+    private Path root;
+
+    /**
+     * Constructor.
+     */
+    public Generate() {
+        this.options = new ArgumentParser();
+    }
+
     @Override
-    public void perform(final List<Rule> rules, final List<String> args) throws BaseException {
-        final ArgumentParser options = new ArgumentParser();
-        options.parse(args);
-        final License license = new License(options.getLicence());
-        final Package pkg = new Package(options.getPackage());
-        final Context.Constructor cctor = new Context.Constructor();
-        cctor.setLicense(license);
-        cctor.setPackage(pkg);
-        cctor.setVersion("1.0.0");
-        final Context context = cctor.createContext();
-        for (final Rule rule : rules) {
-            final String subfolder = "nodes";
-            String language = rule.getLanguage();
-            if (language.isEmpty()) {
-                language = "common";
-            }
-            final File folder = Paths.get(options.getOutput(), language, subfolder).toFile();
-            folder.mkdirs();
+    public void perform(final Program program, final List<String> args) throws BaseException {
+        this.options.parse(args);
+        this.license = new License(this.options.getLicence());
+        this.basepkg = new Package(this.options.getPackage());
+        this.root = Paths.get(
+            this.options.getOutput(),
+            this.options.getPackage().replace('.', '/')
+        );
+        for (final String language : program.getAllLanguages()) {
+            this.generateNodes(program, language);
+        }
+    }
+
+    /**
+     * Generates nodes describing the syntax of the specified language.
+     * @param program Program implemented in DSL
+     * @param language Language name
+     * @throws BaseException If files cannot be generated
+     */
+    private void generateNodes(final Program program, final String language) throws BaseException {
+        final Context.Constructor cct = new Context.Constructor();
+        cct.setLicense(this.license);
+        cct.setPackage(this.basepkg.getSubpackage("common", "nodes"));
+        cct.setVersion("1.0.0");
+        final Context context = cct.createContext();
+        final File folder = this.root.resolve(String.format("%s/nodes", language)).toFile();
+        folder.mkdirs();
+        for (final NodeDescriptor rule : program.getNodeDescriptorsForLanguage(language)) {
             final RuleGenerator generator = rule.createGenerator();
             if (generator != null) {
                 final Set<CompilationUnit> units = generator.createUnits(context);
@@ -69,7 +107,7 @@ public final class Generate implements Action {
                     new FilesWriter(
                         new File(
                             folder,
-                            ((NodeDescriptor) rule).getName().concat(".java")
+                            rule.getName().concat(".java")
                         )
                         .getAbsolutePath()
                     )

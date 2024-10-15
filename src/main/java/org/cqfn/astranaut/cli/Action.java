@@ -24,7 +24,7 @@
 package org.cqfn.astranaut.cli;
 
 import java.util.List;
-import org.cqfn.astranaut.dsl.Rule;
+import org.cqfn.astranaut.dsl.Program;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -34,9 +34,9 @@ import org.cqfn.astranaut.exceptions.BaseException;
 public interface Action {
     /**
      * Performs the action.
-     * @param rules List of rules read from the DSL source code
+     * @param program Program implemented in DSL
      * @param args Unprocessed command line arguments, that is, all but the first two
      * @throws BaseException If the action could not be performed
      */
-    void perform(List<Rule> rules, List<String> args) throws BaseException;
+    void perform(Program program, List<String> args) throws BaseException;
 }
