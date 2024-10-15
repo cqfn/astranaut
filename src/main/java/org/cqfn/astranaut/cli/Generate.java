@@ -94,7 +94,7 @@ public final class Generate implements Action {
         final Context.Constructor cct = new Context.Constructor();
         cct.setLicense(this.license);
         cct.setPackage(this.basepkg.getSubpackage("common", "nodes"));
-        cct.setVersion("1.0.0");
+        cct.setVersion(this.options.getVersion());
         final Context context = cct.createContext();
         final File folder = this.root.resolve(String.format("%s/nodes", language)).toFile();
         folder.mkdirs();

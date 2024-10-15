@@ -50,6 +50,11 @@ public class ArgumentParser {
     private String pkg;
 
     /**
+     * Version number.
+     */
+    private String version;
+
+    /**
      * Constructor.
      */
     public ArgumentParser() {
@@ -60,6 +65,7 @@ public class ArgumentParser {
             System.getProperty("user.name")
         );
         this.pkg = "ast";
+        this.version = "1.0.0";
     }
 
     /**
@@ -93,14 +99,16 @@ public class ArgumentParser {
                 final String name = ArgumentParser.parseString(arg, iterator);
                 final String pattern = "^[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*$";
                 if (!name.matches(pattern)) {
-                    throw  new CommonCliException(
-                        String.format(
-                            "The string '%s' is not a valid Java package name",
-                            name
-                        )
+                    throw new CommonCliException(
+                            String.format(
+                                    "The string '%s' is not a valid Java package name",
+                                    name
+                            )
                     );
                 }
                 this.pkg = name;
+            } else if (arg.equals("--version") || arg.equals("-v")) {
+                this.version = ArgumentParser.parseString(arg, iterator);
             }
         }
     }
@@ -127,6 +135,15 @@ public class ArgumentParser {
      */
     public String getPackage() {
         return this.pkg;
+    }
+
+    /**
+     * Returns the version number of the generated files.
+     *  This number will be added to the description of each generated class and interface.
+     * @return Version number
+     */
+    public String getVersion() {
+        return this.version;
     }
 
     /**
