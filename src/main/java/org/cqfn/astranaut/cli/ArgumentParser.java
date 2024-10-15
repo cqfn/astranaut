@@ -77,38 +77,25 @@ public class ArgumentParser {
         final Iterator<String> iterator = args.iterator();
         while (iterator.hasNext()) {
             final String arg = iterator.next();
-            if (arg.equals("--output") || arg.equals("-o")) {
-                this.output = ArgumentParser.parseString(arg, iterator);
-            } else if (arg.equals("--license") || arg.equals("-l")) {
-                final String name = ArgumentParser.parseString(arg, iterator);
-                this.licence = new FilesReader(name)
-                    .readAsString(
-                        new FilesReader.CustomExceptionCreator<CliException>() {
-                            @Override
-                            public CliException create() {
-                                return new CommonCliException(
-                                    String.format(
-                                        "Can't read the license file '%s'",
-                                        name
-                                    )
-                                );
-                            }
-                        }
-                    );
-            } else if (arg.equals("--package") || arg.equals("-p")) {
-                final String name = ArgumentParser.parseString(arg, iterator);
-                final String pattern = "^[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*$";
-                if (!name.matches(pattern)) {
-                    throw new CommonCliException(
-                            String.format(
-                                    "The string '%s' is not a valid Java package name",
-                                    name
-                            )
-                    );
-                }
-                this.pkg = name;
-            } else if (arg.equals("--version") || arg.equals("-v")) {
-                this.version = ArgumentParser.parseString(arg, iterator);
+            switch (arg) {
+                case "--output":
+                case "-o":
+                    this.output = ArgumentParser.parseString(arg, iterator);
+                    break;
+                case "--license":
+                case "-l":
+                    this.parseLicense(arg, iterator);
+                    break;
+                case "--package":
+                case "-p":
+                    this.parsePackageName(arg, iterator);
+                    break;
+                case "--version":
+                case "-v":
+                    this.version = ArgumentParser.parseString(arg, iterator);
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -176,5 +163,51 @@ public class ArgumentParser {
             );
         }
         return value;
+    }
+
+    /**
+     * Parses the name of the file containing the license and reads the file.
+     * @param arg Parameter
+     * @param iterator Iterator by parameters
+     * @throws CliException If parsing or reading failed
+     */
+    private void parseLicense(final String arg, final Iterator<String> iterator)
+        throws CliException {
+        final String name = ArgumentParser.parseString(arg, iterator);
+        this.licence = new FilesReader(name)
+            .readAsString(
+                new FilesReader.CustomExceptionCreator<CliException>() {
+                    @Override
+                    public CliException create() {
+                        return new CommonCliException(
+                            String.format(
+                                "Can't read the license file '%s'",
+                                name
+                            )
+                        );
+                    }
+                }
+            );
+    }
+
+    /**
+     * Parses the package name and checks it for correctness.
+     * @param arg Parameter
+     * @param iterator Iterator by parameters
+     * @throws CliException If parsing or checking failed
+     */
+    private void parsePackageName(final String arg, final Iterator<String> iterator)
+        throws CliException {
+        final String name = ArgumentParser.parseString(arg, iterator);
+        final String pattern = "^[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*$";
+        if (!name.matches(pattern)) {
+            throw new CommonCliException(
+                String.format(
+                    "The string '%s' is not a valid Java package name",
+                    name
+                )
+            );
+        }
+        this.pkg = name;
     }
 }

@@ -104,16 +104,46 @@ public final class Generate implements Action {
                 final Set<CompilationUnit> units = generator.createUnits(context);
                 for (final CompilationUnit unit : units) {
                     final String code = unit.generateJavaCode();
-                    new FilesWriter(
-                        new File(
-                            folder,
-                            rule.getName().concat(".java")
-                        )
-                        .getAbsolutePath()
+                    final String path = new File(
+                        folder,
+                        rule.getName().concat(".java")
                     )
-                        .writeStringNoExcept(code);
+                        .getAbsolutePath();
+                    final boolean result = new FilesWriter(path).writeStringNoExcept(code);
+                    if (!result) {
+                        throw new CannotWriteFile(path);
+                    }
                 }
             }
+        }
+    }
+
+    /**
+     * Exception 'Cannot write file'.
+     * @since 1.0.0
+     */
+    private static final class CannotWriteFile extends CliException {
+        /**
+         * Version identifier.
+         */
+        private static final long serialVersionUID = -1;
+
+        /**
+         * The name of the file that could not be written.
+         */
+        private final String name;
+
+        /**
+         * Constructor.
+         * @param name The name of the file that could not be written
+         */
+        private CannotWriteFile(final String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getErrorMessage() {
+            return String.format("Cannot write file: '%s'", this.name);
         }
     }
 }
