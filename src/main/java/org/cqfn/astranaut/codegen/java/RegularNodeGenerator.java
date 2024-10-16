@@ -84,53 +84,53 @@ public final class RegularNodeGenerator implements RuleGenerator {
 
     /**
      * Creates a field and a method related to the fragment.
-     * @param node Class describing the node
+     * @param klass Class describing the node
      */
-    private static void createFragmentFieldAndGetter(final Klass node) {
+    private static void createFragmentFieldAndGetter(final Klass klass) {
         final Field field = new Field(
             "Fragment",
             "fragment",
             "Fragment of source code that is associated with the node."
         );
         field.makePrivate();
-        node.addField(field);
+        klass.addField(field);
         final Method getter = new Method("Fragment", "getFragment");
         getter.makePublic();
         getter.setBody("return this.fragment;");
-        node.addMethod(getter);
+        klass.addMethod(getter);
     }
 
     /**
      * Creates fields and a method related to the type.
-     * @param node Class describing the node
+     * @param klass Class describing the node
      */
-    private void createTypeFieldAndGetter(final Klass node) {
+    private void createTypeFieldAndGetter(final Klass klass) {
         final String name = this.rule.getName();
         final Field typename = new Field("String", "NAME", "Name of the type");
         typename.makePublic();
         typename.makeStatic();
         typename.makeFinal(String.format("\"%s\"", name));
-        node.addField(typename);
+        klass.addField(typename);
         final Field object = new Field("Type", "TYPE", "Type of the node");
         object.makePublic();
         object.makeStatic();
         object.makeFinal(String.format("new %sType()", name));
-        node.addField(object);
+        klass.addField(object);
         final Method getter = new Method("Type", "getType");
         getter.makePublic();
         getter.setBody(String.format("return %s.TYPE;", name));
-        node.addMethod(getter);
+        klass.addMethod(getter);
     }
 
     /**
      * Creates the 'getData()' method.
-     * @param node Class describing the node
+     * @param klass Class describing the node
      */
-    private static void createDataGetter(final Klass node) {
+    private static void createDataGetter(final Klass klass) {
         final Method getter = new Method("String", "getData");
         getter.makePublic();
         getter.setBody("return \"\";");
-        node.addMethod(getter);
+        klass.addMethod(getter);
     }
 
     /**
@@ -165,7 +165,31 @@ public final class RegularNodeGenerator implements RuleGenerator {
         type.makeFinal();
         type.setImplementsList("Type");
         type.setVersion(context.getVersion());
+        this.createNameGetter(type);
+        this.createBuilderCreator(type);
         return type;
+    }
+
+    /**
+     * Creates the 'getName()' method.
+     * @param klass Class describing the type
+     */
+    private void createNameGetter(final Klass klass) {
+        final Method method = new Method("String", "getName");
+        method.makePublic();
+        method.setBody(String.format("return %s.NAME;", this.rule.getName()));
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates the 'createBuilder()' method.
+     * @param klass Class describing the type
+     */
+    private void createBuilderCreator(final Klass klass) {
+        final Method method = new Method("Builder", "createBuilder");
+        method.makePublic();
+        method.setBody(String.format("return new %s.Constructor();", this.rule.getName()));
+        klass.addMethod(method);
     }
 
     /**

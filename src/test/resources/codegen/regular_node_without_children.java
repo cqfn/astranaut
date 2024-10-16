@@ -58,6 +58,15 @@ public final class This implements Node {
      * @since 1.0.0
      */
     private static final class ThisType implements Type {
+        @Override
+        public String getName() {
+            return This.NAME;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new This.Constructor();
+        }
     }
 
     /**
