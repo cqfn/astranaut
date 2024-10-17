@@ -21,27 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
-
-import org.cqfn.astranaut.codegen.java.RuleGenerator;
+package org.cqfn.astranaut.cli;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * Common exception thrown during  actions inside the CLI module, suitable for most cases
+ * where the error message is generated from a string.
  * @since 1.0.0
  */
-public interface Rule {
+public final class CommonCliException extends CliException {
     /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * Version identifier.
      */
-    String getLanguage();
+    private static final long serialVersionUID = -1;
+
+    /**
+     * Error message.
+     */
+    private final String message;
+
+    /**
+     * Constructor.
+     * @param message Error message
+     */
+    public CommonCliException(final String message) {
+        this.message = message;
+    }
 
     @Override
-    String toString();
-
-    /**
-     * Creates a suitable generator that generates Java code.
-     * @return Generator
-     */
-    RuleGenerator createGenerator();
+    public String getErrorMessage() {
+        return this.message;
+    }
 }

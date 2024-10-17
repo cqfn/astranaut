@@ -26,6 +26,7 @@ package org.cqfn.astranaut.dsl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
 import org.cqfn.astranaut.interpreter.LiteralBuilder;
@@ -99,6 +100,11 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
             builder.append(LiteralDescriptor.DELIMITER).append(this.exception).append('\'');
         }
         return builder.toString();
+    }
+
+    @Override
+    public RuleGenerator createGenerator() {
+        return null;
     }
 
     @Override

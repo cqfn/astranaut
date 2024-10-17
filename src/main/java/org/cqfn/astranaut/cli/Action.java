@@ -21,27 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.cli;
 
-import org.cqfn.astranaut.codegen.java.RuleGenerator;
+import java.util.List;
+import org.cqfn.astranaut.dsl.Program;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * Some useful action that the program performs.
  * @since 1.0.0
  */
-public interface Rule {
+public interface Action {
     /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * Performs the action.
+     * @param program Program implemented in DSL
+     * @param args Unprocessed command line arguments, that is, all but the first two
+     * @throws BaseException If the action could not be performed
      */
-    String getLanguage();
-
-    @Override
-    String toString();
-
-    /**
-     * Creates a suitable generator that generates Java code.
-     * @return Generator
-     */
-    RuleGenerator createGenerator();
+    void perform(Program program, List<String> args) throws BaseException;
 }
