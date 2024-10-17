@@ -93,7 +93,7 @@ public final class Generate implements Action {
     private void generateNodes(final Program program, final String language) throws BaseException {
         final Context.Constructor cct = new Context.Constructor();
         cct.setLicense(this.license);
-        cct.setPackage(this.basepkg.getSubpackage("common", "nodes"));
+        cct.setPackage(this.basepkg.getSubpackage(language, "nodes"));
         cct.setVersion(this.options.getVersion());
         final Context context = cct.createContext();
         final File folder = this.root.resolve(String.format("%s/nodes", language)).toFile();

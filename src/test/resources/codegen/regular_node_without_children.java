@@ -3,6 +3,7 @@
  */
 package org.cqfn.astranaut.test;
 
+import java.util.List;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
@@ -74,5 +75,36 @@ public final class This implements Node {
      * @since 1.0.0
      */
     public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final This node = new This();
+            node.fragment = this.fragment;
+            return node;
+        }
     }
 }

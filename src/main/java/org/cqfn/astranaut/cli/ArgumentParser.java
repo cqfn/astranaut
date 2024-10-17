@@ -92,7 +92,7 @@ public class ArgumentParser {
                     break;
                 case "--version":
                 case "-v":
-                    this.version = ArgumentParser.parseString(arg, iterator);
+                    this.parseVersion(arg, iterator);
                     break;
                 default:
                     break;
@@ -209,5 +209,26 @@ public class ArgumentParser {
             );
         }
         this.pkg = name;
+    }
+
+    /**
+     * Parses the version number and checks it for correctness.
+     * @param arg Parameter
+     * @param iterator Iterator by parameters
+     * @throws CliException If parsing or checking failed
+     */
+    private void parseVersion(final String arg, final Iterator<String> iterator)
+        throws CliException {
+        final String name = ArgumentParser.parseString(arg, iterator);
+        final String pattern = "^\\d+(\\.\\d+){1,2}(\\.[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$";
+        if (!name.matches(pattern)) {
+            throw new CommonCliException(
+                String.format(
+                    "The string '%s' is not a valid version number",
+                    name
+                )
+            );
+        }
+        this.version = name;
     }
 }

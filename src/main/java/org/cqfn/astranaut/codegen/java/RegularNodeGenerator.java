@@ -23,7 +23,9 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 
@@ -63,6 +65,7 @@ public final class RegularNodeGenerator implements RuleGenerator {
             context.getPackage(),
             node
         );
+        unit.addImport("java.util.List");
         final String base = "org.cqfn.astranaut.core.base.";
         unit.addImport(base.concat("Node"));
         unit.addImport(base.concat("Fragment"));
@@ -127,10 +130,10 @@ public final class RegularNodeGenerator implements RuleGenerator {
      * @param klass Class describing the node
      */
     private static void createDataGetter(final Klass klass) {
-        final Method getter = new Method("String", "getData");
-        getter.makePublic();
-        getter.setBody("return \"\";");
-        klass.addMethod(getter);
+        final Method method = new Method("String", "getData");
+        method.makePublic();
+        method.setBody("return \"\";");
+        klass.addMethod(method);
     }
 
     /**
@@ -156,18 +159,18 @@ public final class RegularNodeGenerator implements RuleGenerator {
      */
     private Klass createTypeClass(final Context context) {
         final String name = this.rule.getName();
-        final Klass type = new Klass(
+        final Klass klass = new Klass(
             String.format("%sType", name),
             String.format("Type implementation describing '%s' nodes.", name)
         );
-        type.makePrivate();
-        type.makeStatic();
-        type.makeFinal();
-        type.setImplementsList("Type");
-        type.setVersion(context.getVersion());
-        this.createNameGetter(type);
-        this.createBuilderCreator(type);
-        return type;
+        klass.makePrivate();
+        klass.makeStatic();
+        klass.makeFinal();
+        klass.setImplementsList("Type");
+        klass.setVersion(context.getVersion());
+        this.createNameGetter(klass);
+        this.createBuilderCreator(klass);
+        return klass;
     }
 
     /**
@@ -183,7 +186,7 @@ public final class RegularNodeGenerator implements RuleGenerator {
 
     /**
      * Creates the 'createBuilder()' method.
-     * @param klass Class describing the type
+     * @param klass Class describing the node
      */
     private void createBuilderCreator(final Klass klass) {
         final Method method = new Method("Builder", "createBuilder");
@@ -199,15 +202,90 @@ public final class RegularNodeGenerator implements RuleGenerator {
      */
     private Klass createBuilderClass(final Context context) {
         final String name = this.rule.getName();
-        final Klass builder = new Klass(
+        final Klass klass = new Klass(
             String.format("Constructor"),
             String.format("Constructor (builder) that creates nodes of the '%s' type.", name)
         );
-        builder.makePublic();
-        builder.makeStatic();
-        builder.makeFinal();
-        builder.setImplementsList("Builder");
-        builder.setVersion(context.getVersion());
-        return builder;
+        klass.makePublic();
+        klass.makeStatic();
+        klass.makeFinal();
+        klass.setImplementsList("Builder");
+        klass.setVersion(context.getVersion());
+        RegularNodeGenerator.createFragmentFieldAndSetter(klass);
+        RegularNodeGenerator.createDataSetter(klass);
+        RegularNodeGenerator.createChildrenListSetter(klass);
+        RegularNodeGenerator.createValidator(klass);
+        this.createNodeCreator(klass);
+        return klass;
+    }
+
+    /**
+     * Creates a field and a method related to the fragment.
+     * @param klass Class describing the builder
+     */
+    private static void createFragmentFieldAndSetter(final Klass klass) {
+        final Field field = new Field(
+            "Fragment",
+            "fragment",
+            "Fragment of source code that is associated with the node."
+        );
+        field.makePrivate();
+        klass.addField(field);
+        final Method setter = new Method("void", "setFragment");
+        setter.makePublic();
+        setter.addArgument("Fragment", "object");
+        setter.setBody("this.fragment = object;");
+        klass.addMethod(setter);
+    }
+
+    /**
+     * Creates the 'setData()' method.
+     * @param klass Class describing the builder
+     */
+    private static void createDataSetter(final Klass klass) {
+        final Method method = new Method("boolean", "setData");
+        method.makePublic();
+        method.addArgument("String", "value");
+        method.setBody("return value.isEmpty();");
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates the 'setChildrenList()' method.
+     * @param klass Class describing the builder
+     */
+    private static void createChildrenListSetter(final Klass klass) {
+        final Method method = new Method("boolean", "setChildrenList");
+        method.makePublic();
+        method.addArgument("List<Node>", "list");
+        method.setBody("return list.isEmpty();");
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates the 'isValid()' method.
+     * @param klass Class describing the builder
+     */
+    private static void createValidator(final Klass klass) {
+        final Method method = new Method("boolean", "isValid");
+        method.makePublic();
+        method.setBody("return true;");
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates the 'createNode()' method.
+     * @param klass Class describing the builder
+     */
+    private void createNodeCreator(final Klass klass) {
+        final Method method = new Method("Node", "createNode");
+        method.makePublic();
+        final String name = this.rule.getName();
+        final List<String> lines = new ArrayList<>();
+        lines.add(String.format("final %s node = new %s();", name, name));
+        lines.add("node.fragment = this.fragment;");
+        lines.add("return node;");
+        method.setBody(String.join("\n", lines));
+        klass.addMethod(method);
     }
 }
