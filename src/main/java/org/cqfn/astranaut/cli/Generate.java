@@ -27,11 +27,13 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import org.cqfn.astranaut.codegen.java.CompilationUnit;
 import org.cqfn.astranaut.codegen.java.Context;
 import org.cqfn.astranaut.codegen.java.License;
 import org.cqfn.astranaut.codegen.java.Package;
+import org.cqfn.astranaut.codegen.java.PackageInfo;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.utils.FilesWriter;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
@@ -91,25 +93,42 @@ public final class Generate implements Action {
      * @throws BaseException If files cannot be generated
      */
     private void generateNodes(final Program program, final String language) throws BaseException {
-        final Context.Constructor cct = new Context.Constructor();
-        cct.setLicense(this.license);
-        cct.setPackage(this.basepkg.getSubpackage(language, "nodes"));
-        cct.setVersion(this.options.getVersion());
-        final Context context = cct.createContext();
+        final Package pkg = this.basepkg.getSubpackage(language, "nodes");
         final File folder = this.root.resolve(String.format("%s/nodes", language)).toFile();
         folder.mkdirs();
+        final String brief;
+        if (language.equals("common")) {
+            brief = "This package contains common ('green') nodes";
+        } else {
+            brief = String.format(
+                "This package contains nodes that describe the syntax of %s%s language",
+                language.substring(0, 1).toUpperCase(Locale.ENGLISH),
+                language.substring(1)
+            );
+        }
+        final PackageInfo info = new PackageInfo(this.license, brief, pkg);
+        String path = new File(folder, "package-info.java").getAbsolutePath();
+        boolean result = new FilesWriter(path).writeStringNoExcept(info.generateJavaCode());
+        if (!result) {
+            throw new CannotWriteFile(path);
+        }
+        final Context.Constructor cct = new Context.Constructor();
+        cct.setLicense(this.license);
+        cct.setPackage(pkg);
+        cct.setVersion(this.options.getVersion());
+        final Context context = cct.createContext();
         for (final NodeDescriptor rule : program.getNodeDescriptorsForLanguage(language)) {
             final RuleGenerator generator = rule.createGenerator();
             if (generator != null) {
                 final Set<CompilationUnit> units = generator.createUnits(context);
                 for (final CompilationUnit unit : units) {
                     final String code = unit.generateJavaCode();
-                    final String path = new File(
+                    path = new File(
                         folder,
                         rule.getName().concat(".java")
                     )
                         .getAbsolutePath();
-                    final boolean result = new FilesWriter(path).writeStringNoExcept(code);
+                    result = new FilesWriter(path).writeStringNoExcept(code);
                     if (!result) {
                         throw new CannotWriteFile(path);
                     }
