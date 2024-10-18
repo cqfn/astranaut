@@ -24,6 +24,8 @@
 package org.cqfn.astranaut.cli;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.file.Path;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -31,6 +33,7 @@ import java.util.logging.StreamHandler;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Tests covering {@link Main} class.
@@ -61,6 +64,24 @@ class MainTest {
     }
 
     @Test
+    void generate(final @TempDir Path temp) {
+        final Path output = temp.resolve("output");
+        final String[] args = {
+            "generate",
+            "src/test/resources/dsl/node_without_children.dsl",
+            "--output",
+            output.toFile().getAbsolutePath(),
+            "--package",
+            "tree",
+        };
+        Main.main(args);
+        final File generated = temp.resolve("output/tree/common/nodes").toFile();
+        Assertions.assertTrue(generated.exists());
+        Assertions.assertTrue(generated.isDirectory());
+        Assertions.assertTrue(new File(generated, "This.java").exists());
+    }
+
+    @Test
     void runWithoutParameters() {
         boolean oops = false;
         try {
@@ -69,6 +90,33 @@ class MainTest {
             oops = true;
             Assertions.assertEquals("Command line interface", exception.getInitiator());
             Assertions.assertEquals(MainTest.NO_PARAMETERS, exception.getErrorMessage());
+        }
+        Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void unknownAction() {
+        boolean oops = false;
+        try {
+            Main.run("relax");
+        } catch (final BaseException exception) {
+            oops = true;
+            Assertions.assertEquals("Unknown action: 'relax'", exception.getErrorMessage());
+        }
+        Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void programIsNotSpecified() {
+        boolean oops = false;
+        try {
+            Main.run("generate");
+        } catch (final BaseException exception) {
+            oops = true;
+            Assertions.assertEquals(
+                "A file with a DSL program is not specified",
+                exception.getErrorMessage()
+            );
         }
         Assertions.assertTrue(oops);
     }
