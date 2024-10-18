@@ -21,27 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
-
-import org.cqfn.astranaut.codegen.java.RuleGenerator;
+package org.cqfn.astranaut.codegen.java;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * String constants used when source code is generated.
  * @since 1.0.0
  */
-public interface Rule {
+final class Strings {
     /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * The 'Node' type.
      */
-    String getLanguage();
-
-    @Override
-    String toString();
+    public static final String TYPE_NODE = "Node";
 
     /**
-     * Creates a suitable generator that generates Java code.
-     * @return Generator
+     * The 'Fragment' type.
      */
-    RuleGenerator createGenerator();
+    public static final String TYPE_FRAGMENT = "Fragment";
+
+    /**
+     * Private constructor.
+     */
+    private Strings() {
+    }
 }

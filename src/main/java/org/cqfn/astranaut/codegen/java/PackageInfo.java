@@ -23,71 +23,53 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
-import java.util.Set;
-import java.util.TreeSet;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * Compilation unit, that is, whatever is needed to generate a Java source file.
+ * Describes 'package-info.java' file.
  * @since 1.0.0
  */
-public final class CompilationUnit implements JavaFileGenerator {
+public final class PackageInfo implements JavaFileGenerator {
     /**
      * License.
      */
     private final License license;
 
     /**
-     * Package.
+     * Documentation.
+     */
+    private final JavaDoc doc;
+
+    /**
+     * Package itself.
      */
     private final Package pkg;
 
     /**
-     * Set of imports.
-     */
-    private final Set<String> imports;
-
-    /**
-     * Class or interface.
-     */
-    private final ClassOrInterface coi;
-
-    /**
      * Constructor.
-     * @param license License.
-     * @param pkg Package.
-     * @param coi Class or interface.
+     * @param license License
+     * @param brief Brief description of the package
+     * @param pkg Package itself
      */
-    public CompilationUnit(final License license, final Package pkg, final ClassOrInterface coi) {
+    public PackageInfo(final License license, final String brief, final Package pkg) {
         this.license = license;
+        this.doc = new JavaDoc(brief);
         this.pkg = pkg;
-        this.imports = new TreeSet<>();
-        this.coi = coi;
     }
 
     /**
-     * Adds the name of the imported class to the list.
-     * @param klass Full name of the imported class
+     * Sets the version number. It will be added to JavaDoc.
+     * @param value Version number
      */
-    public void addImport(final String klass) {
-        final String value = klass.trim();
-        if (value.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-        this.imports.add(value);
+    public void setVersion(final String value) {
+        this.doc.setVersion(value);
     }
 
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.license.build(indent, code);
-        this.pkg.build(indent, code);
         code.add(indent, "");
-        if (!this.imports.isEmpty()) {
-            for (final String klass : this.imports) {
-                code.add(indent, String.format("import %s;", klass));
-            }
-            code.add(indent, "");
-        }
-        this.coi.build(indent, code);
+        this.doc.build(indent, code);
+        this.pkg.build(indent, code);
     }
 }

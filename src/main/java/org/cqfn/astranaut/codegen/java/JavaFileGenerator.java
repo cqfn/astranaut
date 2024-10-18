@@ -21,27 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.codegen.java;
 
-import org.cqfn.astranaut.codegen.java.RuleGenerator;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * Entity that represents and generates whole Java files.
  * @since 1.0.0
  */
-public interface Rule {
+public interface JavaFileGenerator extends Entity {
     /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * Generates the source code of the entity as a string.
+     * @return Source code of the entity
+     * @throws BaseException If there are any problems during code generation
      */
-    String getLanguage();
-
-    @Override
-    String toString();
-
-    /**
-     * Creates a suitable generator that generates Java code.
-     * @return Generator
-     */
-    RuleGenerator createGenerator();
+    default String generateJavaCode() throws BaseException {
+        final SourceCodeBuilder code = new SourceCodeBuilder();
+        this.build(0, code);
+        return code.toString();
+    }
 }

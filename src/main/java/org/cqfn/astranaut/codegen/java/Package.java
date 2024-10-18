@@ -46,6 +46,18 @@ public final class Package implements Entity {
         this.name = Package.prepareName(parts);
     }
 
+    /**
+     * Returns the packet that is inside the current packet.
+     * @param parts Parts of the subpackage name
+     * @return Subpackage
+     */
+    public Package getSubpackage(final String... parts) {
+        final String[] args = new String[parts.length + 1];
+        args[0] = this.name;
+        System.arraycopy(parts, 0, args, 1, parts.length);
+        return new Package(args);
+    }
+
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         code.add(indent, String.format("package %s;", this.name));

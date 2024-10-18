@@ -21,27 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
-
-import org.cqfn.astranaut.codegen.java.RuleGenerator;
 
 /**
- * One rule of the DSL language. Describes either a node or a transformation.
+ * This package contains test set covering classes that are responsible\
+ *  for the command line interface.
  * @since 1.0.0
  */
-public interface Rule {
-    /**
-     * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
-     */
-    String getLanguage();
-
-    @Override
-    String toString();
-
-    /**
-     * Creates a suitable generator that generates Java code.
-     * @return Generator
-     */
-    RuleGenerator createGenerator();
-}
+package org.cqfn.astranaut.cli;

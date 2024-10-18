@@ -53,11 +53,28 @@ public final class Statement {
     }
 
     /**
+     * Extracts the language marker if it is present in the statement.
+     * @return Language or empty string
+     */
+    public String getLanguage() {
+        String language = "";
+        if (this.code.matches("^[a-zA-Z][a-zA-Z0-9]*:.*")) {
+            language = this.code.split(":")[0].trim();
+        }
+        return language;
+    }
+
+    /**
      * Returns source code of the statement.
      * @return Source code of the statement
      */
     public String getCode() {
-        return this.code
+        final String language = this.getLanguage();
+        String tail = this.code;
+        if (!language.isEmpty()) {
+            tail = this.code.substring(language.length() + 1).trim();
+        }
+        return tail
             .replaceAll("[\\r\\n]+", " ")
             .replaceAll("\\s{2,}", " ");
     }
