@@ -79,6 +79,7 @@ class MainTest {
         Assertions.assertTrue(generated.exists());
         Assertions.assertTrue(generated.isDirectory());
         Assertions.assertTrue(new File(generated, "This.java").exists());
+        Assertions.assertTrue(new File(generated, "package-info.java").exists());
     }
 
     @Test
