@@ -107,6 +107,7 @@ public final class Generate implements Action {
             );
         }
         final PackageInfo info = new PackageInfo(this.license, brief, pkg);
+        info.setVersion(this.options.getVersion());
         String path = new File(folder, "package-info.java").getAbsolutePath();
         boolean result = new FilesWriter(path).writeStringNoExcept(info.generateJavaCode());
         if (!result) {

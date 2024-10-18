@@ -155,6 +155,7 @@ public final class This implements Node {
 
 /**
  * This package contains common ('green') nodes.
+ * @since 1.0.0
  */
 package org.cqfn.uast.tree.common.nodes;
 
