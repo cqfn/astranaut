@@ -34,6 +34,7 @@ import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
  *  a limited number of some child nodes and no data.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public final class RegularNodeGenerator implements RuleGenerator {
     /**
      * The rule that describes regular node.
@@ -55,7 +56,7 @@ public final class RegularNodeGenerator implements RuleGenerator {
         final Klass node = new Klass(name, brief);
         node.makePublic();
         node.makeFinal();
-        node.setImplementsList("Node");
+        node.setImplementsList(Strings.TYPE_NODE);
         node.setVersion(context.getVersion());
         node.addNested(this.createTypeClass(context));
         node.addNested(this.createBuilderClass(context));
@@ -67,8 +68,8 @@ public final class RegularNodeGenerator implements RuleGenerator {
         );
         unit.addImport("java.util.List");
         final String base = "org.cqfn.astranaut.core.base.";
-        unit.addImport(base.concat("Node"));
-        unit.addImport(base.concat("Fragment"));
+        unit.addImport(base.concat(Strings.TYPE_NODE));
+        unit.addImport(base.concat(Strings.TYPE_FRAGMENT));
         unit.addImport(base.concat("Type"));
         unit.addImport(base.concat("Builder"));
         return Collections.singleton(unit);
@@ -91,13 +92,13 @@ public final class RegularNodeGenerator implements RuleGenerator {
      */
     private static void createFragmentFieldAndGetter(final Klass klass) {
         final Field field = new Field(
-            "Fragment",
+            Strings.TYPE_FRAGMENT,
             "fragment",
             "Fragment of source code that is associated with the node."
         );
         field.makePrivate();
         klass.addField(field);
-        final Method getter = new Method("Fragment", "getFragment");
+        final Method getter = new Method(Strings.TYPE_FRAGMENT, "getFragment");
         getter.makePublic();
         getter.setBody("return this.fragment;");
         klass.addMethod(getter);
@@ -145,7 +146,7 @@ public final class RegularNodeGenerator implements RuleGenerator {
         count.makePublic();
         count.setBody("return 0;");
         node.addMethod(count);
-        final Method getter = new Method("Node", "getChild");
+        final Method getter = new Method(Strings.TYPE_NODE, "getChild");
         getter.makePublic();
         getter.addArgument("int", "index");
         getter.setBody("throw new IndexOutOfBoundsException();");
@@ -225,7 +226,7 @@ public final class RegularNodeGenerator implements RuleGenerator {
      */
     private static void createFragmentFieldAndSetter(final Klass klass) {
         final Field field = new Field(
-            "Fragment",
+            Strings.TYPE_FRAGMENT,
             "fragment",
             "Fragment of source code that is associated with the node."
         );
@@ -233,7 +234,7 @@ public final class RegularNodeGenerator implements RuleGenerator {
         klass.addField(field);
         final Method setter = new Method("void", "setFragment");
         setter.makePublic();
-        setter.addArgument("Fragment", "object");
+        setter.addArgument(Strings.TYPE_FRAGMENT, "object");
         setter.setBody("this.fragment = object;");
         klass.addMethod(setter);
     }
@@ -278,10 +279,10 @@ public final class RegularNodeGenerator implements RuleGenerator {
      * @param klass Class describing the builder
      */
     private void createNodeCreator(final Klass klass) {
-        final Method method = new Method("Node", "createNode");
+        final Method method = new Method(Strings.TYPE_NODE, "createNode");
         method.makePublic();
         final String name = this.rule.getName();
-        final List<String> lines = new ArrayList<>();
+        final List<String> lines = new ArrayList<>(16);
         lines.add(String.format("final %s node = new %s();", name, name));
         lines.add("node.fragment = this.fragment;");
         lines.add("return node;");
