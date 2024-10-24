@@ -37,6 +37,8 @@ public final class Scanner {
     private static final Map<Character, SingleCharToken> TOKENS =
         new MapUtils<Character, SingleCharToken>()
             .put(',', Comma.INSTANCE)
+            .put('{', OpeningCurlyBracket.INSTANCE)
+            .put('}', ClosingCurlyBracket.INSTANCE)
             .make();
 
     /**

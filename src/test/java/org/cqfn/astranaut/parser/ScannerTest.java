@@ -120,6 +120,34 @@ class ScannerTest {
     }
 
     @Test
+    void openingCurlyBracket() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " { ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof OpeningCurlyBracket);
+            Assertions.assertEquals("{", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void closingCurlyBracket() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " } ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof ClosingCurlyBracket);
+            Assertions.assertEquals("}", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
     void unknownSymbol() {
         final Scanner scanner = new Scanner(ScannerTest.LOCATION, " ` ");
         boolean oops = false;
