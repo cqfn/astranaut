@@ -32,6 +32,7 @@ import org.cqfn.astranaut.exceptions.BaseException;
  * Describes a Java class and generates source code for it.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public final class Klass implements ClassOrInterface {
     /**
      * Name of the class.
@@ -79,6 +80,11 @@ public final class Klass implements ClassOrInterface {
     private final List<Field> fields;
 
     /**
+     * List of constructors.
+     */
+    private final List<Constructor> constructors;
+
+    /**
      * List of methods.
      */
     private final List<Method> methods;
@@ -98,6 +104,7 @@ public final class Klass implements ClassOrInterface {
         this.doc = new JavaDoc(brief);
         this.impl = new String[0];
         this.fields = new ArrayList<>(0);
+        this.constructors = new ArrayList<>(0);
         this.methods = new ArrayList<>(0);
         this.nested = new ArrayList<>(0);
     }
@@ -183,6 +190,16 @@ public final class Klass implements ClassOrInterface {
         this.nested.add(coi);
     }
 
+    /**
+     * Creates a class constructor.
+     * @return An entity representing the constructor for this class
+     */
+    public Constructor createConstructor() {
+        final Constructor entity = new Constructor(this.name);
+        this.constructors.add(entity);
+        return entity;
+    }
+
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.doc.build(indent, code);
@@ -197,6 +214,13 @@ public final class Klass implements ClassOrInterface {
             }
             flag = true;
             field.build(indent + 1, code);
+        }
+        for (final Constructor ctor : this.constructors) {
+            if (flag) {
+                code.add(indent, "");
+            }
+            flag = true;
+            ctor.build(indent + 1, code);
         }
         final List<Method> mlist = this.methods.stream()
             .sorted((left, right) -> Integer.compare(right.getPriority(), left.getPriority()))

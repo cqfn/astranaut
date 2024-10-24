@@ -77,6 +77,11 @@ public final class RegularNodeGenerator extends NodeGenerator {
     }
 
     @Override
+    public void createSpecificEntitiesInBuilderClass(final Klass klass) {
+        this.getClass();
+    }
+
+    @Override
     public String getDataSetterBody() {
         return "return value.isEmpty();";
     }

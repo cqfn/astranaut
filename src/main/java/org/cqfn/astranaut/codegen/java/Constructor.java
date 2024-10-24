@@ -29,17 +29,12 @@ import org.cqfn.astranaut.core.utils.Pair;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * Describes a method and generates source code for it.
+ * Describes a constructor (constructor without return value) and generates source code for it.
  * @since 1.0.0
  */
-public final class Method extends BaseMethod {
+public final class Constructor extends BaseMethod {
     /**
-     * Type of return value.
-     */
-    private final String ret;
-
-    /**
-     * Name of the method.
+     * Name of the constructor.
      */
     private final String name;
 
@@ -49,70 +44,28 @@ public final class Method extends BaseMethod {
     private final JavaDoc doc;
 
     /**
-     * Flag indicating that the generated method is overridden.
-     */
-    private final boolean over;
-
-    /**
-     * Flag indicating that the generated method is static.
-     */
-    private boolean stat;
-
-    /**
-     * Flag indicating that the generated method is final.
-     */
-    private boolean fin;
-
-    /**
-     * List of method arguments (where key is type, value is name).
+     * List of constructor arguments (where key is type, value is name).
      */
     private final List<Pair<String, String>> args;
 
     /**
-     * Body of the method.
+     * Body of the constructor.
      */
     private String body;
 
     /**
-     * Constructor of overridden method.
-     * @param ret Type of the method.
-     * @param name Name of the method.
-     */
-    public Method(final String ret, final String name) {
-        this(ret, name, "");
-    }
-
-    /**
      * Constructor.
-     * @param ret Type of the method.
-     * @param name Name of the method.
-     * @param brief Brief description of the method
+     * @param name Name of the constructor.
      */
-    public Method(final String ret, final String name, final String brief) {
-        this.ret = ret;
+    public Constructor(final String name) {
         this.name = name;
-        this.doc = new JavaDoc(brief);
-        this.over = brief.isEmpty();
+        this.doc = new JavaDoc("Constructor");
         this.args = new ArrayList<>(0);
         this.body = "";
     }
 
     /**
-     * Makes the method static.
-     */
-    public void makeStatic() {
-        this.stat = true;
-    }
-
-    /**
-     * Makes the method final.
-     */
-    public void makeFinal() {
-        this.fin = true;
-    }
-
-    /**
-     * Adds an argument to the method.
+     * Adds an argument to the constructor.
      * @param type Type of the argument
      * @param identifier Name of the argument
      */
@@ -121,39 +74,17 @@ public final class Method extends BaseMethod {
     }
 
     /**
-     * Sets the body of the method.
+     * Sets the body of the constructor.
      * @param text Method body source code
      */
     public void setBody(final String text) {
         this.body = text;
     }
 
-    /**
-     * Returns the priority of the method.
-     *  Fields with higher priority are placed at the beginning of classes.
-     * @return Priority of the method
-     */
-    public int getPriority() {
-        final int priority;
-        if (!this.stat && this.isPublic()) {
-            priority = 4;
-        } else if (this.isPublic()) {
-            priority = 3;
-        } else if (this.stat) {
-            priority = 1;
-        } else {
-            priority = 2;
-        }
-        return priority;
-    }
-
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         if (this.doc.hasNonEmptyBrief()) {
             this.doc.build(indent, code);
-        }
-        if (this.over) {
-            code.add(indent, "@Override");
         }
         code.add(indent, this.composeHeader());
         this.buildBody(indent + 1, code);
@@ -166,7 +97,7 @@ public final class Method extends BaseMethod {
     }
 
     /**
-     * Composes the header (signature) of the method.
+     * Composes the header (signature) of the constructor.
      * @return Method header
      */
     private String composeHeader() {
@@ -178,13 +109,7 @@ public final class Method extends BaseMethod {
         } else if (this.isPrivate()) {
             header.append("private ");
         }
-        if (this.stat) {
-            header.append("static ");
-        }
-        if (this.fin) {
-            header.append("final ");
-        }
-        header.append(this.ret).append(' ').append(this.name).append('(');
+        header.append(this.name).append('(');
         boolean flag = false;
         for (final Pair<String, String> arg : this.args) {
             if (flag) {

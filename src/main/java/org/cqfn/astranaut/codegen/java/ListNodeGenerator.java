@@ -78,6 +78,22 @@ public final class ListNodeGenerator extends NodeGenerator {
     }
 
     @Override
+    public void createSpecificEntitiesInBuilderClass(final Klass klass) {
+        this.needCollectionsClass();
+        final String type = String.format("List<%s>", this.rule.getChildType());
+        final Field children = new Field(
+            type,
+            "children",
+            "List of child nodes"
+        );
+        children.makePrivate();
+        klass.addField(children);
+        final Constructor ctor = klass.createConstructor();
+        ctor.makePublic();
+        ctor.setBody("this.children = Collections.emptyList();");
+    }
+
+    @Override
     public String getDataSetterBody() {
         return "return value.isEmpty();";
     }

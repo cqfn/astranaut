@@ -101,6 +101,12 @@ public abstract class NodeGenerator implements RuleGenerator {
     public abstract String getChildGetterBody();
 
     /**
+     * Creates specific entities in the class describing the builder of the node.
+     * @param klass Class describing the node builder
+     */
+    public abstract void createSpecificEntitiesInBuilderClass(Klass klass);
+
+    /**
      * Returns body of the 'setData()' method.
      * @return Body of the 'setData()' method
      */
@@ -268,6 +274,7 @@ public abstract class NodeGenerator implements RuleGenerator {
         this.createDataSetter(klass);
         this.createChildrenListSetter(klass);
         this.createValidator(klass);
+        this.createSpecificEntitiesInBuilderClass(klass);
         this.createNodeCreator(klass);
         return klass;
     }
