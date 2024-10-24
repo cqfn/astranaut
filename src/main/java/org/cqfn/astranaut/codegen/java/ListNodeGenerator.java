@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.cqfn.astranaut.dsl.ListNodeDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 
@@ -38,11 +40,17 @@ public final class ListNodeGenerator extends NodeGenerator {
     private final ListNodeDescriptor rule;
 
     /**
+     * Java type of node list.
+     */
+    private final String ltype;
+
+    /**
      * Constructor.
      * @param rule The rule that describes regular node
      */
     public ListNodeGenerator(final ListNodeDescriptor rule) {
         this.rule = rule;
+        this.ltype = String.format("List<%s>", this.rule.getChildType());
     }
 
     @Override
@@ -52,14 +60,23 @@ public final class ListNodeGenerator extends NodeGenerator {
 
     @Override
     public void createSpecificEntitiesInNodeClass(final Klass klass) {
-        final String type = String.format("List<%s>", this.rule.getChildType());
+        final String type = this.rule.getChildType();
         final Field children = new Field(
-            type,
+            this.ltype,
             "children",
             "List of child nodes"
         );
         children.makePrivate();
         klass.addField(children);
+        final Method getter = new Method(
+            type,
+            String.format("get%s", type),
+            "Returns child node by its index"
+        );
+        getter.makePublic();
+        getter.addArgument(Strings.TYPE_INT, "index");
+        getter.setBody("return this.children.get(index);");
+        klass.addMethod(getter);
     }
 
     @Override
@@ -80,9 +97,8 @@ public final class ListNodeGenerator extends NodeGenerator {
     @Override
     public void createSpecificEntitiesInBuilderClass(final Klass klass) {
         this.needCollectionsClass();
-        final String type = String.format("List<%s>", this.rule.getChildType());
         final Field children = new Field(
-            type,
+            this.ltype,
             "children",
             "List of child nodes"
         );
@@ -100,11 +116,36 @@ public final class ListNodeGenerator extends NodeGenerator {
 
     @Override
     public String getChildrenListSetterBody() {
-        return "return list.isEmpty();";
+        this.needArrayListClass();
+        final String type = this.rule.getChildType();
+        final List<String> lines = new ArrayList<>(16);
+        lines.add(
+            String.format(
+                "final %s temp = new ArrayList<>(list.size());",
+               this.ltype
+            )
+        );
+        lines.add("boolean result = true;");
+        lines.add("for (final Node node: list) {");
+        lines.add(String.format("if (node instanceof %s) {", type));
+        lines.add(String.format("temp.add((%s) node);", type));
+        lines.add("} else {");
+        lines.add("result = false;");
+        lines.add("break;");
+        lines.add("}");
+        lines.add("}");
+        lines.add("this.children = temp;");
+        lines.add("return result;");
+        return String.join("\n", lines);
     }
 
     @Override
     public String getValidatorBody() {
         return "return true;";
+    }
+
+    @Override
+    public void fillNodeCreator(final List<String> lines) {
+        lines.add("node.children = Collections.unmodifiableList(this.children);");
     }
 }

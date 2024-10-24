@@ -135,6 +135,9 @@ public abstract  class BaseMethod implements Entity {
                     extra = 1;
                 }
                 int index = tail.indexOf('{');
+                if (index > 0 && tail.charAt(0) == '}') {
+                    indent = indent - 1;
+                }
                 if (index >= 0) {
                     list.add(new Pair<>(tail.substring(0, index + 1).trim(), indent + extra));
                     indent = indent + 1;

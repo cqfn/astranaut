@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.List;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 
@@ -94,5 +95,10 @@ public final class RegularNodeGenerator extends NodeGenerator {
     @Override
     public String getValidatorBody() {
         return "return true;";
+    }
+
+    @Override
+    public void fillNodeCreator(final List<String> lines) {
+        this.getClass();
     }
 }

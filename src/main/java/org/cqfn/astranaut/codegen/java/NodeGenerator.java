@@ -41,6 +41,12 @@ public abstract class NodeGenerator implements RuleGenerator {
      */
     private boolean collections;
 
+    /**
+     * Flag indicating that the 'java.util.ArrayList' class should be included
+     *  in the generated code.
+     */
+    private boolean arraylist;
+
     @Override
     public final Set<CompilationUnit> createUnits(final Context context) {
         final String name = this.getRule().getName();
@@ -61,6 +67,9 @@ public abstract class NodeGenerator implements RuleGenerator {
         unit.addImport("java.util.List");
         if (this.collections) {
             unit.addImport("java.util.Collections");
+        }
+        if (this.arraylist) {
+            unit.addImport("java.util.ArrayList");
         }
         final String base = "org.cqfn.astranaut.core.base.";
         unit.addImport(base.concat(Strings.TYPE_NODE));
@@ -125,11 +134,25 @@ public abstract class NodeGenerator implements RuleGenerator {
     public abstract String getValidatorBody();
 
     /**
+     * Fills the body of 'createNode' method.
+     * @param lines List of where to write source code lines
+     */
+    public abstract void fillNodeCreator(List<String> lines);
+
+    /**
      * Sets the flag indicating that the 'java.util.Collections' class
      *  should be included in the generated code.
      */
     protected void needCollectionsClass() {
         this.collections = true;
+    }
+
+    /**
+     * Sets the flag indicating that the 'java.util.ArrayList' class
+     *  should be included in the generated code.
+     */
+    protected void needArrayListClass() {
+        this.arraylist = true;
     }
 
     /**
@@ -344,6 +367,7 @@ public abstract class NodeGenerator implements RuleGenerator {
         final List<String> lines = new ArrayList<>(16);
         lines.add(String.format("final %s node = new %s();", name, name));
         lines.add("node.fragment = this.fragment;");
+        this.fillNodeCreator(lines);
         lines.add("return node;");
         method.setBody(String.join("\n", lines));
         klass.addMethod(method);
