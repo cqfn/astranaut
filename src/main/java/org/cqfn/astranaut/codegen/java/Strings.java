@@ -29,9 +29,39 @@ package org.cqfn.astranaut.codegen.java;
  */
 final class Strings {
     /**
+     * The 'void' type.
+     */
+    public static final String TYPE_VOID = "void";
+
+    /**
+     * The 'boolean' type.
+     */
+    public static final String TYPE_BOOLEAN = "boolean";
+
+    /**
+     * The 'int' type.
+     */
+    public static final String TYPE_INT = "int";
+
+    /**
+     * The 'String' type.
+     */
+    public static final String TYPE_STRING = "String";
+
+    /**
      * The 'Node' type.
      */
     public static final String TYPE_NODE = "Node";
+
+    /**
+     * The 'Type' type.
+     */
+    public static final String TYPE_TYPE = "Type";
+
+    /**
+     * The 'Builder' type.
+     */
+    public static final String TYPE_BUILDER = "Builder";
 
     /**
      * The 'Fragment' type.

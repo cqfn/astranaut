@@ -1,0 +1,333 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2024 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.astranaut.codegen.java;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import org.cqfn.astranaut.dsl.NodeDescriptor;
+
+/**
+ * Generator that creates compilation units that describe a node or transformation.
+ * @since 1.0.0
+ */
+@SuppressWarnings("PMD.TooManyMethods")
+public abstract class NodeGenerator implements RuleGenerator {
+    /**
+     * Descriptor on the basis of which the source code will be built.
+     */
+    private final NodeDescriptor rule;
+
+    /**
+     * Constructor.
+     * @param rule Descriptor on the basis of which the source code will be built
+     */
+    protected NodeGenerator(final NodeDescriptor rule) {
+        this.rule = rule;
+    }
+
+    @Override
+    public final Set<CompilationUnit> createUnits(final Context context) {
+        final String name = this.rule.getName();
+        final String brief = String.format("Node of the '%s' type.", name);
+        final Klass klass = new Klass(name, brief);
+        klass.makePublic();
+        klass.makeFinal();
+        klass.setImplementsList(Strings.TYPE_NODE);
+        klass.setVersion(context.getVersion());
+        klass.addNested(this.createTypeClass(context));
+        klass.addNested(this.createBuilderClass(context));
+        this.fillNodeClass(klass);
+        final CompilationUnit unit = new CompilationUnit(
+            context.getLicense(),
+            context.getPackage(),
+            klass
+        );
+        unit.addImport("java.util.List");
+        final String base = "org.cqfn.astranaut.core.base.";
+        unit.addImport(base.concat(Strings.TYPE_NODE));
+        unit.addImport(base.concat(Strings.TYPE_FRAGMENT));
+        unit.addImport(base.concat(Strings.TYPE_TYPE));
+        unit.addImport(base.concat(Strings.TYPE_BUILDER));
+        return Collections.singleton(unit);
+    }
+
+    /**
+     * Returns body of the 'getData()' method.
+     * @param klass Class describing the node
+     * @return Body of the 'getData()' method
+     */
+    public abstract String getDataGetterBody(Klass klass);
+
+    /**
+     * Returns body of the 'getChildCount()' method.
+     * @param klass Class describing the node
+     * @return Body of the 'getChildCount()' method
+     */
+    public abstract String getChildCountGetterBody(Klass klass);
+
+    /**
+     * Returns body of the 'getChild()' method.
+     * @param klass Class describing the node
+     * @return Body of the 'getChild()' method
+     */
+    public abstract String getChildGetterBody(Klass klass);
+
+    /**
+     * Returns body of the 'setData()' method.
+     * @param klass Class describing the builder
+     * @return Body of the 'setData()' method
+     */
+    public abstract String getDataSetterBody(Klass klass);
+
+    /**
+     * Returns body of the 'setChildrenList()' method.
+     * @param klass Class describing the builder
+     * @return Body of the 'setChildrenList()' method
+     */
+    public abstract String getChildrenListSetterBody(Klass klass);
+
+    /**
+     * Returns body of the 'isValid()' method.
+     * @param klass Class describing the builder
+     * @return Body of the 'isValid()' method
+     */
+    public abstract String getValidatorBody(Klass klass);
+
+    /**
+     * Fills the class describing the node with fields and methods.
+     * @param klass Class describing the node
+     */
+    private void fillNodeClass(final Klass klass) {
+        NodeGenerator.createFragmentFieldAndGetter(klass);
+        this.createTypeFieldAndGetter(klass);
+        this.createDataGetter(klass);
+        this.createChildrenFieldAndGetter(klass);
+    }
+
+    /**
+     * Creates a field and a method related to the fragment.
+     * @param klass Class describing the node
+     */
+    private static void createFragmentFieldAndGetter(final Klass klass) {
+        final Field field = new Field(
+            Strings.TYPE_FRAGMENT,
+            "fragment",
+            "Fragment of source code that is associated with the node."
+        );
+        field.makePrivate();
+        klass.addField(field);
+        final Method getter = new Method(Strings.TYPE_FRAGMENT, "getFragment");
+        getter.makePublic();
+        getter.setBody("return this.fragment;");
+        klass.addMethod(getter);
+    }
+
+    /**
+     * Creates fields and a method related to the type.
+     * @param klass Class describing the node
+     */
+    private void createTypeFieldAndGetter(final Klass klass) {
+        final String name = this.rule.getName();
+        final Field typename = new Field(Strings.TYPE_STRING, "NAME", "Name of the type");
+        typename.makePublic();
+        typename.makeStatic();
+        typename.makeFinal(String.format("\"%s\"", name));
+        klass.addField(typename);
+        final Field object = new Field(Strings.TYPE_TYPE, "TYPE", "Type of the node");
+        object.makePublic();
+        object.makeStatic();
+        object.makeFinal(String.format("new %sType()", name));
+        klass.addField(object);
+        final Method getter = new Method(Strings.TYPE_TYPE, "getType");
+        getter.makePublic();
+        getter.setBody(String.format("return %s.TYPE;", name));
+        klass.addMethod(getter);
+    }
+
+    /**
+     * Creates the 'getData()' method.
+     * @param klass Class describing the node
+     */
+    private void createDataGetter(final Klass klass) {
+        final Method method = new Method(Strings.TYPE_STRING, "getData");
+        method.makePublic();
+        method.setBody(this.getDataGetterBody(klass));
+        klass.addMethod(method);
+    }
+
+    /**
+    * Generates fields and methods related to children.
+    * @param klass Class describing the node
+    */
+    private void createChildrenFieldAndGetter(final Klass klass) {
+        final Method count = new Method(Strings.TYPE_INT, "getChildCount");
+        count.makePublic();
+        count.setBody(this.getChildCountGetterBody(klass));
+        klass.addMethod(count);
+        final Method getter = new Method(Strings.TYPE_NODE, "getChild");
+        getter.makePublic();
+        getter.addArgument(Strings.TYPE_INT, "index");
+        getter.setBody(this.getChildGetterBody(klass));
+        klass.addMethod(getter);
+    }
+
+    /**
+     * Creates a nested class that implements the node type.
+     * @param context Context
+     * @return Class description
+     */
+    private Klass createTypeClass(final Context context) {
+        final String name = this.rule.getName();
+        final Klass klass = new Klass(
+            String.format("%sType", name),
+            String.format("Type implementation describing '%s' nodes.", name)
+        );
+        klass.makePrivate();
+        klass.makeStatic();
+        klass.makeFinal();
+        klass.setImplementsList(Strings.TYPE_TYPE);
+        klass.setVersion(context.getVersion());
+        this.createNameGetter(klass);
+        this.createBuilderCreator(klass);
+        return klass;
+    }
+
+    /**
+     * Creates the 'getName()' method.
+     * @param klass Class describing the type
+     */
+    private void createNameGetter(final Klass klass) {
+        final Method method = new Method(Strings.TYPE_STRING, "getName");
+        method.makePublic();
+        method.setBody(String.format("return %s.NAME;", this.rule.getName()));
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates the 'createBuilder()' method.
+     * @param klass Class describing the node
+     */
+    private void createBuilderCreator(final Klass klass) {
+        final Method method = new Method(Strings.TYPE_BUILDER, "createBuilder");
+        method.makePublic();
+        method.setBody(String.format("return new %s.Constructor();", this.rule.getName()));
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates a nested class that implements the node builder.
+     * @param context Context
+     * @return Class description
+     */
+    private Klass createBuilderClass(final Context context) {
+        final String name = this.rule.getName();
+        final Klass klass = new Klass(
+            String.format("Constructor"),
+            String.format("Constructor (builder) that creates nodes of the '%s' type.", name)
+        );
+        klass.makePublic();
+        klass.makeStatic();
+        klass.makeFinal();
+        klass.setImplementsList(Strings.TYPE_BUILDER);
+        klass.setVersion(context.getVersion());
+        NodeGenerator.createFragmentFieldAndSetter(klass);
+        this.createDataSetter(klass);
+        this.createChildrenListSetter(klass);
+        this.createValidator(klass);
+        this.createNodeCreator(klass);
+        return klass;
+    }
+
+    /**
+     * Creates a field and a method related to the fragment.
+     * @param klass Class describing the builder
+     */
+    private static void createFragmentFieldAndSetter(final Klass klass) {
+        final Field field = new Field(
+            Strings.TYPE_FRAGMENT,
+            "fragment",
+            "Fragment of source code that is associated with the node."
+        );
+        field.makePrivate();
+        klass.addField(field);
+        final Method setter = new Method(Strings.TYPE_VOID, "setFragment");
+        setter.makePublic();
+        setter.addArgument(Strings.TYPE_FRAGMENT, "object");
+        setter.setBody("this.fragment = object;");
+        klass.addMethod(setter);
+    }
+
+    /**
+     * Creates the 'setData()' method.
+     * @param klass Class describing the builder
+     */
+    private void createDataSetter(final Klass klass) {
+        final Method method = new Method(Strings.TYPE_BOOLEAN, "setData");
+        method.makePublic();
+        method.addArgument(Strings.TYPE_STRING, "value");
+        method.setBody(this.getDataSetterBody(klass));
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates the 'setChildrenList()' method.
+     * @param klass Class describing the builder
+     */
+    private void createChildrenListSetter(final Klass klass) {
+        final Method method = new Method(Strings.TYPE_BOOLEAN, "setChildrenList");
+        method.makePublic();
+        method.addArgument("List<Node>", "list");
+        method.setBody(this.getChildrenListSetterBody(klass));
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates the 'isValid()' method.
+     * @param klass Class describing the builder
+     */
+    private void createValidator(final Klass klass) {
+        final Method method = new Method(Strings.TYPE_BOOLEAN, "isValid");
+        method.makePublic();
+        method.setBody(this.getValidatorBody(klass));
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates the 'createNode()' method.
+     * @param klass Class describing the builder
+     */
+    private void createNodeCreator(final Klass klass) {
+        final Method method = new Method(Strings.TYPE_NODE, "createNode");
+        method.makePublic();
+        final String name = this.rule.getName();
+        final List<String> lines = new ArrayList<>(16);
+        lines.add(String.format("final %s node = new %s();", name, name));
+        lines.add("node.fragment = this.fragment;");
+        lines.add("return node;");
+        method.setBody(String.join("\n", lines));
+        klass.addMethod(method);
+    }
+}
