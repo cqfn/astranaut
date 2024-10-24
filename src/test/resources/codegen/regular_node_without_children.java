@@ -3,6 +3,7 @@
  */
 package org.cqfn.astranaut.test;
 
+import java.util.Collections;
 import java.util.List;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.Fragment;
@@ -52,6 +53,11 @@ public final class This implements Node {
     @Override
     public Node getChild(final int index) {
         throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
     }
 
     /**

@@ -36,21 +36,14 @@ import org.cqfn.astranaut.dsl.NodeDescriptor;
 @SuppressWarnings("PMD.TooManyMethods")
 public abstract class NodeGenerator implements RuleGenerator {
     /**
-     * Descriptor on the basis of which the source code will be built.
+     * Flag indicating that the 'java.util.Collections' class should be included
+     *  in the generated code.
      */
-    private final NodeDescriptor rule;
-
-    /**
-     * Constructor.
-     * @param rule Descriptor on the basis of which the source code will be built
-     */
-    protected NodeGenerator(final NodeDescriptor rule) {
-        this.rule = rule;
-    }
+    private boolean collections;
 
     @Override
     public final Set<CompilationUnit> createUnits(final Context context) {
-        final String name = this.rule.getName();
+        final String name = this.getRule().getName();
         final String brief = String.format("Node of the '%s' type.", name);
         final Klass klass = new Klass(name, brief);
         klass.makePublic();
@@ -66,6 +59,9 @@ public abstract class NodeGenerator implements RuleGenerator {
             klass
         );
         unit.addImport("java.util.List");
+        if (this.collections) {
+            unit.addImport("java.util.Collections");
+        }
         final String base = "org.cqfn.astranaut.core.base.";
         unit.addImport(base.concat(Strings.TYPE_NODE));
         unit.addImport(base.concat(Strings.TYPE_FRAGMENT));
@@ -75,46 +71,60 @@ public abstract class NodeGenerator implements RuleGenerator {
     }
 
     /**
-     * Returns body of the 'getData()' method.
+     * Returns descriptor on the basis of which the source code will be built.
+     * @return Node descriptor
+     */
+    public abstract NodeDescriptor getRule();
+
+    /**
+     * Creates specific entities in the class describing the node.
      * @param klass Class describing the node
+     */
+    public abstract void createSpecificEntitiesInNodeClass(Klass klass);
+
+    /**
+     * Returns body of the 'getData()' method.
      * @return Body of the 'getData()' method
      */
-    public abstract String getDataGetterBody(Klass klass);
+    public abstract String getDataGetterBody();
 
     /**
      * Returns body of the 'getChildCount()' method.
-     * @param klass Class describing the node
      * @return Body of the 'getChildCount()' method
      */
-    public abstract String getChildCountGetterBody(Klass klass);
+    public abstract String getChildCountGetterBody();
 
     /**
      * Returns body of the 'getChild()' method.
-     * @param klass Class describing the node
      * @return Body of the 'getChild()' method
      */
-    public abstract String getChildGetterBody(Klass klass);
+    public abstract String getChildGetterBody();
 
     /**
      * Returns body of the 'setData()' method.
-     * @param klass Class describing the builder
      * @return Body of the 'setData()' method
      */
-    public abstract String getDataSetterBody(Klass klass);
+    public abstract String getDataSetterBody();
 
     /**
      * Returns body of the 'setChildrenList()' method.
-     * @param klass Class describing the builder
      * @return Body of the 'setChildrenList()' method
      */
-    public abstract String getChildrenListSetterBody(Klass klass);
+    public abstract String getChildrenListSetterBody();
 
     /**
      * Returns body of the 'isValid()' method.
-     * @param klass Class describing the builder
      * @return Body of the 'isValid()' method
      */
-    public abstract String getValidatorBody(Klass klass);
+    public abstract String getValidatorBody();
+
+    /**
+     * Sets the flag indicating that the 'java.util.Collections' class
+     *  should be included in the generated code.
+     */
+    protected void needCollectionsClass() {
+        this.collections = true;
+    }
 
     /**
      * Fills the class describing the node with fields and methods.
@@ -125,6 +135,7 @@ public abstract class NodeGenerator implements RuleGenerator {
         this.createTypeFieldAndGetter(klass);
         this.createDataGetter(klass);
         this.createChildrenFieldAndGetter(klass);
+        this.createSpecificEntitiesInNodeClass(klass);
     }
 
     /**
@@ -150,7 +161,7 @@ public abstract class NodeGenerator implements RuleGenerator {
      * @param klass Class describing the node
      */
     private void createTypeFieldAndGetter(final Klass klass) {
-        final String name = this.rule.getName();
+        final String name = this.getRule().getName();
         final Field typename = new Field(Strings.TYPE_STRING, "NAME", "Name of the type");
         typename.makePublic();
         typename.makeStatic();
@@ -174,7 +185,7 @@ public abstract class NodeGenerator implements RuleGenerator {
     private void createDataGetter(final Klass klass) {
         final Method method = new Method(Strings.TYPE_STRING, "getData");
         method.makePublic();
-        method.setBody(this.getDataGetterBody(klass));
+        method.setBody(this.getDataGetterBody());
         klass.addMethod(method);
     }
 
@@ -185,12 +196,12 @@ public abstract class NodeGenerator implements RuleGenerator {
     private void createChildrenFieldAndGetter(final Klass klass) {
         final Method count = new Method(Strings.TYPE_INT, "getChildCount");
         count.makePublic();
-        count.setBody(this.getChildCountGetterBody(klass));
+        count.setBody(this.getChildCountGetterBody());
         klass.addMethod(count);
         final Method getter = new Method(Strings.TYPE_NODE, "getChild");
         getter.makePublic();
         getter.addArgument(Strings.TYPE_INT, "index");
-        getter.setBody(this.getChildGetterBody(klass));
+        getter.setBody(this.getChildGetterBody());
         klass.addMethod(getter);
     }
 
@@ -200,7 +211,7 @@ public abstract class NodeGenerator implements RuleGenerator {
      * @return Class description
      */
     private Klass createTypeClass(final Context context) {
-        final String name = this.rule.getName();
+        final String name = this.getRule().getName();
         final Klass klass = new Klass(
             String.format("%sType", name),
             String.format("Type implementation describing '%s' nodes.", name)
@@ -222,7 +233,7 @@ public abstract class NodeGenerator implements RuleGenerator {
     private void createNameGetter(final Klass klass) {
         final Method method = new Method(Strings.TYPE_STRING, "getName");
         method.makePublic();
-        method.setBody(String.format("return %s.NAME;", this.rule.getName()));
+        method.setBody(String.format("return %s.NAME;", this.getRule().getName()));
         klass.addMethod(method);
     }
 
@@ -233,7 +244,7 @@ public abstract class NodeGenerator implements RuleGenerator {
     private void createBuilderCreator(final Klass klass) {
         final Method method = new Method(Strings.TYPE_BUILDER, "createBuilder");
         method.makePublic();
-        method.setBody(String.format("return new %s.Constructor();", this.rule.getName()));
+        method.setBody(String.format("return new %s.Constructor();", this.getRule().getName()));
         klass.addMethod(method);
     }
 
@@ -243,9 +254,9 @@ public abstract class NodeGenerator implements RuleGenerator {
      * @return Class description
      */
     private Klass createBuilderClass(final Context context) {
-        final String name = this.rule.getName();
+        final String name = this.getRule().getName();
         final Klass klass = new Klass(
-            String.format("Constructor"),
+            "Constructor",
             String.format("Constructor (builder) that creates nodes of the '%s' type.", name)
         );
         klass.makePublic();
@@ -288,7 +299,7 @@ public abstract class NodeGenerator implements RuleGenerator {
         final Method method = new Method(Strings.TYPE_BOOLEAN, "setData");
         method.makePublic();
         method.addArgument(Strings.TYPE_STRING, "value");
-        method.setBody(this.getDataSetterBody(klass));
+        method.setBody(this.getDataSetterBody());
         klass.addMethod(method);
     }
 
@@ -300,7 +311,7 @@ public abstract class NodeGenerator implements RuleGenerator {
         final Method method = new Method(Strings.TYPE_BOOLEAN, "setChildrenList");
         method.makePublic();
         method.addArgument("List<Node>", "list");
-        method.setBody(this.getChildrenListSetterBody(klass));
+        method.setBody(this.getChildrenListSetterBody());
         klass.addMethod(method);
     }
 
@@ -311,7 +322,7 @@ public abstract class NodeGenerator implements RuleGenerator {
     private void createValidator(final Klass klass) {
         final Method method = new Method(Strings.TYPE_BOOLEAN, "isValid");
         method.makePublic();
-        method.setBody(this.getValidatorBody(klass));
+        method.setBody(this.getValidatorBody());
         klass.addMethod(method);
     }
 
@@ -322,7 +333,7 @@ public abstract class NodeGenerator implements RuleGenerator {
     private void createNodeCreator(final Klass klass) {
         final Method method = new Method(Strings.TYPE_NODE, "createNode");
         method.makePublic();
-        final String name = this.rule.getName();
+        final String name = this.getRule().getName();
         final List<String> lines = new ArrayList<>(16);
         lines.add(String.format("final %s node = new %s();", name, name));
         lines.add("node.fragment = this.fragment;");

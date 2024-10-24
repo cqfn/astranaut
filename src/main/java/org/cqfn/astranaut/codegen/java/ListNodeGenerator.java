@@ -23,25 +23,25 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import org.cqfn.astranaut.dsl.ListNodeDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
-import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 
 /**
- * Generator that creates source code for a regular node, that is, a node that may have
- *  a limited number of some child nodes and no data.
+ * Generator that creates source code for a list node, that is, node that can contain
+ *  an unlimited number of child nodes of the same type.
  * @since 1.0.0
  */
-public final class RegularNodeGenerator extends NodeGenerator {
+public final class ListNodeGenerator extends NodeGenerator {
     /**
      * Descriptor on the basis of which the source code will be built.
      */
-    private final RegularNodeDescriptor rule;
+    private final ListNodeDescriptor rule;
 
     /**
      * Constructor.
      * @param rule The rule that describes regular node
      */
-    public RegularNodeGenerator(final RegularNodeDescriptor rule) {
+    public ListNodeGenerator(final ListNodeDescriptor rule) {
         this.rule = rule;
     }
 
@@ -52,13 +52,14 @@ public final class RegularNodeGenerator extends NodeGenerator {
 
     @Override
     public void createSpecificEntitiesInNodeClass(final Klass klass) {
-        if (this.rule.getExtChildTypes().isEmpty()) {
-            this.needCollectionsClass();
-            final Method list = new Method("List<Node>", "getChildrenList");
-            list.makePublic();
-            list.setBody("return Collections.emptyList();");
-            klass.addMethod(list);
-        }
+        final String type = String.format("List<%s>", this.rule.getChildType());
+        final Field children = new Field(
+            type,
+            "children",
+            "List of child nodes"
+        );
+        children.makePrivate();
+        klass.addField(children);
     }
 
     @Override
@@ -68,12 +69,12 @@ public final class RegularNodeGenerator extends NodeGenerator {
 
     @Override
     public String getChildCountGetterBody() {
-        return "return 0;";
+        return "return this.children.size();";
     }
 
     @Override
     public String getChildGetterBody() {
-        return "throw new IndexOutOfBoundsException();";
+        return "return this.children.get(index);";
     }
 
     @Override

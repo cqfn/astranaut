@@ -25,6 +25,7 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.Collections;
 import java.util.List;
+import org.cqfn.astranaut.codegen.java.ListNodeGenerator;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
@@ -71,7 +72,7 @@ public final class ListNodeDescriptor extends NonAbstractNodeDescriptor {
 
     @Override
     public RuleGenerator createGenerator() {
-        return null;
+        return new ListNodeGenerator(this);
     }
 
     @Override
