@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.parser;
 
+import org.cqfn.astranaut.dsl.ListNodeDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 import org.cqfn.astranaut.exceptions.BaseException;
@@ -33,7 +34,7 @@ import org.junit.jupiter.api.Test;
  * Tests covering {@link NodeDescriptorParser} class.
  * @since 1.0.0
  */
-@SuppressWarnings("PMD.CloseResource")
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.CloseResource"})
 class NodeDescriptionParsingTest {
     /**
      * Some name for a fake programming language, for testing purposes.
@@ -50,6 +51,19 @@ class NodeDescriptionParsingTest {
         Assertions.assertEquals(
             0,
             ((RegularNodeDescriptor) descriptor).getExtChildTypes().size()
+        );
+    }
+
+    @Test
+    void listNode() {
+        final String code = "Arguments <- {Expression}";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertEquals(code, descriptor.toString());
+        Assertions.assertEquals("Arguments", descriptor.getName());
+        Assertions.assertTrue(descriptor instanceof ListNodeDescriptor);
+        Assertions.assertEquals(
+            "Expression",
+            ((ListNodeDescriptor) descriptor).getChildType()
         );
     }
 
@@ -114,6 +128,42 @@ class NodeDescriptionParsingTest {
         final NodeDescriptorParser parser = new NodeDescriptorParser(
             NodeDescriptionParsingTest.LANGUAGE,
             this.createStatement("AAA <- 0, BBB")
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void noTokensAfterOpeningCurlyBracket() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("AAA <- {")
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void noIdentifierAfterOpeningCurlyBracket() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("AAA <- {0")
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void noClosingCurlyBracket() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("AAA <- {BBB")
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void extraTokenClosingCurlyBracket() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("AAA <- {BBB},")
         );
         Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
     }

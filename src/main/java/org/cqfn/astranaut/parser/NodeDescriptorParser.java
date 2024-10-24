@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.parser;
 
 import java.util.Collections;
+import org.cqfn.astranaut.dsl.ListNodeDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 
@@ -69,9 +70,11 @@ public class NodeDescriptorParser {
         final Scanner scanner = new Scanner(loc, parts[1]);
         final Token first = scanner.getToken();
         final NodeDescriptor result;
+        final String name = this.parseName(parts[0]);
         if (first instanceof Zero) {
-            final String name = this.parseName(parts[0]);
             result = this.parseNodeWithoutChildren(name, scanner);
+        } else if (first instanceof OpeningCurlyBracket) {
+            result = this.parseListNode(name, scanner);
         } else {
             throw new CommonParsingException(
                 loc,
@@ -119,5 +122,38 @@ public class NodeDescriptorParser {
             );
         }
         return new RegularNodeDescriptor(name, Collections.emptyList());
+    }
+
+    /**
+     * Parses a list node descriptor.
+     * @param name Node name
+     * @param scanner Scanner
+     * @return List node descriptor
+     * @throws ParsingException If there are any errors on the right side of the descriptor
+     */
+    private ListNodeDescriptor parseListNode(final String name, final Scanner scanner)
+        throws ParsingException {
+        final Token identifier = scanner.getToken();
+        if (!(identifier instanceof Identifier)) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                "An identifier is expected after '{'"
+            );
+        }
+        Token next = scanner.getToken();
+        if (!(next instanceof ClosingCurlyBracket)) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                "A closing bracket '}' is expected after the identifier"
+            );
+        }
+        next = scanner.getToken();
+        if (next != null) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                "There should be no tokens after '}'"
+            );
+        }
+        return new ListNodeDescriptor(name, identifier.toString());
     }
 }
