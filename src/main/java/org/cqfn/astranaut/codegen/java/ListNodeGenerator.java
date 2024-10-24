@@ -74,8 +74,9 @@ public final class ListNodeGenerator extends NodeGenerator {
             "Returns child node by its index"
         );
         getter.makePublic();
-        getter.addArgument(Strings.TYPE_INT, "index");
+        getter.addArgument(Strings.TYPE_INT, "index", "Child index");
         getter.setBody("return this.children.get(index);");
+        getter.setReturnsDescription("Child node");
         klass.addMethod(getter);
     }
 

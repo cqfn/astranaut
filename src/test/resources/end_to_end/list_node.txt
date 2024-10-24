@@ -83,6 +83,8 @@ public final class Entities implements Node {
 
     /**
      * Returns child node by its index.
+     * @param index Child index
+     * @return Child node
      */
     public Entity getEntity(final int index) {
         return this.children.get(index);

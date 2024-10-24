@@ -121,11 +121,30 @@ public final class Method extends BaseMethod {
     }
 
     /**
+     * Adds an argument to the method.
+     * @param type Type of the argument
+     * @param identifier Name of the argument
+     * @param brief Brief description of the argument
+     */
+    public void addArgument(final String type, final String identifier, final String brief) {
+        this.addArgument(type, identifier);
+        this.doc.addParameter(identifier, brief);
+    }
+
+    /**
      * Sets the body of the method.
      * @param text Method body source code
      */
     public void setBody(final String text) {
         this.body = text;
+    }
+
+    /**
+     * Adds a description to be printed after the '@return' tag.
+     * @param description Description
+     */
+    public void setReturnsDescription(final String description) {
+        this.doc.setReturnsDescription(description);
     }
 
     /**
