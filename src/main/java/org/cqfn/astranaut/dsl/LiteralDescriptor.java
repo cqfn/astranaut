@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.cqfn.astranaut.codegen.java.LiteralGenerator;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
@@ -38,6 +39,7 @@ import org.cqfn.astranaut.interpreter.LiteralBuilder;
  * Descriptor of a literal, that is, a node that has data and no child nodes.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.DataClass")
 public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
     /**
      * Common exception thrown by number parsers.
@@ -122,11 +124,47 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
     }
 
     /**
+     * Returns the data type of the value that is stored in the node.
+     * @return Data type
+     */
+    public String getDataType() {
+        return this.type;
+    }
+
+    /**
      * Returns the initial data of the nodes to be created.
      * @return Data represented as a string
      */
     public String getInitial() {
         return this.initial;
+    }
+
+    /**
+     * Returns line of Java code that represents data within a node as a string.
+     * @return Source code of serializer
+     */
+    public String getSerializer() {
+        final String code;
+        if (this.serializer.isEmpty() && LiteralDescriptor.PRIMITIVES.containsKey(this.type)) {
+            code = "String.valueOf(#)";
+        } else {
+            code = this.serializer;
+        }
+        return code;
+    }
+
+    /**
+     * Returns line of Java code that parses data represented as a string into a native Java type.
+     * @return Source code of parser
+     */
+    public String getParser() {
+        final String code;
+        if (this.parser.isEmpty() && LiteralDescriptor.PRIMITIVES.containsKey(this.type)) {
+            code = LiteralDescriptor.PRIMITIVES.get(this.type).getKey();
+        } else {
+            code = this.parser;
+        }
+        return code;
     }
 
     @Override
@@ -151,7 +189,7 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
 
     @Override
     public RuleGenerator createGenerator() {
-        return null;
+        return new LiteralGenerator(this);
     }
 
     @Override
