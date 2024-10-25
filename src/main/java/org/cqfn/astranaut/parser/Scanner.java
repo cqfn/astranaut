@@ -97,6 +97,10 @@ public final class Scanner {
                 token = this.parseNumber(chr);
                 break;
             }
+            if (chr == '\'' || chr == '"') {
+                token = this.parseString(chr);
+                break;
+            }
             throw new UnknownSymbol(this.loc, chr);
         } while (false);
         return token;
@@ -159,6 +163,51 @@ public final class Scanner {
             token = new Number(value);
         }
         return token;
+    }
+
+    /**
+     * Parses a sequence of characters as a string literal.
+     * @param quote Quotation mark that opens a string
+     * @return A token
+     * @throws ParsingException If the string literal could not be parsed
+     */
+    private Token parseString(final char quote) throws ParsingException {
+        char chr = this.nextChar();
+        final StringBuilder builder = new StringBuilder();
+        while (chr != quote) {
+            if (chr == 0) {
+                throw new CommonParsingException(this.loc, "String literal is not closed");
+            }
+            if (chr == '\\') {
+                chr = this.nextChar();
+                switch (chr) {
+                    case 'r':
+                        builder.append('\r');
+                        break;
+                    case 'n':
+                        builder.append('\n');
+                        break;
+                    case 't':
+                        builder.append('\t');
+                        break;
+                    case '\\':
+                    case '\'':
+                    case '\"':
+                        builder.append(chr);
+                        break;
+                    default:
+                        throw new CommonParsingException(
+                            this.loc,
+                            "Invalid string escape sequence"
+                        );
+                }
+            } else {
+                builder.append(chr);
+            }
+            chr = this.nextChar();
+        }
+        this.nextChar();
+        return new StringToken(quote, builder.toString());
     }
 
     /**

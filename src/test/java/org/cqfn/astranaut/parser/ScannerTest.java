@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
  * Tests covering {@link Scanner} class and tokens.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 class ScannerTest {
     /**
      * Fake location of DSL code.
@@ -145,6 +146,72 @@ class ScannerTest {
             oops = true;
         }
         Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void stringInSingleQuotes() {
+        final String code = "'abc'";
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, code);
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof StringToken);
+            Assertions.assertEquals("abc", ((StringToken) token).getValue());
+            Assertions.assertEquals(code, token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void stringInDoubleQuotes() {
+        final String code = "\"def\"";
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, code);
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof StringToken);
+            Assertions.assertEquals("def", ((StringToken) token).getValue());
+            Assertions.assertEquals(code, token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void stringWithEscapeSequences() {
+        boolean oops = false;
+        try {
+            String code = "'abc\\nd\\re\\tf\\\\\\''";
+            Scanner scanner = new Scanner(ScannerTest.LOCATION, code);
+            Token token = scanner.getToken();
+            Assertions.assertEquals(code, token.toString());
+            code = "\"\\\"test\\\"\"";
+            scanner = new Scanner(ScannerTest.LOCATION, code);
+            token = scanner.getToken();
+            Assertions.assertEquals(code, token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void unclosedSrtring() {
+        Assertions.assertThrows(
+            ParsingException.class,
+            () -> new Scanner(ScannerTest.LOCATION, "'abc").getToken()
+        );
+    }
+
+    @Test
+    void invalidStringEscapeSequence() {
+        Assertions.assertThrows(
+            ParsingException.class,
+            () -> new Scanner(ScannerTest.LOCATION, "'abc\\~'").getToken()
+        );
     }
 
     @Test
