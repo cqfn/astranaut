@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.parser;
 
 import org.cqfn.astranaut.dsl.ListNodeDescriptor;
+import org.cqfn.astranaut.dsl.LiteralDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 import org.cqfn.astranaut.exceptions.BaseException;
@@ -185,6 +186,135 @@ class NodeDescriptionParsingTest {
             );
         }
         Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void literalWithTypeOnly() {
+        final String code = "IntegerLiteral <- 'int'";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertEquals(code, descriptor.toString());
+        Assertions.assertTrue(descriptor instanceof LiteralDescriptor);
+    }
+
+    @Test
+    void literalWithEmptyType() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("Literal <- ''")
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void literalWithInitialValue() {
+        final String code = "IntegerLiteral <- 'int', '0'";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertEquals(code, descriptor.toString());
+        Assertions.assertTrue(descriptor instanceof LiteralDescriptor);
+    }
+
+    @Test
+    void literalWithoutInitialValue() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement("Literal <- 'String'")
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void literalWithSerializerAndParser() {
+        final String code =
+            "IntegerLiteral <- 'int', '0', 'String.valueOf(#)', 'Integer.parseInt(#)'";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertEquals(code, descriptor.toString());
+        Assertions.assertTrue(descriptor instanceof LiteralDescriptor);
+    }
+
+    @Test
+    void literalWithoutInitialValueAndSerializer() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "IntegerLiteral <- 'int', '', 'String.valueOf(#)', 'Integer.parseInt(#)'"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void literalWithSerializerButWithoutParser() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "IntegerLiteral <- 'int', '0', 'String.valueOf(#)'"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void literalWithoutParserButWithSerializer() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "IntegerLiteral <- 'int', '0', '', 'Integer.parseInt(#)'"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void serializerWithoutPlaceholder() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "IntegerLiteral <- 'int', '0', 'String.valueOf(value)', 'Integer.parseInt(#)'"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void parserWithoutPlaceholder() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "IntegerLiteral <- 'int', '0', 'String.valueOf(#)', 'Integer.parseInt(value)'"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void literalBasedOnObjectWithoutParser() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "Literal <- 'Object', 'null'"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void fullLiteralDescriptor() {
+        final String code =
+            "IntegerLiteral <- 'int', '0', 'String.valueOf(#)', 'Integer.parseInt(#)', 'NumberFormatException'";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertEquals(code, descriptor.toString());
+        Assertions.assertTrue(descriptor instanceof LiteralDescriptor);
+    }
+
+    @Test
+    void literalWithExceptionButWithoutParser() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "IntegerLiteral <- 'int', '0', '', '', 'NumberFormatException'"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
     }
 
     /**

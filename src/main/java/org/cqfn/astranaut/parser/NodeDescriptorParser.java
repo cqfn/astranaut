@@ -25,6 +25,7 @@ package org.cqfn.astranaut.parser;
 
 import java.util.Collections;
 import org.cqfn.astranaut.dsl.ListNodeDescriptor;
+import org.cqfn.astranaut.dsl.LiteralDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 
@@ -75,6 +76,8 @@ public class NodeDescriptorParser {
             result = this.parseNodeWithoutChildren(name, scanner);
         } else if (first instanceof OpeningCurlyBracket) {
             result = this.parseListNode(name, scanner);
+        } else if (first instanceof StringToken) {
+            result = this.parseLiteral(name, scanner, (StringToken) first);
         } else {
             throw new CommonParsingException(
                 loc,
@@ -155,5 +158,139 @@ public class NodeDescriptorParser {
             );
         }
         return new ListNodeDescriptor(name, identifier.toString());
+    }
+
+    /**
+     * Parses a literal descriptor.
+     * @param name Node name
+     * @param scanner Scanner
+     * @param first First token from the right side
+     * @return Literal descriptor
+     * @throws ParsingException If there are any errors on the right side of the descriptor
+     */
+    private LiteralDescriptor parseLiteral(final String name, final Scanner scanner,
+        final StringToken first) throws ParsingException {
+        final String type = first.getValue();
+        if (type.isEmpty()) {
+            throw new CommonParsingException(this.stmt.getLocation(), "Data type cannot be empty");
+        }
+        final LiteralDescriptor.Constructor ctor = new LiteralDescriptor.Constructor(name);
+        ctor.setType(type);
+        this.parseInitialValue(scanner, ctor);
+        this.parseSerializerAndParser(scanner, ctor);
+        this.parseLiteralException(scanner, ctor);
+        final Token next = scanner.getToken();
+        if (next != null) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                "Redundant tokens at the end of a literal descriptor"
+            );
+        }
+        return ctor.createDescriptor();
+    }
+
+    /**
+     * Parses the initial value of the literal.
+     * @param scanner Scanner
+     * @param ctor Literal constructor
+     * @throws ParsingException If the initial value could not be parsed
+     */
+    private void parseInitialValue(final Scanner scanner, final LiteralDescriptor.Constructor ctor)
+        throws ParsingException {
+        final String initial = this.parseNextStringToken(scanner);
+        if (initial.isEmpty() && !ctor.hasPrimitiveType()) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                "For a non-primitive Java type, the initial value must be specified"
+            );
+        }
+        ctor.setInitial(initial);
+    }
+
+    /**
+     * Parses the serializer code and parser code of the literal.
+     * @param scanner Scanner
+     * @param ctor Literal constructor
+     * @throws ParsingException If the serializer code or parser code cannot be parsed
+     */
+    private void parseSerializerAndParser(final Scanner scanner,
+        final LiteralDescriptor.Constructor ctor) throws ParsingException {
+        final String serializer = this.parseNextStringToken(scanner);
+        if (!ctor.hasInitial() && !serializer.isEmpty()) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                "If a serializer is specified, there must also be an initial value"
+            );
+        }
+        ctor.setSerializer(serializer);
+        final String parser = this.parseNextStringToken(scanner);
+        if (serializer.isEmpty() ^ parser.isEmpty()) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                "Either both serializer and parser are specified, or neither are specified"
+            );
+        }
+        if (!parser.isEmpty() && (serializer.indexOf('#') < 0 || parser.indexOf('#') < 0)) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                "The serializer and parser must contain the '#' placeholder"
+            );
+        }
+        if (!ctor.hasPrimitiveType() && !ctor.getType().equals("String") && parser.isEmpty()) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                String.format(
+                    "A parser and a serializer must be specified for the '%s' type",
+                    ctor.getType()
+                )
+            );
+        }
+        ctor.setParser(parser);
+    }
+
+    /**
+     * Parses the exception code of the literal.
+     * @param scanner Scanner
+     * @param ctor Literal constructor
+     * @throws ParsingException If the exception code could not be parsed
+     */
+    private void parseLiteralException(final Scanner scanner,
+        final LiteralDescriptor.Constructor ctor) throws ParsingException {
+        final String exception = this.parseNextStringToken(scanner);
+        if (!exception.isEmpty() && !ctor.hasParser()) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                "If an exception is specified, there must be a parser as well"
+            );
+        }
+        ctor.setException(exception);
+    }
+
+    /**
+     * Parses the following sequence of tokens, consisting of a comma and a string token.
+     * @param scanner Scanner
+     * @return String token value or empty string if no more tokens
+     * @throws ParsingException If no further string tokens
+     */
+    private String parseNextStringToken(final Scanner scanner) throws ParsingException {
+        final Token first = scanner.getToken();
+        String value = "";
+        if (first != null) {
+            if (!(first instanceof Comma)) {
+                throw new CommonParsingException(
+                    this.stmt.getLocation(),
+                    "The string literal must be followed by ','"
+                );
+            }
+            final Token second = scanner.getToken();
+            if (!(second instanceof StringToken)) {
+                throw new CommonParsingException(
+                    this.stmt.getLocation(),
+                    "A string literal is expected after ','"
+                );
+            }
+            value = ((StringToken) second).getValue();
+        }
+        return value;
     }
 }

@@ -26,9 +26,12 @@ package org.cqfn.astranaut.dsl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.utils.MapUtils;
+import org.cqfn.astranaut.core.utils.Pair;
 import org.cqfn.astranaut.interpreter.LiteralBuilder;
 
 /**
@@ -36,6 +39,50 @@ import org.cqfn.astranaut.interpreter.LiteralBuilder;
  * @since 1.0.0
  */
 public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
+    /**
+     * Common exception thrown by number parsers.
+     */
+    public static  final String NUMBER_EXCEPTION = "NumberFormatException";
+
+    /**
+     * Collection of primitive types.
+     */
+    public static final Map<String, Pair<String, String>> PRIMITIVES =
+        new MapUtils<String, Pair<String, String>>()
+            .put(
+                "byte",
+                new Pair<>("Byte.parseByte(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "short",
+                new Pair<>("Short.parseShort(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "int",
+                new Pair<>("Integer.parseInt(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "long",
+                new Pair<>("Long.parseLong(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "float",
+                new Pair<>("Float.parseFloat(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "double",
+                new Pair<>("Double.parseDouble(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "char",
+                new Pair<>("#.charAt(0)", "IndexOutOfBoundsException")
+            )
+            .put(
+                "boolean",
+                new Pair<>("Boolean.parseBoolean(value)", "")
+            )
+            .make();
+
     /**
      * Delimiter that is used when stringifying a descriptor.
      */
@@ -167,11 +214,35 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
         }
 
         /**
+         * Return native Java type of the literal.
+         * @return Literal type.
+         */
+        public String getType() {
+            return this.type;
+        }
+
+        /**
+         * Returns a flag if the literal type is a primitive Java type.
+         * @return Flag
+         */
+        public boolean hasPrimitiveType() {
+            return LiteralDescriptor.PRIMITIVES.containsKey(this.type);
+        }
+
+        /**
          * Sets native Java type of the literal.
          * @param value Native Java type of the literal
          */
         public void setType(final String value) {
             this.type = value.trim();
+        }
+
+        /**
+         * Returns a flag whether the initial value of the node is specified.
+         * @return Flag
+         */
+        public boolean hasInitial() {
+            return !this.initial.isEmpty();
         }
 
         /**
@@ -189,6 +260,14 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
          */
         public void setSerializer(final String value) {
             this.serializer = value.trim();
+        }
+
+        /**
+         * Returns a flag whether a parser is specified.
+         * @return Flag
+         */
+        public boolean hasParser() {
+            return !this.parser.isEmpty();
         }
 
         /**
