@@ -47,6 +47,13 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void literals(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("literals.txt");
+        final String actual = this.run("literals.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.
