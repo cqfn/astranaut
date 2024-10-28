@@ -37,8 +37,12 @@ public final class Scanner {
     private static final Map<Character, SingleCharToken> TOKENS =
         new MapUtils<Character, SingleCharToken>()
             .put(',', Comma.INSTANCE)
+            .put('@', AtSymbol.INSTANCE)
+            .put('|', VerticalLine.INSTANCE)
             .put('{', OpeningCurlyBracket.INSTANCE)
             .put('}', ClosingCurlyBracket.INSTANCE)
+            .put('[', OpeningSquareBracket.INSTANCE)
+            .put(']', ClosingSquareBracket.INSTANCE)
             .make();
 
     /**
