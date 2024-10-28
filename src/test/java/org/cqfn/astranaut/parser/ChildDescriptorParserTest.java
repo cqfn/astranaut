@@ -231,4 +231,10 @@ class ChildDescriptorParserTest {
             () -> parser.parse(scanner, scanner.getToken())
         );
     }
+
+    @Test
+    void emptyDescriptor() {
+        final ChildDescriptorParser parser = new ChildDescriptorParser();
+        Assertions.assertThrows(IllegalStateException.class, parser::createDescriptor);
+    }
 }
