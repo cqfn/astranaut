@@ -62,6 +62,18 @@ public final class LiteralGenerator extends NodeGenerator {
         value.makePrivate();
         klass.addField(value);
         this.needCollectionsClass();
+        final Method getter = new Method(
+            this.rule.getDataType(),
+            "getValue",
+            "Returns the value of the node in native form"
+        );
+        getter.setReturnsDescription("Value of the node");
+        getter.makePublic();
+        getter.setBody("return this.data;");
+        if (this.rule.getDataType().equals("boolean")) {
+            getter.suppressWarning("PMD.BooleanGetMethodName");
+        }
+        klass.addMethod(getter);
         final Method list = new Method("List<Node>", "getChildrenList");
         list.makePublic();
         list.setBody("return Collections.emptyList();");
@@ -95,6 +107,11 @@ public final class LiteralGenerator extends NodeGenerator {
 
     @Override
     public void createSpecificEntitiesInBuilderClass(final Klass klass) {
+        final String initial = this.rule.getInitial();
+        if (!initial.isEmpty()) {
+            final Constructor ctor = klass.createConstructor();
+            ctor.setBody(String.format("this.data = %s;", initial));
+        }
         final Field value = new Field(
             this.rule.getDataType(),
             "data",

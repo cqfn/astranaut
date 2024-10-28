@@ -49,6 +49,11 @@ public final class Method extends BaseMethod {
     private final JavaDoc doc;
 
     /**
+     * Suppresses compiler or codechecker warnings.
+     */
+    private final Suppress suppress;
+
+    /**
      * Flag indicating that the generated method is overridden.
      */
     private final boolean over;
@@ -92,9 +97,18 @@ public final class Method extends BaseMethod {
         this.ret = ret;
         this.name = name;
         this.doc = new JavaDoc(brief);
+        this.suppress = new Suppress();
         this.over = brief.isEmpty();
         this.args = new ArrayList<>(0);
         this.body = "";
+    }
+
+    /**
+     * Adds a warning that needs to be suppressed.
+     * @param warning Warning
+     */
+    public void suppressWarning(final String warning) {
+        this.suppress.addWarning(warning);
     }
 
     /**
@@ -171,6 +185,7 @@ public final class Method extends BaseMethod {
         if (this.doc.hasNonEmptyBrief()) {
             this.doc.build(indent, code);
         }
+        this.suppress.build(indent, code);
         if (this.over) {
             code.add(indent, "@Override");
         }
