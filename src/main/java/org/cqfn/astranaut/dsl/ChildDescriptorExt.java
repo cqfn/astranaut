@@ -59,6 +59,30 @@ public final class ChildDescriptorExt {
     }
 
     /**
+     * Returns a flag indicating that the node described by the descriptor is optional.
+     * @return Optional flag.
+     */
+    public boolean isOptional() {
+        return this.optional;
+    }
+
+    /**
+     * Returns tag, that is, a name that uniquely identifies this particular child node.
+     * @return Node tag
+     */
+    public String getTag() {
+        return this.tag;
+    }
+
+    /**
+     * Returns type of the node.
+     * @return Node type
+     */
+    public String getType() {
+        return this.type;
+    }
+
+    /**
      * Converts this extended descriptor to a simple descriptor for use in the interpreter.
      * @return A simple descriptor (without a tag)
      */

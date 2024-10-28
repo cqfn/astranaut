@@ -72,6 +72,14 @@ public final class Scanner {
     }
 
     /**
+     * Returns location of the DSL code.
+     * @return Location of the DSL code
+     */
+    public Location getLocation() {
+        return this.loc;
+    }
+
+    /**
      * Extracts the next token from the line. If the line has ended (no more tokens),
      *  returns {@code null}.
      * @return A token
