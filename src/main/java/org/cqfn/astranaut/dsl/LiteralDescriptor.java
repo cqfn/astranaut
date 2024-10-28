@@ -167,6 +167,20 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
         return code;
     }
 
+    /**
+     * Returns the name of the exception class that can be thrown when processing invalid data.
+     * @return Exception class name
+     */
+    public String getException() {
+        final String code;
+        if (this.exception.isEmpty() && LiteralDescriptor.PRIMITIVES.containsKey(this.type)) {
+            code = LiteralDescriptor.PRIMITIVES.get(this.type).getValue();
+        } else {
+            code = this.exception;
+        }
+        return code;
+    }
+
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();

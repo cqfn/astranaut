@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.cqfn.astranaut.dsl.LiteralDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
@@ -55,7 +56,7 @@ public final class LiteralGenerator extends NodeGenerator {
     public void createSpecificEntitiesInNodeClass(final Klass klass) {
         final Field value = new Field(
             this.rule.getDataType(),
-            "value",
+            "data",
             "Value of the node"
         );
         value.makePrivate();
@@ -72,11 +73,11 @@ public final class LiteralGenerator extends NodeGenerator {
         final String serializer = this.rule.getSerializer();
         final String body;
         if (serializer.isEmpty()) {
-            body = "return this.value;";
+            body = "return this.data;";
         } else {
             body = String.format(
                 "return %s;",
-                this.rule.getSerializer().replace("#", "this.value")
+                this.rule.getSerializer().replace("#", "this.data")
             );
         }
         return body;
@@ -94,12 +95,46 @@ public final class LiteralGenerator extends NodeGenerator {
 
     @Override
     public void createSpecificEntitiesInBuilderClass(final Klass klass) {
-        this.getClass();
+        final Field value = new Field(
+            this.rule.getDataType(),
+            "data",
+            "Value of the node to be created"
+        );
+        value.makePrivate();
+        klass.addField(value);
     }
 
     @Override
     public String getDataSetterBody() {
-        return "return value.isEmpty();";
+        final List<String> lines = new ArrayList<>(2);
+        final String parser = this.rule.getParser();
+        final String exception = this.rule.getException();
+        String ret = "true";
+        if (parser.isEmpty()) {
+            lines.add("this.data = value;");
+        } else if (exception.isEmpty()) {
+            lines.add(
+                String.format(
+                    "this.data = %s;",
+                    parser.replace("#", "value")
+                )
+            );
+        } else {
+            ret = "result";
+            lines.add("boolean result = true;");
+            lines.add("try {");
+            lines.add(
+                String.format(
+                    "this.data = %s;",
+                    parser.replace("#", "value")
+                )
+            );
+            lines.add(String.format("} catch (final %s ignored) {", exception));
+            lines.add("result = false;");
+            lines.add("}");
+        }
+        lines.add(String.format("return %s;", ret));
+        return String.join("\n", lines);
     }
 
     @Override
@@ -114,6 +149,6 @@ public final class LiteralGenerator extends NodeGenerator {
 
     @Override
     public void fillNodeCreator(final List<String> lines) {
-        this.getClass();
+        lines.add("node.data = this.data;");
     }
 }
