@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.parser;
 
+import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
 import org.cqfn.astranaut.dsl.ListNodeDescriptor;
 import org.cqfn.astranaut.dsl.LiteralDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
@@ -315,6 +316,70 @@ class NodeDescriptionParsingTest {
             )
         );
         Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void regularNodeWithOneChild() {
+        final String code = "AAA <- BBB";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertTrue(descriptor instanceof RegularNodeDescriptor);
+        Assertions.assertEquals(code, descriptor.toString());
+    }
+
+    @Test
+    void regularNodeWithTwoChildren() {
+        final String code = "AAA <- BBB, CCC";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertTrue(descriptor instanceof RegularNodeDescriptor);
+        Assertions.assertEquals(code, descriptor.toString());
+    }
+
+    @Test
+    void regularNodeWithThreeChildren() {
+        final String code = "AAA <- BBB, CCC, DDD";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertTrue(descriptor instanceof RegularNodeDescriptor);
+        Assertions.assertEquals(code, descriptor.toString());
+    }
+
+    @Test
+    void regularNodeWithOptionalAndTaggedChildren() {
+        final String code = "AAA <- [BBB], ccc@CCC";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertTrue(descriptor instanceof RegularNodeDescriptor);
+        Assertions.assertEquals(code, descriptor.toString());
+    }
+
+    @Test
+    void abstractNodeWithTwoSubtypes() {
+        final String code = "AAA <- BBB | CCC";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertTrue(descriptor instanceof AbstractNodeDescriptor);
+        Assertions.assertEquals(code, descriptor.toString());
+    }
+
+    @Test
+    void abstractNodeWithThreeSubtypes() {
+        final String code = "AAA <- BBB | CCC | DDD";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertTrue(descriptor instanceof AbstractNodeDescriptor);
+        Assertions.assertEquals(code, descriptor.toString());
+    }
+
+    @Test
+    void abstractNodeWithZeroAtTheEnd() {
+        final String code = "AAA <- BBB | DDD | 0";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertTrue(descriptor instanceof AbstractNodeDescriptor);
+        Assertions.assertEquals("AAA <- BBB | DDD", descriptor.toString());
+    }
+
+    @Test
+    void abstractNodeWithOneSubtype() {
+        final String code = "AAA <- EEE | 0";
+        final NodeDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertTrue(descriptor instanceof AbstractNodeDescriptor);
+        Assertions.assertEquals("AAA <- EEE | ?", descriptor.toString());
     }
 
     /**

@@ -400,6 +400,7 @@ public class NodeDescriptorParser {
                     String.format("A vertical line '|' is expected after '%s'", subtype)
                 );
             }
+            next = scanner.getToken();
         } while (next != null);
         if (zero && next != null) {
             throw new NoTokensAfterZero(this.stmt.getLocation());
