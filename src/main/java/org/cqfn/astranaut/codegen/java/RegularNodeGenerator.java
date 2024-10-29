@@ -32,7 +32,7 @@ import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
  *  a limited number of some child nodes and no data.
  * @since 1.0.0
  */
-public final class RegularNodeGenerator extends NodeGenerator {
+public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
     /**
      * Descriptor on the basis of which the source code will be built.
      */

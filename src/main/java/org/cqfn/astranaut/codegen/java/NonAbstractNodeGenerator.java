@@ -30,11 +30,11 @@ import java.util.Set;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 
 /**
- * Generator that creates compilation units that describe a node or transformation.
+ * Generator that creates compilation units that describe a non-abstract node.
  * @since 1.0.0
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public abstract class NodeGenerator implements RuleGenerator {
+public abstract class NonAbstractNodeGenerator implements RuleGenerator {
     /**
      * Flag indicating that the 'java.util.Collections' class should be included
      *  in the generated code.
@@ -160,7 +160,7 @@ public abstract class NodeGenerator implements RuleGenerator {
      * @param klass Class describing the node
      */
     private void fillNodeClass(final Klass klass) {
-        NodeGenerator.createFragmentFieldAndGetter(klass);
+        NonAbstractNodeGenerator.createFragmentFieldAndGetter(klass);
         this.createTypeFieldAndGetter(klass);
         this.createDataGetter(klass);
         this.createChildrenFieldAndGetter(klass);
@@ -293,7 +293,7 @@ public abstract class NodeGenerator implements RuleGenerator {
         klass.makeFinal();
         klass.setImplementsList(Strings.TYPE_BUILDER);
         klass.setVersion(context.getVersion());
-        NodeGenerator.createFragmentFieldAndSetter(klass);
+        NonAbstractNodeGenerator.createFragmentFieldAndSetter(klass);
         this.createDataSetter(klass);
         this.createChildrenListSetter(klass);
         this.createValidator(klass);

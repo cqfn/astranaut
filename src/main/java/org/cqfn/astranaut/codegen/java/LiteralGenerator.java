@@ -33,7 +33,7 @@ import org.cqfn.astranaut.dsl.NodeDescriptor;
  *  and no child nodes.
  * @since 1.0.0
  */
-public final class LiteralGenerator extends NodeGenerator {
+public final class LiteralGenerator extends NonAbstractNodeGenerator {
     /**
      * Descriptor on the basis of which the source code will be built.
      */

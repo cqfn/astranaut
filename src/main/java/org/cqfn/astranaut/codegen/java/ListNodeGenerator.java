@@ -33,7 +33,7 @@ import org.cqfn.astranaut.dsl.NodeDescriptor;
  *  an unlimited number of child nodes of the same type.
  * @since 1.0.0
  */
-public final class ListNodeGenerator extends NodeGenerator {
+public final class ListNodeGenerator extends NonAbstractNodeGenerator {
     /**
      * Descriptor on the basis of which the source code will be built.
      */

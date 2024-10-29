@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import org.cqfn.astranaut.codegen.java.AbstractNodeGenerator;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 
 /**
@@ -71,7 +72,7 @@ public final class AbstractNodeDescriptor extends NodeDescriptor {
 
     @Override
     public RuleGenerator createGenerator() {
-        return null;
+        return new AbstractNodeGenerator(this);
     }
 
     /**

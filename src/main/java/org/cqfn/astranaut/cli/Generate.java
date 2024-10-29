@@ -120,19 +120,17 @@ public final class Generate implements Action {
         final Context context = cct.createContext();
         for (final NodeDescriptor rule : program.getNodeDescriptorsForLanguage(language)) {
             final RuleGenerator generator = rule.createGenerator();
-            if (generator != null) {
-                final Set<CompilationUnit> units = generator.createUnits(context);
-                for (final CompilationUnit unit : units) {
-                    final String code = unit.generateJavaCode();
-                    path = new File(
-                        folder,
-                        rule.getName().concat(".java")
-                    )
-                        .getAbsolutePath();
-                    result = new FilesWriter(path).writeStringNoExcept(code);
-                    if (!result) {
-                        throw new CannotWriteFile(path);
-                    }
+            final Set<CompilationUnit> units = generator.createUnits(context);
+            for (final CompilationUnit unit : units) {
+                final String code = unit.generateJavaCode();
+                path = new File(
+                    folder,
+                    rule.getName().concat(".java")
+                )
+                    .getAbsolutePath();
+                result = new FilesWriter(path).writeStringNoExcept(code);
+                if (!result) {
+                    throw new CannotWriteFile(path);
                 }
             }
         }
