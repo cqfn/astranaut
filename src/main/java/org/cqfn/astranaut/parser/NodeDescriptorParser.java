@@ -23,7 +23,11 @@
  */
 package org.cqfn.astranaut.parser;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
+import org.cqfn.astranaut.dsl.ChildDescriptorExt;
 import org.cqfn.astranaut.dsl.ListNodeDescriptor;
 import org.cqfn.astranaut.dsl.LiteralDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
@@ -33,6 +37,7 @@ import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
  * Parser that parses node descriptors.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class NodeDescriptorParser {
     /**
      * Name of the programming language whose entity this node descriptor covers.
@@ -78,6 +83,8 @@ public class NodeDescriptorParser {
             result = this.parseListNode(name, scanner);
         } else if (first instanceof StringToken) {
             result = this.parseLiteral(name, scanner, (StringToken) first);
+        } else if (first instanceof Identifier || first instanceof SquareBracket) {
+            result = this.parseRegularOrAbstractNode(name, scanner, first);
         } else {
             throw new CommonParsingException(
                 loc,
@@ -119,10 +126,7 @@ public class NodeDescriptorParser {
         throws ParsingException {
         final Token next = scanner.getToken();
         if (next != null) {
-            throw new CommonParsingException(
-                this.stmt.getLocation(),
-                "There should be no tokens after '0'"
-            );
+            throw new NoTokensAfterZero(this.stmt.getLocation());
         }
         return new RegularNodeDescriptor(name, Collections.emptyList());
     }
@@ -292,5 +296,138 @@ public class NodeDescriptorParser {
             value = ((StringToken) second).getValue();
         }
         return value;
+    }
+
+    /**
+     * Parses a sequence of tokens as a descriptor of a regular node or an abstract node.
+     * @param name Node name
+     * @param scanner Scanner
+     * @param first First node
+     * @return Regular node descriptor or abstract node descriptor
+     * @throws ParsingException If there are any errors on the right side of the descriptor
+     */
+    @SuppressWarnings("PMD.ConfusingTernary")
+    private NodeDescriptor parseRegularOrAbstractNode(final String name, final Scanner scanner,
+        final Token first) throws ParsingException {
+        final ChildDescriptorParser parser = new ChildDescriptorParser();
+        final Token next = parser.parse(scanner, first);
+        final ChildDescriptorExt child = parser.createDescriptor();
+        final NodeDescriptor result;
+        if (next == null) {
+            result = new RegularNodeDescriptor(
+                name,
+                Collections.singletonList(child)
+            );
+        } else if (next instanceof Comma) {
+            result = this.parseRegularNode(name, scanner, child);
+        } else if (!(next instanceof VerticalLine)) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                String.format("A separator is expected after '%s'", child.toString())
+            );
+        } else if (child.isOptional() || !child.getTag().isEmpty()) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                "Wrong syntax for describing an abstract node"
+            );
+        } else {
+            result = this.parseAbstractNode(name, scanner, child.getType());
+        }
+        return result;
+    }
+
+    /**
+     * Parses a sequence of tokens as a descriptor of a regular node.
+     * @param name Node name
+     * @param scanner Scanner
+     * @param first First child descriptor
+     * @return Regular node descriptor
+     * @throws ParsingException If there are any errors on the right side of the descriptor
+     */
+    private RegularNodeDescriptor parseRegularNode(final String name, final Scanner scanner,
+        final ChildDescriptorExt first) throws ParsingException {
+        final List<ChildDescriptorExt> children = new ArrayList<>(2);
+        children.add(first);
+        Token next = null;
+        ChildDescriptorExt last = first;
+        do {
+            final ChildDescriptorParser parser = new ChildDescriptorParser();
+            next = parser.parse(scanner, scanner.getToken());
+            if (next != null && !(next instanceof Comma)) {
+                throw new CommonParsingException(
+                    this.stmt.getLocation(),
+                    String.format("A comma ',' is expected after '%s'", last.toString())
+                );
+            }
+            last = parser.createDescriptor();
+            children.add(last);
+        } while (next != null);
+        return new RegularNodeDescriptor(name, children);
+    }
+
+    /**
+     * Parses a sequence of tokens as a descriptor of an abstract node.
+     * @param name Node name
+     * @param scanner Scanner
+     * @param first First subtype name
+     * @return Abstract node descriptor
+     * @throws ParsingException If there are any errors on the right side of the descriptor
+     */
+    private AbstractNodeDescriptor parseAbstractNode(final String name, final Scanner scanner,
+        final String first) throws ParsingException {
+        final List<String> subtypes = new ArrayList<>(2);
+        subtypes.add(first);
+        Token next = scanner.getToken();
+        boolean zero = false;
+        do {
+            if (next instanceof Zero) {
+                zero = true;
+                next = scanner.getToken();
+                break;
+            }
+            if (!(next instanceof Identifier)) {
+                throw new CommonParsingException(
+                    this.stmt.getLocation(),
+                    "An identifier is expected after '|'"
+                );
+            }
+            final String subtype = next.toString();
+            subtypes.add(subtype);
+            next = scanner.getToken();
+            if (next != null && !(next instanceof VerticalLine)) {
+                throw new CommonParsingException(
+                    this.stmt.getLocation(),
+                    String.format("A vertical line '|' is expected after '%s'", subtype)
+                );
+            }
+        } while (next != null);
+        if (zero && next != null) {
+            throw new NoTokensAfterZero(this.stmt.getLocation());
+        }
+        return new AbstractNodeDescriptor(name, subtypes);
+    }
+
+    /**
+     * Exception 'There should be no tokens after zero'.
+     * @since 1.0.0
+     */
+    private static final class NoTokensAfterZero extends ParsingException {
+        /**
+         * Version identifier.
+         */
+        private static final long serialVersionUID = -1;
+
+        /**
+         * Constructor.
+         * @param loc Location of the code where the error was found
+         */
+        private NoTokensAfterZero(final Location loc) {
+            super(loc);
+        }
+
+        @Override
+        public String getReason() {
+            return "There should be no tokens after '0'";
+        }
     }
 }
