@@ -52,6 +52,14 @@ public final class AbstractNodeDescriptor extends NodeDescriptor {
         this.subtypes = AbstractNodeDescriptor.checkSubtypeList(subtypes);
     }
 
+    /**
+     * Returns list of types that inherit from this type.
+     * @return Subtypes list
+     */
+    public List<String> getSubtypes() {
+        return this.subtypes;
+    }
+
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();

@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
 
@@ -51,15 +52,28 @@ public final class AbstractNodeGenerator implements  RuleGenerator {
         final String brief = String.format("Node of the '%s' type.", name);
         final Interface iface = new Interface(name, brief);
         iface.makePublic();
-        iface.setExtendsList(Strings.TYPE_NODE);
+        final List<AbstractNodeDescriptor> bases = this.rule.getBaseDescriptors();
+        boolean node = false;
+        if (bases.isEmpty()) {
+            node = true;
+            iface.setExtendsList(Strings.TYPE_NODE);
+        } else {
+            iface.setExtendsList(
+                bases.stream()
+                    .map(AbstractNodeDescriptor::getName)
+                    .toArray(String[]::new)
+            );
+        }
         iface.setVersion(context.getVersion());
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
             iface
         );
-        final String base = "org.cqfn.astranaut.core.base.";
-        unit.addImport(base.concat(Strings.TYPE_NODE));
+        if (node) {
+            final String base = "org.cqfn.astranaut.core.base.";
+            unit.addImport(base.concat(Strings.TYPE_NODE));
+        }
         return Collections.singleton(unit);
     }
 }

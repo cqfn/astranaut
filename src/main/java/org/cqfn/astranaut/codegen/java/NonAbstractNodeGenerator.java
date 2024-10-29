@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 
 /**
@@ -54,7 +55,16 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         final Klass klass = new Klass(name, brief);
         klass.makePublic();
         klass.makeFinal();
-        klass.setImplementsList(Strings.TYPE_NODE);
+        final List<AbstractNodeDescriptor> bases = this.getRule().getBaseDescriptors();
+        if (bases.isEmpty()) {
+            klass.setImplementsList(Strings.TYPE_NODE);
+        } else {
+            klass.setImplementsList(
+                bases.stream()
+                    .map(AbstractNodeDescriptor::getName)
+                    .toArray(String[]::new)
+            );
+        }
         klass.setVersion(context.getVersion());
         klass.addNested(this.createTypeClass(context));
         klass.addNested(this.createBuilderClass(context));

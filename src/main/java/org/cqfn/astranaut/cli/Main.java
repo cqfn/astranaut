@@ -26,6 +26,7 @@ package org.cqfn.astranaut.cli;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.cqfn.astranaut.analyzer.Analyzer;
 import org.cqfn.astranaut.dsl.Program;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.cqfn.astranaut.parser.DslReader;
@@ -89,6 +90,8 @@ public final class Main {
         reader.readFile(args[1]);
         final ProgramParser parser = new ProgramParser();
         final Program program = parser.parse(reader);
+        final Analyzer analyzer = new Analyzer(program);
+        analyzer.analyze();
         action.perform(program, Arrays.asList(args).subList(2, args.length));
     }
 }

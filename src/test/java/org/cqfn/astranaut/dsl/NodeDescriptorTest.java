@@ -56,7 +56,7 @@ class NodeDescriptorTest {
             first.addBaseDescriptor(third);
         } catch (final BaseException exception) {
             oops = true;
-            Assertions.assertEquals("Parser", exception.getInitiator());
+            Assertions.assertEquals("Analyzer", exception.getInitiator());
             Assertions.assertEquals(
                 "Adding this descriptor would create a cycle: 'C <- A | ?'",
                 exception.getErrorMessage()
