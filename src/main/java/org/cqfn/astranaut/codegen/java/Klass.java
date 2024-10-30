@@ -45,6 +45,11 @@ public final class Klass implements ClassOrInterface {
     private final JavaDoc doc;
 
     /**
+     * Suppresses compiler or codechecker warnings.
+     */
+    private final Suppress suppress;
+
+    /**
      * Flag indicating that the generated class is public.
      */
     private boolean pub;
@@ -102,11 +107,20 @@ public final class Klass implements ClassOrInterface {
     public Klass(final String name, final String brief) {
         this.name = name;
         this.doc = new JavaDoc(brief);
+        this.suppress = new Suppress();
         this.impl = new String[0];
         this.fields = new ArrayList<>(0);
         this.constructors = new ArrayList<>(0);
         this.methods = new ArrayList<>(0);
         this.nested = new ArrayList<>(0);
+    }
+
+    /**
+     * Adds a warning that needs to be suppressed.
+     * @param warning Warning
+     */
+    public void suppressWarning(final String warning) {
+        this.suppress.addWarning(warning);
     }
 
     /**
@@ -203,6 +217,7 @@ public final class Klass implements ClassOrInterface {
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.doc.build(indent, code);
+        this.suppress.build(indent, code);
         code.add(indent, this.composeHeader());
         boolean flag = false;
         final List<Field> flist = this.fields.stream()

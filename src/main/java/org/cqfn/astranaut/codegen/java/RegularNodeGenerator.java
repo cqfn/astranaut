@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import org.cqfn.astranaut.dsl.ChildDescriptorExt;
@@ -128,13 +129,32 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
 
     @Override
     public String getChildrenListSetterBody() {
-        return "return list.isEmpty();";
+        final List<String> lines = new ArrayList<>(1);
+        if (this.names.length == 0) {
+            lines.add("return list.isEmpty();");
+        } else if (this.decorator) {
+            final String type = this.rule.getExtChildTypes().get(0).getType();
+            lines.add("boolean result = false;");
+            lines.add(
+                String.format(
+                    "if (list.size() == 1 && list.get(0) instanceof %s) {",
+                    type
+                )
+            );
+            lines.add(String.format("this.%s = (%s) list.get(0);", this.names[0], type));
+            lines.add("result = true;");
+            lines.add("}");
+            lines.add("return result;");
+        } else {
+            lines.add("return false;");
+        }
+        return String.join("\n", lines);
     }
 
     @Override
     public String getValidatorBody() {
         boolean flag = false;
-        final StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder(80);
         final List<ChildDescriptorExt> children = this.rule.getExtChildTypes();
         for (int index = 0; index < children.size(); index = index + 1) {
             final ChildDescriptorExt descriptor = children.get(index);
@@ -145,7 +165,7 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
                 builder.append(" && ");
             }
             flag = true;
-            builder.append(this.names[index]).append(" != null");
+            builder.append("this.").append(this.names[index]).append(" != null");
         }
         final String expression;
         if (flag) {
@@ -204,12 +224,14 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
      */
     private void createFieldsWithGettersForTaggedChildren(final Klass klass) {
         final List<ChildDescriptorExt> children = this.rule.getExtChildTypes();
+        int count = 0;
         for (int index = 0; index < children.size(); index = index + 1) {
             final ChildDescriptorExt descriptor = children.get(index);
             final String tag = descriptor.getTag();
             if (tag.isEmpty()) {
                 continue;
             }
+            count = count + 1;
             final Field field = new Field(
                 descriptor.getType(),
                 this.names[index],
@@ -239,6 +261,9 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
             }
             getter.setBody(String.format("return this.%s;", this.names[index]));
             klass.addMethod(getter);
+        }
+        if (count > 1) {
+            klass.suppressWarning("PMD.DataClass");
         }
     }
 
@@ -304,12 +329,16 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
      */
     private static String[] generateVariableNames(final RegularNodeDescriptor rule) {
         final List<ChildDescriptorExt> children = rule.getExtChildTypes();
-        final String[] names = new String[children.size()];
+        final int size = children.size();
+        final String[] names = new String[size];
         final NameGenerator generator = new NameGenerator();
-        for (int index = 0; index < children.size(); index = index + 1) {
+        for (int index = 0; index < size; index = index + 1) {
             final ChildDescriptorExt child = children.get(index);
             final String tag = child.getTag();
             String name = generator.nextName();
+            if (size == 1) {
+                name = "child";
+            }
             if (!tag.isEmpty()) {
                 name = tag.toLowerCase(Locale.ENGLISH);
             }
