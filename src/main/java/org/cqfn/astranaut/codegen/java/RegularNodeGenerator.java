@@ -46,12 +46,19 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
     private final String[] names;
 
     /**
+     * Flag indicating that this node is a wrapper (decorator) of another node.
+     */
+    private final boolean decorator;
+
+    /**
      * Constructor.
      * @param rule The rule that describes regular node
      */
     public RegularNodeGenerator(final RegularNodeDescriptor rule) {
         this.rule = rule;
         this.names = RegularNodeGenerator.generateVariableNames(rule);
+        this.decorator = rule.getExtChildTypes().size() == 1
+            && !rule.getExtChildTypes().get(0).isOptional();
     }
 
     @Override
@@ -152,7 +159,43 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
 
     @Override
     public void fillNodeCreator(final List<String> lines) {
-        this.getClass();
+        final List<ChildDescriptorExt> children = this.rule.getExtChildTypes();
+        for (int index = 0; index < children.size(); index = index + 1) {
+            final ChildDescriptorExt descriptor = children.get(index);
+            if (!descriptor.getTag().isEmpty()) {
+                lines.add(
+                    String.format(
+                        "node.%s = this.%s;",
+                        this.names[index],
+                        this.names[index]
+                    )
+                );
+            }
+        }
+        if (this.decorator) {
+            this.needCollectionsClass();
+            lines.add(
+                String.format(
+                    "node.children = Collections.singletonList(this.%s);",
+                    this.names[0]
+                )
+            );
+        } else if (this.names.length > 0) {
+            this.needListUtilsClass();
+            final StringBuilder builder = new StringBuilder();
+            for (int index = 0; index < this.names.length; index = index + 1) {
+                if (index > 0) {
+                    builder.append(", ");
+                }
+                builder.append("this.").append(this.names[index]);
+            }
+            lines.add(
+                String.format(
+                    "node.children = new ListUtils<Node>().add(%s).make();",
+                    builder.toString()
+                )
+            );
+        }
     }
 
     /**
@@ -160,14 +203,16 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
      * @param klass Class describing regular node
      */
     private void createFieldsWithGettersForTaggedChildren(final Klass klass) {
-        for (final ChildDescriptorExt descriptor : this.rule.getExtChildTypes()) {
+        final List<ChildDescriptorExt> children = this.rule.getExtChildTypes();
+        for (int index = 0; index < children.size(); index = index + 1) {
+            final ChildDescriptorExt descriptor = children.get(index);
             final String tag = descriptor.getTag();
             if (tag.isEmpty()) {
                 continue;
             }
             final Field field = new Field(
                 descriptor.getType(),
-                tag.toLowerCase(Locale.ENGLISH),
+                this.names[index],
                 String.format("Child node with '%s' tag", tag)
             );
             field.makePrivate();
@@ -192,7 +237,7 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
             } else {
                 getter.setReturnsDescription("Child node (can't be {@code null})");
             }
-            getter.setBody(String.format("return this.%s;", tag.toLowerCase(Locale.ENGLISH)));
+            getter.setBody(String.format("return this.%s;", this.names[index]));
             klass.addMethod(getter);
         }
     }
