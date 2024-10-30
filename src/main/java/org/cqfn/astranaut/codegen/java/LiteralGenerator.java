@@ -74,7 +74,7 @@ public final class LiteralGenerator extends NonAbstractNodeGenerator {
             getter.suppressWarning("PMD.BooleanGetMethodName");
         }
         klass.addMethod(getter);
-        final Method list = new Method("List<Node>", "getChildrenList");
+        final Method list = new Method(Strings.TYPE_NODE_LIST, "getChildrenList");
         list.makePublic();
         list.setBody("return Collections.emptyList();");
         klass.addMethod(list);

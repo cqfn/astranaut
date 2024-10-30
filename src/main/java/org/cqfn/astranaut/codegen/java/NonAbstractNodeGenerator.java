@@ -48,6 +48,11 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
      */
     private boolean arraylist;
 
+    /**
+     * Flag indicating that a non-trivial validator has been generated.
+     */
+    private boolean validator;
+
     @Override
     public final Set<CompilationUnit> createUnits(final Context context) {
         final String name = this.getRule().getName();
@@ -163,6 +168,13 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
      */
     protected void needArrayListClass() {
         this.arraylist = true;
+    }
+
+    /**
+     * Sets a flag indicating that a non-trivial validator has been generated.
+     */
+    protected void hasNonTrivialValidator() {
+        this.validator = true;
     }
 
     /**
@@ -304,10 +316,10 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         klass.setImplementsList(Strings.TYPE_BUILDER);
         klass.setVersion(context.getVersion());
         NonAbstractNodeGenerator.createFragmentFieldAndSetter(klass);
+        this.createSpecificEntitiesInBuilderClass(klass);
         this.createDataSetter(klass);
         this.createChildrenListSetter(klass);
         this.createValidator(klass);
-        this.createSpecificEntitiesInBuilderClass(klass);
         this.createNodeCreator(klass);
         return klass;
     }
@@ -350,7 +362,7 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
     private void createChildrenListSetter(final Klass klass) {
         final Method method = new Method(Strings.TYPE_BOOLEAN, "setChildrenList");
         method.makePublic();
-        method.addArgument("List<Node>", "list");
+        method.addArgument(Strings.TYPE_NODE_LIST, "list");
         method.setBody(this.getChildrenListSetterBody());
         klass.addMethod(method);
     }
@@ -375,6 +387,11 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         method.makePublic();
         final String name = this.getRule().getName();
         final List<String> lines = new ArrayList<>(16);
+        if (this.validator) {
+            lines.add("if (!this.isValid()) {");
+            lines.add("throw new IllegalStateException();");
+            lines.add("}");
+        }
         lines.add(String.format("final %s node = new %s();", name, name));
         lines.add("node.fragment = this.fragment;");
         this.fillNodeCreator(lines);

@@ -23,59 +23,58 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * String constants used when source code is generated.
+ * Generates non-repeating names (numerals) that can be used as names for variables
+ *  when the variable name is not known.
  * @since 1.0.0
  */
-final class Strings {
+public class NameGenerator {
     /**
-     * The 'void' type.
+     * List of names.
      */
-    public static final String TYPE_VOID = "void";
+    private static final List<String> NAMES = Arrays.asList(
+        "first",
+        "second",
+        "third",
+        "fourth",
+        "fifth",
+        "sixth",
+        "seventh",
+        "eighth",
+        "ninth",
+        "tenth",
+        "eleventh",
+        "twelfth",
+        "thirteenth",
+        "fourteenth",
+        "fifteenth",
+        "sixteenth",
+        "seventeenth",
+        "eighteenth",
+        "nineteenth",
+        "twentieth"
+    );
 
     /**
-     * The 'boolean' type.
+     * Current index.
      */
-    public static final String TYPE_BOOLEAN = "boolean";
+    private int current;
 
     /**
-     * The 'int' type.
+     * Returns the next name.
+     * @return A name
      */
-    public static final String TYPE_INT = "int";
-
-    /**
-     * The 'String' type.
-     */
-    public static final String TYPE_STRING = "String";
-
-    /**
-     * The 'Node' type.
-     */
-    public static final String TYPE_NODE = "Node";
-
-    /**
-     * The 'List&lt;Node&gt;' type.
-     */
-    public static final String TYPE_NODE_LIST = "List<Node>";
-
-    /**
-     * The 'Type' type.
-     */
-    public static final String TYPE_TYPE = "Type";
-
-    /**
-     * The 'Builder' type.
-     */
-    public static final String TYPE_BUILDER = "Builder";
-
-    /**
-     * The 'Fragment' type.
-     */
-    public static final String TYPE_FRAGMENT = "Fragment";
-
-    /**
-     * Private constructor.
-     */
-    private Strings() {
+    public String nextName() {
+        final String name;
+        if (this.current < NameGenerator.NAMES.size()) {
+            name = NameGenerator.NAMES.get(this.current);
+            this.current = this.current + 1;
+        } else {
+            throw new IllegalStateException("No more names available.");
+        }
+        return name;
     }
 }
