@@ -96,6 +96,11 @@ public final class ListNodeGenerator extends NonAbstractNodeGenerator {
     }
 
     @Override
+    public void createSpecificEntitiesInTypeClass(final Klass klass) {
+        this.getClass();
+    }
+
+    @Override
     public void createSpecificEntitiesInBuilderClass(final Klass klass) {
         this.needCollectionsClass();
         final Field children = new Field(

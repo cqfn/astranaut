@@ -59,6 +59,12 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
      */
     private boolean validator;
 
+    /**
+     * Flag indicating that the 'org.cqfn.astranaut.core.base.ChildDescriptor' class
+     *  should be included in the generated code.
+     */
+    private boolean chldecr;
+
     @Override
     public final Set<CompilationUnit> createUnits(final Context context) {
         final String name = this.getRule().getName();
@@ -100,6 +106,9 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         unit.addImport(base.concat(Strings.TYPE_FRAGMENT));
         unit.addImport(base.concat(Strings.TYPE_TYPE));
         unit.addImport(base.concat(Strings.TYPE_BUILDER));
+        if (this.chldecr) {
+            unit.addImport(base.concat(Strings.TYPE_CHLD_DESCR));
+        }
         return Collections.singleton(unit);
     }
 
@@ -132,6 +141,12 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
      * @return Body of the 'getChild()' method
      */
     public abstract String getChildGetterBody();
+
+    /**
+     * Creates specific entities in the class describing the type of the node.
+     * @param klass Class describing the node type
+     */
+    public abstract void createSpecificEntitiesInTypeClass(Klass klass);
 
     /**
      * Creates specific entities in the class describing the builder of the node.
@@ -192,6 +207,14 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
      */
     protected void hasNonTrivialValidator() {
         this.validator = true;
+    }
+
+    /**
+     * Sets the flag indicating that the 'org.cqfn.astranaut.core.base.ChildDescriptor' class
+     *  should be included in the generated code.
+     */
+    protected void needChildDescriptorClass() {
+        this.chldecr = true;
     }
 
     /**
@@ -289,6 +312,7 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         klass.makeFinal();
         klass.setImplementsList(Strings.TYPE_TYPE);
         klass.setVersion(context.getVersion());
+        this.createSpecificEntitiesInTypeClass(klass);
         this.createNameGetter(klass);
         this.createBuilderCreator(klass);
         return klass;

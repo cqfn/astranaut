@@ -106,6 +106,11 @@ public final class LiteralGenerator extends NonAbstractNodeGenerator {
     }
 
     @Override
+    public void createSpecificEntitiesInTypeClass(final Klass klass) {
+        this.getClass();
+    }
+
+    @Override
     public void createSpecificEntitiesInBuilderClass(final Klass klass) {
         final String initial = this.rule.getInitial();
         if (!initial.isEmpty()) {

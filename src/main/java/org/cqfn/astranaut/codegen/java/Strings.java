@@ -74,6 +74,11 @@ final class Strings {
     public static final String TYPE_FRAGMENT = "Fragment";
 
     /**
+     * The 'ChildDescriptor' type.
+     */
+    public static final String TYPE_CHLD_DESCR = "ChildDescriptor";
+
+    /**
      * Private constructor.
      */
     private Strings() {

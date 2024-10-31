@@ -116,6 +116,22 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
     }
 
     @Override
+    public void createSpecificEntitiesInTypeClass(final Klass klass) {
+        if (this.names.length > 0) {
+            this.needChildDescriptorClass();
+            final Field types = new Field(
+                "List<ChildDescriptor>",
+                "CHILD_TYPES",
+                "List of child node descriptors"
+            );
+            types.makePublic();
+            types.makeStatic();
+            types.makeFinal("null");
+            klass.addField(types);
+        }
+    }
+
+    @Override
     public void createSpecificEntitiesInBuilderClass(final Klass klass) {
         if (this.names.length > 0) {
             this.createFieldsWithSettersForTaggedChildren(klass);
