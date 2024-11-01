@@ -131,23 +131,18 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
             );
             types.makePublic();
             types.makeStatic();
-            this.needArraysClass();
             final StringBuilder initial = new StringBuilder();
-            initial.append("Arrays.asList(");
-            boolean flag = false;
+            initial.append("ChildDescriptor.create()");
             for (final ChildDescriptorExt descriptor : this.rule.getExtChildTypes()) {
-                if (flag) {
-                    initial.append(", ");
+                if (descriptor.isOptional()) {
+                    initial.append(".optional(");
+                } else {
+                    initial.append(".required(");
                 }
-                flag = true;
-                initial
-                    .append("new ChildDescriptor(")
-                    .append(constants.createStaticField(descriptor.getType()))
-                    .append(", ")
-                    .append(descriptor.isOptional())
-                    .append(')');
+                final String field = constants.createStaticField(descriptor.getType());
+                initial.append(field).append(')');
             }
-            initial.append(')');
+            initial.append(".build()");
             types.makeFinal(initial.toString());
             klass.addField(types);
         }
