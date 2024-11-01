@@ -49,6 +49,11 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
     private boolean arraylist;
 
     /**
+     * Flag indicating that the 'java.util.Arrays' class should be included in the generated code.
+     */
+    private boolean arrays;
+
+    /**
      * Flag indicating that the 'org.cqfn.astranaut.core.utils.ListUtils' class should be included
      *  in the generated code.
      */
@@ -97,6 +102,9 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         }
         if (this.arraylist) {
             unit.addImport("java.util.ArrayList");
+        }
+        if (this.arrays) {
+            unit.addImport("java.util.Arrays");
         }
         if (this.listutils) {
             unit.addImport("org.cqfn.astranaut.core.utils.ListUtils");
@@ -192,6 +200,14 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
      */
     protected void needArrayListClass() {
         this.arraylist = true;
+    }
+
+    /**
+     * Sets the flag indicating that the 'java.util.Arrays' class should be included
+     *  in the generated code.
+     */
+    protected void needArraysClass() {
+        this.arrays = true;
     }
 
     /**

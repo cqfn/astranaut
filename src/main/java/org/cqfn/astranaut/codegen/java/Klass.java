@@ -116,6 +116,14 @@ public final class Klass implements ClassOrInterface {
     }
 
     /**
+     * Returns name of the class.
+     * @return Name of the class
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
      * Adds a warning that needs to be suppressed.
      * @param warning Warning
      */
