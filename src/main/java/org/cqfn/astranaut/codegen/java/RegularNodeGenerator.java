@@ -118,6 +118,7 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
     @Override
     public void createSpecificEntitiesInTypeClass(final Klass klass) {
         if (this.names.length > 0) {
+            final String lsttype = "List<ChildDescriptor>";
             final ConstantStrings constants = new ConstantStrings(
                 klass,
                 "TYPE",
@@ -125,11 +126,11 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
             );
             this.needChildDescriptorClass();
             final Field types = new Field(
-                "List<ChildDescriptor>",
+                lsttype,
                 "CHILD_TYPES",
                 "List of child node descriptors"
             );
-            types.makePublic();
+            types.makePrivate();
             types.makeStatic();
             final StringBuilder initial = new StringBuilder();
             initial.append("ChildDescriptor.create()");
@@ -145,6 +146,10 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
             initial.append(".build()");
             types.makeFinal(initial.toString());
             klass.addField(types);
+            final Method getter = new Method(lsttype, "getChildTypes");
+            getter.makePublic();
+            getter.setBody(String.format("return %s.CHILD_TYPES;", klass.getName()));
+            klass.addMethod(getter);
         }
     }
 

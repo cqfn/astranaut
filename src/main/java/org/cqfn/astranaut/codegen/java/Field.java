@@ -161,7 +161,20 @@ public final class Field implements Entity {
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.doc.build(indent, code);
-        final StringBuilder builder = new StringBuilder(128);
+        final String declaration = this.composeDeclaration();
+        if (this.initial.isEmpty()) {
+            code.add(indent, declaration.concat(";"));
+        } else {
+            this.buildFieldWithInitialValue(indent, code, declaration);
+        }
+    }
+
+    /**
+     * Compiles a declaration of the field.
+     * @return String declaration of the field without an initial value
+     */
+    private String composeDeclaration() {
+        final StringBuilder builder = new StringBuilder(100);
         if (this.pub) {
             builder.append("public ");
         } else if (this.prt) {
@@ -176,10 +189,68 @@ public final class Field implements Entity {
             builder.append("final ");
         }
         builder.append(this.type).append(' ').append(this.name);
-        if (!this.initial.isEmpty()) {
-            builder.append(" = ").append(this.initial);
-        }
-        builder.append(';');
-        code.add(indent, builder.toString());
+        return builder.toString();
+    }
+
+    /**
+     * Builds field declaration with initial value.
+     * @param indent Code indentation. Each generated line will be indented as follows
+     * @param code Source code builder
+     * @param head Field declaration without initial value
+     * @throws BaseException If there are any problems during code generation
+     */
+    private void buildFieldWithInitialValue(final int indent, final SourceCodeBuilder code,
+        final String head) throws BaseException {
+        do {
+            final String simple = String.format("%s = %s;", head, this.initial);
+            if (SourceCodeBuilder.tryOn(indent, simple)) {
+                code.add(indent, simple);
+                break;
+            }
+            code.add(indent, String.format("%s =", head));
+            final String second =  String.format("%s;", this.initial);
+            if (SourceCodeBuilder.tryOn(indent + 1, second)) {
+                code.add(indent + 1, second);
+                break;
+            }
+            if (Field.tryBreakLineByCallChain(indent + 1, code, this.initial)) {
+                break;
+            }
+            throw new SourceCodeBuilder.CodeLineIsTooLong(this.initial);
+        } while (false);
+    }
+
+    /**
+     * Trying to break down the line of code along the call chain.
+     *  Each new call in the chain starts with a new line.
+     * @param indent Indentation
+     * @param code Source code builder
+     * @param line Line of code that should be broken into smaller lines
+     * @return Result, {@code true} if successful
+     * @throws BaseException If there are any problems during code generation
+     */
+    private static boolean tryBreakLineByCallChain(final int indent, final SourceCodeBuilder code,
+        final String line) throws BaseException {
+        final String[] list = line.split("(?<=\\))(?=\\.)");
+        list[list.length - 1] = list[list.length - 1].concat(";");
+        boolean result;
+        do {
+            result = SourceCodeBuilder.tryOn(indent, list[0]);
+            if (!result) {
+                break;
+            }
+            int index;
+            for (index = 1; index < list.length && result; index = index + 1) {
+                result = SourceCodeBuilder.tryOn(indent + 1, list[index]);
+            }
+            if (!result) {
+                break;
+            }
+            code.add(indent, list[0]);
+            for (index = 1; index < list.length && result; index = index + 1) {
+                code.add(indent + 1, list[index]);
+            }
+        } while (false);
+        return result;
     }
 }

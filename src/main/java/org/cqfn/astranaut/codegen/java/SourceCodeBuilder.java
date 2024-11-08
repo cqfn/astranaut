@@ -63,6 +63,18 @@ public final class SourceCodeBuilder {
         }
     }
 
+    /**
+     * Tests whether a line of code will fit the maximum length or whether it must be divided.
+     * @param indent Indentation
+     * @param text Program text
+     * @return Check result, {@code true} if fits
+     */
+    @SuppressWarnings("PMD.ProhibitPublicStaticMethods")
+    public static boolean tryOn(final int indent, final String text) {
+        final int length = indent * SourceCodeBuilder.TABULATION.length() + text.length() + 1;
+        return length < SourceCodeBuilder.MAX_LINE_LENGTH;
+    }
+
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
@@ -70,6 +82,43 @@ public final class SourceCodeBuilder {
             line.build(builder);
         }
         return builder.toString();
+    }
+
+    /**
+     * Exception 'The line of code is too long'.
+     * @since 1.0.0
+     */
+    public static final class CodeLineIsTooLong extends BaseException {
+        /**
+         * Version identifier.
+         */
+        private static final long serialVersionUID = -1;
+
+        /**
+         * Text of a source code line that is too long.
+         */
+        private final String text;
+
+        /**
+         * Constructor.
+         * @param text Text of a source code line that is too long
+         */
+        public CodeLineIsTooLong(final String text) {
+            this.text = text;
+        }
+
+        @Override
+        public String getInitiator() {
+            return "Codegen";
+        }
+
+        @Override
+        public String getErrorMessage() {
+            return String.format(
+                "The line of code is too long: '%s...'",
+                this.text.trim().substring(0, 19)
+            );
+        }
     }
 
     /**
@@ -111,43 +160,6 @@ public final class SourceCodeBuilder {
                 }
                 builder.append(this.text).append('\n');
             }
-        }
-    }
-
-    /**
-     * Exception 'The line of code is too long'.
-     * @since 1.0.0
-     */
-    private static final class CodeLineIsTooLong extends BaseException {
-        /**
-         * Version identifier.
-         */
-        private static final long serialVersionUID = -1;
-
-        /**
-         * Text of a source code line that is too long.
-         */
-        private final String text;
-
-        /**
-         * Constructor.
-         * @param text Text of a source code line that is too long
-         */
-        private CodeLineIsTooLong(final String text) {
-            this.text = text;
-        }
-
-        @Override
-        public String getInitiator() {
-            return "Codegen";
-        }
-
-        @Override
-        public String getErrorMessage() {
-            return String.format(
-                "The line of code is too long: '%s...'",
-                this.text.trim().substring(0, 19)
-            );
         }
     }
 }
