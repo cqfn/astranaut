@@ -61,6 +61,11 @@ public final class Interface implements ClassOrInterface {
         this.ext = new String[0];
     }
 
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
     /**
      * Sets the version number. It will be added to JavaDoc.
      * @param value Version number

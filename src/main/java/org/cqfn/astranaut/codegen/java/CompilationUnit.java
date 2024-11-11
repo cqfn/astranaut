@@ -90,4 +90,12 @@ public final class CompilationUnit implements JavaFileGenerator {
         }
         this.coi.build(indent, code);
     }
+
+    /**
+     * Returns the name of the compilation unit file.
+     * @return Java filename
+     */
+    public String getFileName() {
+        return this.coi.getName().concat(".java");
+    }
 }

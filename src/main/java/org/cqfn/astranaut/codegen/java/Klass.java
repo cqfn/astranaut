@@ -75,6 +75,11 @@ public final class Klass implements ClassOrInterface {
     private boolean fin;
 
     /**
+     * The name of the superclass from which this class inherits.
+     */
+    private String ext;
+
+    /**
      * A list of interfaces that this class implements.
      */
     private String[] impl;
@@ -108,6 +113,7 @@ public final class Klass implements ClassOrInterface {
         this.name = name;
         this.doc = new JavaDoc(brief);
         this.suppress = new Suppress();
+        this.ext = "";
         this.impl = new String[0];
         this.fields = new ArrayList<>(0);
         this.constructors = new ArrayList<>(0);
@@ -115,10 +121,7 @@ public final class Klass implements ClassOrInterface {
         this.nested = new ArrayList<>(0);
     }
 
-    /**
-     * Returns name of the class.
-     * @return Name of the class
-     */
+    @Override
     public String getName() {
         return this.name;
     }
@@ -178,6 +181,14 @@ public final class Klass implements ClassOrInterface {
      */
     public void makeFinal() {
         this.fin = true;
+    }
+
+    /**
+     * Sets the name of the superclass from which this class inherits.
+     * @param classname Class name
+     */
+    public void setSuperclass(final String classname) {
+        this.ext = classname;
     }
 
     /**
@@ -285,6 +296,9 @@ public final class Klass implements ClassOrInterface {
             header.append("final ");
         }
         header.append("class ").append(this.name);
+        if (!this.ext.isEmpty()) {
+            header.append(" extends ").append(this.ext);
+        }
         if (this.impl.length > 0) {
             header.append(" implements ");
             boolean flag = false;

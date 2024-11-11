@@ -28,4 +28,9 @@ package org.cqfn.astranaut.codegen.java;
  * @since 1.0.0
  */
 public interface ClassOrInterface extends Entity {
+    /**
+     * Returns the name of the class or interface.
+     * @return Name of the entity
+     */
+    String getName();
 }

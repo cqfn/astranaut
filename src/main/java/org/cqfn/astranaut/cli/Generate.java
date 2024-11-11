@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Set;
 import org.cqfn.astranaut.codegen.java.CompilationUnit;
 import org.cqfn.astranaut.codegen.java.Context;
+import org.cqfn.astranaut.codegen.java.FactoryGenerator;
 import org.cqfn.astranaut.codegen.java.License;
 import org.cqfn.astranaut.codegen.java.Package;
 import org.cqfn.astranaut.codegen.java.PackageInfo;
@@ -66,6 +67,11 @@ public final class Generate implements Action {
     private Path root;
 
     /**
+     * Generates factories for nodes.
+     */
+    private FactoryGenerator factories;
+
+    /**
      * Constructor.
      */
     public Generate() {
@@ -81,6 +87,7 @@ public final class Generate implements Action {
             this.options.getOutput(),
             this.options.getPackage().replace('.', '/')
         );
+        this.factories = new FactoryGenerator(program);
         for (final String language : program.getAllLanguages()) {
             this.generateNodes(program, language);
         }
@@ -118,16 +125,19 @@ public final class Generate implements Action {
         cct.setPackage(pkg);
         cct.setVersion(this.options.getVersion());
         final Context context = cct.createContext();
+        final CompilationUnit factory = this.factories.createUnit(language, context);
+        String code = factory.generateJavaCode();
+        path = new File(folder, factory.getFileName()).getAbsolutePath();
+        result = new FilesWriter(path).writeStringNoExcept(code);
+        if (!result) {
+            throw new CannotWriteFile(path);
+        }
         for (final NodeDescriptor rule : program.getNodeDescriptorsForLanguage(language)) {
             final RuleGenerator generator = rule.createGenerator();
             final Set<CompilationUnit> units = generator.createUnits(context);
             for (final CompilationUnit unit : units) {
-                final String code = unit.generateJavaCode();
-                path = new File(
-                    folder,
-                    rule.getName().concat(".java")
-                )
-                    .getAbsolutePath();
+                code = unit.generateJavaCode();
+                path = new File(folder, unit.getFileName()).getAbsolutePath();
                 result = new FilesWriter(path).writeStringNoExcept(code);
                 if (!result) {
                     throw new CannotWriteFile(path);
