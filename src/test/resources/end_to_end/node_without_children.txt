@@ -40,6 +40,12 @@ public final class CommonFactory extends DefaultFactory {
     public static final Factory INSTANCE = new CommonFactory();
 
     /**
+     * Default properties of nodes describing the language.
+     */
+    public static final Map<String, String> PROPERTIES =
+        new MapUtils<String, String>().put("language", "common").put("color", "green").make();
+
+    /**
      * Collection of types supported by this factory.
      */
     private static final Map<String, Type> TYPES =

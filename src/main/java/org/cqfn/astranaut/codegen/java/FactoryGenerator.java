@@ -79,6 +79,7 @@ public class FactoryGenerator {
         instance.makeStatic();
         instance.makeFinal(String.format("new %s()", classname));
         klass.addField(instance);
+        FactoryGenerator.createMapOfProperties(language, klass);
         this.createMapOfTypes(language, klass);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
@@ -94,11 +95,39 @@ public class FactoryGenerator {
     }
 
     /**
-     * Creates a collection that contains a collection of types supported by this factory.
+     * Creates a collection containing the default properties of the nodes describing the language.
      * @param language Language for which the factory is generated
      * @param klass The class to which to add the field
      */
-    public void createMapOfTypes(final String language, final Klass klass) {
+    private static void createMapOfProperties(final String language, final Klass klass) {
+        final Field field = new Field(
+            "Map<String, String>",
+            "PROPERTIES",
+            "Default properties of nodes describing the language"
+        );
+        field.makePublic();
+        field.makeStatic();
+        final String color;
+        if (language.equals("common")) {
+            color = "green";
+        } else {
+            color = "red";
+        }
+        final String initial = String.format(
+            "new MapUtils<String, String>().put(\"language\", \"%s\").put(\"color\", \"%s\").make()",
+            language,
+            color
+        );
+        field.makeFinal(initial);
+        klass.addField(field);
+    }
+
+    /**
+     * Creates a collection that contains types supported by this factory.
+     * @param language Language for which the factory is generated
+     * @param klass The class to which to add the field
+     */
+    private void createMapOfTypes(final String language, final Klass klass) {
         final Field field = new Field(
             "Map<String, Type>",
             "TYPES",
