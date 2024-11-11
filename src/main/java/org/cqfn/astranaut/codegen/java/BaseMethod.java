@@ -112,7 +112,7 @@ public abstract  class BaseMethod implements Entity {
      * @throws BaseException If there are any problems during code generation
      */
     protected void buildBody(final int indent, final SourceCodeBuilder code) throws BaseException {
-        final List<Pair<String, Integer>> lines = this.splitBodyByLines();
+        final List<Pair<String, Integer>> lines = this.splitBodyByLines(indent);
         for (final Pair<String, Integer> line : lines) {
             code.add(indent + line.getValue(), line.getKey());
         }
@@ -120,13 +120,14 @@ public abstract  class BaseMethod implements Entity {
 
     /**
      * Separates the method body by indented lines.
+     * @param indent Code indentation. Each generated line will be indented as follows
      * @return List of indented lines (where key is line, value is indentation)
-     * @throws SyntaxErrorInSourceCode If the method body contains an error that could be detected
-     *  at this stage
+     * @throws BaseException If the method body contains an error that could be detected
+     *  at this stage or source code line is too long
      */
-    private List<Pair<String, Integer>> splitBodyByLines() throws SyntaxErrorInSourceCode {
+    private List<Pair<String, Integer>> splitBodyByLines(final int indent) throws BaseException {
         final List<Pair<String, Integer>> list = new ArrayList<>(0);
-        int indent = 0;
+        int offset = 0;
         for (final String line : this.getBody().split("\n")) {
             String tail = line.trim();
             while (!tail.isEmpty()) {
@@ -136,17 +137,17 @@ public abstract  class BaseMethod implements Entity {
                 }
                 int index = tail.indexOf('{');
                 if (index > 0 && tail.charAt(0) == '}') {
-                    indent = indent - 1;
+                    offset = offset - 1;
                 }
                 if (index >= 0) {
-                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), indent + extra));
-                    indent = indent + 1;
+                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), offset + extra));
+                    offset = offset + 1;
                     tail = tail.substring(index + 1).trim();
                     continue;
                 }
                 index = tail.indexOf(';');
                 if (index >= 0) {
-                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), indent + extra));
+                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), offset + extra));
                     tail = tail.substring(index + 1).trim();
                     continue;
                 }
@@ -155,16 +156,49 @@ public abstract  class BaseMethod implements Entity {
                     throw new SyntaxErrorInSourceCode(tail);
                 }
                 if (index == 0) {
-                    indent = indent - 1;
-                    list.add(new Pair<>("}", indent));
+                    offset = offset - 1;
+                    list.add(new Pair<>("}", offset));
                     tail = tail.substring(index + 1).trim();
                     continue;
                 }
-                list.add(new Pair<>(tail, indent + extra));
+                list.add(new Pair<>(tail, offset + extra));
                 tail = "";
             }
         }
-        return list;
+        return BaseMethod.fixLinesThatAreTooLong(list, indent);
+    }
+
+    /**
+     * Fixes lines that are too long by breaking them into smaller lines where possible.
+     * @param list Initial list of lines that may contain lines that are too long
+     * @param indent Code indentation. Each generated line will be indented as follows
+     * @return Fixed list of lines
+     * @throws BaseException If some lines are too long and they could never be split
+     */
+    private static List<Pair<String, Integer>> fixLinesThatAreTooLong(
+        final List<Pair<String, Integer>> list, final int indent) throws BaseException {
+        List<Pair<String, Integer>> result = new ArrayList<>(list.size());
+        boolean flag = false;
+        for (final Pair<String, Integer> line : list) {
+            final String code = line.getKey();
+            final int offset = line.getValue();
+            if (SourceCodeBuilder.tryOn(indent + offset, code)) {
+                result.add(line);
+                continue;
+            }
+            final int index = code.indexOf('=');
+            if (index > 0 && index < code.length() - 1) {
+                result.add(new Pair<>(code.substring(0, index + 1), offset));
+                result.add(new Pair<>(code.substring(index + 1).trim(), offset + 1));
+                flag = true;
+                continue;
+            }
+            throw new SourceCodeBuilder.CodeLineIsTooLong(code);
+        }
+        if (flag) {
+            result = BaseMethod.fixLinesThatAreTooLong(result, indent);
+        }
+        return result;
     }
 
     /**

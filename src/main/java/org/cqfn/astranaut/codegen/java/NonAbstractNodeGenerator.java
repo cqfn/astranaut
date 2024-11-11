@@ -70,6 +70,12 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
      */
     private boolean chldecr;
 
+    /**
+     * Flag indicating that the 'org.cqfn.astranaut.core.algorithms.NodeAllocator' class
+     *  should be included in the generated code.
+     */
+    private boolean allocator;
+
     @Override
     public final Set<CompilationUnit> createUnits(final Context context) {
         final String name = this.getRule().getName();
@@ -108,6 +114,9 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         }
         if (this.listutils) {
             unit.addImport("org.cqfn.astranaut.core.utils.ListUtils");
+        }
+        if (this.allocator) {
+            unit.addImport("org.cqfn.astranaut.core.algorithms.NodeAllocator");
         }
         final String base = "org.cqfn.astranaut.core.base.";
         unit.addImport(base.concat(Strings.TYPE_NODE));
@@ -231,6 +240,14 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
      */
     protected void needChildDescriptorClass() {
         this.chldecr = true;
+    }
+
+    /**
+     * Sets the flag indicating that the 'org.cqfn.astranaut.core.algorithms.NodeAllocator' class
+     *  should be included in the generated code.
+     */
+    protected void needNodeAllocatorClass() {
+        this.allocator = true;
     }
 
     /**

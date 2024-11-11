@@ -167,11 +167,12 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
 
     @Override
     public String getChildrenListSetterBody() {
+        final List<ChildDescriptorExt> children = this.rule.getExtChildTypes();
         final List<String> lines = new ArrayList<>(1);
         if (this.names.length == 0) {
             lines.add("return list.isEmpty();");
         } else if (this.decorator) {
-            final String type = this.rule.getExtChildTypes().get(0).getType();
+            final String type = children.get(0).getType();
             lines.add("boolean result = false;");
             lines.add(
                 String.format(
@@ -184,7 +185,33 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
             lines.add("}");
             lines.add("return result;");
         } else {
-            lines.add("return false;");
+            this.needNodeAllocatorClass();
+            lines.add(
+                String.format(
+                    "final NodeAllocator allocator = new NodeAllocator(%sType.CHILD_TYPES);",
+                    this.rule.getName()
+                )
+            );
+            lines.add(
+                String.format(
+                    "final Node[] nodes = new Node[%d];",
+                    children.size()
+                )
+            );
+            lines.add("final boolean result = allocator.allocate(nodes, list);");
+            lines.add("if (result) {");
+            for (int index = 0; index < this.names.length; index = index + 1) {
+                lines.add(
+                    String.format(
+                        "this.%s = (%s) nodes[%d];",
+                        this.names[index],
+                        children.get(index).getType(),
+                        index
+                    )
+                );
+            }
+            lines.add("}");
+            lines.add("return result;");
         }
         return String.join("\n", lines);
     }
