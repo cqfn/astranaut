@@ -32,6 +32,7 @@ import java.util.Set;
 import org.cqfn.astranaut.codegen.java.CompilationUnit;
 import org.cqfn.astranaut.codegen.java.Context;
 import org.cqfn.astranaut.codegen.java.FactoryGenerator;
+import org.cqfn.astranaut.codegen.java.FactoryProviderGenerator;
 import org.cqfn.astranaut.codegen.java.License;
 import org.cqfn.astranaut.codegen.java.Package;
 import org.cqfn.astranaut.codegen.java.PackageInfo;
@@ -90,6 +91,31 @@ public final class Generate implements Action {
         this.factories = new FactoryGenerator(program);
         for (final String language : program.getAllLanguages()) {
             this.generateNodes(program, language);
+        }
+        final PackageInfo info = new PackageInfo(
+            this.license,
+            "Nodes describing syntax trees, and algorithms to process them, generated from the description in the DSL language",
+            this.basepkg
+        );
+        info.setVersion(this.options.getVersion());
+        String path =
+            new File(this.root.toString(), "package-info.java").getAbsolutePath();
+        String code = info.generateJavaCode();
+        boolean result = new FilesWriter(path).writeStringNoExcept(code);
+        if (!result) {
+            throw new CannotWriteFile(path);
+        }
+        final Context.Constructor cct = new Context.Constructor();
+        cct.setLicense(this.license);
+        cct.setPackage(this.basepkg);
+        cct.setVersion(this.options.getVersion());
+        final Context context = cct.createContext();
+        final CompilationUnit provider = new FactoryProviderGenerator(program).createUnit(context);
+        code = provider.generateJavaCode();
+        path = new File(this.root.toString(), provider.getFileName()).getAbsolutePath();
+        result = new FilesWriter(path).writeStringNoExcept(code);
+        if (!result) {
+            throw new CannotWriteFile(path);
         }
     }
 

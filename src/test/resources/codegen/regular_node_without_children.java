@@ -5,6 +5,7 @@ package org.cqfn.astranaut.test;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
@@ -68,6 +69,11 @@ public final class This implements Node {
         @Override
         public String getName() {
             return This.NAME;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
         }
 
         @Override

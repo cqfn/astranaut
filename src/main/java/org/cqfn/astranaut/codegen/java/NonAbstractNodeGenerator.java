@@ -26,6 +26,7 @@ package org.cqfn.astranaut.codegen.java;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
@@ -103,6 +104,7 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
             klass
         );
         unit.addImport("java.util.List");
+        unit.addImport("java.util.Map");
         if (this.collections) {
             unit.addImport("java.util.Collections");
         }
@@ -347,6 +349,7 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         klass.setVersion(context.getVersion());
         this.createSpecificEntitiesInTypeClass(klass);
         this.createNameGetter(klass);
+        this.createPropertiesGetter(klass);
         this.createBuilderCreator(klass);
         return klass;
     }
@@ -359,6 +362,27 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         final Method method = new Method(Strings.TYPE_STRING, "getName");
         method.makePublic();
         method.setBody(String.format("return %s.NAME;", this.getRule().getName()));
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates the 'getProperties()' method.
+     * @param klass Class describing the type
+     */
+    private void createPropertiesGetter(final Klass klass) {
+        final Method method = new Method(Strings.TYPE_MAP_STRINGS, "getProperties");
+        String language = this.getRule().getLanguage();
+        if (language.isEmpty()) {
+            language = "common";
+        }
+        method.makePublic();
+        method.setBody(
+            String.format(
+                "return %s%sFactory.PROPERTIES;",
+                language.substring(0, 1).toUpperCase(Locale.ENGLISH),
+                language.substring(1)
+            )
+        );
         klass.addMethod(method);
     }
 

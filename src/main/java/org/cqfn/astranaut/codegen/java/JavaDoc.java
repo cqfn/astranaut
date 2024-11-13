@@ -141,7 +141,7 @@ public final class JavaDoc implements Entity {
             words = this.brief.concat(".").split(" ");
         }
         final int length = SourceCodeBuilder.MAX_LINE_LENGTH
-            - SourceCodeBuilder.TABULATION.length() * indent - 4;
+            - SourceCodeBuilder.TABULATION.length() * indent - 5;
         final List<String> lines = new LinkedList<>();
         StringBuilder line = new StringBuilder();
         for (final String word : words) {

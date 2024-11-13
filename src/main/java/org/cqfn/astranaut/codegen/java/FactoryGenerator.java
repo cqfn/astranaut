@@ -50,7 +50,7 @@ public class FactoryGenerator {
      * Creates compilation unit that contains a factory.
      * @param language Language for which the factory is generated
      * @param context Data required to generate Java source code
-     * @return Set of created compilation units (contains at least one)
+     * @return Compilation unit
      */
     public CompilationUnit createUnit(final String language, final Context context) {
         final String name = language

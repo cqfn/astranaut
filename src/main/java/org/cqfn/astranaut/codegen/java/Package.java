@@ -63,6 +63,11 @@ public final class Package implements Entity {
         code.add(indent, String.format("package %s;", this.name));
     }
 
+    @Override
+    public String toString() {
+        return this.name;
+    }
+
     /**
      * Prepares the name of the package from the parts.
      * @param parts Parts of the package name

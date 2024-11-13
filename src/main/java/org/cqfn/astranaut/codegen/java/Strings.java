@@ -49,6 +49,11 @@ final class Strings {
     public static final String TYPE_STRING = "String";
 
     /**
+     * The 'Map&lt;String, String&gt;' type.
+     */
+    public static final String TYPE_MAP_STRINGS = "Map<String, String>";
+
+    /**
      * The 'Node' type.
      */
     public static final String TYPE_NODE = "Node";
