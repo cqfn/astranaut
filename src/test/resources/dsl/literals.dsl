@@ -25,3 +25,9 @@
 IntegerLiteral <- 'int';
 StringLiteral <- 'String', '""';
 BooleanLiteral <- 'boolean';
+JsonLiteral <-
+    'com.kniazkov.json.JsonElement',
+    'com.kniazkov.json.JsonNull.INSTANCE',
+    '#.toString()',
+    'com.kniazkov.json.Json.parse(#)',
+    'com.kniazkov.json.JsonException' ;
