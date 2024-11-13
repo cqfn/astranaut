@@ -49,6 +49,11 @@ final class Strings {
     public static final String TYPE_STRING = "String";
 
     /**
+     * The 'List&lt;String&gt;' type.
+     */
+    public static final String TYPE_LIST_STRINGS = "List<String>";
+
+    /**
      * The 'Map&lt;String, String&gt;' type.
      */
     public static final String TYPE_MAP_STRINGS = "Map<String, String>";

@@ -116,14 +116,10 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
     }
 
     @Override
-    public void createSpecificEntitiesInTypeClass(final Klass klass) {
+    public void createSpecificEntitiesInTypeClass(final ConstantStrings constants,
+        final Klass klass) {
         if (this.names.length > 0) {
             final String lsttype = "List<ChildDescriptor>";
-            final ConstantStrings constants = new ConstantStrings(
-                klass,
-                "TYPE",
-                "The '#' type name"
-            );
             this.needChildDescriptorClass();
             final Field types = new Field(
                 lsttype,

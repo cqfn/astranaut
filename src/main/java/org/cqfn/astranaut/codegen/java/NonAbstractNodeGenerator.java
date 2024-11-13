@@ -50,7 +50,8 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
     private boolean arraylist;
 
     /**
-     * Flag indicating that the 'java.util.Arrays' class should be included in the generated code.
+     * Flag indicating that the 'java.util.Arrays' class should be included
+     *  in the generated code.
      */
     private boolean arrays;
 
@@ -163,9 +164,10 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
 
     /**
      * Creates specific entities in the class describing the type of the node.
+     * @param constants Generator of fields containing constant (final) strings.
      * @param klass Class describing the node type
      */
-    public abstract void createSpecificEntitiesInTypeClass(Klass klass);
+    public abstract void createSpecificEntitiesInTypeClass(ConstantStrings constants, Klass klass);
 
     /**
      * Creates specific entities in the class describing the builder of the node.
@@ -347,8 +349,14 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         klass.makeFinal();
         klass.setImplementsList(Strings.TYPE_TYPE);
         klass.setVersion(context.getVersion());
-        this.createSpecificEntitiesInTypeClass(klass);
+        final ConstantStrings constants = new ConstantStrings(
+            klass,
+            "TYPE",
+            "The '#' type name"
+        );
+        this.createSpecificEntitiesInTypeClass(constants, klass);
         this.createNameGetter(klass);
+        this.createHierarchyFieldAndGetter(constants, klass);
         this.createPropertiesGetter(klass);
         this.createBuilderCreator(klass);
         return klass;
@@ -363,6 +371,47 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         method.makePublic();
         method.setBody(String.format("return %s.NAME;", this.getRule().getName()));
         klass.addMethod(method);
+    }
+
+    /**
+     * Creates the 'HIERARCHY' field and 'getHierarchy()' method.
+     * @param constants Generator of fields containing constant (final) strings.
+     * @param klass Class describing the type
+     */
+    private void createHierarchyFieldAndGetter(final ConstantStrings constants, final Klass klass) {
+        final List<NodeDescriptor> topology = this.getRule().getTopology();
+        final Field field = new Field(
+            Strings.TYPE_LIST_STRINGS,
+            "HIERARCHY",
+            "Node hierarchy"
+        );
+        field.makePrivate();
+        field.makeStatic();
+        if (topology.size() > 1) {
+            this.needArraysClass();
+            final StringBuilder builder = new StringBuilder(128);
+            builder.append("Arrays.asList(");
+            final List<String> hierarchy = new ArrayList<>(1);
+            hierarchy.add(String.format("%s.NAME", this.getRule().getName()));
+            for (int index = 1; index < topology.size(); index = index + 1) {
+                hierarchy.add(constants.createStaticField(topology.get(index).getName()));
+            }
+            builder.append(String.join(", ", hierarchy)).append(')');
+            field.makeFinal(builder.toString());
+        } else {
+            this.needCollectionsClass();
+            field.makeFinal(
+                String.format(
+                    "Collections.singletonList(%s.NAME)",
+                    this.getRule().getName()
+                )
+            );
+        }
+        klass.addField(field);
+        final Method getter = new Method(Strings.TYPE_LIST_STRINGS, "getHierarchy");
+        getter.makePublic();
+        getter.setBody(String.format("return %sType.HIERARCHY;", this.getRule().getName()));
+        klass.addMethod(getter);
     }
 
     /**

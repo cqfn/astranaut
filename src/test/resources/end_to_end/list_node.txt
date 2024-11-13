@@ -220,9 +220,19 @@ public final class Entities implements Node {
      * @since 1.0.0
      */
     private static final class EntitiesType implements Type {
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(Entities.NAME);
+
         @Override
         public String getName() {
             return Entities.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return EntitiesType.HIERARCHY;
         }
 
         @Override
@@ -387,9 +397,19 @@ public final class Entity implements Node {
      * @since 1.0.0
      */
     private static final class EntityType implements Type {
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(Entity.NAME);
+
         @Override
         public String getName() {
             return Entity.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return EntityType.HIERARCHY;
         }
 
         @Override

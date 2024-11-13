@@ -23,12 +23,17 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
  * Describes a field and generates source code for it.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public final class Field implements Entity {
     /**
      * Type of the field.
@@ -213,7 +218,10 @@ public final class Field implements Entity {
                 code.add(indent + 1, second);
                 break;
             }
-            if (Field.tryBreakLineByCallChain(indent + 1, code, this.initial)) {
+            if (Field.tryBreakLineByCallChain(indent + 1, code, second)) {
+                break;
+            }
+            if (Field.tryBreakLineByDepthOfCalls(indent + 1, code, second)) {
                 break;
             }
             throw new SourceCodeBuilder.CodeLineIsTooLong(this.initial);
@@ -232,7 +240,6 @@ public final class Field implements Entity {
     private static boolean tryBreakLineByCallChain(final int indent, final SourceCodeBuilder code,
         final String line) throws BaseException {
         final String[] list = line.split("(?<=\\))(?=\\.)");
-        list[list.length - 1] = list[list.length - 1].concat(";");
         boolean result;
         do {
             result = SourceCodeBuilder.tryOn(indent, list[0]);
@@ -251,6 +258,64 @@ public final class Field implements Entity {
                 code.add(indent + 1, list[index]);
             }
         } while (false);
+        return result;
+    }
+
+    /**
+     * Tries to break down the line by the parentheses that define function calls.
+     *  Each new call is made on a new line and indented.
+     * @param indent Indentation
+     * @param code Source code builder
+     * @param line Line of code that should be broken into smaller lines
+     * @return Result, {@code true} if successful
+     * @throws BaseException If there are any problems during code generation
+     */
+    private static boolean tryBreakLineByDepthOfCalls(final int indent,
+        final SourceCodeBuilder code, final String line) throws BaseException {
+        final int begin = line.indexOf('(');
+        final int end = line.lastIndexOf(')');
+        boolean result = false;
+        if (begin >= 0 && end > 0) {
+            code.add(indent, line.substring(0, begin + 1).trim());
+            final String middle = line.substring(begin + 1, end);
+            result = Field.tryBreakLineByDepthOfCalls(indent + 1, code, middle)
+                || Field.tryBreakLineByCommas(indent + 1, code, middle);
+            code.add(indent, line.substring(end).trim());
+        }
+        return result;
+    }
+
+    /**
+     * Tries to break down the line by the commas that separate the arguments.
+     * @param indent Indentation
+     * @param code Source code builder
+     * @param line Line of code that should be broken into smaller lines
+     * @return Result, {@code true} if successful
+     * @throws BaseException If there are any problems during code generation
+     */
+    private static boolean tryBreakLineByCommas(final int indent,
+        final SourceCodeBuilder code, final String line) throws BaseException {
+        boolean result = true;
+        final List<String> arguments = new ArrayList<>(2);
+        final Pattern pattern = Pattern.compile("[^,()]+|\\([^()]*\\)");
+        final Matcher matcher = pattern.matcher(line);
+        while (matcher.find()) {
+            arguments.add(matcher.group().trim());
+        }
+        for (int index = 0; index < arguments.size() && result; index = index + 1) {
+            final String argument;
+            if (index < arguments.size() - 1) {
+                argument = arguments.get(index).concat(",");
+            } else {
+                argument = arguments.get(index);
+            }
+            result = SourceCodeBuilder.tryOn(indent, argument);
+            if (result) {
+                code.add(indent, argument);
+                continue;
+            }
+            result = Field.tryBreakLineByDepthOfCalls(indent, code, argument);
+        }
         return result;
     }
 }

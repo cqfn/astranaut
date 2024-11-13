@@ -96,7 +96,8 @@ public final class ListNodeGenerator extends NonAbstractNodeGenerator {
     }
 
     @Override
-    public void createSpecificEntitiesInTypeClass(final Klass klass) {
+    public void createSpecificEntitiesInTypeClass(final ConstantStrings constants,
+        final Klass klass) {
         this.getClass();
     }
 

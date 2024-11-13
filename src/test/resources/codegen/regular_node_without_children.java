@@ -66,9 +66,19 @@ public final class This implements Node {
      * @since 1.0.0
      */
     private static final class ThisType implements Type {
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(This.NAME);
+
         @Override
         public String getName() {
             return This.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return ThisType.HIERARCHY;
         }
 
         @Override

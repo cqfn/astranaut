@@ -182,6 +182,7 @@ public interface Expression extends Node {
  */
 package org.cqfn.uast.tree.common.nodes;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -258,9 +259,25 @@ public final class IntegerLiteral implements Expression {
      * @since 1.0.0
      */
     private static final class IntegerLiteralType implements Type {
+        /**
+         * The 'Expression' type name.
+         */
+        private static final String TYPE_EXPRESSION = "Expression";
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Arrays.asList(IntegerLiteral.NAME, IntegerLiteralType.TYPE_EXPRESSION);
+
         @Override
         public String getName() {
             return IntegerLiteral.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return IntegerLiteralType.HIERARCHY;
         }
 
         @Override
@@ -430,6 +447,12 @@ public final class StatementExpression implements Node {
         private static final List<ChildDescriptor> CHILD_TYPES =
             ChildDescriptor.create().required(StatementExpressionType.TYPE_EXPRESSION).build();
 
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Collections.singletonList(StatementExpression.NAME);
+
         @Override
         public List<ChildDescriptor> getChildTypes() {
             return StatementExpressionType.CHILD_TYPES;
@@ -438,6 +461,11 @@ public final class StatementExpression implements Node {
         @Override
         public String getName() {
             return StatementExpression.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return StatementExpressionType.HIERARCHY;
         }
 
         @Override
@@ -529,6 +557,7 @@ public final class StatementExpression implements Node {
  */
 package org.cqfn.uast.tree.common.nodes;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -605,9 +634,25 @@ public final class StringLiteral implements Expression {
      * @since 1.0.0
      */
     private static final class StringLiteralType implements Type {
+        /**
+         * The 'Expression' type name.
+         */
+        private static final String TYPE_EXPRESSION = "Expression";
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Arrays.asList(StringLiteral.NAME, StringLiteralType.TYPE_EXPRESSION);
+
         @Override
         public String getName() {
             return StringLiteral.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return StringLiteralType.HIERARCHY;
         }
 
         @Override
