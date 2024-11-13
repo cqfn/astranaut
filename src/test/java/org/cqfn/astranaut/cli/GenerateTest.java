@@ -48,6 +48,13 @@ class GenerateTest extends EndToEndTest {
     }
 
     @Test
+    void nodeWithTwoChildren(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("node_with_two_children.txt");
+        final String actual = this.run("node_with_two_children.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
     void listNode(final @TempDir Path temp) {
         final String expected = this.loadStringResource("list_node.txt");
         final String actual = this.run("list_node.dsl", temp);
