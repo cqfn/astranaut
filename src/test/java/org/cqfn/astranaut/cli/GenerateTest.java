@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.cli;
 
 import java.nio.file.Path;
+import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -75,6 +76,22 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void languageDefined(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("language_defined.txt");
+        final String actual = this.run("language_defined.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void readBadDsl(final @TempDir Path temp) {
+        final String message = this.runAndReadErrorMessage("bad.dsl", temp);
+        Assertions.assertEquals(
+            "bad.dsl, 26: The rule does not contain a separator",
+            message
+        );
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.
@@ -99,5 +116,37 @@ class GenerateTest extends EndToEndTest {
         Main.main(args);
         Assertions.assertTrue(output.toFile().exists());
         return this.getAllFilesContent(output);
+    }
+
+    /**
+     * Starts the project in generation mode, but expect the execution to terminate with an error.
+     * @param rules Name of the file containing the rules (DSL code)
+     * @param dir Temporary folder path
+     * @return Error message
+     */
+    private String runAndReadErrorMessage(final String rules, final Path dir) {
+        String message = "";
+        final Path output = dir.resolve("output");
+        final String[] args = {
+            "generate",
+            String.format("src/test/resources/dsl/%s", rules),
+            "--output",
+            output.toFile().getAbsolutePath(),
+            "--package",
+            "org.cqfn.uast.tree",
+            "--license",
+            "LICENSE.txt",
+            "--version",
+            "1.0.0",
+        };
+        boolean oops = false;
+        try {
+            Main.run(args);
+        } catch (final BaseException exception) {
+            oops = true;
+            message = exception.getErrorMessage();
+        }
+        Assertions.assertTrue(oops);
+        return message;
     }
 }
