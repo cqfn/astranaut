@@ -351,6 +351,40 @@ class KlassTest {
         Assertions.assertTrue(result);
     }
 
+    @Test
+    void classWithTwoConstructor() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with two constructors.",
+                " */",
+                "class Test15 {",
+                "    /**",
+                "     * Constructor.",
+                "     */",
+                "    Test15(final String[] args) {",
+                "    }",
+                "",
+                "    /**",
+                "     * Constructor.",
+                "     */",
+                "    Test15() {",
+                "        this(null);",
+                "    }",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test15", "Class with two constructors");
+        Constructor first = klass.createConstructor();
+        first.addArgument("String[]", "args");
+        Constructor second = klass.createConstructor();
+        second.setBody("this(null);");
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
     /**
      * Tests the source code generation from an object describing a class.
      * @param klass Object describing a class
