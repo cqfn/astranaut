@@ -491,6 +491,17 @@ class NodeDescriptionParsingTest {
         Assertions.assertTrue(oops);
     }
 
+    @Test
+    void noComma() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "VariableDeclaration <- [Identifier], Identifier Expression"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
     /**
      * Parses a single descriptor from the DSL source code.
      * @param code DSL source code
