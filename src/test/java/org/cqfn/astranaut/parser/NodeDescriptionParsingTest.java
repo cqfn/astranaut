@@ -382,6 +382,115 @@ class NodeDescriptionParsingTest {
         Assertions.assertEquals("AAA <- EEE | ?", descriptor.toString());
     }
 
+    @Test
+    void extraTokensAfterLiteral() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "IntegerLiteral <- 'int', '0', 'String.valueOf(#)', 'Integer.parseInt(#)', 'NumberFormatException', xxx"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void noCommaAfterStringToken() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "IntegerLiteral <- 'int' '0'"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void badTokenAfterComma() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "IntegerLiteral <- 'int', xxx"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void noSeparator() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "Expression <- Literal BooleanExpression"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void optionalChildInAbstractNode() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "Expression <- [Literal] | BooleanExpression"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void taggedChildInAbstractNode() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "Expression <- xxx@Literal | BooleanExpression"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void noVerticalLine() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "Expression <- Literal | BooleanExpression BinaryOperator"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void noIdentifierAfterVerticalLine() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "Expression <- Literal | 13"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void extraTokensAfterZero() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "Expression <- Literal | 0,"
+            )
+        );
+        boolean oops = false;
+        try {
+            parser.parseDescriptor();
+        } catch (final ParsingException exception) {
+            oops = true;
+            Assertions.assertEquals(
+                "There should be no tokens after '0'",
+                exception.getReason()
+            );
+        }
+        Assertions.assertTrue(oops);
+    }
+
     /**
      * Parses a single descriptor from the DSL source code.
      * @param code DSL source code
