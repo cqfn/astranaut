@@ -27,3 +27,4 @@ StringLiteral <- 'String', '""';
 Expression <- IntegerLiteral | StringLiteral;
 
 StatementExpression <- Expression;
+Return <- [Expression];
