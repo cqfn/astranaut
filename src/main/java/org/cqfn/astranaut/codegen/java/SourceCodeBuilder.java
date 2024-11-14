@@ -64,6 +64,13 @@ public final class SourceCodeBuilder {
     }
 
     /**
+     * Removes all generated source code.
+     */
+    public void clear() {
+        this.lines.clear();
+    }
+
+    /**
      * Tests whether a line of code will fit the maximum length or whether it must be divided.
      * @param indent Indentation
      * @param text Program text
