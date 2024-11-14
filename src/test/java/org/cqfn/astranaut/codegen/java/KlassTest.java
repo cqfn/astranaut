@@ -24,7 +24,6 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.Arrays;
-import java.util.Collections;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -345,7 +344,7 @@ class KlassTest {
             )
         );
         final Klass klass = new Klass("Test14", "Class with constructor");
-        Constructor ctor = klass.createConstructor();
+        final Constructor ctor = klass.createConstructor();
         ctor.addArgument("String[]", "args");
         final boolean result = this.testCodegen(klass, expected);
         Assertions.assertTrue(result);
@@ -377,10 +376,44 @@ class KlassTest {
             )
         );
         final Klass klass = new Klass("Test15", "Class with two constructors");
-        Constructor first = klass.createConstructor();
+        final Constructor first = klass.createConstructor();
         first.addArgument("String[]", "args");
-        Constructor second = klass.createConstructor();
+        final Constructor second = klass.createConstructor();
         second.setBody("this(null);");
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void classWithConstructorAndField() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with constructor and field.",
+                " */",
+                "class Test16 {",
+                "    /**",
+                "     * Field.",
+                "     */",
+                "    private int value;",
+                "",
+                "    /**",
+                "     * Constructor.",
+                "     */",
+                "    Test16() {",
+                "        this.value = 0;",
+                "    }",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test16", "Class with constructor and field");
+        final Constructor ctor = klass.createConstructor();
+        ctor.setBody("this.value = 0;");
+        final Field field = new Field("int", "value", "Field");
+        field.makePrivate();
+        klass.addField(field);
         final boolean result = this.testCodegen(klass, expected);
         Assertions.assertTrue(result);
     }
