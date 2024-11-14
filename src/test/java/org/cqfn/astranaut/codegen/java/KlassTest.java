@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.Arrays;
+import java.util.Collections;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -321,6 +322,31 @@ class KlassTest {
         final Method fourth = new Method("void", "fourth", "Fourth method");
         fourth.makePublic();
         klass.addMethod(fourth);
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void classWithConstructor() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with constructor.",
+                " */",
+                "class Test14 {",
+                "    /**",
+                "     * Constructor.",
+                "     */",
+                "    Test14(final String[] args) {",
+                "    }",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test14", "Class with constructor");
+        Constructor ctor = klass.createConstructor();
+        ctor.addArgument("String[]", "args");
         final boolean result = this.testCodegen(klass, expected);
         Assertions.assertTrue(result);
     }
