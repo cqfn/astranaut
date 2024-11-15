@@ -43,6 +43,11 @@ public final class SourceCodeBuilder {
     public static final String TABULATION = "    ";
 
     /**
+     * Empty line instance.
+     */
+    private static final Line EMPTY_LINE = new Line(0, "");
+
+    /**
      * Indented source code lines.
      */
     private final List<Line> lines = new ArrayList<>(128);
@@ -60,6 +65,23 @@ public final class SourceCodeBuilder {
                 throw new CodeLineIsTooLong(text);
             }
             this.lines.add(new Line(indent, line));
+        }
+    }
+
+    /**
+     * Adds an empty line.
+     */
+    public void addEmpty() {
+        this.lines.add(SourceCodeBuilder.EMPTY_LINE);
+    }
+
+    /**
+     * Adds an empty line if the flag is active.
+     * @param flag Flag
+     */
+    public void addEmpty(final boolean flag) {
+        if (flag) {
+            this.lines.add(SourceCodeBuilder.EMPTY_LINE);
         }
     }
 

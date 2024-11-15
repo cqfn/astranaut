@@ -243,16 +243,12 @@ public final class Klass implements ClassOrInterface {
             .sorted((left, right) -> Integer.compare(right.getPriority(), left.getPriority()))
             .collect(Collectors.toList());
         for (final Field field : flist) {
-            if (flag) {
-                code.add(indent, "");
-            }
+            code.addEmpty(flag);
             flag = true;
             field.build(indent + 1, code);
         }
         for (final Constructor ctor : this.constructors) {
-            if (flag) {
-                code.add(indent, "");
-            }
+            code.addEmpty(flag);
             flag = true;
             ctor.build(indent + 1, code);
         }
@@ -260,16 +256,12 @@ public final class Klass implements ClassOrInterface {
             .sorted((left, right) -> Integer.compare(right.getPriority(), left.getPriority()))
             .collect(Collectors.toList());
         for (final Method method : mlist) {
-            if (flag) {
-                code.add(indent, "");
-            }
+            code.addEmpty(flag);
             flag = true;
             method.build(indent + 1, code);
         }
         for (final ClassOrInterface coi : this.nested) {
-            if (flag) {
-                code.add(indent, "");
-            }
+            code.addEmpty(flag);
             flag = true;
             coi.build(indent + 1, code);
         }

@@ -68,7 +68,7 @@ public final class PackageInfo implements JavaFileGenerator {
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.license.build(indent, code);
-        code.add(indent, "");
+        code.addEmpty();
         this.doc.build(indent, code);
         this.pkg.build(indent, code);
     }

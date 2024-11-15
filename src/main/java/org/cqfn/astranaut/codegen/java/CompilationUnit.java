@@ -81,12 +81,12 @@ public final class CompilationUnit implements JavaFileGenerator {
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.license.build(indent, code);
         this.pkg.build(indent, code);
-        code.add(indent, "");
+        code.addEmpty();
         if (!this.imports.isEmpty()) {
             for (final String klass : this.imports) {
                 code.add(indent, String.format("import %s;", klass));
             }
-            code.add(indent, "");
+            code.addEmpty();
         }
         this.coi.build(indent, code);
     }
