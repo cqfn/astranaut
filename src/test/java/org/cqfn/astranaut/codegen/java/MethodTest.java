@@ -282,6 +282,16 @@ class MethodTest {
         Assertions.assertTrue(oops);
     }
 
+    @Test
+    void methodWithLineThatIsTooLong() {
+        final Method method = new Method("void", "doSomething");
+        method.setBody(
+            "System.out.println(\"The infantile goat accompanies this delightful sunset with an indifferent stare.\")"
+        );
+        final SourceCodeBuilder builder = new SourceCodeBuilder();
+        Assertions.assertThrows(BaseException.class, ()->{method.build(0, builder);});
+    }
+
     /**
      * Tests the source code generation from an object describing a method.
      * @param method Object describing a method

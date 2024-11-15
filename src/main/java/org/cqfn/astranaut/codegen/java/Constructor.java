@@ -83,9 +83,7 @@ public final class Constructor extends BaseMethod {
 
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
-        if (this.doc.hasNonEmptyBrief()) {
-            this.doc.build(indent, code);
-        }
+        this.doc.build(indent, code);
         code.add(indent, this.composeHeader());
         this.buildBody(indent + 1, code);
         code.add(indent, "}");
