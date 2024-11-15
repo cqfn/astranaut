@@ -112,7 +112,7 @@ class GenerateTest extends EndToEndTest {
                 final Set<PosixFilePermission> permissions =
                     Files.getPosixFilePermissions(readonly);
                 permissions.remove(PosixFilePermission.OWNER_WRITE);
-                Files.setPosixFilePermissions(dir, permissions);
+                Files.setPosixFilePermissions(readonly, permissions);
             }
             String message = "";
             final String[] args = {
@@ -140,7 +140,7 @@ class GenerateTest extends EndToEndTest {
                 final Set<PosixFilePermission> permissions =
                     Files.getPosixFilePermissions(readonly);
                 permissions.add(PosixFilePermission.OWNER_WRITE);
-                Files.setPosixFilePermissions(dir, permissions);
+                Files.setPosixFilePermissions(readonly, permissions);
             }
             Assertions.assertTrue(wow);
             Assertions.assertEquals("Cannot write file: 'package-info.java'", message);
