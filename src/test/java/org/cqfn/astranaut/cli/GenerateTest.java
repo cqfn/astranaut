@@ -23,7 +23,13 @@
  */
 package org.cqfn.astranaut.cli;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.Locale;
+import java.util.Set;
+import org.cqfn.astranaut.core.utils.FilesWriter;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,6 +39,7 @@ import org.junit.jupiter.api.io.TempDir;
  * End-to-end tests checking file generation for different rule sets.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 class GenerateTest extends EndToEndTest {
     @Test
     void nodeWithoutChildren(final @TempDir Path temp) {
@@ -90,6 +97,57 @@ class GenerateTest extends EndToEndTest {
             "bad.dsl, 26: The rule does not contain a separator",
             message
         );
+    }
+
+    @Test
+    void writeToProtectedFile(final @TempDir Path temp) {
+        boolean oops = false;
+        try {
+            final Path dir = temp.resolve("output");
+            final Path readonly = temp.resolve("output/org/cqfn/uast/tree/package-info.java");
+            new FilesWriter(readonly.toFile().getAbsolutePath()).writeStringNoExcept("xxx");
+            if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("win")) {
+                Files.setAttribute(readonly, "dos:readonly", true);
+            } else {
+                final Set<PosixFilePermission> permissions =
+                    Files.getPosixFilePermissions(readonly);
+                permissions.remove(PosixFilePermission.OWNER_WRITE);
+                Files.setPosixFilePermissions(dir, permissions);
+            }
+            String message = "";
+            final String[] args = {
+                "generate",
+                "src/test/resources/dsl/node_without_children.dsl",
+                "--output",
+                dir.toFile().getAbsolutePath(),
+                "--package",
+                "org.cqfn.uast.tree",
+                "--license",
+                "LICENSE.txt",
+                "--version",
+                "1.0.0",
+            };
+            boolean wow = false;
+            try {
+                Main.run(args);
+            } catch (final BaseException exception) {
+                wow = true;
+                message = exception.getErrorMessage();
+            }
+            if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("win")) {
+                Files.setAttribute(readonly, "dos:readonly", false);
+            } else {
+                final Set<PosixFilePermission> permissions =
+                    Files.getPosixFilePermissions(readonly);
+                permissions.add(PosixFilePermission.OWNER_WRITE);
+                Files.setPosixFilePermissions(dir, permissions);
+            }
+            Assertions.assertTrue(wow);
+            Assertions.assertEquals("Cannot write file: 'package-info.java'", message);
+        } catch (final IOException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 
     /**

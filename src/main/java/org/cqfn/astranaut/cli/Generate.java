@@ -98,25 +98,20 @@ public final class Generate implements Action {
             this.basepkg
         );
         info.setVersion(this.options.getVersion());
-        String path =
-            new File(this.root.toString(), "package-info.java").getAbsolutePath();
-        String code = info.generateJavaCode();
-        boolean result = new FilesWriter(path).writeStringNoExcept(code);
-        if (!result) {
-            throw new CannotWriteFile(path);
-        }
+        Generate.writeFile(
+            new File(this.root.toString(), "package-info.java"),
+            info.generateJavaCode()
+        );
         final Context.Constructor cct = new Context.Constructor();
         cct.setLicense(this.license);
         cct.setPackage(this.basepkg);
         cct.setVersion(this.options.getVersion());
         final Context context = cct.createContext();
         final CompilationUnit provider = new FactoryProviderGenerator(program).createUnit(context);
-        code = provider.generateJavaCode();
-        path = new File(this.root.toString(), provider.getFileName()).getAbsolutePath();
-        result = new FilesWriter(path).writeStringNoExcept(code);
-        if (!result) {
-            throw new CannotWriteFile(path);
-        }
+        Generate.writeFile(
+            new File(this.root.toString(), provider.getFileName()),
+            provider.generateJavaCode()
+        );
     }
 
     /**
@@ -141,34 +136,33 @@ public final class Generate implements Action {
         }
         final PackageInfo info = new PackageInfo(this.license, brief, pkg);
         info.setVersion(this.options.getVersion());
-        String path = new File(folder, "package-info.java").getAbsolutePath();
-        boolean result = new FilesWriter(path).writeStringNoExcept(info.generateJavaCode());
-        if (!result) {
-            throw new CannotWriteFile(path);
-        }
+        Generate.writeFile(new File(folder, "package-info.java"), info.generateJavaCode());
         final Context.Constructor cct = new Context.Constructor();
         cct.setLicense(this.license);
         cct.setPackage(pkg);
         cct.setVersion(this.options.getVersion());
         final Context context = cct.createContext();
         final CompilationUnit factory = this.factories.createUnit(language, context);
-        String code = factory.generateJavaCode();
-        path = new File(folder, factory.getFileName()).getAbsolutePath();
-        result = new FilesWriter(path).writeStringNoExcept(code);
-        if (!result) {
-            throw new CannotWriteFile(path);
-        }
+        Generate.writeFile(new File(folder, factory.getFileName()), factory.generateJavaCode());
         for (final NodeDescriptor rule : program.getNodeDescriptorsForLanguage(language)) {
             final RuleGenerator generator = rule.createGenerator();
             final Set<CompilationUnit> units = generator.createUnits(context);
             for (final CompilationUnit unit : units) {
-                code = unit.generateJavaCode();
-                path = new File(folder, unit.getFileName()).getAbsolutePath();
-                result = new FilesWriter(path).writeStringNoExcept(code);
-                if (!result) {
-                    throw new CannotWriteFile(path);
-                }
+                Generate.writeFile(new File(folder, unit.getFileName()), unit.generateJavaCode());
             }
+        }
+    }
+
+    /**
+     * Writes a file.
+     * @param file File
+     * @param content File content
+     * @throws CliException In case it is not possible to write a file.
+     */
+    private static void writeFile(final File file, final String content) throws CliException {
+        final boolean result = new FilesWriter(file.getAbsolutePath()).writeStringNoExcept(content);
+        if (!result) {
+            throw new CannotWriteFile(file.getName());
         }
     }
 
