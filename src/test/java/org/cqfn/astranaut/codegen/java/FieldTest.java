@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  * Tests covering {@link Field} class.
  * @since 1.0.0
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 class FieldTest {
     @Test
     void simpleField() {
@@ -155,6 +155,83 @@ class FieldTest {
         );
         final Field field = new Field("String", "value", "Final field");
         field.makeFinal("\"test\"");
+        final boolean result = this.testCodegen(field, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void fieldWithLongInitialString() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Final field.",
+                " */",
+                "final String value =",
+                "    \"The infantile goat accompanies this delightful sunset with an indifferent stare.\";",
+                ""
+            )
+        );
+        final Field field = new Field("String", "value", "Final field");
+        field.makeFinal(
+            "\"The infantile goat accompanies this delightful sunset with an indifferent stare.\""
+        );
+        final boolean result = this.testCodegen(field, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void fieldWithLongInitialCallChain() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Final field.",
+                " */",
+                "final String value =",
+                "    new StringBuilder()",
+                "        .append(\"aaaaa\")",
+                "        .append(\"bbbbb\")",
+                "        .append(\"ccccc\")",
+                "        .append(\"ddddd\")",
+                "        .toString();",
+                ""
+            )
+        );
+        final Field field = new Field("String", "value", "Final field");
+        field.makeFinal(
+            "new StringBuilder().append(\"aaaaa\").append(\"bbbbb\").append(\"ccccc\").append(\"ddddd\").toString()"
+        );
+        final boolean result = this.testCodegen(field, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void fieldWithLongInitialDepthCall() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Final field.",
+                " */",
+                "final Set<String> value =",
+                "    new TreeSet<>(",
+                "        Arrays.asList(",
+                "            \"aaaaaaa\",",
+                "            \"bbbbbbb\",",
+                "            \"ccccccc\",",
+                "            \"ddddddd\",",
+                "            \"eeeeeee\",",
+                "            \"fffffff\"",
+                "        )",
+                "    );",
+                ""
+            )
+        );
+        final Field field = new Field("Set<String>", "value", "Final field");
+        field.makeFinal(
+            "new TreeSet<>(Arrays.asList(\"aaaaaaa\", \"bbbbbbb\", \"ccccccc\", \"ddddddd\", \"eeeeeee\", \"fffffff\"))"
+        );
         final boolean result = this.testCodegen(field, expected);
         Assertions.assertTrue(result);
     }
