@@ -289,7 +289,7 @@ class MethodTest {
             "System.out.println(\"The infantile goat accompanies this delightful sunset with an indifferent stare.\")"
         );
         final SourceCodeBuilder builder = new SourceCodeBuilder();
-        Assertions.assertThrows(BaseException.class, ()->{method.build(0, builder);});
+        Assertions.assertThrows(BaseException.class, () -> method.build(0, builder));
     }
 
     /**
