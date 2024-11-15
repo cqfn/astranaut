@@ -362,14 +362,14 @@ class KlassTest {
                 "    /**",
                 "     * Constructor.",
                 "     */",
-                "    Test15(final String[] args) {",
+                "    protected Test15(final int key, final int value) {",
                 "    }",
                 "",
                 "    /**",
                 "     * Constructor.",
                 "     */",
                 "    Test15() {",
-                "        this(null);",
+                "        this(0, 0);",
                 "    }",
                 "}",
                 ""
@@ -377,9 +377,11 @@ class KlassTest {
         );
         final Klass klass = new Klass("Test15", "Class with two constructors");
         final Constructor first = klass.createConstructor();
-        first.addArgument("String[]", "args");
+        first.addArgument("int", "key");
+        first.addArgument("int", "value");
+        first.makeProtected();
         final Constructor second = klass.createConstructor();
-        second.setBody("this(null);");
+        second.setBody("this(0, 0);");
         final boolean result = this.testCodegen(klass, expected);
         Assertions.assertTrue(result);
     }

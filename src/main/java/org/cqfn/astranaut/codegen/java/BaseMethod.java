@@ -187,7 +187,7 @@ public abstract  class BaseMethod implements Entity {
                 continue;
             }
             final int index = code.indexOf('=');
-            if (index > 0 && index < code.length() - 1) {
+            if (index > 0) {
                 result.add(new Pair<>(code.substring(0, index + 1), offset));
                 result.add(new Pair<>(code.substring(index + 1).trim(), offset + 1));
                 flag = true;
