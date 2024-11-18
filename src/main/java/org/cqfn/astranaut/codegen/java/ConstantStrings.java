@@ -160,14 +160,14 @@ public class ConstantStrings {
     private String truncateAtConsonant(final String name) {
         String truncated = name;
         int index = ConstantStrings.MAX_NAME_LENGTH;
-        while (index > this.prefix.length()) {
+        while (index > this.prefix.length() + 1) {
             if (!ConstantStrings.isVowel(name.charAt(index - 1))) {
                 truncated = name.substring(0, index);
                 break;
             }
             index = index - 1;
         }
-        if (index == this.prefix.length()) {
+        if (index == this.prefix.length() + 1) {
             truncated = name.substring(0, ConstantStrings.MAX_NAME_LENGTH);
         }
         return truncated;

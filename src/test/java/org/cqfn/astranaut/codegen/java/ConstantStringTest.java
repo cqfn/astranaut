@@ -70,8 +70,8 @@ class ConstantStringTest {
             strings.createStaticField("HugeVariableNameThatShouldBeTruncated")
         );
         Assertions.assertEquals(
-            "Test.TYPE_ZZZZZZZZZZZ",
-            strings.createStaticField("Zzzzzzzzzzzzzzzzzzzzzzzzzzzzz")
+            "Test.TYPE_AAAAAAAAAAA",
+            strings.createStaticField("AaaaaaaaaaaaZzzzzzzzzzzz")
         );
     }
 
