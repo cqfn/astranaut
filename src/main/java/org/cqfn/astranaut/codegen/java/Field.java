@@ -275,8 +275,21 @@ public final class Field implements Entity {
         final SourceCodeBuilder code, final String line) throws BaseException {
         final int begin = line.indexOf('(');
         final int end = line.lastIndexOf(')');
+        if (begin >= 0 && end < 0) {
+            throw new BaseException() {
+                @Override
+                public String getInitiator() {
+                    return "Codegen";
+                }
+
+                @Override
+                public String getErrorMessage() {
+                    return "Unclosed parenthesis";
+                }
+            };
+        }
         boolean result = false;
-        if (begin >= 0 && end > 0) {
+        if (begin >= 0) {
             code.add(indent, line.substring(0, begin + 1).trim());
             final String middle = line.substring(begin + 1, end);
             result = Field.tryBreakLineByDepthOfCalls(indent + 1, code, middle)

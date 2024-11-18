@@ -238,16 +238,36 @@ class FieldTest {
 
     @Test
     void fieldWithVeryLongInitialString() {
-        final Field field = new Field("Set<String>", "value", "Final field");
+        final Field field = new Field("String", "value", "Final field");
         field.makeFinal(
             "new StringBuilder().append(\"aaaaa\").append(\"The crazy stinky infantile old goat accompanies this delightful sunset with an indifferent stare.\").toString()"
+        );
+        Assertions.assertTrue(this.testBadField(field));
+    }
+
+    @Test
+    void fieldWithStrangeClassName() {
+        final Field field = new Field("String", "value", "Final field");
+        field.makeFinal(
+            "new TheCrazyStinkyInfantileOldGoatAccompaniesThisDelightfulSunsetWithAnIndifferentStareStringBuilder().toString()"
+        );
+        Assertions.assertTrue(this.testBadField(field));
+    }
+
+    @Test
+    void fieldWithInitialValueWithNotClosedBracket() {
+        final Field field = new Field("String", "value", "Final field");
+        field.makeFinal(
+            "new TreeSet<>(Arrays.asList(\"aaaaaaaaaaa\", \"bbbbbbb\", \"ccccccc\", \"ddddddd\", \"eeeeeee\", \"fffffff\")"
         );
         boolean oops = false;
         try {
             final SourceCodeBuilder builder = new SourceCodeBuilder();
             field.build(0, builder);
-        } catch (final BaseException ignored) {
+        } catch (final BaseException exception) {
             oops = true;
+            Assertions.assertEquals("Codegen", exception.getInitiator());
+            Assertions.assertEquals("Unclosed parenthesis", exception.getErrorMessage());
         }
         Assertions.assertTrue(oops);
     }
@@ -270,5 +290,22 @@ class FieldTest {
             oops = true;
         }
         return !oops && equals;
+    }
+
+    /**
+     * Tests codegeneration of a field with bad parameters,
+     *  the codegenerator is expected to throw an exception.
+     * @param field Object describing a field
+     * @return Testing result, {@code true} if exception was thrown
+     */
+    private boolean testBadField(final Field field) {
+        boolean oops = false;
+        try {
+            final SourceCodeBuilder builder = new SourceCodeBuilder();
+            field.build(0, builder);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        return oops;
     }
 }
