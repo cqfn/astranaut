@@ -70,4 +70,15 @@ class ConstantStringTest {
             strings.createStaticField("HugeVariableNameThatShouldBeTruncated")
         );
     }
+
+    @Test
+    void badArguments() {
+        boolean oops = false;
+        try {
+            new ConstantStrings(null, "", "");
+        } catch (final IllegalArgumentException ignored) {
+            oops = true;
+        }
+        Assertions.assertTrue(oops);
+    }
 }
