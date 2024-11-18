@@ -113,7 +113,7 @@ public class ConstantStrings {
             if (result.length() <= ConstantStrings.MAX_NAME_LENGTH) {
                 break;
             }
-            result = this.truncateAtConsonant(result);
+            result = this.truncateAtConsonant(this.addPrefix(name));
         } while (false);
         return result;
     }
