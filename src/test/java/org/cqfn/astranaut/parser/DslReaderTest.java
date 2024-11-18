@@ -71,15 +71,15 @@ class DslReaderTest {
         try {
             reader.readFile("src/test/resources/dsl/simple.dsl");
             Statement stmt = reader.getStatement();
-            Assertions.assertEquals("simple.dsl, 5: This <- 0", stmt.toString());
+            Assertions.assertEquals("simple.dsl, 25: This <- 0", stmt.toString());
             stmt = reader.getStatement();
             Assertions.assertEquals(
-                "simple.dsl, 7-9: Addition <- left@Expression, right@Expression",
+                "simple.dsl, 27-29: Addition <- left@Expression, right@Expression",
                 stmt.toString()
             );
             stmt = reader.getStatement();
             Assertions.assertEquals(
-                "simple.dsl, 9: Expression <- This | Addition",
+                "simple.dsl, 29: Expression <- This | Addition",
                 stmt.toString()
             );
             stmt = reader.getStatement();

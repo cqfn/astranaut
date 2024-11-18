@@ -31,7 +31,7 @@ import org.cqfn.astranaut.exceptions.BaseException;
  * Compilation unit, that is, whatever is needed to generate a Java source file.
  * @since 1.0.0
  */
-public final class CompilationUnit implements Entity {
+public final class CompilationUnit implements JavaFileGenerator {
     /**
      * License.
      */
@@ -66,17 +66,6 @@ public final class CompilationUnit implements Entity {
     }
 
     /**
-     * Generates the source code of the compilation unit as a string.
-     * @return Source code of the compilation unit
-     * @throws BaseException If there are any problems during code generation
-     */
-    public String generateJavaCode() throws BaseException {
-        final SourceCodeBuilder code = new SourceCodeBuilder();
-        this.build(0, code);
-        return code.toString();
-    }
-
-    /**
      * Adds the name of the imported class to the list.
      * @param klass Full name of the imported class
      */
@@ -92,13 +81,21 @@ public final class CompilationUnit implements Entity {
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.license.build(indent, code);
         this.pkg.build(indent, code);
-        code.add(indent, "");
+        code.addEmpty();
         if (!this.imports.isEmpty()) {
             for (final String klass : this.imports) {
                 code.add(indent, String.format("import %s;", klass));
             }
-            code.add(indent, "");
+            code.addEmpty();
         }
         this.coi.build(indent, code);
+    }
+
+    /**
+     * Returns the name of the compilation unit file.
+     * @return Java filename
+     */
+    public String getFileName() {
+        return this.coi.getName().concat(".java");
     }
 }

@@ -26,15 +26,65 @@ package org.cqfn.astranaut.dsl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.codegen.java.LiteralGenerator;
+import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.utils.MapUtils;
+import org.cqfn.astranaut.core.utils.Pair;
 import org.cqfn.astranaut.interpreter.LiteralBuilder;
 
 /**
  * Descriptor of a literal, that is, a node that has data and no child nodes.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.DataClass")
 public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
+    /**
+     * Common exception thrown by number parsers.
+     */
+    public static  final String NUMBER_EXCEPTION = "NumberFormatException";
+
+    /**
+     * Collection of primitive types.
+     */
+    public static final Map<String, Pair<String, String>> PRIMITIVES =
+        new MapUtils<String, Pair<String, String>>()
+            .put(
+                "byte",
+                new Pair<>("Byte.parseByte(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "short",
+                new Pair<>("Short.parseShort(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "int",
+                new Pair<>("Integer.parseInt(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "long",
+                new Pair<>("Long.parseLong(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "float",
+                new Pair<>("Float.parseFloat(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "double",
+                new Pair<>("Double.parseDouble(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+            )
+            .put(
+                "char",
+                new Pair<>("#.charAt(0)", "IndexOutOfBoundsException")
+            )
+            .put(
+                "boolean",
+                new Pair<>("Boolean.parseBoolean(value)", "")
+            )
+            .make();
+
     /**
      * Delimiter that is used when stringifying a descriptor.
      */
@@ -74,11 +124,61 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
     }
 
     /**
+     * Returns the data type of the value that is stored in the node.
+     * @return Data type
+     */
+    public String getDataType() {
+        return this.type;
+    }
+
+    /**
      * Returns the initial data of the nodes to be created.
      * @return Data represented as a string
      */
     public String getInitial() {
         return this.initial;
+    }
+
+    /**
+     * Returns line of Java code that represents data within a node as a string.
+     * @return Source code of serializer
+     */
+    public String getSerializer() {
+        final String code;
+        if (this.serializer.isEmpty() && LiteralDescriptor.PRIMITIVES.containsKey(this.type)) {
+            code = "String.valueOf(#)";
+        } else {
+            code = this.serializer;
+        }
+        return code;
+    }
+
+    /**
+     * Returns line of Java code that parses data represented as a string into a native Java type.
+     * @return Source code of parser
+     */
+    public String getParser() {
+        final String code;
+        if (this.parser.isEmpty() && LiteralDescriptor.PRIMITIVES.containsKey(this.type)) {
+            code = LiteralDescriptor.PRIMITIVES.get(this.type).getKey();
+        } else {
+            code = this.parser;
+        }
+        return code;
+    }
+
+    /**
+     * Returns the name of the exception class that can be thrown when processing invalid data.
+     * @return Exception class name
+     */
+    public String getException() {
+        final String code;
+        if (this.exception.isEmpty() && LiteralDescriptor.PRIMITIVES.containsKey(this.type)) {
+            code = LiteralDescriptor.PRIMITIVES.get(this.type).getValue();
+        } else {
+            code = this.exception;
+        }
+        return code;
     }
 
     @Override
@@ -99,6 +199,11 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
             builder.append(LiteralDescriptor.DELIMITER).append(this.exception).append('\'');
         }
         return builder.toString();
+    }
+
+    @Override
+    public RuleGenerator createGenerator() {
+        return new LiteralGenerator(this);
     }
 
     @Override
@@ -161,11 +266,35 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
         }
 
         /**
+         * Return native Java type of the literal.
+         * @return Literal type.
+         */
+        public String getType() {
+            return this.type;
+        }
+
+        /**
+         * Returns a flag if the literal type is a primitive Java type.
+         * @return Flag
+         */
+        public boolean hasPrimitiveType() {
+            return LiteralDescriptor.PRIMITIVES.containsKey(this.type);
+        }
+
+        /**
          * Sets native Java type of the literal.
          * @param value Native Java type of the literal
          */
         public void setType(final String value) {
             this.type = value.trim();
+        }
+
+        /**
+         * Returns a flag whether the initial value of the node is specified.
+         * @return Flag
+         */
+        public boolean hasInitial() {
+            return !this.initial.isEmpty();
         }
 
         /**
@@ -183,6 +312,14 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
          */
         public void setSerializer(final String value) {
             this.serializer = value.trim();
+        }
+
+        /**
+         * Returns a flag whether a parser is specified.
+         * @return Flag
+         */
+        public boolean hasParser() {
+            return !this.parser.isEmpty();
         }
 
         /**

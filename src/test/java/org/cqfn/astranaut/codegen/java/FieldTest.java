@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  * Tests covering {@link Field} class.
  * @since 1.0.0
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 class FieldTest {
     @Test
     void simpleField() {
@@ -159,6 +159,128 @@ class FieldTest {
         Assertions.assertTrue(result);
     }
 
+    @Test
+    void fieldWithLongInitialString() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Final field.",
+                " */",
+                "final String value =",
+                "    \"The infantile goat accompanies this delightful sunset with an indifferent stare.\";",
+                ""
+            )
+        );
+        final Field field = new Field("String", "value", "Final field");
+        field.makeFinal(
+            "\"The infantile goat accompanies this delightful sunset with an indifferent stare.\""
+        );
+        final boolean result = this.testCodegen(field, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void fieldWithLongInitialCallChain() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Final field.",
+                " */",
+                "final String value =",
+                "    new StringBuilder()",
+                "        .append(\"aaaaa\")",
+                "        .append(\"bbbbb\")",
+                "        .append(\"ccccc\")",
+                "        .append(\"ddddd\")",
+                "        .toString();",
+                ""
+            )
+        );
+        final Field field = new Field("String", "value", "Final field");
+        field.makeFinal(
+            "new StringBuilder().append(\"aaaaa\").append(\"bbbbb\").append(\"ccccc\").append(\"ddddd\").toString()"
+        );
+        final boolean result = this.testCodegen(field, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void fieldWithLongInitialDepthCall() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Final field.",
+                " */",
+                "final Set<String> value =",
+                "    new TreeSet<>(",
+                "        Arrays.asList(",
+                "            \"aaaaaaa\",",
+                "            \"bbbbbbb\",",
+                "            \"ccccccc\",",
+                "            \"ddddddd\",",
+                "            \"eeeeeee\",",
+                "            \"fffffff\"",
+                "        )",
+                "    );",
+                ""
+            )
+        );
+        final Field field = new Field("Set<String>", "value", "Final field");
+        field.makeFinal(
+            "new TreeSet<>(Arrays.asList(\"aaaaaaa\", \"bbbbbbb\", \"ccccccc\", \"ddddddd\", \"eeeeeee\", \"fffffff\"))"
+        );
+        final boolean result = this.testCodegen(field, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void fieldWithVeryLongInitialString() {
+        final Field field = new Field("String", "value", "Final field");
+        field.makeFinal(
+            "new StringBuilder().append(\"aaaaa\").append(\"The crazy stinky infantile old goat accompanies this delightful sunset with an indifferent stare.\").toString()"
+        );
+        Assertions.assertTrue(this.testBadField(field));
+    }
+
+    @Test
+    void fieldWithStrangeClassName() {
+        final Field field = new Field("String", "value", "Final field");
+        field.makeFinal(
+            "new TheCrazyStinkyInfantileOldGoatAccompaniesThisDelightfulSunsetWithAnIndifferentStareStringBuilder().toString()"
+        );
+        Assertions.assertTrue(this.testBadField(field));
+    }
+
+    @Test
+    void fieldWithInitialValueWithNotClosedBracket() {
+        final Field field = new Field("Set<String>", "value", "Final field");
+        field.makeFinal(
+            "new TreeSet<>(Arrays.asList(\"aaaaaaaaaaa\", \"bbbbbbb\", \"ccccccc\", \"ddddddd\", \"eeeeeee\", \"fffffff\")"
+        );
+        boolean oops = false;
+        try {
+            final SourceCodeBuilder builder = new SourceCodeBuilder();
+            field.build(0, builder);
+        } catch (final BaseException exception) {
+            oops = true;
+            Assertions.assertEquals("Codegen", exception.getInitiator());
+            Assertions.assertEquals("Unclosed parenthesis", exception.getErrorMessage());
+        }
+        Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void fieldWithVeryLongInitialPart() {
+        final Field field = new Field("Set<String>", "value", "Final field");
+        field.makeFinal(
+            "new TreeSet<>(Arrays.asList(\"aaaaaaa\", \"bbbbbbb\", \"The crazy stinky infantile old goat accompanies this delightful sunset with an indifferent stare\", \"ddddddd\", \"eeeeeee\", \"fffffff\"))"
+        );
+        Assertions.assertTrue(this.testBadField(field));
+    }
+
     /**
      * Tests the source code generation from an object describing a field.
      * @param field Object describing a field
@@ -177,5 +299,22 @@ class FieldTest {
             oops = true;
         }
         return !oops && equals;
+    }
+
+    /**
+     * Tests codegeneration of a field with bad parameters,
+     *  the codegenerator is expected to throw an exception.
+     * @param field Object describing a field
+     * @return Testing result, {@code true} if exception was thrown
+     */
+    private boolean testBadField(final Field field) {
+        boolean oops = false;
+        try {
+            final SourceCodeBuilder builder = new SourceCodeBuilder();
+            field.build(0, builder);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        return oops;
     }
 }

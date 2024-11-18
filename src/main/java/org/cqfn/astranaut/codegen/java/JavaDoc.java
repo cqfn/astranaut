@@ -23,9 +23,11 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import org.cqfn.astranaut.core.utils.Pair;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -44,6 +46,16 @@ public final class JavaDoc implements Entity {
     private String version;
 
     /**
+     * List of parameters, each described by '@param' tag.
+     */
+    private final List<Pair<String, String>> parameters;
+
+    /**
+     * Describes '@return' tag.
+     */
+    private String returns;
+
+    /**
      * Constructor.
      * @param brief Brief description of the entity
      */
@@ -53,6 +65,8 @@ public final class JavaDoc implements Entity {
             .replaceAll("\\s+", " ")
             .trim();
         this.version = "";
+        this.parameters = new ArrayList<>(0);
+        this.returns = "";
     }
 
     /**
@@ -61,6 +75,23 @@ public final class JavaDoc implements Entity {
      */
     public void setVersion(final String value) {
         this.version = value.trim();
+    }
+
+    /**
+     * Adds a parameter described by '@param' tag.
+     * @param name Parameter name
+     * @param description Parameter description
+     */
+    public void addParameter(final String name, final String description) {
+        this.parameters.add(new Pair<>(name, description));
+    }
+
+    /**
+     * Adds a description to be printed after the '@return' tag.
+     * @param description Description
+     */
+    public void setReturnsDescription(final String description) {
+        this.returns = description;
     }
 
     /**
@@ -76,7 +107,21 @@ public final class JavaDoc implements Entity {
         code.add(indent, "/**");
         this.buildBrief(indent, code);
         if (!this.version.isEmpty()) {
-            code.add(indent, String.format(" * @since %s", this.version));
+            code.add(indent, String.format(" * @%s %s", "since", this.version));
+        }
+        for (final Pair<String, String> parameter : this.parameters) {
+            code.add(
+                indent,
+                String.format(
+                    " * @%s %s %s",
+                    "param",
+                    parameter.getKey(),
+                    parameter.getValue()
+                )
+            );
+        }
+        if (!this.returns.isEmpty()) {
+            code.add(indent, String.format(" * @%s %s", "return", this.returns));
         }
         code.add(indent, " */");
     }
@@ -96,7 +141,7 @@ public final class JavaDoc implements Entity {
             words = this.brief.concat(".").split(" ");
         }
         final int length = SourceCodeBuilder.MAX_LINE_LENGTH
-            - SourceCodeBuilder.TABULATION.length() * indent - 4;
+            - SourceCodeBuilder.TABULATION.length() * indent - 5;
         final List<String> lines = new LinkedList<>();
         StringBuilder line = new StringBuilder();
         for (final String word : words) {

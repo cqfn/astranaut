@@ -32,6 +32,7 @@ import org.cqfn.astranaut.exceptions.BaseException;
  * Describes a Java class and generates source code for it.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public final class Klass implements ClassOrInterface {
     /**
      * Name of the class.
@@ -42,6 +43,11 @@ public final class Klass implements ClassOrInterface {
      * Documentation.
      */
     private final JavaDoc doc;
+
+    /**
+     * Suppresses compiler or codechecker warnings.
+     */
+    private final Suppress suppress;
 
     /**
      * Flag indicating that the generated class is public.
@@ -69,6 +75,11 @@ public final class Klass implements ClassOrInterface {
     private boolean fin;
 
     /**
+     * The name of the superclass from which this class inherits.
+     */
+    private String ext;
+
+    /**
      * A list of interfaces that this class implements.
      */
     private String[] impl;
@@ -77,6 +88,11 @@ public final class Klass implements ClassOrInterface {
      * List of fields.
      */
     private final List<Field> fields;
+
+    /**
+     * List of constructors.
+     */
+    private final List<Constructor> constructors;
 
     /**
      * List of methods.
@@ -96,10 +112,26 @@ public final class Klass implements ClassOrInterface {
     public Klass(final String name, final String brief) {
         this.name = name;
         this.doc = new JavaDoc(brief);
+        this.suppress = new Suppress();
+        this.ext = "";
         this.impl = new String[0];
         this.fields = new ArrayList<>(0);
+        this.constructors = new ArrayList<>(0);
         this.methods = new ArrayList<>(0);
         this.nested = new ArrayList<>(0);
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * Adds a warning that needs to be suppressed.
+     * @param warning Warning
+     */
+    public void suppressWarning(final String warning) {
+        this.suppress.addWarning(warning);
     }
 
     /**
@@ -152,6 +184,14 @@ public final class Klass implements ClassOrInterface {
     }
 
     /**
+     * Sets the name of the superclass from which this class inherits.
+     * @param classname Class name
+     */
+    public void setSuperclass(final String classname) {
+        this.ext = classname;
+    }
+
+    /**
      * Sets the list of interfaces that this class implements.
      * @param names Interface names
      */
@@ -183,35 +223,45 @@ public final class Klass implements ClassOrInterface {
         this.nested.add(coi);
     }
 
+    /**
+     * Creates a class constructor.
+     * @return An entity representing the constructor for this class
+     */
+    public Constructor createConstructor() {
+        final Constructor entity = new Constructor(this.name);
+        this.constructors.add(entity);
+        return entity;
+    }
+
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.doc.build(indent, code);
+        this.suppress.build(indent, code);
         code.add(indent, this.composeHeader());
         boolean flag = false;
         final List<Field> flist = this.fields.stream()
             .sorted((left, right) -> Integer.compare(right.getPriority(), left.getPriority()))
             .collect(Collectors.toList());
         for (final Field field : flist) {
-            if (flag) {
-                code.add(indent, "");
-            }
+            code.addEmpty(flag);
             flag = true;
             field.build(indent + 1, code);
+        }
+        for (final Constructor ctor : this.constructors) {
+            code.addEmpty(flag);
+            flag = true;
+            ctor.build(indent + 1, code);
         }
         final List<Method> mlist = this.methods.stream()
             .sorted((left, right) -> Integer.compare(right.getPriority(), left.getPriority()))
             .collect(Collectors.toList());
         for (final Method method : mlist) {
-            if (flag) {
-                code.add(indent, "");
-            }
+            code.addEmpty(flag);
             flag = true;
             method.build(indent + 1, code);
         }
         for (final ClassOrInterface coi : this.nested) {
-            if (flag) {
-                code.add(indent, "");
-            }
+            code.addEmpty(flag);
             flag = true;
             coi.build(indent + 1, code);
         }
@@ -238,6 +288,9 @@ public final class Klass implements ClassOrInterface {
             header.append("final ");
         }
         header.append("class ").append(this.name);
+        if (!this.ext.isEmpty()) {
+            header.append(" extends ").append(this.ext);
+        }
         if (this.impl.length > 0) {
             header.append(" implements ");
             boolean flag = false;

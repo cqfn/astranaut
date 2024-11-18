@@ -325,6 +325,101 @@ class KlassTest {
         Assertions.assertTrue(result);
     }
 
+    @Test
+    void classWithConstructor() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with constructor.",
+                " */",
+                "class Test14 {",
+                "    /**",
+                "     * Constructor.",
+                "     */",
+                "    Test14(final String[] args) {",
+                "    }",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test14", "Class with constructor");
+        final Constructor ctor = klass.createConstructor();
+        ctor.addArgument("String[]", "args");
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void classWithTwoConstructor() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with two constructors.",
+                " */",
+                "class Test15 {",
+                "    /**",
+                "     * Constructor.",
+                "     */",
+                "    protected Test15(final int key, final int value) {",
+                "    }",
+                "",
+                "    /**",
+                "     * Constructor.",
+                "     */",
+                "    Test15() {",
+                "        this(0, 0);",
+                "    }",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test15", "Class with two constructors");
+        final Constructor first = klass.createConstructor();
+        first.addArgument("int", "key");
+        first.addArgument("int", "value");
+        first.makeProtected();
+        final Constructor second = klass.createConstructor();
+        second.setBody("this(0, 0);");
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void classWithConstructorAndField() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Class with constructor and field.",
+                " */",
+                "class Test16 {",
+                "    /**",
+                "     * Field.",
+                "     */",
+                "    private int value;",
+                "",
+                "    /**",
+                "     * Constructor.",
+                "     */",
+                "    Test16() {",
+                "        this.value = 0;",
+                "    }",
+                "}",
+                ""
+            )
+        );
+        final Klass klass = new Klass("Test16", "Class with constructor and field");
+        final Constructor ctor = klass.createConstructor();
+        ctor.setBody("this.value = 0;");
+        final Field field = new Field("int", "value", "Field");
+        field.makePrivate();
+        klass.addField(field);
+        final boolean result = this.testCodegen(klass, expected);
+        Assertions.assertTrue(result);
+    }
+
     /**
      * Tests the source code generation from an object describing a class.
      * @param klass Object describing a class

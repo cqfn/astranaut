@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import org.cqfn.astranaut.codegen.java.AbstractNodeGenerator;
+import org.cqfn.astranaut.codegen.java.RuleGenerator;
 
 /**
  * The descriptor of an abstract node, that is, a node from which other nodes
@@ -50,6 +52,14 @@ public final class AbstractNodeDescriptor extends NodeDescriptor {
         this.subtypes = AbstractNodeDescriptor.checkSubtypeList(subtypes);
     }
 
+    /**
+     * Returns list of types that inherit from this type.
+     * @return Subtypes list
+     */
+    public List<String> getSubtypes() {
+        return this.subtypes;
+    }
+
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
@@ -66,6 +76,11 @@ public final class AbstractNodeDescriptor extends NodeDescriptor {
             builder.append(" | ?");
         }
         return builder.toString();
+    }
+
+    @Override
+    public RuleGenerator createGenerator() {
+        return new AbstractNodeGenerator(this);
     }
 
     /**

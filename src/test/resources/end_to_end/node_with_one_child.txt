@@ -1,0 +1,972 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2024 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree;
+
+import java.util.Map;
+import org.cqfn.astranaut.core.base.DefaultFactory;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.utils.MapUtils;
+
+/**
+ * Factory provider that aggregates all factories.
+ * @since 1.0.0
+ */
+public final class FactoryProvider implements org.cqfn.astranaut.core.base.FactoryProvider {
+    /**
+     * The factory provider instance.
+     */
+    public static final FactoryProvider INSTANCE = new FactoryProvider();
+
+    /**
+     * Collection of factories supported by this provider.
+     */
+    private static final Map<String, Factory> FACTORIES =
+        new MapUtils<String, Factory>()
+            .put("common", org.cqfn.uast.tree.common.nodes.CommonFactory.INSTANCE)
+            .make();
+
+    /**
+     * Constructor.
+     */
+    private FactoryProvider() {
+    }
+
+    @Override
+    public Factory getFactory(final String language) {
+        return FactoryProvider.FACTORIES.getOrDefault(language, DefaultFactory.EMPTY);
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2024 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Map;
+import org.cqfn.astranaut.core.base.DefaultFactory;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.astranaut.core.utils.MapUtils;
+
+/**
+ * Factory that creates nodes for the 'Common' language.
+ * @since 1.0.0
+ */
+public final class CommonFactory extends DefaultFactory {
+    /**
+     * The factory instance.
+     */
+    public static final Factory INSTANCE = new CommonFactory();
+
+    /**
+     * Default properties of nodes describing the language.
+     */
+    public static final Map<String, String> PROPERTIES =
+        new MapUtils<String, String>().put("language", "common").put("color", "green").make();
+
+    /**
+     * Collection of types supported by this factory.
+     */
+    private static final Map<String, Type> TYPES =
+        new MapUtils<String, Type>()
+            .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
+            .put(StringLiteral.NAME, StringLiteral.TYPE)
+            .put(StatementExpression.NAME, StatementExpression.TYPE)
+            .put(Return.NAME, Return.TYPE)
+            .make();
+
+    /**
+     * Constructor.
+     */
+    private CommonFactory() {
+        super(CommonFactory.TYPES);
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2024 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Node of the 'Expression' type.
+ * @since 1.0.0
+ */
+public interface Expression extends Node {
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2024 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'IntegerLiteral' type.
+ * @since 1.0.0
+ */
+public final class IntegerLiteral implements Expression {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "IntegerLiteral";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new IntegerLiteralType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Value of the node.
+     */
+    private int data;
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return IntegerLiteral.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return String.valueOf(this.data);
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    /**
+     * Returns the value of the node in native form.
+     * @return Value of the node
+     */
+    public int getValue() {
+        return this.data;
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Type implementation describing 'IntegerLiteral' nodes.
+     * @since 1.0.0
+     */
+    private static final class IntegerLiteralType implements Type {
+        /**
+         * The 'Expression' type name.
+         */
+        private static final String TYPE_EXPRESSION = "Expression";
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Arrays.asList(IntegerLiteral.NAME, IntegerLiteralType.TYPE_EXPRESSION);
+
+        @Override
+        public String getName() {
+            return IntegerLiteral.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return IntegerLiteralType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new IntegerLiteral.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'IntegerLiteral' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Value of the node to be created.
+         */
+        private int data;
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            boolean result = true;
+            try {
+                this.data = Integer.parseInt(value);
+            } catch (final NumberFormatException ignored) {
+                result = false;
+            }
+            return result;
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final IntegerLiteral node = new IntegerLiteral();
+            node.fragment = this.fragment;
+            node.data = this.data;
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2024 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.algorithms.NodeAllocator;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.astranaut.core.utils.ListUtils;
+
+/**
+ * Node of the 'Return' type.
+ * @since 1.0.0
+ */
+public final class Return implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "Return";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new ReturnType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * List of child nodes.
+     */
+    private List<Node> children;
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return Return.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return this.children.size();
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return this.children;
+    }
+
+    /**
+     * Type implementation describing 'Return' nodes.
+     * @since 1.0.0
+     */
+    private static final class ReturnType implements Type {
+        /**
+         * The 'Expression' type name.
+         */
+        private static final String TYPE_EXPRESSION = "Expression";
+
+        /**
+         * List of child node descriptors.
+         */
+        private static final List<ChildDescriptor> CHILD_TYPES =
+            ChildDescriptor.create().optional(ReturnType.TYPE_EXPRESSION).build();
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(Return.NAME);
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return ReturnType.CHILD_TYPES;
+        }
+
+        @Override
+        public String getName() {
+            return Return.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return ReturnType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Return.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'Return' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Child node.
+         */
+        private Expression child;
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            final NodeAllocator allocator = new NodeAllocator(ReturnType.CHILD_TYPES);
+            final Node[] nodes = new Node[1];
+            final boolean result = allocator.allocate(nodes, list);
+            if (result) {
+                this.child = (Expression) nodes[0];
+            }
+            return result;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final Return node = new Return();
+            node.fragment = this.fragment;
+            node.children = new ListUtils<Node>().add(this.child).make();
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2024 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'StatementExpression' type.
+ * @since 1.0.0
+ */
+public final class StatementExpression implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "StatementExpression";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new StatementExpressionType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * List of child nodes.
+     */
+    private List<Node> children;
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return StatementExpression.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return this.children.size();
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return this.children;
+    }
+
+    /**
+     * Type implementation describing 'StatementExpression' nodes.
+     * @since 1.0.0
+     */
+    private static final class StatementExpressionType implements Type {
+        /**
+         * The 'Expression' type name.
+         */
+        private static final String TYPE_EXPRESSION = "Expression";
+
+        /**
+         * List of child node descriptors.
+         */
+        private static final List<ChildDescriptor> CHILD_TYPES =
+            ChildDescriptor.create().required(StatementExpressionType.TYPE_EXPRESSION).build();
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Collections.singletonList(StatementExpression.NAME);
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return StatementExpressionType.CHILD_TYPES;
+        }
+
+        @Override
+        public String getName() {
+            return StatementExpression.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return StatementExpressionType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new StatementExpression.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'StatementExpression' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Child node.
+         */
+        private Expression child;
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            boolean result = false;
+            if (list.size() == 1 && list.get(0) instanceof Expression) {
+                this.child = (Expression) list.get(0);
+                result = true;
+            }
+            return result;
+        }
+
+        @Override
+        public boolean isValid() {
+            return this.child != null;
+        }
+
+        @Override
+        public Node createNode() {
+            if (!this.isValid()) {
+                throw new IllegalStateException();
+            }
+            final StatementExpression node = new StatementExpression();
+            node.fragment = this.fragment;
+            node.children = Collections.singletonList(this.child);
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2024 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'StringLiteral' type.
+ * @since 1.0.0
+ */
+public final class StringLiteral implements Expression {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "StringLiteral";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new StringLiteralType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Value of the node.
+     */
+    private String data;
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return StringLiteral.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return this.data;
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    /**
+     * Returns the value of the node in native form.
+     * @return Value of the node
+     */
+    public String getValue() {
+        return this.data;
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Type implementation describing 'StringLiteral' nodes.
+     * @since 1.0.0
+     */
+    private static final class StringLiteralType implements Type {
+        /**
+         * The 'Expression' type name.
+         */
+        private static final String TYPE_EXPRESSION = "Expression";
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Arrays.asList(StringLiteral.NAME, StringLiteralType.TYPE_EXPRESSION);
+
+        @Override
+        public String getName() {
+            return StringLiteral.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return StringLiteralType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new StringLiteral.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'StringLiteral' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Value of the node to be created.
+         */
+        private String data;
+
+        /**
+         * Constructor.
+         */
+        Constructor() {
+            this.data = "";
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            this.data = value;
+            return true;
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final StringLiteral node = new StringLiteral();
+            node.fragment = this.fragment;
+            node.data = this.data;
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2024 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * This package contains common ('green') nodes.
+ * @since 1.0.0
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2024 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * Nodes describing syntax trees, and algorithms to process them, generated from the description
+ *  in the DSL language.
+ * @since 1.0.0
+ */
+package org.cqfn.uast.tree;
+

@@ -32,7 +32,7 @@ import org.cqfn.astranaut.exceptions.BaseException;
  * Describes a method and generates source code for it.
  * @since 1.0.0
  */
-public final class Method implements Entity {
+public final class Method extends BaseMethod {
     /**
      * Type of return value.
      */
@@ -49,24 +49,14 @@ public final class Method implements Entity {
     private final JavaDoc doc;
 
     /**
+     * Suppresses compiler or codechecker warnings.
+     */
+    private final Suppress suppress;
+
+    /**
      * Flag indicating that the generated method is overridden.
      */
     private final boolean over;
-
-    /**
-     * Flag indicating that the generated method is public.
-     */
-    private boolean pub;
-
-    /**
-     * Flag indicating that the generated method is protected.
-     */
-    private boolean prt;
-
-    /**
-     * Flag indicating that the generated method is private.
-     */
-    private boolean pvt;
 
     /**
      * Flag indicating that the generated method is static.
@@ -107,36 +97,18 @@ public final class Method implements Entity {
         this.ret = ret;
         this.name = name;
         this.doc = new JavaDoc(brief);
+        this.suppress = new Suppress();
         this.over = brief.isEmpty();
         this.args = new ArrayList<>(0);
         this.body = "";
     }
 
     /**
-     * Makes the method public.
+     * Adds a warning that needs to be suppressed.
+     * @param warning Warning
      */
-    public void makePublic() {
-        this.pub = true;
-        this.prt = false;
-        this.pvt = false;
-    }
-
-    /**
-     * Makes the method protected.
-     */
-    public void makeProtected() {
-        this.pub = false;
-        this.prt = true;
-        this.pvt = false;
-    }
-
-    /**
-     * Makes the method private.
-     */
-    public void makePrivate() {
-        this.pub = false;
-        this.prt = false;
-        this.pvt = true;
+    public void suppressWarning(final String warning) {
+        this.suppress.addWarning(warning);
     }
 
     /**
@@ -163,11 +135,30 @@ public final class Method implements Entity {
     }
 
     /**
+     * Adds an argument to the method.
+     * @param type Type of the argument
+     * @param identifier Name of the argument
+     * @param brief Brief description of the argument
+     */
+    public void addArgument(final String type, final String identifier, final String brief) {
+        this.addArgument(type, identifier);
+        this.doc.addParameter(identifier, brief);
+    }
+
+    /**
      * Sets the body of the method.
      * @param text Method body source code
      */
     public void setBody(final String text) {
         this.body = text;
+    }
+
+    /**
+     * Adds a description to be printed after the '@return' tag.
+     * @param description Description
+     */
+    public void setReturnsDescription(final String description) {
+        this.doc.setReturnsDescription(description);
     }
 
     /**
@@ -177,9 +168,9 @@ public final class Method implements Entity {
      */
     public int getPriority() {
         final int priority;
-        if (!this.stat && this.pub) {
+        if (!this.stat && this.isPublic()) {
             priority = 4;
-        } else if (this.pub) {
+        } else if (this.isPublic()) {
             priority = 3;
         } else if (this.stat) {
             priority = 1;
@@ -194,6 +185,7 @@ public final class Method implements Entity {
         if (this.doc.hasNonEmptyBrief()) {
             this.doc.build(indent, code);
         }
+        this.suppress.build(indent, code);
         if (this.over) {
             code.add(indent, "@Override");
         }
@@ -202,17 +194,22 @@ public final class Method implements Entity {
         code.add(indent, "}");
     }
 
+    @Override
+    public String getBody() {
+        return this.body;
+    }
+
     /**
      * Composes the header (signature) of the method.
      * @return Method header
      */
     private String composeHeader() {
         final StringBuilder header = new StringBuilder(128);
-        if (this.pub) {
+        if (this.isPublic()) {
             header.append("public ");
-        } else if (this.prt) {
+        } else if (this.isProtected()) {
             header.append("protected ");
-        } else if (this.pvt) {
+        } else if (this.isPrivate()) {
             header.append("private ");
         }
         if (this.stat) {
@@ -232,101 +229,5 @@ public final class Method implements Entity {
         }
         header.append(") {");
         return header.toString();
-    }
-
-    /**
-     * Generates the body of the method. Splits it into lines and indents it properly.
-     * @param indent Code indentation. Each generated line will be indented as follows
-     * @param code Source code builder
-     * @throws BaseException If there are any problems during code generation
-     */
-    private void buildBody(final int indent, final SourceCodeBuilder code) throws BaseException {
-        final List<Pair<String, Integer>> lines = this.splitBodyByLines();
-        for (final Pair<String, Integer> line : lines) {
-            code.add(indent + line.getValue(), line.getKey());
-        }
-    }
-
-    /**
-     * Separates the method body by indented lines.
-     * @return List of indented lines (where key is line, value is indentation)
-     * @throws SyntaxErrorInSourceCode If the method body contains an error that could be detected
-     *  at this stage
-     */
-    private List<Pair<String, Integer>> splitBodyByLines() throws SyntaxErrorInSourceCode {
-        final List<Pair<String, Integer>> list = new ArrayList<>(0);
-        int indent = 0;
-        for (final String line : this.body.split("\n")) {
-            String tail = line.trim();
-            while (!tail.isEmpty()) {
-                int extra = 0;
-                if (tail.charAt(0) == '.') {
-                    extra = 1;
-                }
-                int index = tail.indexOf('{');
-                if (index >= 0) {
-                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), indent + extra));
-                    indent = indent + 1;
-                    tail = tail.substring(index + 1).trim();
-                    continue;
-                }
-                index = tail.indexOf(';');
-                if (index >= 0) {
-                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), indent + extra));
-                    tail = tail.substring(index + 1).trim();
-                    continue;
-                }
-                index = tail.indexOf('}');
-                if (index > 0) {
-                    throw new SyntaxErrorInSourceCode(tail);
-                }
-                if (index == 0) {
-                    indent = indent - 1;
-                    list.add(new Pair<>("}", indent));
-                    tail = tail.substring(index + 1).trim();
-                    continue;
-                }
-                list.add(new Pair<>(tail, indent + extra));
-                tail = "";
-            }
-        }
-        return list;
-    }
-
-    /**
-     * Exception 'Syntax error in source code'.
-     * @since 1.0.0
-     */
-    private static final class SyntaxErrorInSourceCode extends BaseException {
-        /**
-         * Version identifier.
-         */
-        private static final long serialVersionUID = -1;
-
-        /**
-         * Text of a source code that contains an error.
-         */
-        private final String text;
-
-        /**
-         * Constructor.
-         * @param text Text of a source code that contains an error.
-         */
-        private SyntaxErrorInSourceCode(final String text) {
-            this.text = text;
-        }
-
-        @Override
-        public String getInitiator() {
-            return "Codegen";
-        }
-
-        @Override
-        public String getErrorMessage() {
-            return String.format(
-                "Syntax error in source code: '%s'",
-                this.text.trim()
-            );
-        }
     }
 }

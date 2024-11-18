@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.dsl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -97,6 +98,14 @@ public abstract class NodeDescriptor implements Rule {
             throw new CycleException(descriptor);
         }
         this.bases.add(descriptor);
+    }
+
+    /**
+     * Returns list of base descriptors.
+     * @return List of node descriptors from which this node inherits
+     */
+    public List<AbstractNodeDescriptor> getBaseDescriptors() {
+        return Collections.unmodifiableList(this.bases);
     }
 
     /**
@@ -176,7 +185,7 @@ public abstract class NodeDescriptor implements Rule {
 
         @Override
         public String getInitiator() {
-            return "Parser";
+            return "Analyzer";
         }
 
         @Override
