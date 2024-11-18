@@ -277,6 +277,8 @@ public final class Field implements Entity {
         final int end = line.lastIndexOf(')');
         if (begin >= 0 && end < 0) {
             throw new BaseException() {
+                private static final long serialVersionUID = -1;
+
                 @Override
                 public String getInitiator() {
                     return "Codegen";
