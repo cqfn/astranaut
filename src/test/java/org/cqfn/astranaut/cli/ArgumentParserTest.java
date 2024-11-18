@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.cli;
 
 import java.util.Arrays;
+import java.util.Collections;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,19 @@ class ArgumentParserTest {
         }
         Assertions.assertFalse(oops);
         Assertions.assertEquals("test2", parser.getOutput());
+    }
+
+    @Test
+    void badOutput() {
+        final ArgumentParser parser = new ArgumentParser();
+        Assertions.assertThrows(
+            CommonCliException.class,
+            () -> parser.parse(Collections.singletonList("-o"))
+        );
+        Assertions.assertThrows(
+            CommonCliException.class,
+            () -> parser.parse(Arrays.asList("--output", "--license"))
+        );
     }
 
     @Test
@@ -153,5 +167,17 @@ class ArgumentParserTest {
             );
         }
         Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void unknownArgument() {
+        final ArgumentParser parser = new ArgumentParser();
+        boolean oops = false;
+        try {
+            parser.parse(Arrays.asList("-o", "test3", "unknown", "-l", "LICENSE.txt"));
+        } catch (final CliException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }
