@@ -256,7 +256,7 @@ class FieldTest {
 
     @Test
     void fieldWithInitialValueWithNotClosedBracket() {
-        final Field field = new Field("String", "value", "Final field");
+        final Field field = new Field("Set<String>", "value", "Final field");
         field.makeFinal(
             "new TreeSet<>(Arrays.asList(\"aaaaaaaaaaa\", \"bbbbbbb\", \"ccccccc\", \"ddddddd\", \"eeeeeee\", \"fffffff\")"
         );
@@ -270,6 +270,15 @@ class FieldTest {
             Assertions.assertEquals("Unclosed parenthesis", exception.getErrorMessage());
         }
         Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void fieldWithVeryLongInitialPart() {
+        final Field field = new Field("Set<String>", "value", "Final field");
+        field.makeFinal(
+            "new TreeSet<>(Arrays.asList(\"aaaaaaa\", \"bbbbbbb\", \"The crazy stinky infantile old goat accompanies this delightful sunset with an indifferent stare\", \"ddddddd\", \"eeeeeee\", \"fffffff\"))"
+        );
+        Assertions.assertTrue(this.testBadField(field));
     }
 
     /**
