@@ -218,10 +218,11 @@ public final class Field implements Entity {
                 code.add(indent + 1, second);
                 break;
             }
-            if (Field.tryBreakLineByCallChain(indent + 1, code, second)) {
+            if (!second.contains(").")
+                && Field.tryBreakLineByDepthOfCalls(indent + 1, code, second)) {
                 break;
             }
-            if (Field.tryBreakLineByDepthOfCalls(indent + 1, code, second)) {
+            if (Field.tryBreakLineByCallChain(indent + 1, code, second)) {
                 break;
             }
             throw new SourceCodeBuilder.CodeLineIsTooLong(this.initial);
@@ -254,7 +255,7 @@ public final class Field implements Entity {
                 break;
             }
             code.add(indent, list[0]);
-            for (index = 1; index < list.length && result; index = index + 1) {
+            for (index = 1; index < list.length; index = index + 1) {
                 code.add(indent + 1, list[index]);
             }
         } while (false);

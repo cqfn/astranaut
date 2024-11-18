@@ -236,6 +236,22 @@ class FieldTest {
         Assertions.assertTrue(result);
     }
 
+    @Test
+    void fieldWithVeryLongInitialString() {
+        final Field field = new Field("Set<String>", "value", "Final field");
+        field.makeFinal(
+            "new StringBuilder().append(\"aaaaa\").append(\"The crazy stinky infantile old goat accompanies this delightful sunset with an indifferent stare.\").toString()"
+        );
+        boolean oops = false;
+        try {
+            final SourceCodeBuilder builder = new SourceCodeBuilder();
+            field.build(0, builder);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertTrue(oops);
+    }
+
     /**
      * Tests the source code generation from an object describing a field.
      * @param field Object describing a field
