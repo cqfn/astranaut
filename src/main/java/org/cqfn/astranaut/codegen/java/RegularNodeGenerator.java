@@ -47,19 +47,12 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
     private final String[] names;
 
     /**
-     * Flag indicating that this node is a wrapper (decorator) of another node.
-     */
-    private final boolean decorator;
-
-    /**
      * Constructor.
      * @param rule The rule that describes regular node
      */
     public RegularNodeGenerator(final RegularNodeDescriptor rule) {
         this.rule = rule;
         this.names = RegularNodeGenerator.generateVariableNames(rule);
-        this.decorator = rule.getExtChildTypes().size() == 1
-            && !rule.getExtChildTypes().get(0).isOptional();
     }
 
     @Override
@@ -167,7 +160,7 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
         final List<String> lines = new ArrayList<>(1);
         if (this.names.length == 0) {
             lines.add("return list.isEmpty();");
-        } else if (this.decorator) {
+        } else if (this.names.length == 1 && !children.get(0).isOptional()) {
             final String type = children.get(0).getType();
             lines.add("boolean result = false;");
             lines.add(
@@ -253,7 +246,7 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
                 );
             }
         }
-        if (this.decorator) {
+        if (this.names.length == 1 && !children.get(0).isOptional()) {
             this.needCollectionsClass();
             lines.add(
                 String.format(
