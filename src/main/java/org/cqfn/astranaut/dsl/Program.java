@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.dsl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -34,60 +35,50 @@ import java.util.TreeSet;
  */
 public final class Program {
     /**
-     * List of all rules.
+     * List of all rules (immutable).
      */
     private final List<Rule> all;
+
+    /**
+     * Cached result for getAllLanguages().
+     */
+    private Set<String> languages;
 
     /**
      * Constructor.
      * @param all List of all rules
      */
     public Program(final List<Rule> all) {
-        this.all = all;
+        this.all = Collections.unmodifiableList(new ArrayList<>(all));
     }
 
     /**
      * Returns a list of all languages for which at least one rule is described.
-     * @return A list containing at least one element
+     * @return A set containing at least one element
      */
     public Set<String> getAllLanguages() {
-        final Set<String> list = new TreeSet<>();
-        for (final Rule rule : this.all) {
-            list.add(Program.fixLanguage(rule.getLanguage()));
+        if (this.languages == null) {
+            final Set<String> set = new TreeSet<>();
+            for (final Rule rule : this.all) {
+                set.add(rule.getLanguage());
+            }
+            this.languages = Collections.unmodifiableSet(set);
         }
-        return list;
+        return this.languages;
     }
 
     /**
-     * Returns a list of node descriptors for one language.
+     * Returns a list of node descriptors for a specific language.
      * @param name Language name
      * @return List of node descriptors for this language
      */
     public List<NodeDescriptor> getNodeDescriptorsForLanguage(final String name) {
-        final String fixed = Program.fixLanguage(name);
         final List<NodeDescriptor> list = new ArrayList<>(0);
         for (final Rule rule : this.all) {
-            if (rule instanceof NodeDescriptor
-                && Program.fixLanguage(rule.getLanguage()).equals(fixed)) {
+            if (rule instanceof NodeDescriptor && rule.getLanguage().equals(name)) {
                 list.add((NodeDescriptor) rule);
             }
         }
         return list;
-    }
-
-    /**
-     * Fixes the language name, so that an empty name becomes “common”.
-     *  This gives us a non-empty folder and package name.
-     * @param name Language name
-     * @return Fixed language name
-     */
-    private static String fixLanguage(final String name) {
-        final String result;
-        if (name.isEmpty()) {
-            result = "common";
-        } else {
-            result = name;
-        }
-        return result;
     }
 }

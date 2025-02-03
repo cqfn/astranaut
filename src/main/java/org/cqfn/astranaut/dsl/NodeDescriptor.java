@@ -61,7 +61,7 @@ public abstract class NodeDescriptor implements Rule {
      * @param name Name of the type of the node (left side of the rule)
      */
     public NodeDescriptor(final String name) {
-        this.language = "";
+        this.language = "common";
         this.name = name;
         this.bases = new ArrayList<>(1);
     }
@@ -71,6 +71,9 @@ public abstract class NodeDescriptor implements Rule {
      * @param value Name of the programming language
      */
     public void setLanguage(final String value) {
+        if (value.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
         this.language = value.toLowerCase(Locale.ENGLISH);
     }
 

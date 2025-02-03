@@ -45,7 +45,7 @@ public class ProgramParser {
      * Constructor.
      */
     public ProgramParser() {
-        this.language = "";
+        this.language = "common";
     }
 
     /**

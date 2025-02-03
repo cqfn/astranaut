@@ -32,7 +32,8 @@ import org.cqfn.astranaut.codegen.java.RuleGenerator;
 public interface Rule {
     /**
      * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * If no language is defined, returns the string "common".
+     * @return The name of the programming language, never null or empty.
      */
     String getLanguage();
 

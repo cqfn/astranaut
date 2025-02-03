@@ -110,7 +110,8 @@ class NodeDescriptorTest {
             "Null",
             Collections.emptyList()
         );
-        Assertions.assertEquals("", descriptor.getLanguage());
+        Assertions.assertEquals("common", descriptor.getLanguage());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> descriptor.setLanguage(""));
         descriptor.setLanguage("Java");
         Assertions.assertEquals("java", descriptor.getLanguage());
     }
