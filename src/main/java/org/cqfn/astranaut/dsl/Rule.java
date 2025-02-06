@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import java.util.Set;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 
 /**
@@ -39,6 +40,18 @@ public interface Rule {
 
     @Override
     String toString();
+
+    /**
+     * Adds a node descriptor as a dependency.
+     * @param descriptor The node descriptor to add
+     */
+    void addDependency(NodeDescriptor descriptor);
+
+    /**
+     * Returns the set of dependencies for this rule.
+     * @return Set of node descriptors
+     */
+    Set<NodeDescriptor> getDependencies();
 
     /**
      * Creates a suitable generator that generates Java code.

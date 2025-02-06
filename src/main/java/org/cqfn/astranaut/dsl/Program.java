@@ -98,4 +98,21 @@ public final class Program {
         }
         return result;
     }
+
+    /**
+     * Returns a node descriptor by name and language.
+     * If the descriptor is not found in the specified language, it searches in the "common"
+     * language (if the specified language is not "common").
+     * @param name The name of the node descriptor
+     * @param language The language to search in
+     * @return The node descriptor, or {@code null} if not found
+     */
+    public NodeDescriptor getNodeDescriptorByNameAndLanguage(final String name,
+        final String language) {
+        NodeDescriptor descriptor = this.getNodeDescriptorsByLanguage(language).get(name);
+        if (descriptor == null && !"common".equals(language)) {
+            descriptor = this.getNodeDescriptorsByLanguage(language).get("common");
+        }
+        return descriptor;
+    }
 }

@@ -53,17 +53,7 @@ class ProgramTest {
         );
         second.setLanguage("bbb");
         rules.add(second);
-        final Rule third = new Rule() {
-            @Override
-            public String getLanguage() {
-                return "ccc";
-            }
-
-            @Override
-            public RuleGenerator createGenerator() {
-                return null;
-            }
-        };
+        final Rule third = new TestRule();
         rules.add(third);
         final Program program = new Program(rules);
         final Set<String> languages = new TreeSet<>(Arrays.asList("common", "bbb", "ccc"));
@@ -73,5 +63,31 @@ class ProgramTest {
             .values();
         Assertions.assertEquals(1, descriptors.size());
         Assertions.assertSame(second, descriptors.iterator().next());
+    }
+
+    /**
+     * Rule for testing purpose.
+     * @since 1.0.0
+     */
+    private static final class TestRule implements Rule {
+        @Override
+        public String getLanguage() {
+            return "ccc";
+        }
+
+        @Override
+        public void addDependency(final NodeDescriptor descriptor) {
+            this.getClass();
+        }
+
+        @Override
+        public Set<NodeDescriptor> getDependencies() {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public RuleGenerator createGenerator() {
+            return null;
+        }
     }
 }

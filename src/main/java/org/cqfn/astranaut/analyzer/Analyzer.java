@@ -23,13 +23,13 @@
  */
 package org.cqfn.astranaut.analyzer;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
+import org.cqfn.astranaut.dsl.ChildDescriptorExt;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.Program;
+import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -58,29 +58,36 @@ public class Analyzer {
     public void analyze() throws BaseException {
         final Set<String> languages = this.program.getAllLanguages();
         for (final String language : languages) {
-            final Collection<NodeDescriptor> descriptors =
-                this.program.getNodeDescriptorsByLanguage(language).values();
-            Analyzer.linkAbstractNodes(descriptors);
+            final Map<String, NodeDescriptor> descriptors =
+                this.program.getNodeDescriptorsByLanguage(language);
+            this.linkNodes(language, descriptors);
         }
     }
 
     /**
-     * Builds links between abstract and non-abstract nodes of the same language.
-     * @param descriptors Collection of node descriptors
+     * Builds links between nodes: abstract and non-abstract nodes of the same language,
+     *  child nodes.
+     * @param language Node language
+     * @param descriptors Node descriptors mapped by their names
      * @throws BaseException If the DSL program contains errors
      */
-    private static void linkAbstractNodes(final Collection<NodeDescriptor> descriptors)
+    private void linkNodes(final String language, final Map<String, NodeDescriptor> descriptors)
         throws BaseException {
-        final Map<String, NodeDescriptor> map = new TreeMap<>();
-        for (final NodeDescriptor descriptor : descriptors) {
-            map.put(descriptor.getName(), descriptor);
-        }
-        for (final NodeDescriptor descriptor : descriptors) {
+        for (final Map.Entry<String, NodeDescriptor> entry : descriptors.entrySet()) {
+            final NodeDescriptor descriptor = entry.getValue();
             if (descriptor instanceof AbstractNodeDescriptor) {
                 final AbstractNodeDescriptor abstrakt = (AbstractNodeDescriptor) descriptor;
                 for (final String subtype : abstrakt.getSubtypes()) {
-                    final NodeDescriptor inherited = map.get(subtype);
+                    final NodeDescriptor inherited =
+                        this.program.getNodeDescriptorByNameAndLanguage(subtype, language);
                     inherited.addBaseDescriptor(abstrakt);
+                }
+            } else if (descriptor instanceof RegularNodeDescriptor) {
+                final RegularNodeDescriptor regular = (RegularNodeDescriptor) descriptor;
+                for (final ChildDescriptorExt child : regular.getExtChildTypes()) {
+                    final NodeDescriptor dependency =
+                        this.program.getNodeDescriptorByNameAndLanguage(child.getType(), language);
+                    regular.addDependency(dependency);
                 }
             }
         }

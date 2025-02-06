@@ -57,6 +57,11 @@ public abstract class NodeDescriptor implements Rule {
     private final List<AbstractNodeDescriptor> bases;
 
     /**
+     * Set of nodes on which this node depends. These can be child or base node types.
+     */
+    private final Set<NodeDescriptor> dependencies;
+
+    /**
      * Constructor.
      * @param name Name of the type of the node (left side of the rule)
      */
@@ -64,6 +69,7 @@ public abstract class NodeDescriptor implements Rule {
         this.language = "common";
         this.name = name;
         this.bases = new ArrayList<>(1);
+        this.dependencies = new HashSet<>();
     }
 
     /**
@@ -80,6 +86,16 @@ public abstract class NodeDescriptor implements Rule {
     @Override
     public final String getLanguage() {
         return this.language;
+    }
+
+    @Override
+    public final void addDependency(final NodeDescriptor descriptor) {
+        this.dependencies.add(descriptor);
+    }
+
+    @Override
+    public final Set<NodeDescriptor> getDependencies() {
+        return Collections.unmodifiableSet(this.dependencies);
     }
 
     /**
@@ -101,6 +117,7 @@ public abstract class NodeDescriptor implements Rule {
             throw new CycleException(descriptor);
         }
         this.bases.add(descriptor);
+        this.dependencies.add(descriptor);
     }
 
     /**
