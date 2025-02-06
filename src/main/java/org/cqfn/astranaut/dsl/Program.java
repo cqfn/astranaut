@@ -26,7 +26,9 @@ package org.cqfn.astranaut.dsl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -45,11 +47,17 @@ public final class Program {
     private Set<String> languages;
 
     /**
+     * Cached result for getNodeDescriptorsByLanguage().
+     */
+    private final Map<String, Map<String, NodeDescriptor>> nodes;
+
+    /**
      * Constructor.
      * @param all List of all rules
      */
     public Program(final List<Rule> all) {
         this.all = Collections.unmodifiableList(new ArrayList<>(all));
+        this.nodes = new TreeMap<>();
     }
 
     /**
@@ -68,17 +76,26 @@ public final class Program {
     }
 
     /**
-     * Returns a list of node descriptors for a specific language.
-     * @param name Language name
-     * @return List of node descriptors for this language
+     * Returns an immutable map of node descriptors for the specified language.
+     * The map is cached for performance.
+     * @param language The language to get the node descriptors for
+     * @return An immutable map of node descriptors
      */
-    public List<NodeDescriptor> getNodeDescriptorsForLanguage(final String name) {
-        final List<NodeDescriptor> list = new ArrayList<>(0);
-        for (final Rule rule : this.all) {
-            if (rule instanceof NodeDescriptor && rule.getLanguage().equals(name)) {
-                list.add((NodeDescriptor) rule);
+    public Map<String, NodeDescriptor> getNodeDescriptorsByLanguage(final String language) {
+        final Map<String, NodeDescriptor> result;
+        if (this.nodes.containsKey(language)) {
+            result = this.nodes.get(language);
+        } else {
+            final Map<String, NodeDescriptor> descriptors = new TreeMap<>();
+            for (final Rule rule : this.all) {
+                if (rule instanceof NodeDescriptor && rule.getLanguage().equals(language)) {
+                    final NodeDescriptor descriptor = (NodeDescriptor) rule;
+                    descriptors.put(descriptor.getName(), descriptor);
+                }
             }
+            result = Collections.unmodifiableMap(descriptors);
+            this.nodes.put(language, result);
         }
-        return list;
+        return result;
     }
 }

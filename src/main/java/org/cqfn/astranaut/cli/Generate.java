@@ -144,7 +144,7 @@ public final class Generate implements Action {
         final Context context = cct.createContext();
         final CompilationUnit factory = this.factories.createUnit(language, context);
         Generate.writeFile(new File(folder, factory.getFileName()), factory.generateJavaCode());
-        for (final NodeDescriptor rule : program.getNodeDescriptorsForLanguage(language)) {
+        for (final NodeDescriptor rule : program.getNodeDescriptorsByLanguage(language).values()) {
             final RuleGenerator generator = rule.createGenerator();
             final Set<CompilationUnit> units = generator.createUnits(context);
             for (final CompilationUnit unit : units) {

@@ -111,9 +111,9 @@ public final class CommonFactory extends DefaultFactory {
     private static final Map<String, Type> TYPES =
         new MapUtils<String, Type>()
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
-            .put(StringLiteral.NAME, StringLiteral.TYPE)
-            .put(StatementExpression.NAME, StatementExpression.TYPE)
             .put(Return.NAME, Return.TYPE)
+            .put(StatementExpression.NAME, StatementExpression.TYPE)
+            .put(StringLiteral.NAME, StringLiteral.TYPE)
             .make();
 
     /**

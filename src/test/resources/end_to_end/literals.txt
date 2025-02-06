@@ -291,10 +291,10 @@ public final class CommonFactory extends DefaultFactory {
      */
     private static final Map<String, Type> TYPES =
         new MapUtils<String, Type>()
-            .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
-            .put(StringLiteral.NAME, StringLiteral.TYPE)
             .put(BooleanLiteral.NAME, BooleanLiteral.TYPE)
+            .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(JsonLiteral.NAME, JsonLiteral.TYPE)
+            .put(StringLiteral.NAME, StringLiteral.TYPE)
             .make();
 
     /**

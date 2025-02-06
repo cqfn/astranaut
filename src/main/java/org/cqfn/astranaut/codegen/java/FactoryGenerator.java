@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Collection;
 import java.util.Locale;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
@@ -137,7 +138,9 @@ public class FactoryGenerator {
         field.makeStatic();
         final StringBuilder builder = new StringBuilder(128);
         builder.append("new MapUtils<String, Type>()");
-        for (final NodeDescriptor rule : this.program.getNodeDescriptorsForLanguage(language)) {
+        final Collection<NodeDescriptor> rules =
+            this.program.getNodeDescriptorsByLanguage(language).values();
+        for (final NodeDescriptor rule : rules) {
             if (!(rule instanceof AbstractNodeDescriptor)) {
                 builder
                     .append(".put(")

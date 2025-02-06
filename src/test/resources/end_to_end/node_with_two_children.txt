@@ -353,9 +353,9 @@ public final class CommonFactory extends DefaultFactory {
      */
     private static final Map<String, Type> TYPES =
         new MapUtils<String, Type>()
+            .put(Addition.NAME, Addition.TYPE)
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(StringLiteral.NAME, StringLiteral.TYPE)
-            .put(Addition.NAME, Addition.TYPE)
             .put(Subtraction.NAME, Subtraction.TYPE)
             .make();
 

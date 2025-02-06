@@ -23,7 +23,7 @@
  */
 package org.cqfn.astranaut.analyzer;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -58,18 +58,18 @@ public class Analyzer {
     public void analyze() throws BaseException {
         final Set<String> languages = this.program.getAllLanguages();
         for (final String language : languages) {
-            final List<NodeDescriptor> descriptors =
-                this.program.getNodeDescriptorsForLanguage(language);
+            final Collection<NodeDescriptor> descriptors =
+                this.program.getNodeDescriptorsByLanguage(language).values();
             Analyzer.linkAbstractNodes(descriptors);
         }
     }
 
     /**
      * Builds links between abstract and non-abstract nodes of the same language.
-     * @param descriptors List of node descriptors
+     * @param descriptors Collection of node descriptors
      * @throws BaseException If the DSL program contains errors
      */
-    private static void linkAbstractNodes(final List<NodeDescriptor> descriptors)
+    private static void linkAbstractNodes(final Collection<NodeDescriptor> descriptors)
         throws BaseException {
         final Map<String, NodeDescriptor> map = new TreeMap<>();
         for (final NodeDescriptor descriptor : descriptors) {

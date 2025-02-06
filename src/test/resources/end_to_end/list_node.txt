@@ -110,8 +110,8 @@ public final class CommonFactory extends DefaultFactory {
      */
     private static final Map<String, Type> TYPES =
         new MapUtils<String, Type>()
-            .put(Entity.NAME, Entity.TYPE)
             .put(Entities.NAME, Entities.TYPE)
+            .put(Entity.NAME, Entity.TYPE)
             .make();
 
     /**

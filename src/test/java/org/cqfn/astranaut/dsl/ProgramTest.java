@@ -25,6 +25,7 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -67,8 +68,10 @@ class ProgramTest {
         final Program program = new Program(rules);
         final Set<String> languages = new TreeSet<>(Arrays.asList("common", "bbb", "ccc"));
         Assertions.assertEquals(languages, program.getAllLanguages());
-        final List<NodeDescriptor> descriptors = program.getNodeDescriptorsForLanguage("bbb");
+        final Collection<NodeDescriptor> descriptors = program
+            .getNodeDescriptorsByLanguage("bbb")
+            .values();
         Assertions.assertEquals(1, descriptors.size());
-        Assertions.assertSame(second, descriptors.get(0));
+        Assertions.assertSame(second, descriptors.iterator().next());
     }
 }
