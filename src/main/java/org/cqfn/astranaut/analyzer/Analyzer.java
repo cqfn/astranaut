@@ -76,38 +76,63 @@ public class Analyzer {
         for (final Map.Entry<String, NodeDescriptor> entry : descriptors.entrySet()) {
             final NodeDescriptor descriptor = entry.getValue();
             if (descriptor instanceof AbstractNodeDescriptor) {
-                final AbstractNodeDescriptor abstrakt = (AbstractNodeDescriptor) descriptor;
-                for (final String subtype : abstrakt.getSubtypes()) {
-                    final NodeDescriptor inherited =
-                        this.program.getNodeDescriptorByNameAndLanguage(subtype, language);
-                    if (inherited == null) {
-                        throw new CommonAnalyzerException(
-                            String.format(
-                                "The abstract node '%s' is the base for the node '%s' which is not defined",
-                                abstrakt.getName(),
-                                subtype
-                            )
-                        );
-                    }
-                    inherited.addBaseDescriptor(abstrakt);
-                }
+                this.linkAbstractNode(language, (AbstractNodeDescriptor) descriptor);
             } else if (descriptor instanceof RegularNodeDescriptor) {
-                final RegularNodeDescriptor regular = (RegularNodeDescriptor) descriptor;
-                for (final ChildDescriptorExt child : regular.getExtChildTypes()) {
-                    final NodeDescriptor dependency =
-                        this.program.getNodeDescriptorByNameAndLanguage(child.getType(), language);
-                    if (dependency == null) {
-                        throw new CommonAnalyzerException(
-                            String.format(
-                                "The '%s' node contains a child node '%s' which is not defined",
-                                regular.getName(),
-                                child.getType()
-                            )
-                        );
-                    }
-                    regular.addDependency(dependency);
-                }
+                this.linkRegularNode(language, (RegularNodeDescriptor) descriptor);
             }
+        }
+    }
+
+    /**
+     * Links abstract nodes to their subtypes and base descriptors.
+     * @param language The language of the nodes
+     * @param descriptor The abstract node descriptor to process
+     * @throws BaseException If the base node or subtype is not defined
+     */
+    private void linkAbstractNode(final String language, final AbstractNodeDescriptor descriptor)
+        throws BaseException {
+        for (final String subtype : descriptor.getSubtypes()) {
+            final NodeDescriptor subdescr =
+                this.program.getNodeDescriptorByNameAndLanguage(subtype, language);
+            if (subdescr == null) {
+                throw new CommonAnalyzerException(
+                    String.format(
+                        "The abstract node '%s' is the base for the node '%s' which is not defined",
+                        descriptor.getName(),
+                        subtype
+                    )
+                );
+            }
+            if (!subdescr.getLanguage().equals(descriptor.getLanguage())
+                && subdescr instanceof AbstractNodeDescriptor) {
+                descriptor.addBaseDescriptor((AbstractNodeDescriptor) subdescr);
+            } else {
+                subdescr.addBaseDescriptor(descriptor);
+            }
+        }
+    }
+
+    /**
+     * Links regular nodes to their child descriptors.
+     * @param language The language of the nodes
+     * @param descriptor The regular node descriptor to process
+     * @throws BaseException If the child node is not defined
+     */
+    private void linkRegularNode(final String language, final RegularNodeDescriptor descriptor)
+        throws BaseException {
+        for (final ChildDescriptorExt child : descriptor.getExtChildTypes()) {
+            final NodeDescriptor dependency =
+                this.program.getNodeDescriptorByNameAndLanguage(child.getType(), language);
+            if (dependency == null) {
+                throw new CommonAnalyzerException(
+                    String.format(
+                        "The '%s' node contains a child node '%s' which is not defined",
+                        descriptor.getName(),
+                        child.getType()
+                    )
+                );
+            }
+            descriptor.addDependency(dependency);
         }
     }
 }
