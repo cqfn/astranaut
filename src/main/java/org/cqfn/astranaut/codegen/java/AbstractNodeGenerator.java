@@ -27,12 +27,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
+import org.cqfn.astranaut.dsl.Rule;
 
 /**
  * Generator that creates compilation units that describe an abstract node.
  * @since 1.0.0
  */
-public final class AbstractNodeGenerator implements  RuleGenerator {
+public final class AbstractNodeGenerator extends RuleGenerator {
     /**
      * Descriptor on the basis of which the source code will be built.
      */
@@ -44,6 +45,11 @@ public final class AbstractNodeGenerator implements  RuleGenerator {
      */
     public AbstractNodeGenerator(final AbstractNodeDescriptor rule) {
         this.rule = rule;
+    }
+
+    @Override
+    public Rule getRule() {
+        return this.rule;
     }
 
     @Override
@@ -74,6 +80,7 @@ public final class AbstractNodeGenerator implements  RuleGenerator {
             final String base = "org.cqfn.astranaut.core.base.";
             unit.addImport(base.concat(Strings.TYPE_NODE));
         }
+        this.resolveDependencies(unit, context);
         return Collections.singleton(unit);
     }
 }

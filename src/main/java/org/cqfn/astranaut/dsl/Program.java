@@ -111,7 +111,7 @@ public final class Program {
         final String language) {
         NodeDescriptor descriptor = this.getNodeDescriptorsByLanguage(language).get(name);
         if (descriptor == null && !"common".equals(language)) {
-            descriptor = this.getNodeDescriptorsByLanguage(language).get("common");
+            descriptor = this.getNodeDescriptorsByLanguage("common").get(name);
         }
         return descriptor;
     }

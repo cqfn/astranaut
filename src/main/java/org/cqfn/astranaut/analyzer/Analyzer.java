@@ -80,6 +80,15 @@ public class Analyzer {
                 for (final String subtype : abstrakt.getSubtypes()) {
                     final NodeDescriptor inherited =
                         this.program.getNodeDescriptorByNameAndLanguage(subtype, language);
+                    if (inherited == null) {
+                        throw new CommonAnalyzerException(
+                            String.format(
+                                "The abstract node '%s' is the base for the node '%s' which is not defined",
+                                abstrakt.getName(),
+                                subtype
+                            )
+                        );
+                    }
                     inherited.addBaseDescriptor(abstrakt);
                 }
             } else if (descriptor instanceof RegularNodeDescriptor) {
@@ -87,6 +96,15 @@ public class Analyzer {
                 for (final ChildDescriptorExt child : regular.getExtChildTypes()) {
                     final NodeDescriptor dependency =
                         this.program.getNodeDescriptorByNameAndLanguage(child.getType(), language);
+                    if (dependency == null) {
+                        throw new CommonAnalyzerException(
+                            String.format(
+                                "The '%s' node contains a child node '%s' which is not defined",
+                                regular.getName(),
+                                child.getType()
+                            )
+                        );
+                    }
                     regular.addDependency(dependency);
                 }
             }

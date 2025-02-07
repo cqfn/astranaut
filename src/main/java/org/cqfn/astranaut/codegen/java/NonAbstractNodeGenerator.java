@@ -36,7 +36,7 @@ import org.cqfn.astranaut.dsl.NodeDescriptor;
  * @since 1.0.0
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public abstract class NonAbstractNodeGenerator implements RuleGenerator {
+public abstract class NonAbstractNodeGenerator extends RuleGenerator {
     /**
      * Flag indicating that the 'java.util.Collections' class should be included
      *  in the generated code.
@@ -129,6 +129,7 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         if (this.chldecr) {
             unit.addImport(base.concat(Strings.TYPE_CHLD_DESCR));
         }
+        this.resolveDependencies(unit, context);
         return Collections.singleton(unit);
     }
 
