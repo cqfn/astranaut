@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import org.cqfn.astranaut.exceptions.BaseException;
 
@@ -71,6 +72,12 @@ public abstract class NodeDescriptor implements Rule {
         this.bases = new ArrayList<>(1);
         this.dependencies = new HashSet<>();
     }
+
+    /**
+     * Returns the set of tags that have child nodes and their corresponding node types.
+     * @return Tags correlated with their types
+     */
+    public abstract Map<String, String> getTags();
 
     /**
      * Sets the name of the programming language for which this node descriptor is described.

@@ -27,6 +27,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import org.cqfn.astranaut.codegen.java.AbstractNodeGenerator;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 
@@ -41,6 +45,11 @@ public final class AbstractNodeDescriptor extends NodeDescriptor {
      * List of types that inherit from this type.
      */
     private final List<String> subtypes;
+
+    /**
+     * Tags and their types.
+     */
+    private Map<String, String> tags;
 
     /**
      * Constructor.
@@ -81,6 +90,44 @@ public final class AbstractNodeDescriptor extends NodeDescriptor {
     @Override
     public RuleGenerator createGenerator() {
         return new AbstractNodeGenerator(this);
+    }
+
+    @Override
+    public Map<String, String> getTags() {
+        final Map<String, String> result;
+        if (this.tags == null) {
+            result = Collections.emptyMap();
+        } else {
+            result = Collections.unmodifiableMap(this.tags);
+        }
+        return result;
+    }
+
+    /**
+     * Merges the provided map of tags with the current tags, considering all inherited descriptors
+     *  of the abstract (base) node. The merge algorithm ensures that only tags matching across
+     *  all descendants remain in the abstract node.
+     * If the current tags are null, they are initialized with the provided map.
+     * If the current tags are not empty, it removes entries whose values match the ones in the
+     *  provided map.
+     * @param others A map containing tags and their associated values to merge.
+     */
+    public void mergeTags(final Map<String, String> others) {
+        if (this.tags == null) {
+            this.tags = new TreeMap<>(others);
+        } else if (!this.tags.isEmpty()) {
+            final Set<String> remove = new TreeSet<>();
+            for (final Map.Entry<String, String> entry : this.tags.entrySet()) {
+                final String tag = entry.getKey();
+                final String type = others.get(tag);
+                if (!entry.getValue().equals(type)) {
+                    remove.add(tag);
+                }
+            }
+            for (final String tag : remove) {
+                this.tags.remove(tag);
+            }
+        }
     }
 
     /**

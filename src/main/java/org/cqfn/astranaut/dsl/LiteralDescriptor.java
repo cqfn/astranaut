@@ -216,6 +216,11 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
         return new LiteralBuilder(this);
     }
 
+    @Override
+    public Map<String, String> getTags() {
+        return Collections.emptyMap();
+    }
+
     /**
      * Class that correctly constructs a literal descriptor.
      * @since 1.0.0

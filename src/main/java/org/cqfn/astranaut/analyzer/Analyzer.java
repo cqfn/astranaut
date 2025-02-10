@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.analyzer;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
@@ -30,6 +31,7 @@ import org.cqfn.astranaut.dsl.ChildDescriptorExt;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.Program;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
+import org.cqfn.astranaut.dsl.Rule;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -61,6 +63,11 @@ public class Analyzer {
             final Map<String, NodeDescriptor> descriptors =
                 this.program.getNodeDescriptorsByLanguage(language);
             this.linkNodes(language, descriptors);
+        }
+        for (final Rule rule : this.program.getAllRules()) {
+            if (rule instanceof RegularNodeDescriptor) {
+                Analyzer.addTagsToBaseNodes((NodeDescriptor) rule);
+            }
         }
     }
 
@@ -133,6 +140,21 @@ public class Analyzer {
                 );
             }
             descriptor.addDependency(dependency);
+        }
+    }
+
+    /**
+     * Recursively adds tags to the base nodes of the given descriptor.
+     *  For each base node descriptor, it merges the tags from the current descriptor
+     *  and then recursively calls this method for the base node.
+     * @param descriptor The node descriptor whose tags will be added to its base nodes.
+     */
+    private static void addTagsToBaseNodes(final NodeDescriptor descriptor) {
+        final List<AbstractNodeDescriptor> bases = descriptor.getBaseDescriptors();
+        final Map<String, String> tags = descriptor.getTags();
+        for (final AbstractNodeDescriptor base : bases) {
+            base.mergeTags(tags);
+            Analyzer.addTagsToBaseNodes(base);
         }
     }
 }

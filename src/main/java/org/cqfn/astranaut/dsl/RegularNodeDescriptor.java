@@ -25,6 +25,8 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.cqfn.astranaut.codegen.java.RegularNodeGenerator;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
@@ -94,5 +96,16 @@ public final class RegularNodeDescriptor extends NonAbstractNodeDescriptor {
     @Override
     public Builder createBuilder() {
         return new RegularBuilder(this);
+    }
+
+    @Override
+    public Map<String, String> getTags() {
+        final Map<String, String> result = new TreeMap<>();
+        for (final ChildDescriptorExt child : this.children) {
+            if (!child.getTag().isEmpty()) {
+                result.put(child.getTag(), child.getType());
+            }
+        }
+        return Collections.unmodifiableMap(result);
     }
 }

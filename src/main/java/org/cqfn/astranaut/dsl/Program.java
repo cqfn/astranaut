@@ -61,6 +61,14 @@ public final class Program {
     }
 
     /**
+     * Returns all rules in the order they are declared in the DSL file.
+     * @return A list of rules.
+     */
+    public List<Rule> getAllRules() {
+        return this.all;
+    }
+
+    /**
      * Returns a list of all languages for which at least one rule is described.
      * @return A set containing at least one element
      */
