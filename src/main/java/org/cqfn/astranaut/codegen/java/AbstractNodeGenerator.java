@@ -25,6 +25,8 @@ package org.cqfn.astranaut.codegen.java;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
 import org.cqfn.astranaut.dsl.Rule;
@@ -71,6 +73,7 @@ public final class AbstractNodeGenerator extends RuleGenerator {
             );
         }
         iface.setVersion(context.getVersion());
+        this.createGettersForTaggedFields(iface);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
@@ -82,5 +85,28 @@ public final class AbstractNodeGenerator extends RuleGenerator {
         }
         this.resolveDependencies(unit, context);
         return Collections.singleton(unit);
+    }
+
+    /**
+     * Creates getters for all tagged children.
+     * @param iface Interface describing abstract node
+     */
+    private void createGettersForTaggedFields(final Interface iface) {
+        final Map<String, String> tags = this.rule.getTags();
+        for (final Map.Entry<String, String> entry : tags.entrySet()) {
+            final String tag = entry.getKey();
+            final String type = entry.getValue();
+            final MethodSignature getter = new MethodSignature(
+                type,
+                String.format(
+                    "get%s%s",
+                    tag.substring(0, 1).toUpperCase(Locale.ENGLISH),
+                    tag.substring(1)
+                ),
+                String.format("Returns child node with '%s' tag", tag)
+            );
+            getter.setReturnsDescription("Child node (can't be {@code null})");
+            iface.addMethodSignature(getter);
+        }
     }
 }
