@@ -25,6 +25,7 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +48,9 @@ public final class AbstractNodeDescriptor extends NodeDescriptor {
     private final List<String> subtypes;
 
     /**
-     * Tags and their types.
+     * Tags and corresponding child descriptors.
      */
-    private Map<String, String> tags;
+    private Map<String, ChildDescriptorExt> tags;
 
     /**
      * Constructor.
@@ -93,8 +94,8 @@ public final class AbstractNodeDescriptor extends NodeDescriptor {
     }
 
     @Override
-    public Map<String, String> getTags() {
-        final Map<String, String> result;
+    public Map<String, ChildDescriptorExt> getTags() {
+        final Map<String, ChildDescriptorExt> result;
         if (this.tags == null) {
             result = Collections.emptyMap();
         } else {
@@ -112,20 +113,32 @@ public final class AbstractNodeDescriptor extends NodeDescriptor {
      *  provided map.
      * @param others A map containing tags and their associated values to merge.
      */
-    public void mergeTags(final Map<String, String> others) {
+    public void mergeTags(final Map<String, ChildDescriptorExt> others) {
         if (this.tags == null) {
             this.tags = new TreeMap<>(others);
         } else if (!this.tags.isEmpty()) {
+            final Set<ChildDescriptorExt> replace = new HashSet<>();
             final Set<String> remove = new TreeSet<>();
-            for (final Map.Entry<String, String> entry : this.tags.entrySet()) {
+            for (final Map.Entry<String, ChildDescriptorExt> entry : this.tags.entrySet()) {
                 final String tag = entry.getKey();
-                final String type = others.get(tag);
-                if (!entry.getValue().equals(type)) {
+                final ChildDescriptorExt other = others.get(tag);
+                if (other == null) {
                     remove.add(tag);
+                    continue;
+                }
+                final ChildDescriptorExt current = entry.getValue();
+                final ChildDescriptorExt substitute = current.merge(other);
+                if (substitute == null) {
+                    remove.add(tag);
+                } else if (!substitute.equals(current)) {
+                    replace.add(substitute);
                 }
             }
             for (final String tag : remove) {
                 this.tags.remove(tag);
+            }
+            for (final ChildDescriptorExt descr : replace) {
+                this.tags.put(descr.getTag(), descr);
             }
         }
     }

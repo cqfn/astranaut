@@ -217,7 +217,7 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
     }
 
     @Override
-    public Map<String, String> getTags() {
+    public Map<String, ChildDescriptorExt> getTags() {
         return Collections.emptyMap();
     }
 

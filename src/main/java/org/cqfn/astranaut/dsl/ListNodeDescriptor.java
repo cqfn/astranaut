@@ -82,7 +82,7 @@ public final class ListNodeDescriptor extends NonAbstractNodeDescriptor {
     }
 
     @Override
-    public Map<String, String> getTags() {
+    public Map<String, ChildDescriptorExt> getTags() {
         return Collections.emptyMap();
     }
 }

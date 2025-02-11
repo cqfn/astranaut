@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
+import org.cqfn.astranaut.dsl.ChildDescriptorExt;
 import org.cqfn.astranaut.dsl.Rule;
 
 /**
@@ -92,12 +93,11 @@ public final class AbstractNodeGenerator extends RuleGenerator {
      * @param iface Interface describing abstract node
      */
     private void createGettersForTaggedFields(final Interface iface) {
-        final Map<String, String> tags = this.rule.getTags();
-        for (final Map.Entry<String, String> entry : tags.entrySet()) {
+        final Map<String, ChildDescriptorExt> tags = this.rule.getTags();
+        for (final Map.Entry<String, ChildDescriptorExt> entry : tags.entrySet()) {
             final String tag = entry.getKey();
-            final String type = entry.getValue();
             final MethodSignature getter = new MethodSignature(
-                type,
+                entry.getValue().getType(),
                 String.format(
                     "get%s%s",
                     tag.substring(0, 1).toUpperCase(Locale.ENGLISH),
@@ -105,7 +105,16 @@ public final class AbstractNodeGenerator extends RuleGenerator {
                 ),
                 String.format("Returns child node with '%s' tag", tag)
             );
-            getter.setReturnsDescription("Child node (can't be {@code null})");
+            if (entry.getValue().isOptional()) {
+                getter.setReturnsDescription(
+                    String.format(
+                        "Child node or {@code null} if the node with '%s' tag is not specified",
+                        tag
+                    )
+                );
+            } else {
+                getter.setReturnsDescription("Child node (can't be {@code null})");
+            }
             iface.addMethodSignature(getter);
         }
     }

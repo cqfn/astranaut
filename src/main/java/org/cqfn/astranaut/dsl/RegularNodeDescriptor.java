@@ -99,11 +99,11 @@ public final class RegularNodeDescriptor extends NonAbstractNodeDescriptor {
     }
 
     @Override
-    public Map<String, String> getTags() {
-        final Map<String, String> result = new TreeMap<>();
+    public Map<String, ChildDescriptorExt> getTags() {
+        final Map<String, ChildDescriptorExt> result = new TreeMap<>();
         for (final ChildDescriptorExt child : this.children) {
             if (!child.getTag().isEmpty()) {
-                result.put(child.getTag(), child.getType());
+                result.put(child.getTag(), child);
             }
         }
         return Collections.unmodifiableMap(result);

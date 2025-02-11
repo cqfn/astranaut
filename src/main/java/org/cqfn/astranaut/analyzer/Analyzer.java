@@ -128,9 +128,9 @@ public class Analyzer {
     private void linkRegularNode(final String language, final RegularNodeDescriptor descriptor)
         throws BaseException {
         for (final ChildDescriptorExt child : descriptor.getExtChildTypes()) {
-            final NodeDescriptor dependency =
+            final NodeDescriptor rule =
                 this.program.getNodeDescriptorByNameAndLanguage(child.getType(), language);
-            if (dependency == null) {
+            if (rule == null) {
                 throw new CommonAnalyzerException(
                     String.format(
                         "The '%s' node contains a child node '%s' which is not defined",
@@ -139,7 +139,8 @@ public class Analyzer {
                     )
                 );
             }
-            descriptor.addDependency(dependency);
+            child.setRule(rule);
+            descriptor.addDependency(rule);
         }
     }
 
@@ -151,7 +152,7 @@ public class Analyzer {
      */
     private static void addTagsToBaseNodes(final NodeDescriptor descriptor) {
         final List<AbstractNodeDescriptor> bases = descriptor.getBaseDescriptors();
-        final Map<String, String> tags = descriptor.getTags();
+        final Map<String, ChildDescriptorExt> tags = descriptor.getTags();
         for (final AbstractNodeDescriptor base : bases) {
             base.mergeTags(tags);
             Analyzer.addTagsToBaseNodes(base);

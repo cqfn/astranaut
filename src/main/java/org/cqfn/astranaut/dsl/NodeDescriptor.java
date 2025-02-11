@@ -63,6 +63,11 @@ public abstract class NodeDescriptor implements Rule {
     private final Set<NodeDescriptor> dependencies;
 
     /**
+     * Inheritance topology (cached list).
+     */
+    private List<NodeDescriptor> topology;
+
+    /**
      * Constructor.
      * @param name Name of the type of the node (left side of the rule)
      */
@@ -74,10 +79,10 @@ public abstract class NodeDescriptor implements Rule {
     }
 
     /**
-     * Returns the set of tags that have child nodes and their corresponding node types.
-     * @return Tags correlated with their types
+     * Returns the set of tags that have child nodes and their corresponding descriptors.
+     * @return Tags correlated with descriptors
      */
-    public abstract Map<String, String> getTags();
+    public abstract Map<String, ChildDescriptorExt> getTags();
 
     /**
      * Sets the name of the programming language for which this node descriptor is described.
@@ -141,10 +146,12 @@ public abstract class NodeDescriptor implements Rule {
      * @return A list of descriptors consisting of at least one descriptor (this one)
      */
     public List<NodeDescriptor> getTopology() {
-        final List<NodeDescriptor> topology = new LinkedList<>();
-        final Set<NodeDescriptor> visited = new HashSet<>();
-        this.buildTopology(topology, visited);
-        return topology;
+        if (this.topology == null) {
+            this.topology = new LinkedList<>();
+            final Set<NodeDescriptor> visited = new HashSet<>();
+            this.buildTopology(this.topology, visited);
+        }
+        return this.topology;
     }
 
     /**
@@ -170,19 +177,19 @@ public abstract class NodeDescriptor implements Rule {
 
     /**
      * Recursively performs topological sorting of the inheritance graph.
-     * @param topology List to which the sorted descriptors will be added
+     * @param list List to which the sorted descriptors will be added
      * @param visited Visited descriptors, it is necessary not to process them repeatedly
      */
-    private void buildTopology(final List<NodeDescriptor> topology,
+    private void buildTopology(final List<NodeDescriptor> list,
         final Set<NodeDescriptor> visited) {
         if (!visited.contains(this)) {
             final ListIterator<AbstractNodeDescriptor> iterator =
                 this.bases.listIterator(this.bases.size());
             while (iterator.hasPrevious()) {
                 final NodeDescriptor base = iterator.previous();
-                base.buildTopology(topology, visited);
+                base.buildTopology(list, visited);
             }
-            topology.add(0, this);
+            list.add(0, this);
             visited.add(this);
         }
     }

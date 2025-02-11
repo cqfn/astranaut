@@ -23,12 +23,15 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import java.util.LinkedList;
+import java.util.List;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
 
 /**
  * Extended child node descriptor. It's like {@link ChildDescriptor}, but also contains tags.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.DataClass")
 public final class ChildDescriptorExt {
     /**
      * Flag indicating that the child node is optional.
@@ -44,6 +47,11 @@ public final class ChildDescriptorExt {
      * Type of child node as a string.
      */
     private final String type;
+
+    /**
+     * Rule describing the type of the child node.
+     */
+    private NodeDescriptor rule;
 
     /**
      * Constructor.
@@ -83,6 +91,14 @@ public final class ChildDescriptorExt {
     }
 
     /**
+     * Sets rule describing the type of the child node.
+     * @param descriptor Node descriptor
+     */
+    public void setRule(final NodeDescriptor descriptor) {
+        this.rule = descriptor;
+    }
+
+    /**
      * Converts this extended descriptor to a simple descriptor for use in the interpreter.
      * @return A simple descriptor (without a tag)
      */
@@ -104,5 +120,59 @@ public final class ChildDescriptorExt {
             builder.append(']');
         }
         return builder.toString();
+    }
+
+    /**
+     * Merges the current descriptor with another one.
+     *  If the tags or types do not match, returns null. If the types differ, creates a new
+     *  descriptor based on the first common parent (base descriptor). If both descriptors are
+     *  optional, returns the current one. Otherwise, returns the other descriptor.
+     * @param other The descriptor to merge with the current one.
+     * @return A merged ChildDescriptorExt, or null if the merge is not possible.
+     */
+    @SuppressWarnings("PMD.ConfusingTernary")
+    public ChildDescriptorExt merge(final ChildDescriptorExt other) {
+        final ChildDescriptorExt result;
+        if (!this.tag.equals(other.tag)) {
+            result = null;
+        } else if (!this.type.equals(other.type)) {
+            result = this.createFromFirstCommonParent(other);
+        } else if (this.optional) {
+            result = this;
+        } else {
+            result = other;
+        }
+        return result;
+    }
+
+    /**
+     * Creates a new ChildDescriptorExt based on the first common parent between two descriptors.
+     *  It compares the topologies of both descriptors and selects the first common node from the
+     *  topologies. If no common parent is found, returns {@code null}.
+     * @param other The descriptor to compare with the current one.
+     * @return A new ChildDescriptorExt based on the first common parent, or {@code null}
+     *  if no common parent exists.
+     */
+    private ChildDescriptorExt createFromFirstCommonParent(final ChildDescriptorExt other) {
+        final List<NodeDescriptor> first = this.rule.getTopology();
+        final List<NodeDescriptor> second = other.rule.getTopology();
+        final List<NodeDescriptor> common = new LinkedList<>(first);
+        for (final NodeDescriptor item : first) {
+            if (!second.contains(item)) {
+                common.remove(item);
+            }
+        }
+        final ChildDescriptorExt result;
+        if (common.isEmpty()) {
+            result = null;
+        } else {
+            result = new ChildDescriptorExt(
+                this.optional || other.optional,
+                this.tag,
+                common.get(0).getName()
+            );
+            result.rule = common.get(0);
+        }
+        return result;
     }
 }
