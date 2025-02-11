@@ -155,6 +155,39 @@ public abstract class NodeDescriptor implements Rule {
     }
 
     /**
+     * Checks if the given tag exists in the current descriptor or any of its base descriptors.
+     * @param tag The tag to search for
+     * @return Checking result, {@code true} if the tag exists, either in the current descriptor
+     *  or one of its base descriptors, {@code false} otherwise.
+     */
+    public boolean hasTag(final String tag) {
+        final Map<String, ChildDescriptorExt> tags = this.getTags();
+        boolean result = tags.containsKey(tag);
+        if (!result) {
+            result = this.baseHasTag(tag);
+        }
+        return result;
+    }
+
+    /**
+     * Checks if the given tag exists in any of the base descriptors.
+     * It iterates over all base descriptors and checks if the tag is present in any of them.
+     * @param tag The tag to search for.
+     * @return Checking result, {@code true} if the tag exists in any of the base descriptors,
+     *  {@code false} otherwise.
+     */
+    public boolean baseHasTag(final String tag) {
+        boolean result = false;
+        for (final AbstractNodeDescriptor base : this.bases) {
+            if (base.hasTag(tag)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
      * Checks that the new base descriptor being added will not create a loop
      *  in the inheritance hierarchy, which is not allowed.
      * @param descriptor Base descriptor

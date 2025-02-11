@@ -293,6 +293,10 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
             );
             field.makePrivate();
             klass.addField(field);
+            String brief = "";
+            if (!this.rule.baseHasTag(tag)) {
+                brief = String.format("Returns child node with '%s' tag", tag);
+            }
             final Method getter = new Method(
                 descriptor.getType(),
                 String.format(
@@ -300,7 +304,7 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
                     tag.substring(0, 1).toUpperCase(Locale.ENGLISH),
                     tag.substring(1)
                 ),
-                String.format("Returns child node with '%s' tag", tag)
+                brief
             );
             getter.makePublic();
             if (descriptor.isOptional()) {

@@ -96,6 +96,9 @@ public final class AbstractNodeGenerator extends RuleGenerator {
         final Map<String, ChildDescriptorExt> tags = this.rule.getTags();
         for (final Map.Entry<String, ChildDescriptorExt> entry : tags.entrySet()) {
             final String tag = entry.getKey();
+            if (this.rule.baseHasTag(tag)) {
+                continue;
+            }
             final MethodSignature getter = new MethodSignature(
                 entry.getValue().getType(),
                 String.format(
