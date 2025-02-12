@@ -30,7 +30,7 @@ import java.util.Set;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 
 /**
- * A transformation descriptor describing the transformation of one or more subtrees into a single
+ * Transformation descriptor describing the transformation of one or more subtrees into a single
  *  subtree by DSL rule.
  * @since 1.0.0
  */
