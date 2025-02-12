@@ -24,9 +24,10 @@
 package org.cqfn.astranaut.dsl;
 
 /**
- * Descriptor describing the subtree that results from the transformation, that is, the node
- *  and all its child nodes, which are also subtrees.
+ * Extension of DataDescriptor that is used specifically for the result (right part)
+ *  of the transformation. This allows for more specialized behavior for the result side
+ *  of a transformation.
  * @since 1.0.0
  */
-public final class SubtreeDescriptor {
+public interface DataDescriptorExt extends DataDescriptor {
 }

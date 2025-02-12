@@ -29,7 +29,7 @@ import java.util.Objects;
  * Entity that represents a static string.
  * @since 1.0.0
  */
-public final class StaticString implements Comparable<StaticString> {
+public final class StaticString implements Comparable<StaticString>, DataDescriptor {
     /**
      * The value of the static string.
      */
