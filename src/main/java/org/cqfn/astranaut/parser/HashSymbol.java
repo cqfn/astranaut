@@ -21,11 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.parser;
 
 /**
- * Root or child element of the resulting subtree, that is, the descriptor or hole.
+ * Token representing a hash symbol (#).
  * @since 1.0.0
  */
-public interface ResultingItem {
+public final class HashSymbol extends SingleCharToken {
+    /**
+     * The instance.
+     */
+    public static final SingleCharToken INSTANCE = new HashSymbol();
+
+    /**
+     * Private constructor.
+     */
+    private HashSymbol() {
+    }
+
+    @Override
+    public char getChar() {
+        return '#';
+    }
 }
