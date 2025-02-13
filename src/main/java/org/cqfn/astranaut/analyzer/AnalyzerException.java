@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.analyzer;
 
 import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.parser.Location;
 
 /**
  * Exception thrown during analysis of parsed DSL code.
@@ -35,8 +36,32 @@ public abstract class AnalyzerException extends BaseException {
      */
     private static final long serialVersionUID = -1;
 
+    /**
+     * Location of the code.
+     */
+    private final Location loc;
+
+    /**
+     * Constructor.
+     * @param loc Location of the code where the error was found
+     */
+    protected AnalyzerException(final Location loc) {
+        this.loc = loc;
+    }
+
     @Override
     public final String getInitiator() {
         return "Analyzer";
     }
+
+    @Override
+    public final String getErrorMessage() {
+        return String.format("%s: %s", this.loc.toString(), this.getReason());
+    }
+
+    /**
+     * Returns the cause of the error.
+     * @return A line explaining exactly what happened.
+     */
+    public abstract String getReason();
 }

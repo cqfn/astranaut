@@ -21,38 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.analyzer;
 
-import org.cqfn.astranaut.parser.Location;
+IntegerLiteral <- 'int';
 
-/**
- * Common exception thrown during analysis of parsed DSL code, suitable for most cases
- * where the error message is generated from a string.
- * @since 1.0.0
- */
-public final class CommonAnalyzerException extends AnalyzerException {
-    /**
-     * Version identifier.
-     */
-    private static final long serialVersionUID = -1;
+Addition <- Expression, Expression;
+Subtraction <- Expression, Expression;
+BinaryExpression <- Addition | Subtraction;
 
-    /**
-     * Error message.
-     */
-    private final String message;
-
-    /**
-     * Constructor.
-     * @param loc Location of the code where the error was found
-     * @param message Error message
-     */
-    public CommonAnalyzerException(final Location loc, final String message) {
-        super(loc);
-        this.message = message;
-    }
-
-    @Override
-    public String getReason() {
-        return this.message;
-    }
-}
+Expression <- IntegerLiteral | BinaryExpression | UnaryExpression;

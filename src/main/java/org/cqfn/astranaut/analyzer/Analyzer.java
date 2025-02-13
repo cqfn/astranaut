@@ -33,6 +33,7 @@ import org.cqfn.astranaut.dsl.Program;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 import org.cqfn.astranaut.dsl.Rule;
 import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.parser.Location;
 
 /**
  * Analyzer that analyzes an Astranaut program before code generation or execution
@@ -46,11 +47,18 @@ public class Analyzer {
     private final Program program;
 
     /**
+     * Rules in relation to the location of the DSL code from which they are parsed.
+     */
+    private final Map<Rule, Location> locations;
+
+    /**
      * Constructor.
      * @param program DSL program
+     * @param locations Rules in relation to the location of the DSL code
      */
-    public Analyzer(final Program program) {
+    public Analyzer(final Program program, final Map<Rule, Location> locations) {
         this.program = program;
+        this.locations = locations;
     }
 
     /**
@@ -62,7 +70,7 @@ public class Analyzer {
         for (final String language : languages) {
             final Map<String, NodeDescriptor> descriptors =
                 this.program.getNodeDescriptorsByLanguage(language);
-            this.linkNodes(language, descriptors);
+            this.linkNodes(descriptors);
         }
         for (final Rule rule : this.program.getAllRules()) {
             if (rule instanceof RegularNodeDescriptor) {
@@ -74,35 +82,34 @@ public class Analyzer {
     /**
      * Builds links between nodes: abstract and non-abstract nodes of the same language,
      *  child nodes.
-     * @param language Node language
      * @param descriptors Node descriptors mapped by their names
      * @throws BaseException If the DSL program contains errors
      */
-    private void linkNodes(final String language, final Map<String, NodeDescriptor> descriptors)
+    private void linkNodes(final Map<String, NodeDescriptor> descriptors)
         throws BaseException {
         for (final Map.Entry<String, NodeDescriptor> entry : descriptors.entrySet()) {
             final NodeDescriptor descriptor = entry.getValue();
             if (descriptor instanceof AbstractNodeDescriptor) {
-                this.linkAbstractNode(language, (AbstractNodeDescriptor) descriptor);
+                this.linkAbstractNode((AbstractNodeDescriptor) descriptor);
             } else if (descriptor instanceof RegularNodeDescriptor) {
-                this.linkRegularNode(language, (RegularNodeDescriptor) descriptor);
+                this.linkRegularNode((RegularNodeDescriptor) descriptor);
             }
         }
     }
 
     /**
      * Links abstract nodes to their subtypes and base descriptors.
-     * @param language The language of the nodes
      * @param descriptor The abstract node descriptor to process
      * @throws BaseException If the base node or subtype is not defined
      */
-    private void linkAbstractNode(final String language, final AbstractNodeDescriptor descriptor)
+    private void linkAbstractNode(final AbstractNodeDescriptor descriptor)
         throws BaseException {
         for (final String subtype : descriptor.getSubtypes()) {
             final NodeDescriptor subdescr =
-                this.program.getNodeDescriptorByNameAndLanguage(subtype, language);
+                this.program.getNodeDescriptorByNameAndLanguage(subtype, descriptor.getLanguage());
             if (subdescr == null) {
                 throw new CommonAnalyzerException(
+                    this.locations.get(descriptor),
                     String.format(
                         "The abstract node '%s' is the base for the node '%s' which is not defined",
                         descriptor.getName(),
@@ -121,17 +128,20 @@ public class Analyzer {
 
     /**
      * Links regular nodes to their child descriptors.
-     * @param language The language of the nodes
      * @param descriptor The regular node descriptor to process
      * @throws BaseException If the child node is not defined
      */
-    private void linkRegularNode(final String language, final RegularNodeDescriptor descriptor)
+    private void linkRegularNode(final RegularNodeDescriptor descriptor)
         throws BaseException {
         for (final ChildDescriptorExt child : descriptor.getExtChildTypes()) {
             final NodeDescriptor rule =
-                this.program.getNodeDescriptorByNameAndLanguage(child.getType(), language);
+                this.program.getNodeDescriptorByNameAndLanguage(
+                    child.getType(),
+                    descriptor.getLanguage()
+                );
             if (rule == null) {
                 throw new CommonAnalyzerException(
+                    this.locations.get(descriptor),
                     String.format(
                         "The '%s' node contains a child node '%s' which is not defined",
                         descriptor.getName(),

@@ -99,9 +99,18 @@ class GenerateTest extends EndToEndTest {
 
     @Test
     void readBadDsl(final @TempDir Path temp) {
-        final String message = this.runAndReadErrorMessage("bad.dsl", temp);
+        final String message = this.runAndReadErrorMessage("rule_without_separator.dsl", temp);
         Assertions.assertEquals(
-            "bad.dsl, 26: The rule does not contain a separator",
+            "rule_without_separator.dsl, 26: The rule does not contain a separator",
+            message
+        );
+    }
+
+    @Test
+    void badAbstractNode(final @TempDir Path temp) {
+        final String message = this.runAndReadErrorMessage("bad_abstract_node.dsl", temp);
+        Assertions.assertEquals(
+            "bad_abstract_node.dsl, 31: The abstract node 'Expression' is the base for the node 'UnaryExpression' which is not defined",
             message
         );
     }

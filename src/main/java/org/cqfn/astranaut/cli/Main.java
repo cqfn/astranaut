@@ -90,7 +90,7 @@ public final class Main {
         reader.readFile(args[1]);
         final ProgramParser parser = new ProgramParser();
         final Program program = parser.parse(reader);
-        final Analyzer analyzer = new Analyzer(program);
+        final Analyzer analyzer = new Analyzer(program, parser.getLocations());
         analyzer.analyze();
         action.perform(program, Arrays.asList(args).subList(2, args.length));
     }
