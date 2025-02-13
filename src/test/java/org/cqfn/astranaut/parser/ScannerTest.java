@@ -94,6 +94,20 @@ class ScannerTest {
     }
 
     @Test
+    void hashSymbol() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " # ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof HashSymbol);
+            Assertions.assertEquals("#", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
     void verticalLine() {
         final Scanner scanner = new Scanner(ScannerTest.LOCATION, " | ");
         boolean oops = false;

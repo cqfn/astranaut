@@ -27,6 +27,7 @@ import org.cqfn.astranaut.dsl.ResultingItem;
 import org.cqfn.astranaut.dsl.UntypedHole;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 /**
  * Tests covering {@link ResultingItemParser} class.
@@ -46,10 +47,23 @@ class ResultingItemParsingTest {
             final ResultingItem item = parser.parseItem();
             Assertions.assertTrue(item instanceof UntypedHole);
             Assertions.assertEquals(17, ((UntypedHole) item).getNumber());
+            Assertions.assertEquals("#17", item.toString());
         } catch (final ParsingException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void badHole() {
+        final ResultingItemParser parser = this.createParser("#");
+        Assertions.assertThrows(ParsingException.class, parser::parseItem);
+    }
+
+    @Test
+    void inappropriateToken() {
+        final ResultingItemParser parser = this.createParser("{");
+        Assertions.assertThrows(ParsingException.class, parser::parseItem);
     }
 
     /**
