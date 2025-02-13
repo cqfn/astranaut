@@ -27,7 +27,6 @@ import org.cqfn.astranaut.dsl.ResultingItem;
 import org.cqfn.astranaut.dsl.UntypedHole;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 /**
  * Tests covering {@link ResultingItemParser} class.
