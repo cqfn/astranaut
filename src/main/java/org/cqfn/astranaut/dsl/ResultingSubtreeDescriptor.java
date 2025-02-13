@@ -32,7 +32,7 @@ import java.util.List;
  *  which themselves are subtrees.
  * @since 1.0.0
  */
-public final class ResultingSubtreeDescriptor implements ResultingSubtreeItem {
+public final class ResultingSubtreeDescriptor implements ResultingItem {
     /**
      * The type of the node (e.g., the left side of the rule).
      */
@@ -48,7 +48,7 @@ public final class ResultingSubtreeDescriptor implements ResultingSubtreeItem {
      * The list of child nodes (subtrees) under this node. Each child can be either
      *  a descriptor or another hole.
      */
-    private final List<ResultingSubtreeItem> children;
+    private final List<ResultingItem> children;
 
     /**
      * Constructs a new {@code ResultingSubtreeDescriptor} with the specified type, data, and list
@@ -58,7 +58,7 @@ public final class ResultingSubtreeDescriptor implements ResultingSubtreeItem {
      * @param children The list of child nodes (subtrees) under this node
      */
     public ResultingSubtreeDescriptor(final String type, final DataDescriptorExt data,
-        final List<ResultingSubtreeItem> children) {
+        final List<ResultingItem> children) {
         this.type = type;
         this.data = data;
         this.children = Collections.unmodifiableList(children);
@@ -84,7 +84,29 @@ public final class ResultingSubtreeDescriptor implements ResultingSubtreeItem {
      * Returns an unmodifiable list of child nodes (subtrees) under this node.
      * @return The list of child nodes
      */
-    public List<ResultingSubtreeItem> getChildren() {
+    public List<ResultingItem> getChildren() {
         return this.children;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(this.type);
+        if (this.data != null) {
+            builder.append('<').append(this.data.toString()).append('>');
+        }
+        if (this.children != null && !this.children.isEmpty()) {
+            builder.append('(');
+            boolean flag = false;
+            for (final ResultingItem item : this.children) {
+                if (flag) {
+                    builder.append(", ");
+                }
+                builder.append(item.toString());
+                flag = true;
+            }
+            builder.append(')');
+        }
+        return builder.toString();
     }
 }

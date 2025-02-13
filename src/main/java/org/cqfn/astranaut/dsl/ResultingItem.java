@@ -27,5 +27,5 @@ package org.cqfn.astranaut.dsl;
  * Child element of the resulting subtree, that is, the descriptor or hole.
  * @since 1.0.0
  */
-public interface ResultingSubtreeItem {
+public interface ResultingItem {
 }

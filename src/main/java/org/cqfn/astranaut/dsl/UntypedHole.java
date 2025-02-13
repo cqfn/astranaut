@@ -31,7 +31,7 @@ import java.util.Map;
  *  This class caches commonly used holes (#0, #1, etc.) to improve performance.
  * @since 1.0.0
  */
-public final class UntypedHole implements Hole, DataDescriptor, ResultingSubtreeItem {
+public final class UntypedHole implements Hole, DataDescriptor, ResultingItem {
     /**
      * A cache to store commonly used UntypedHoles (e.g., #0, #1, etc.)
      *  This reduces the number of duplicate objects.

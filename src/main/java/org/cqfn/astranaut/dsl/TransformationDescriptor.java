@@ -36,6 +36,11 @@ import org.cqfn.astranaut.codegen.java.RuleGenerator;
  */
 public final class TransformationDescriptor implements Rule {
     /**
+     * Right side of the rule, that is, the description of the resulting subtree.
+     */
+    private final ResultingItem right;
+
+    /**
      * Name of the programming language for which this transformation descriptor is described.
      */
     private String language;
@@ -47,10 +52,20 @@ public final class TransformationDescriptor implements Rule {
 
     /**
      * Constructor.
+     * @param right Right side of the rule, that is, the description of the resulting subtree
      */
-    public TransformationDescriptor() {
+    public TransformationDescriptor(final ResultingItem right) {
+        this.right = right;
         this.language = "common";
         this.dependencies = new HashSet<>();
+    }
+
+    /**
+     * Returns right side of the rule.
+     * @return A hole or description of the resulting subtree.
+     */
+    public ResultingItem getRight() {
+        return this.right;
     }
 
     @Override
@@ -83,5 +98,10 @@ public final class TransformationDescriptor implements Rule {
     @Override
     public RuleGenerator createGenerator() {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("-> %s", this.right.toString());
     }
 }
