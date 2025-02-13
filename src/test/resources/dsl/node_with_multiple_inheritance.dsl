@@ -21,36 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.parser;
 
-/**
- * Token representing an integer number.
- * @since 1.0.0
- */
-public class Number extends Token {
-    /**
-     * Value of the number.
-     */
-    private final int value;
+IntegerLiteral <- 'int';
+StringLiteral <- 'String', '""';
 
-    /**
-     * Constructor.
-     * @param value Value of the number
-     */
-    public Number(final int value) {
-        this.value = value;
-    }
+Addition <- left@Expression, right@Expression;
+Subtraction <- left@Expression, right@Expression;
+BinaryExpression <- Addition | Subtraction;
 
-    /**
-     * Returns value of the number.
-     * @return Value of the number
-     */
-    public int getValue() {
-        return this.value;
-    }
+PrefixIncrement <- operand@Expression;
+PrefixDecrement <- operand@Expression;
+PrefixOperator <- PrefixIncrement | PrefixDecrement;
 
-    @Override
-    public final String toString() {
-        return String.valueOf(this.value);
-    }
-}
+PostfixIncrement <- operand@Expression;
+PostfixDecrement <- operand@Expression;
+PostfixOperator <- PostfixIncrement | PostfixDecrement;
+
+UnaryExpression <- PrefixIncrement | PostfixIncrement | PrefixDecrement | PostfixDecrement;
+
+Expression <- IntegerLiteral | StringLiteral | BinaryExpression | UnaryExpression;

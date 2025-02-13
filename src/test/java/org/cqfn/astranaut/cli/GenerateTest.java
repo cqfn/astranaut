@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -66,6 +66,13 @@ class GenerateTest extends EndToEndTest {
     void nodeWithThreeChildren(final @TempDir Path temp) {
         final String expected = this.loadStringResource("node_with_three_children.txt");
         final String actual = this.run("node_with_three_children.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void nodeWithMultipleInheritance(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("node_with_multiple_inheritance.txt");
+        final String actual = this.run("node_with_multiple_inheritance.dsl", temp);
         Assertions.assertEquals(expected, actual);
     }
 

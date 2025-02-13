@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 John Doe
+ * Copyright (c) 2025 John Doe
  */
 package org.cqfn.astranaut.test;
 

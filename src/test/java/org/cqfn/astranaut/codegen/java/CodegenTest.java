@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ class CodegenTest {
      */
     Context createContext() {
         final Context.Constructor ctor = new Context.Constructor();
-        ctor.setLicense(new License("Copyright (c) 2024 John Doe"));
+        ctor.setLicense(new License("Copyright (c) 2025 John Doe"));
         ctor.setPackage(new Package("org.cqfn.astranaut.test"));
         ctor.setVersion("1.0.0");
         return ctor.createContext();
