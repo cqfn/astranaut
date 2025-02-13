@@ -116,6 +116,15 @@ class GenerateTest extends EndToEndTest {
     }
 
     @Test
+    void notDefinedChildType(final @TempDir Path temp) {
+        final String message = this.runAndReadErrorMessage("not_defined_child_type.dsl", temp);
+        Assertions.assertEquals(
+            "not_defined_child_type.dsl, 29: The 'Assignment' node contains a child node 'LeftExpression' which is not defined",
+            message
+        );
+    }
+
+    @Test
     void writeToProtectedFile(final @TempDir Path temp) {
         boolean oops = false;
         try {
