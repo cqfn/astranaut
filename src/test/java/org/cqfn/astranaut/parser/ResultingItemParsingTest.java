@@ -25,6 +25,7 @@ package org.cqfn.astranaut.parser;
 
 import org.cqfn.astranaut.dsl.ResultingItem;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
+import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.UntypedHole;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -79,6 +80,56 @@ class ResultingItemParsingTest {
             Assertions.assertNull(descr.getData());
             Assertions.assertTrue(descr.getChildren().isEmpty());
             Assertions.assertEquals(type, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void nameAndDataAsAHole() {
+        final String code = "Identifier<#17>";
+        final ResultingItemParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final ResultingItem item = parser.parseItem();
+            Assertions.assertTrue(item instanceof ResultingSubtreeDescriptor);
+            final ResultingSubtreeDescriptor descr = (ResultingSubtreeDescriptor) item;
+            Assertions.assertEquals("Identifier", descr.getType());
+            Assertions.assertTrue(descr.getData() instanceof UntypedHole);
+            Assertions.assertTrue(descr.getChildren().isEmpty());
+            Assertions.assertEquals(code, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void badData() {
+        final ResultingItemParser parser = this.createParser("Identifier<?>");
+        Assertions.assertThrows(ParsingException.class, parser::parseItem);
+    }
+
+    @Test
+    void unclosedData() {
+        final ResultingItemParser parser = this.createParser("Identifier<#17");
+        Assertions.assertThrows(ParsingException.class, parser::parseItem);
+    }
+
+    @Test
+    void nameAndDataAsAString() {
+        final String code = "Name<'abc'>";
+        final ResultingItemParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final ResultingItem item = parser.parseItem();
+            Assertions.assertTrue(item instanceof ResultingSubtreeDescriptor);
+            final ResultingSubtreeDescriptor descr = (ResultingSubtreeDescriptor) item;
+            Assertions.assertEquals("Name", descr.getType());
+            Assertions.assertTrue(descr.getData() instanceof StaticString);
+            Assertions.assertTrue(descr.getChildren().isEmpty());
+            Assertions.assertEquals(code, descr.toString());
         } catch (final ParsingException ignored) {
             oops = true;
         }

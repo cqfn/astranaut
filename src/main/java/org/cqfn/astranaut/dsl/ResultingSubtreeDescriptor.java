@@ -42,7 +42,7 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
      * The data associated with the node. This could be a static string, untyped hole,
      *  or other data descriptor.
      */
-    private final DataDescriptorExt data;
+    private final RightDataDescriptor data;
 
     /**
      * The list of child nodes (subtrees) under this node. Each child can be either
@@ -57,7 +57,7 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
      * @param data The data associated with the node
      * @param children The list of child nodes (subtrees) under this node
      */
-    public ResultingSubtreeDescriptor(final String type, final DataDescriptorExt data,
+    public ResultingSubtreeDescriptor(final String type, final RightDataDescriptor data,
         final List<ResultingItem> children) {
         this.type = type;
         this.data = data;
@@ -76,7 +76,7 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
      * Returns the data associated with this node.
      * @return The data descriptor of the node
      */
-    public DataDescriptorExt getData() {
+    public RightDataDescriptor getData() {
         return this.data;
     }
 

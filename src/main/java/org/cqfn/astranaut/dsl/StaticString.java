@@ -23,24 +23,24 @@
  */
 package org.cqfn.astranaut.dsl;
 
-import java.util.Objects;
+import org.cqfn.astranaut.parser.StringToken;
 
 /**
  * Entity that represents a static string.
  * @since 1.0.0
  */
-public final class StaticString implements Comparable<StaticString>, DataDescriptor {
+public final class StaticString implements RightDataDescriptor {
     /**
-     * The value of the static string.
+     * Token from which this descriptor is generated.
      */
-    private final String value;
+    private final StringToken token;
 
     /**
      * Constructor to initialize the StaticString with the provided value.
-     * @param value The string value
+     * @param token Token from which this descriptor is generated
      */
-    public StaticString(final String value) {
-        this.value = Objects.requireNonNull(value);
+    public StaticString(final StringToken token) {
+        this.token = token;
     }
 
     /**
@@ -48,41 +48,11 @@ public final class StaticString implements Comparable<StaticString>, DataDescrip
      * @return The string value
      */
     public String getValue() {
-        return this.value;
-    }
-
-    @Override
-    public int compareTo(final StaticString other) {
-        return this.value.compareTo(other.value);
+        return this.token.getValue();
     }
 
     @Override
     public String toString() {
-        final StringBuilder escaped = new StringBuilder(this.value.length() + 10);
-        escaped.append('"');
-        for (final char symbol : this.value.toCharArray()) {
-            switch (symbol) {
-                case '\\':
-                    escaped.append("\\\\");
-                    break;
-                case '\"':
-                    escaped.append("\\\"");
-                    break;
-                case '\r':
-                    escaped.append("\\r");
-                    break;
-                case '\n':
-                    escaped.append("\\n");
-                    break;
-                case '\t':
-                    escaped.append("\\t");
-                    break;
-                default:
-                    escaped.append(symbol);
-                    break;
-            }
-        }
-        escaped.append('"');
-        return escaped.toString();
+        return this.token.toString();
     }
 }

@@ -26,6 +26,8 @@ package org.cqfn.astranaut.parser;
 import java.util.Collections;
 import org.cqfn.astranaut.dsl.ResultingItem;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
+import org.cqfn.astranaut.dsl.RightDataDescriptor;
+import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
@@ -100,13 +102,46 @@ public class ResultingItemParser {
      * @throws ParsingException If the parse fails
      */
     private ResultingSubtreeDescriptor parseSubtree(final String type) throws ParsingException {
-        final Token next = this.scanner.getToken();
+        Token next = this.scanner.getToken();
+        RightDataDescriptor data = null;
+        if (next instanceof OpeningAngleBracket) {
+            data = this.parseData();
+            next = this.scanner.getToken();
+        }
         if (next == null && this.nesting > 0) {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
                 "Unmatched opening parenthesis '(' found"
             );
         }
-        return new ResultingSubtreeDescriptor(type, null, Collections.emptyList());
+        return new ResultingSubtreeDescriptor(type, data, Collections.emptyList());
+    }
+
+    /**
+     * Parses a sequence of tokens as a data descriptor.
+     * @return A data descriptor
+     * @throws ParsingException If the parse fails
+     */
+    private RightDataDescriptor parseData() throws ParsingException {
+        final RightDataDescriptor data;
+        final Token first = this.scanner.getToken();
+        if (first instanceof HashSymbol) {
+            data = this.parseUntypedHole();
+        } else if (first instanceof StringToken) {
+            data = new StaticString((StringToken) first);
+        } else {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                "Invalid data inside data descriptor. Expected either a hole ('#...') or a string"
+            );
+        }
+        final Token next = this.scanner.getToken();
+        if (!(next instanceof ClosingAngleBracket)) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                "Closing angle bracket '>' expected for data descriptor"
+            );
+        }
+        return data;
     }
 }

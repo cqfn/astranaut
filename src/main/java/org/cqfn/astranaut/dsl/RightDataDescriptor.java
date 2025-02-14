@@ -29,5 +29,5 @@ package org.cqfn.astranaut.dsl;
  *  of a transformation.
  * @since 1.0.0
  */
-public interface DataDescriptorExt extends DataDescriptor {
+public interface RightDataDescriptor extends DataDescriptor {
 }
