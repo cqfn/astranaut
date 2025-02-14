@@ -117,8 +117,9 @@ public class Analyzer {
                     )
                 );
             }
-            if (!subdescr.getLanguage().equals(descriptor.getLanguage())
-                && subdescr instanceof AbstractNodeDescriptor) {
+            final boolean alien = !subdescr.getLanguage().equals(descriptor.getLanguage());
+            final boolean revert = alien && subdescr instanceof AbstractNodeDescriptor;
+            if (revert) {
                 descriptor.addBaseDescriptor((AbstractNodeDescriptor) subdescr);
             } else {
                 subdescr.addBaseDescriptor(descriptor);
