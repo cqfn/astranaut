@@ -37,3 +37,9 @@ Subtraction <- left@Expression, right@Expression;
 BinaryExpression <- Addition | Subtraction | Assignment;
 
 Expression <- IntegerLiteral | BinaryExpression | LeftExpression;
+
+Return <- [expression@Expression];
+StatementExpression <- expression@Expression;
+Decorator <- Return | StatementExpression;
+If <- condition@Expression, positive@Statement, [negative@Statement];
+Statement <- Return | StatementExpression | If;

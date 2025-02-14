@@ -49,23 +49,9 @@ public final class MethodSignature implements Entity {
     private final JavaDoc doc;
 
     /**
-     * Flag indicating that the generated method is overridden.
-     */
-    private final boolean over;
-
-    /**
      * List of method arguments (where key is type, value is name).
      */
     private final List<Pair<String, String>> args;
-
-    /**
-     * Constructor of overridden method.
-     * @param ret Type of the method.
-     * @param name Name of the method.
-     */
-    public MethodSignature(final String ret, final String name) {
-        this(ret, name, "");
-    }
 
     /**
      * Constructor.
@@ -77,7 +63,6 @@ public final class MethodSignature implements Entity {
         this.ret = ret;
         this.name = name;
         this.doc = new JavaDoc(brief);
-        this.over = brief.isEmpty();
         this.args = new ArrayList<>(0);
     }
 
@@ -111,12 +96,7 @@ public final class MethodSignature implements Entity {
 
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
-        if (this.doc.hasNonEmptyBrief()) {
-            this.doc.build(indent, code);
-        }
-        if (this.over) {
-            code.add(indent, "@Override");
-        }
+        this.doc.build(indent, code);
         code.add(indent, this.composeHeader());
     }
 

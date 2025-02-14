@@ -670,7 +670,10 @@ public final class CommonFactory extends DefaultFactory {
             .put(Assignment.NAME, Assignment.TYPE)
             .put(FieldAccess.NAME, FieldAccess.TYPE)
             .put(Identifier.NAME, Identifier.TYPE)
+            .put(If.NAME, If.TYPE)
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
+            .put(Return.NAME, Return.TYPE)
+            .put(StatementExpression.NAME, StatementExpression.TYPE)
             .put(Subtraction.NAME, Subtraction.TYPE)
             .put(Variable.NAME, Variable.TYPE)
             .make();
@@ -681,6 +684,45 @@ public final class CommonFactory extends DefaultFactory {
     private CommonFactory() {
         super(CommonFactory.TYPES);
     }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Node of the 'Decorator' type.
+ * @since 1.0.0
+ */
+public interface Decorator extends Node {
+    /**
+     * Returns child node with 'expression' tag.
+     * @return Child node or {@code null} if the node with 'expression' tag is not specified
+     */
+    Expression getExpression();
 }
 
 /*
@@ -1191,6 +1233,292 @@ public final class Identifier implements Node {
 package org.cqfn.uast.tree.common.nodes;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.algorithms.NodeAllocator;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.astranaut.core.utils.ListUtils;
+
+/**
+ * Node of the 'If' type.
+ * @since 1.0.0
+ */
+@SuppressWarnings("PMD.DataClass")
+public final class If implements Statement {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "If";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new IfType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Child node with 'condition' tag.
+     */
+    private Expression condition;
+
+    /**
+     * Child node with 'positive' tag.
+     */
+    private Statement positive;
+
+    /**
+     * Child node with 'negative' tag.
+     */
+    private Statement negative;
+
+    /**
+     * List of child nodes.
+     */
+    private List<Node> children;
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return If.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return this.children.size();
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
+    }
+
+    /**
+     * Returns child node with 'condition' tag.
+     * @return Child node (can't be {@code null})
+     */
+    public Expression getCondition() {
+        return this.condition;
+    }
+
+    /**
+     * Returns child node with 'positive' tag.
+     * @return Child node (can't be {@code null})
+     */
+    public Statement getPositive() {
+        return this.positive;
+    }
+
+    /**
+     * Returns child node with 'negative' tag.
+     * @return Child node or {@code null} if the node with 'negative' tag is not specified
+     */
+    public Statement getNegative() {
+        return this.negative;
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return this.children;
+    }
+
+    /**
+     * Type implementation describing 'If' nodes.
+     * @since 1.0.0
+     */
+    private static final class IfType implements Type {
+        /**
+         * The 'Expression' type name.
+         */
+        private static final String TYPE_EXPRESSION = "Expression";
+
+        /**
+         * The 'Statement' type name.
+         */
+        private static final String TYPE_STATEMENT = "Statement";
+
+        /**
+         * List of child node descriptors.
+         */
+        private static final List<ChildDescriptor> CHILD_TYPES =
+            ChildDescriptor.create()
+                .required(IfType.TYPE_EXPRESSION)
+                .required(IfType.TYPE_STATEMENT)
+                .optional(IfType.TYPE_STATEMENT)
+                .build();
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Arrays.asList(If.NAME, IfType.TYPE_STATEMENT);
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return IfType.CHILD_TYPES;
+        }
+
+        @Override
+        public String getName() {
+            return If.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return IfType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new If.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'If' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Child node with 'condition' tag.
+         */
+        private Expression condition;
+
+        /**
+         * Child node with 'positive' tag.
+         */
+        private Statement positive;
+
+        /**
+         * Child node with 'negative' tag.
+         */
+        private Statement negative;
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        /**
+         * Sets child node with 'condition' tag.
+         * @param object Child node
+         */
+        public void setCondition(final Expression object) {
+            if (object != null) {
+                this.condition = object;
+            }
+        }
+
+        /**
+         * Sets child node with 'positive' tag.
+         * @param object Child node
+         */
+        public void setPositive(final Statement object) {
+            if (object != null) {
+                this.positive = object;
+            }
+        }
+
+        /**
+         * Sets child node with 'negative' tag.
+         * @param object Child node
+         */
+        public void setNegative(final Statement object) {
+            this.negative = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            final NodeAllocator allocator = new NodeAllocator(IfType.CHILD_TYPES);
+            final Node[] nodes = new Node[3];
+            final boolean result = allocator.allocate(nodes, list);
+            if (result) {
+                this.condition = (Expression) nodes[0];
+                this.positive = (Statement) nodes[1];
+                this.negative = (Statement) nodes[2];
+            }
+            return result;
+        }
+
+        @Override
+        public boolean isValid() {
+            return this.condition != null && this.positive != null;
+        }
+
+        @Override
+        public Node createNode() {
+            if (!this.isValid()) {
+                throw new IllegalStateException();
+            }
+            final If node = new If();
+            node.fragment = this.fragment;
+            node.condition = this.condition;
+            node.positive = this.positive;
+            node.negative = this.negative;
+            node.children =
+                new ListUtils<Node>().add(this.condition, this.positive, this.negative).make();
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -1417,6 +1745,485 @@ package org.cqfn.uast.tree.common.nodes;
  * @since 1.0.0
  */
 public interface NamedExpression extends LeftExpression {
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.algorithms.NodeAllocator;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.astranaut.core.utils.ListUtils;
+
+/**
+ * Node of the 'Return' type.
+ * @since 1.0.0
+ */
+public final class Return implements Decorator, Statement {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "Return";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new ReturnType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Child node with 'expression' tag.
+     */
+    private Expression expression;
+
+    /**
+     * List of child nodes.
+     */
+    private List<Node> children;
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return Return.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return this.children.size();
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
+    }
+
+    @Override
+    public Expression getExpression() {
+        return this.expression;
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return this.children;
+    }
+
+    /**
+     * Type implementation describing 'Return' nodes.
+     * @since 1.0.0
+     */
+    private static final class ReturnType implements Type {
+        /**
+         * The 'Expression' type name.
+         */
+        private static final String TYPE_EXPRESSION = "Expression";
+
+        /**
+         * List of child node descriptors.
+         */
+        private static final List<ChildDescriptor> CHILD_TYPES =
+            ChildDescriptor.create().optional(ReturnType.TYPE_EXPRESSION).build();
+
+        /**
+         * The 'Decorator' type name.
+         */
+        private static final String TYPE_DECORATOR = "Decorator";
+
+        /**
+         * The 'Statement' type name.
+         */
+        private static final String TYPE_STATEMENT = "Statement";
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Arrays.asList(Return.NAME, ReturnType.TYPE_DECORATOR, ReturnType.TYPE_STATEMENT);
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return ReturnType.CHILD_TYPES;
+        }
+
+        @Override
+        public String getName() {
+            return Return.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return ReturnType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Return.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'Return' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Child node with 'expression' tag.
+         */
+        private Expression expression;
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        /**
+         * Sets child node with 'expression' tag.
+         * @param object Child node
+         */
+        public void setExpression(final Expression object) {
+            this.expression = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            final NodeAllocator allocator = new NodeAllocator(ReturnType.CHILD_TYPES);
+            final Node[] nodes = new Node[1];
+            final boolean result = allocator.allocate(nodes, list);
+            if (result) {
+                this.expression = (Expression) nodes[0];
+            }
+            return result;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final Return node = new Return();
+            node.fragment = this.fragment;
+            node.expression = this.expression;
+            node.children = new ListUtils<Node>().add(this.expression).make();
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Node of the 'Statement' type.
+ * @since 1.0.0
+ */
+public interface Statement extends Node {
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'StatementExpression' type.
+ * @since 1.0.0
+ */
+public final class StatementExpression implements Decorator, Statement {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "StatementExpression";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new StatementExpressionType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Child node with 'expression' tag.
+     */
+    private Expression expression;
+
+    /**
+     * List of child nodes.
+     */
+    private List<Node> children;
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return StatementExpression.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return this.children.size();
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
+    }
+
+    @Override
+    public Expression getExpression() {
+        return this.expression;
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return this.children;
+    }
+
+    /**
+     * Type implementation describing 'StatementExpression' nodes.
+     * @since 1.0.0
+     */
+    private static final class StatementExpressionType implements Type {
+        /**
+         * The 'Expression' type name.
+         */
+        private static final String TYPE_EXPRESSION = "Expression";
+
+        /**
+         * List of child node descriptors.
+         */
+        private static final List<ChildDescriptor> CHILD_TYPES =
+            ChildDescriptor.create().required(StatementExpressionType.TYPE_EXPRESSION).build();
+
+        /**
+         * The 'Decorator' type name.
+         */
+        private static final String TYPE_DECORATOR = "Decorator";
+
+        /**
+         * The 'Statement' type name.
+         */
+        private static final String TYPE_STATEMENT = "Statement";
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Arrays.asList(
+                StatementExpression.NAME,
+                StatementExpressionType.TYPE_DECORATOR,
+                StatementExpressionType.TYPE_STATEMENT
+            );
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return StatementExpressionType.CHILD_TYPES;
+        }
+
+        @Override
+        public String getName() {
+            return StatementExpression.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return StatementExpressionType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new StatementExpression.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'StatementExpression' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Child node with 'expression' tag.
+         */
+        private Expression expression;
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        /**
+         * Sets child node with 'expression' tag.
+         * @param object Child node
+         */
+        public void setExpression(final Expression object) {
+            if (object != null) {
+                this.expression = object;
+            }
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            boolean result = false;
+            if (list.size() == 1 && list.get(0) instanceof Expression) {
+                this.expression = (Expression) list.get(0);
+                result = true;
+            }
+            return result;
+        }
+
+        @Override
+        public boolean isValid() {
+            return this.expression != null;
+        }
+
+        @Override
+        public Node createNode() {
+            if (!this.isValid()) {
+                throw new IllegalStateException();
+            }
+            final StatementExpression node = new StatementExpression();
+            node.fragment = this.fragment;
+            node.expression = this.expression;
+            node.children = Collections.singletonList(this.expression);
+            return node;
+        }
+    }
 }
 
 /*
