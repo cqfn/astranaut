@@ -668,6 +668,7 @@ public final class CommonFactory extends DefaultFactory {
         new MapUtils<String, Type>()
             .put(Addition.NAME, Addition.TYPE)
             .put(Assignment.NAME, Assignment.TYPE)
+            .put(FieldAccess.NAME, FieldAccess.TYPE)
             .put(Identifier.NAME, Identifier.TYPE)
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(Subtraction.NAME, Subtraction.TYPE)
@@ -714,6 +715,274 @@ import org.cqfn.astranaut.core.base.Node;
  * @since 1.0.0
  */
 public interface Expression extends Node {
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.algorithms.NodeAllocator;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.astranaut.core.utils.ListUtils;
+
+/**
+ * Node of the 'FieldAccess' type.
+ * @since 1.0.0
+ */
+@SuppressWarnings("PMD.DataClass")
+public final class FieldAccess implements NamedExpression {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "FieldAccess";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new FieldAccessType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Child node with 'object' tag.
+     */
+    private Expression object;
+
+    /**
+     * Child node with 'name' tag.
+     */
+    private Identifier name;
+
+    /**
+     * List of child nodes.
+     */
+    private List<Node> children;
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return FieldAccess.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return this.children.size();
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
+    }
+
+    /**
+     * Returns child node with 'object' tag.
+     * @return Child node (can't be {@code null})
+     */
+    public Expression getObject() {
+        return this.object;
+    }
+
+    @Override
+    public Identifier getName() {
+        return this.name;
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return this.children;
+    }
+
+    /**
+     * Type implementation describing 'FieldAccess' nodes.
+     * @since 1.0.0
+     */
+    private static final class FieldAccessType implements Type {
+        /**
+         * The 'Expression' type name.
+         */
+        private static final String TYPE_EXPRESSION = "Expression";
+
+        /**
+         * The 'Identifier' type name.
+         */
+        private static final String TYPE_IDENTIFIER = "Identifier";
+
+        /**
+         * List of child node descriptors.
+         */
+        private static final List<ChildDescriptor> CHILD_TYPES =
+            ChildDescriptor.create()
+                .required(FieldAccessType.TYPE_EXPRESSION)
+                .required(FieldAccessType.TYPE_IDENTIFIER)
+                .build();
+
+        /**
+         * The 'NamedExpression' type name.
+         */
+        private static final String TYPE_NMD_XPRSSN = "NamedExpression";
+
+        /**
+         * The 'LeftExpression' type name.
+         */
+        private static final String TYPE_LFT_XPRSSN = "LeftExpression";
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Arrays.asList(
+                FieldAccess.NAME,
+                FieldAccessType.TYPE_NMD_XPRSSN,
+                FieldAccessType.TYPE_LFT_XPRSSN,
+                FieldAccessType.TYPE_EXPRESSION
+            );
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return FieldAccessType.CHILD_TYPES;
+        }
+
+        @Override
+        public String getName() {
+            return FieldAccess.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return FieldAccessType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new FieldAccess.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'FieldAccess' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Child node with 'object' tag.
+         */
+        private Expression object;
+
+        /**
+         * Child node with 'name' tag.
+         */
+        private Identifier name;
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        /**
+         * Sets child node with 'object' tag.
+         * @param object Child node
+         */
+        public void setObject(final Expression object) {
+            if (object != null) {
+                this.object = object;
+            }
+        }
+
+        /**
+         * Sets child node with 'name' tag.
+         * @param object Child node
+         */
+        public void setName(final Identifier object) {
+            if (object != null) {
+                this.name = object;
+            }
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            final NodeAllocator allocator = new NodeAllocator(FieldAccessType.CHILD_TYPES);
+            final Node[] nodes = new Node[2];
+            final boolean result = allocator.allocate(nodes, list);
+            if (result) {
+                this.object = (Expression) nodes[0];
+                this.name = (Identifier) nodes[1];
+            }
+            return result;
+        }
+
+        @Override
+        public boolean isValid() {
+            return this.object != null && this.name != null;
+        }
+
+        @Override
+        public Node createNode() {
+            if (!this.isValid()) {
+                throw new IllegalStateException();
+            }
+            final FieldAccess node = new FieldAccess();
+            node.fragment = this.fragment;
+            node.object = this.object;
+            node.name = this.name;
+            node.children = new ListUtils<Node>().add(this.object, this.name).make();
+            return node;
+        }
+    }
 }
 
 /*
@@ -1143,6 +1412,38 @@ public interface LeftExpression extends Expression {
  */
 package org.cqfn.uast.tree.common.nodes;
 
+/**
+ * Node of the 'NamedExpression' type.
+ * @since 1.0.0
+ */
+public interface NamedExpression extends LeftExpression {
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -1411,7 +1712,7 @@ import org.cqfn.astranaut.core.base.Type;
  * Node of the 'Variable' type.
  * @since 1.0.0
  */
-public final class Variable implements LeftExpression {
+public final class Variable implements NamedExpression {
     /**
      * Name of the type.
      */
@@ -1489,6 +1790,11 @@ public final class Variable implements LeftExpression {
             ChildDescriptor.create().required(VariableType.TYPE_IDENTIFIER).build();
 
         /**
+         * The 'NamedExpression' type name.
+         */
+        private static final String TYPE_NMD_XPRSSN = "NamedExpression";
+
+        /**
          * The 'LeftExpression' type name.
          */
         private static final String TYPE_LFT_XPRSSN = "LeftExpression";
@@ -1504,6 +1810,7 @@ public final class Variable implements LeftExpression {
         private static final List<String> HIERARCHY =
             Arrays.asList(
                 Variable.NAME,
+                VariableType.TYPE_NMD_XPRSSN,
                 VariableType.TYPE_LFT_XPRSSN,
                 VariableType.TYPE_EXPRESSION
             );

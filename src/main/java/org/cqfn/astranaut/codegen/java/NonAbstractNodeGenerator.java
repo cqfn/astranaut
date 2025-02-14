@@ -421,10 +421,7 @@ public abstract class NonAbstractNodeGenerator extends RuleGenerator {
      */
     private void createPropertiesGetter(final Klass klass) {
         final Method method = new Method(Strings.TYPE_MAP_STRINGS, "getProperties");
-        String language = this.getRule().getLanguage();
-        if (language.isEmpty()) {
-            language = "common";
-        }
+        final String language = this.getRule().getLanguage();
         method.makePublic();
         method.setBody(
             String.format(

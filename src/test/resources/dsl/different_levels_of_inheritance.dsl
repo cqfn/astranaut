@@ -26,7 +26,9 @@ IntegerLiteral <- 'int';
 Identifier <- 'String', '""';
 
 Variable <- name@Identifier;
-LeftExpression <- Variable | 0;
+FieldAccess <- object@Expression, name@Identifier;
+NamedExpression <- Variable | FieldAccess;
+LeftExpression <- NamedExpression | 0;
 
 Assignment <- left@LeftExpression, right@Expression;
 
