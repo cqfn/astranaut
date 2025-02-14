@@ -21,25 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+package org.cqfn.astranaut.parser;
 
 /**
- * Tests covering {@link ListNodeDescriptor} class.
+ * Token representing an angle bracket.
  * @since 1.0.0
  */
-class ListNodeDescriptorTest {
-    @Test
-    void testBaseInterface() {
-        final ListNodeDescriptor rule = new ListNodeDescriptor(
-            "Modifiers",
-            "Modifier"
-        );
-        final String actual = rule.toString();
-        final String expected = "Modifiers <- {Modifier}";
-        Assertions.assertEquals(expected, actual);
-        Assertions.assertTrue(rule.getTags().isEmpty());
-    }
+@SuppressWarnings("PMD.AbstractClassWithoutAnyMethod")
+public abstract class AngleBracket extends Bracket {
 }

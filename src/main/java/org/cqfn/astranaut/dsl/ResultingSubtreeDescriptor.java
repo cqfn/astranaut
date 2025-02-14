@@ -95,7 +95,7 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
         if (this.data != null) {
             builder.append('<').append(this.data.toString()).append('>');
         }
-        if (this.children != null && !this.children.isEmpty()) {
+        if (!this.children.isEmpty()) {
             builder.append('(');
             boolean flag = false;
             for (final ResultingItem item : this.children) {

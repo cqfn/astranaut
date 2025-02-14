@@ -23,7 +23,9 @@
  */
 package org.cqfn.astranaut.parser;
 
+import java.util.Collections;
 import org.cqfn.astranaut.dsl.ResultingItem;
+import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
@@ -38,11 +40,18 @@ public class ResultingItemParser {
     private final Scanner scanner;
 
     /**
+     * Descriptor nesting level.
+     */
+    private final int nesting;
+
+    /**
      * Constructor.
      * @param scanner Scanner
+     * @param nesting Descriptor nesting level
      */
-    public ResultingItemParser(final Scanner scanner) {
+    public ResultingItemParser(final Scanner scanner, final int nesting) {
         this.scanner = scanner;
+        this.nesting = nesting;
     }
 
     /**
@@ -56,6 +65,8 @@ public class ResultingItemParser {
         final ResultingItem item;
         if (first instanceof HashSymbol) {
             item = this.parseUntypedHole();
+        } else if (first instanceof Identifier) {
+            item = this.parseSubtree(first.toString());
         } else {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
@@ -80,5 +91,22 @@ public class ResultingItemParser {
         }
         final int value = ((Number) token).getValue();
         return UntypedHole.getInstance(value);
+    }
+
+    /**
+     * Parses a sequence of tokens as a subtree descriptor.
+     * @param type The type of the root node of the subtree
+     * @return Subtree descriptor
+     * @throws ParsingException If the parse fails
+     */
+    private ResultingSubtreeDescriptor parseSubtree(final String type) throws ParsingException {
+        final Token next = this.scanner.getToken();
+        if (next == null && this.nesting > 0) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                "Unmatched opening parenthesis '(' found"
+            );
+        }
+        return new ResultingSubtreeDescriptor(type, null, Collections.emptyList());
     }
 }

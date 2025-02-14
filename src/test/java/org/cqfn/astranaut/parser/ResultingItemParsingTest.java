@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.parser;
 
 import org.cqfn.astranaut.dsl.ResultingItem;
+import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.UntypedHole;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -65,6 +66,25 @@ class ResultingItemParsingTest {
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
     }
 
+    @Test
+    void simpleName() {
+        final String type = "Addition";
+        final ResultingItemParser parser = this.createParser(type);
+        boolean oops = false;
+        try {
+            final ResultingItem item = parser.parseItem();
+            Assertions.assertTrue(item instanceof ResultingSubtreeDescriptor);
+            final ResultingSubtreeDescriptor descr = (ResultingSubtreeDescriptor) item;
+            Assertions.assertEquals(type, descr.getType());
+            Assertions.assertNull(descr.getData());
+            Assertions.assertTrue(descr.getChildren().isEmpty());
+            Assertions.assertEquals(type, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
     /**
      * Creates a parser that parses an item that is part of the right side of
      *  a transformation rule.
@@ -73,6 +93,6 @@ class ResultingItemParsingTest {
      */
     private ResultingItemParser createParser(final String code) {
         final Scanner scanner = new Scanner(ResultingItemParsingTest.LOCATION, code);
-        return new ResultingItemParser(scanner);
+        return new ResultingItemParser(scanner, 0);
     }
 }
