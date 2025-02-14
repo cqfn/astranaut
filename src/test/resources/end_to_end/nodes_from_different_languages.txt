@@ -113,6 +113,7 @@ public final class CommonFactory extends DefaultFactory {
         new MapUtils<String, Type>()
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(Return.NAME, Return.TYPE)
+            .put(StrangeButValidStatement.NAME, StrangeButValidStatement.TYPE)
             .put(StringLiteral.NAME, StringLiteral.TYPE)
             .make();
 
@@ -627,6 +628,176 @@ import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.uast.tree.java.nodes.JavaStatement;
+
+/**
+ * Node of the 'StrangeButValidStatement' type.
+ * @since 1.0.0
+ */
+public final class StrangeButValidStatement implements JavaStatement {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "StrangeButValidStatement";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new StrangeButValidStatementType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return StrangeButValidStatement.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Type implementation describing 'StrangeButValidStatement' nodes.
+     * @since 1.0.0
+     */
+    private static final class StrangeButValidStatementType implements Type {
+        /**
+         * The 'JavaStatement' type name.
+         */
+        private static final String TYPE_JV_STTMNT = "JavaStatement";
+
+        /**
+         * The 'Statement' type name.
+         */
+        private static final String TYPE_STATEMENT = "Statement";
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY =
+            Arrays.asList(
+                StrangeButValidStatement.NAME,
+                StrangeButValidStatementType.TYPE_JV_STTMNT,
+                StrangeButValidStatementType.TYPE_STATEMENT
+            );
+
+        @Override
+        public String getName() {
+            return StrangeButValidStatement.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return StrangeButValidStatementType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new StrangeButValidStatement.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'StrangeButValidStatement' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final StrangeButValidStatement node = new StrangeButValidStatement();
+            node.fragment = this.fragment;
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
 
 /**
  * Node of the 'StringLiteral' type.
@@ -843,6 +1014,7 @@ import org.cqfn.astranaut.core.base.Type;
 import org.cqfn.astranaut.core.utils.MapUtils;
 import org.cqfn.uast.tree.common.nodes.IntegerLiteral;
 import org.cqfn.uast.tree.common.nodes.Return;
+import org.cqfn.uast.tree.common.nodes.StrangeButValidStatement;
 import org.cqfn.uast.tree.common.nodes.StringLiteral;
 
 /**
@@ -868,6 +1040,7 @@ public final class JavaFactory extends DefaultFactory {
         new MapUtils<String, Type>()
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(Return.NAME, Return.TYPE)
+            .put(StrangeButValidStatement.NAME, StrangeButValidStatement.TYPE)
             .put(StringLiteral.NAME, StringLiteral.TYPE)
             .put(Synchronized.NAME, Synchronized.TYPE)
             .make();
@@ -912,17 +1085,6 @@ import org.cqfn.uast.tree.common.nodes.Statement;
  * @since 1.0.0
  */
 public interface JavaStatement extends Statement {
-    /**
-     * Returns child node with 'obj' tag.
-     * @return Child node (can't be {@code null})
-     */
-    Expression getObj();
-
-    /**
-     * Returns child node with 'stmt' tag.
-     * @return Child node (can't be {@code null})
-     */
-    Statement getStmt();
 }
 
 /*
@@ -1024,12 +1186,18 @@ public final class Synchronized implements JavaStatement {
         return this.children.get(index);
     }
 
-    @Override
+    /**
+     * Returns child node with 'obj' tag.
+     * @return Child node (can't be {@code null})
+     */
     public Expression getObj() {
         return this.obj;
     }
 
-    @Override
+    /**
+     * Returns child node with 'stmt' tag.
+     * @return Child node (can't be {@code null})
+     */
     public Statement getStmt() {
         return this.stmt;
     }

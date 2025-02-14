@@ -29,6 +29,8 @@
     Return <- [expr@Expression];
     Statement <- Return | 0;
 
+    StrangeButValidStatement <- 0;
+
 java:
     Synchronized <- obj@Expression, stmt@Statement;
-    JavaStatement <- Statement | Synchronized;
+    JavaStatement <- Statement | Synchronized | StrangeButValidStatement;
