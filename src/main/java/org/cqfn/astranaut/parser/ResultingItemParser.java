@@ -79,11 +79,6 @@ public class ResultingItemParser {
             item = this.parseSubtree(first.toString());
         } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
             item = null;
-        } else if (first instanceof ClosingRoundBracket && this.nesting == 0) {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                "Unmatched closing parenthesis ')' found"
-            );
         } else {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
@@ -136,13 +131,19 @@ public class ResultingItemParser {
             children = this.parseChildren();
             next = this.scanner.getToken();
         }
-        this.last = next;
+        if (next instanceof ClosingRoundBracket && this.nesting == 0) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                "Unmatched closing parenthesis ')' found"
+            );
+        }
         if (next == null && this.nesting > 0) {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
                 "Unmatched opening parenthesis '(' found"
             );
         }
+        this.last = next;
         return new ResultingSubtreeDescriptor(type, data, children);
     }
 

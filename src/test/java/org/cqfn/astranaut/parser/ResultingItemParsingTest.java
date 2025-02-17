@@ -210,6 +210,45 @@ class ResultingItemParsingTest {
         Assertions.assertFalse(oops);
     }
 
+    @Test
+    void complexCase() {
+        final String code =
+            "AAA(BBB(CCC, DDD, EEE, #1), FFF<'ggg'>, HHH<'iii'>(#2, JJJ(KKK), LLL))";
+        final ResultingItemParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final ResultingItem item = parser.parseItem();
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void missingCommaSeparator() {
+        final ResultingItemParser parser = this.createParser("Addition(#1 #2)");
+        Assertions.assertThrows(ParsingException.class, parser::parseItem);
+    }
+
+    @Test
+    void invalidData() {
+        final ResultingItemParser parser = this.createParser("Name<Name>");
+        Assertions.assertThrows(ParsingException.class, parser::parseItem);
+    }
+
+    @Test
+    void unmatchedOpeningParenthesis() {
+        final ResultingItemParser parser = this.createParser("Name(First, Second");
+        Assertions.assertThrows(ParsingException.class, parser::parseItem);
+    }
+
+    @Test
+    void unmatchedClosingParenthesis() {
+        final ResultingItemParser parser = this.createParser("Name)");
+        Assertions.assertThrows(ParsingException.class, parser::parseItem);
+    }
+
     /**
      * Creates a parser that parses an item that is part of the right side of
      *  a transformation rule.
