@@ -247,6 +247,34 @@ class ScannerTest {
     }
 
     @Test
+    void openingRoundBracket() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " ( ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof OpeningRoundBracket);
+            Assertions.assertEquals("(", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void closingRoundBracket() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " ) ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof ClosingRoundBracket);
+            Assertions.assertEquals(")", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
     void stringInSingleQuotes() {
         final String code = "'abc'";
         final Scanner scanner = new Scanner(ScannerTest.LOCATION, code);

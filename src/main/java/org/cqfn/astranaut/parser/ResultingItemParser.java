@@ -23,7 +23,9 @@
  */
 package org.cqfn.astranaut.parser;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import org.cqfn.astranaut.dsl.ResultingItem;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.RightDataDescriptor;
@@ -47,6 +49,11 @@ public class ResultingItemParser {
     private final int nesting;
 
     /**
+     * The last token received from the scanner but not accepted by the parser.
+     */
+    private Token last;
+
+    /**
      * Constructor.
      * @param scanner Scanner
      * @param nesting Descriptor nesting level
@@ -59,7 +66,8 @@ public class ResultingItemParser {
     /**
      * Parses an item that is part of the right side of a transformation rule or the whole
      *  right side of a transformation rule.
-     * @return Root or child element of the resulting subtree, that is, the descriptor or hole
+     * @return Root or child element of the resulting subtree, that is, the descriptor or hole;
+     *  or {@code null} the scanner does not contain any more tokens
      * @throws ParsingException If the parse fails
      */
     public ResultingItem parseItem() throws ParsingException {
@@ -69,6 +77,13 @@ public class ResultingItemParser {
             item = this.parseUntypedHole();
         } else if (first instanceof Identifier) {
             item = this.parseSubtree(first.toString());
+        } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
+            item = null;
+        } else if (first instanceof ClosingRoundBracket && this.nesting == 0) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                "Unmatched closing parenthesis ')' found"
+            );
         } else {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
@@ -76,6 +91,14 @@ public class ResultingItemParser {
             );
         }
         return item;
+    }
+
+    /**
+     * Return the last token received from the scanner but not accepted by the parser.
+     * @return Last token or {@code null} if all tokens have been accepted.
+     */
+    public Token getLastToken() {
+        return this.last;
     }
 
     /**
@@ -108,13 +131,19 @@ public class ResultingItemParser {
             data = this.parseData();
             next = this.scanner.getToken();
         }
+        List<ResultingItem> children = Collections.emptyList();
+        if (next instanceof OpeningRoundBracket) {
+            children = this.parseChildren();
+            next = this.scanner.getToken();
+        }
+        this.last = next;
         if (next == null && this.nesting > 0) {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
                 "Unmatched opening parenthesis '(' found"
             );
         }
-        return new ResultingSubtreeDescriptor(type, data, Collections.emptyList());
+        return new ResultingSubtreeDescriptor(type, data, children);
     }
 
     /**
@@ -143,5 +172,39 @@ public class ResultingItemParser {
             );
         }
         return data;
+    }
+
+    /**
+     * Parses a sequence of tokens as a list of child descriptors.
+     * @return List of child descriptors
+     * @throws ParsingException If the parse fails
+     */
+    private List<ResultingItem> parseChildren() throws ParsingException {
+        final List<ResultingItem> list = new ArrayList<>(0);
+        do {
+            final ResultingItemParser parser = new ResultingItemParser(
+                this.scanner,
+                this.nesting + 1
+            );
+            final ResultingItem child = parser.parseItem();
+            if (child == null) {
+                break;
+            }
+            list.add(child);
+            Token next = parser.getLastToken();
+            if (next == null) {
+                next = this.scanner.getToken();
+            }
+            if (next instanceof ClosingRoundBracket) {
+                break;
+            }
+            if (!(next instanceof Comma)) {
+                throw new CommonParsingException(
+                    this.scanner.getLocation(),
+                    "Child descriptors must be separated by commas"
+                );
+            }
+        } while (true);
+        return list;
     }
 }

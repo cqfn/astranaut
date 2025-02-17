@@ -45,6 +45,8 @@ public final class Scanner {
             .put(']', ClosingSquareBracket.INSTANCE)
             .put('<', OpeningAngleBracket.INSTANCE)
             .put('>', ClosingAngleBracket.INSTANCE)
+            .put('(', OpeningRoundBracket.INSTANCE)
+            .put(')', ClosingRoundBracket.INSTANCE)
             .put('#', HashSymbol.INSTANCE)
             .make();
 
