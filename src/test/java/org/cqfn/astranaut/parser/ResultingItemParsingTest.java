@@ -66,7 +66,9 @@ class ResultingItemParsingTest {
 
     @Test
     void inappropriateToken() {
-        final ResultingItemParser parser = this.createParser("{");
+        ResultingItemParser parser = this.createParser("{");
+        Assertions.assertThrows(ParsingException.class, parser::parseItem);
+        parser = this.createParser(")");
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
     }
 
