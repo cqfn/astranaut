@@ -162,6 +162,20 @@ class ResultingItemParsingTest {
     }
 
     @Test
+    void innerDescriptorWithoutChildren() {
+        final String code = "StatementExpression(This())";
+        final ResultingItemParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final ResultingItem item = parser.parseItem();
+            Assertions.assertEquals("StatementExpression(This)", item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
     void descriptorWithOneChild() {
         final String code = "Return(#1)";
         final ResultingItemParser parser = this.createParser(code);
@@ -190,6 +204,20 @@ class ResultingItemParsingTest {
         try {
             final ResultingItem item = parser.parseItem();
             Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void descriptorWithExtraComma() {
+        final String code = "Subtraction(#1, #2, )";
+        final ResultingItemParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final ResultingItem item = parser.parseItem();
+            Assertions.assertEquals("Subtraction(#1, #2)", item.toString());
         } catch (final ParsingException ignored) {
             oops = true;
         }
