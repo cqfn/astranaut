@@ -23,7 +23,9 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import java.util.Arrays;
 import java.util.Collections;
+import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -74,5 +76,44 @@ class ChildDescriptorMergingTest {
         );
         final ChildDescriptorExt merged = first.merge(second);
         Assertions.assertNull(merged);
+    }
+
+    @Test
+    void optionalAndMandatory() {
+        boolean oops = false;
+        try {
+            final ChildDescriptorExt first = new ChildDescriptorExt(
+                true,
+                "tag",
+                "FirstType"
+            );
+            final AbstractNodeDescriptor parent = new AbstractNodeDescriptor(
+                "Parent",
+                Arrays.asList("FirstType", "SecondType")
+            );
+            RegularNodeDescriptor descriptor = new RegularNodeDescriptor(
+                "FirstType",
+                Collections.emptyList()
+            );
+            descriptor.addBaseDescriptor(parent);
+            first.setRule(descriptor);
+            final ChildDescriptorExt second = new ChildDescriptorExt(
+                false,
+                "tag",
+                "SecondType"
+            );
+            descriptor = new RegularNodeDescriptor(
+                "SecondType",
+                Collections.emptyList()
+            );
+            descriptor.addBaseDescriptor(parent);
+            second.setRule(descriptor);
+            final ChildDescriptorExt merged = first.merge(second);
+            Assertions.assertEquals("Parent", merged.getType());
+            Assertions.assertTrue(merged.isOptional());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }
