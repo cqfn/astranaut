@@ -79,11 +79,29 @@ class ChildDescriptorMergingTest {
     }
 
     @Test
-    void optionalAndMandatory() {
+    void firstOptionalAndSecondMandatory() {
+        final boolean result = this.oneOptionalAndOneMandatory(true, false);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void firstMandatoryAndSecondOptional() {
+        final boolean result = this.oneOptionalAndOneMandatory(false, true);
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Tests merging two descriptors with different optional flags.
+     * @param first Optional flag of the first descriptor
+     * @param second Optional flag of the second descriptor
+     * @return Optional flag of the resulting descriptor
+     */
+    private boolean oneOptionalAndOneMandatory(final boolean first, final boolean second) {
+        boolean flag = false;
         boolean oops = false;
         try {
-            final ChildDescriptorExt first = new ChildDescriptorExt(
-                true,
+            final ChildDescriptorExt alpha = new ChildDescriptorExt(
+                first,
                 "tag",
                 "FirstType"
             );
@@ -96,9 +114,9 @@ class ChildDescriptorMergingTest {
                 Collections.emptyList()
             );
             descriptor.addBaseDescriptor(parent);
-            first.setRule(descriptor);
-            final ChildDescriptorExt second = new ChildDescriptorExt(
-                false,
+            alpha.setRule(descriptor);
+            final ChildDescriptorExt beta = new ChildDescriptorExt(
+                second,
                 "tag",
                 "SecondType"
             );
@@ -107,13 +125,14 @@ class ChildDescriptorMergingTest {
                 Collections.emptyList()
             );
             descriptor.addBaseDescriptor(parent);
-            second.setRule(descriptor);
-            final ChildDescriptorExt merged = first.merge(second);
+            beta.setRule(descriptor);
+            final ChildDescriptorExt merged = alpha.merge(beta);
             Assertions.assertEquals("Parent", merged.getType());
-            Assertions.assertTrue(merged.isOptional());
+            flag = merged.isOptional();
         } catch (final BaseException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
+        return flag;
     }
 }
