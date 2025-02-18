@@ -279,6 +279,19 @@ class ResultingItemParsingTest {
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
     }
 
+    @Test
+    void emptyInput() {
+        final ResultingItemParser parser = this.createParser(" ");
+        boolean oops = false;
+        try {
+            final ResultingItem item = parser.parseItem();
+            Assertions.assertNull(item);
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
     /**
      * Creates a parser that parses an item that is part of the right side of
      *  a transformation rule.
