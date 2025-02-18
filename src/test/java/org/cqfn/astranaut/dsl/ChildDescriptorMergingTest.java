@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +44,35 @@ class ChildDescriptorMergingTest {
             "second",
             "AnotherType"
         );
-        ChildDescriptorExt merged = first.merge(second);
+        final ChildDescriptorExt merged = first.merge(second);
+        Assertions.assertNull(merged);
+    }
+
+    @Test
+    void noCommonParents() {
+        final ChildDescriptorExt first = new ChildDescriptorExt(
+            false,
+            "value",
+            "Expression"
+        );
+        first.setRule(
+            new AbstractNodeDescriptor(
+                "Expressions",
+                Collections.singletonList("Expression")
+            )
+        );
+        final ChildDescriptorExt second = new ChildDescriptorExt(
+            false,
+            "value",
+            "Identifier"
+        );
+        second.setRule(
+            new AbstractNodeDescriptor(
+                "Identifiers",
+                Collections.singletonList("Identifier")
+            )
+        );
+        final ChildDescriptorExt merged = first.merge(second);
         Assertions.assertNull(merged);
     }
 }
