@@ -48,6 +48,7 @@ class LiteralDescriptorTest {
         Assertions.assertEquals("Identifier <- 'String', ?, ?, ?, ?", ctor.toString());
         final LiteralDescriptor descriptor = ctor.createDescriptor();
         Assertions.assertEquals("Identifier <- 'String'", descriptor.toString());
+        Assertions.assertTrue(descriptor.getTags().isEmpty());
     }
 
     @Test
