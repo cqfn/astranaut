@@ -21,11 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.parser;
 
 /**
- * A child element of the pattern, which can either be a pattern descriptor or a hole.
+ * Exception 'Inappropriate token'.
  * @since 1.0.0
  */
-public interface PatternItem extends LeftSideItem {
+final class InappropriateToken extends ParsingException {
+    /**
+     * Version identifier.
+     */
+    private static final long serialVersionUID = -1;
+
+    /**
+     * Token that is inappropriate.
+     */
+    private final Token token;
+
+    /**
+     * Constructor.
+     *
+     * @param loc Location of the code where the error was found
+     * @param token Token that is inappropriate
+     */
+    InappropriateToken(final Location loc, final Token token) {
+        super(loc);
+        this.token = token;
+    }
+
+    @Override
+    public String getReason() {
+        return String.format("Inappropriate token: '%s'", this.token.toString());
+    }
 }

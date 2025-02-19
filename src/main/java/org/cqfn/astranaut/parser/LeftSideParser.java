@@ -26,18 +26,19 @@ package org.cqfn.astranaut.parser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
-import org.cqfn.astranaut.dsl.RightDataDescriptor;
-import org.cqfn.astranaut.dsl.RightSideItem;
+import org.cqfn.astranaut.dsl.LeftDataDescriptor;
+import org.cqfn.astranaut.dsl.LeftSideItem;
+import org.cqfn.astranaut.dsl.PatternDescriptor;
+import org.cqfn.astranaut.dsl.PatternItem;
 import org.cqfn.astranaut.dsl.StaticString;
+import org.cqfn.astranaut.dsl.TypedHole;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
- * Parses an item that is part of the right side of a transformation rule or the whole right side
- *  of a transformation rule.
+ * Parses an item that is part of the left side of a transformation rule.
  * @since 1.0.0
  */
-public class RightSideItemParser {
+public class LeftSideParser {
     /**
      * Scanner that produces a sequence of tokens.
      */
@@ -58,27 +59,50 @@ public class RightSideItemParser {
      * @param scanner Scanner
      * @param nesting Descriptor nesting level
      */
-    public RightSideItemParser(final Scanner scanner, final int nesting) {
+    public LeftSideParser(final Scanner scanner, final int nesting) {
         this.scanner = scanner;
         this.nesting = nesting;
     }
 
     /**
-     * Parses an item that is part of the right side of a transformation rule or the whole
-     *  right side of a transformation rule.
-     * @return Root or child element of the resulting subtree, that is, the descriptor or hole;
-     *  or {@code null} if the scanner does not contain any more tokens
+     * Parses an item that is part of the left side of a transformation rule.
+     * @return Left item, that is, the pattern descriptor or typed hole; or {@code null} if
+     *  the scanner does not contain any more tokens
      * @throws ParsingException If the parse fails
      */
-    public RightSideItem parseItem() throws ParsingException {
+    public LeftSideItem parseLeftSideItem() throws ParsingException {
         final Token first = this.scanner.getToken();
-        final RightSideItem item;
-        if (first instanceof HashSymbol) {
-            item = this.parseUntypedHole();
-        } else if (first instanceof Identifier) {
-            item = this.parseSubtree(first.toString());
+        final LeftSideItem item;
+        if (first instanceof Identifier) {
+            item = this.parsePatternOrTypedHole(first.toString());
         } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
             item = null;
+        } else if (first instanceof HashSymbol) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                "The left part of the transformation descriptor cannot contain untyped holes"
+            );
+        } else {
+            throw new InappropriateToken(this.scanner.getLocation(), first);
+        }
+        return item;
+    }
+
+    /**
+     * Parses a child element of the pattern, which can either be a pattern descriptor or a hole.
+     * @return Pattern item, that is, the pattern descriptor or hole; or {@code null} if
+     *  the scanner does not contain any more tokens
+     * @throws ParsingException If the parse fails
+     */
+    public PatternItem parsePatternItem() throws ParsingException {
+        final Token first = this.scanner.getToken();
+        final PatternItem item;
+        if (first instanceof Identifier) {
+            item = (PatternItem) this.parsePatternOrTypedHole(first.toString());
+        } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
+            item = null;
+        } else if (first instanceof HashSymbol) {
+            item = this.parseUntypedHole();
         } else {
             throw new InappropriateToken(this.scanner.getLocation(), first);
         }
@@ -108,19 +132,53 @@ public class RightSideItemParser {
     }
 
     /**
-     * Parses a sequence of tokens as a subtree descriptor.
+     * Parses a sequence of tokens as a typed hole.
+     * @param type Type of the hole
+     * @return A typed hole
+     * @throws ParsingException If the parse fails
+     */
+    private TypedHole parseTypedHole(final String type) throws ParsingException {
+        final Token token = this.scanner.getToken();
+        if (!(token instanceof Number)) {
+            throw new BadHole(this.scanner.getLocation());
+        }
+        final int value = ((Number) token).getValue();
+        return new TypedHole(type, value);
+    }
+
+    /**
+     * Parses a sequence of tokens as a pattern descriptor or typed hole.
      * @param type The type of the root node of the subtree
+     * @return Pattern descriptor or typed hole
+     * @throws ParsingException If the parse fails
+     */
+    private LeftSideItem parsePatternOrTypedHole(final String type) throws ParsingException {
+        final Token next = this.scanner.getToken();
+        final LeftSideItem result;
+        if (next instanceof HashSymbol) {
+            result = this.parseTypedHole(type);
+        } else {
+            result = this.parsePattern(type, next);
+        }
+        return result;
+    }
+
+    /**
+     * Parses a sequence of tokens as a pattern descriptor.
+     * @param type The type of the root node of the subtree
+     * @param first First token
      * @return Subtree descriptor
      * @throws ParsingException If the parse fails
      */
-    private ResultingSubtreeDescriptor parseSubtree(final String type) throws ParsingException {
-        Token next = this.scanner.getToken();
-        RightDataDescriptor data = null;
+    private PatternDescriptor parsePattern(final String type, final Token first)
+        throws ParsingException {
+        Token next = first;
+        LeftDataDescriptor data = null;
         if (next instanceof OpeningAngleBracket) {
             data = this.parseData();
             next = this.scanner.getToken();
         }
-        List<RightSideItem> children = Collections.emptyList();
+        List<PatternItem> children = Collections.emptyList();
         if (next instanceof OpeningRoundBracket) {
             children = this.parseChildren();
             next = this.scanner.getToken();
@@ -138,7 +196,7 @@ public class RightSideItemParser {
             );
         }
         this.last = next;
-        return new ResultingSubtreeDescriptor(type, data, children);
+        return new PatternDescriptor(type, data, children);
     }
 
     /**
@@ -146,8 +204,8 @@ public class RightSideItemParser {
      * @return A data descriptor
      * @throws ParsingException If the parse fails
      */
-    private RightDataDescriptor parseData() throws ParsingException {
-        final RightDataDescriptor data;
+    private LeftDataDescriptor parseData() throws ParsingException {
+        final LeftDataDescriptor data;
         final Token first = this.scanner.getToken();
         if (first instanceof HashSymbol) {
             data = this.parseUntypedHole();
@@ -170,18 +228,18 @@ public class RightSideItemParser {
     }
 
     /**
-     * Parses a sequence of tokens as a list of child descriptors.
-     * @return List of child descriptors
+     * Parses a sequence of tokens as a list of pattern children.
+     * @return List of pattern children
      * @throws ParsingException If the parse fails
      */
-    private List<RightSideItem> parseChildren() throws ParsingException {
-        final List<RightSideItem> list = new ArrayList<>(0);
+    private List<PatternItem> parseChildren() throws ParsingException {
+        final List<PatternItem> list = new ArrayList<>(0);
         do {
-            final RightSideItemParser parser = new RightSideItemParser(
+            final LeftSideParser parser = new LeftSideParser(
                 this.scanner,
                 this.nesting + 1
             );
-            final RightSideItem child = parser.parseItem();
+            final PatternItem child = parser.parsePatternItem();
             if (child == null) {
                 break;
             }

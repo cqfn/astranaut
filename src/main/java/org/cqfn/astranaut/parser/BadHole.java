@@ -21,11 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.parser;
 
 /**
- * A child element of the pattern, which can either be a pattern descriptor or a hole.
+ * Exception 'A number is expected after #'.
  * @since 1.0.0
  */
-public interface PatternItem extends LeftSideItem {
+final class BadHole extends ParsingException {
+    /**
+     * Version identifier.
+     */
+    private static final long serialVersionUID = -1;
+
+    /**
+     * Constructor.
+     * @param loc Location of the code where the error was found
+     */
+    BadHole(final Location loc) {
+        super(loc);
+    }
+
+    @Override
+    public String getReason() {
+        return "A number is expected after '#'";
+    }
 }
