@@ -29,7 +29,7 @@ package org.cqfn.astranaut.dsl;
  *  The hole may match any child node of the correct type.
  * @since 1.0.0
  */
-public final class TypedHole implements Hole {
+public final class TypedHole implements Hole, LeftSideItem {
     /**
      * The type of the node this hole is intended to match.
      *  For example, "Expression" or "Statement".

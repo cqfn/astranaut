@@ -26,9 +26,9 @@ package org.cqfn.astranaut.parser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.cqfn.astranaut.dsl.ResultingItem;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.RightDataDescriptor;
+import org.cqfn.astranaut.dsl.RightSideItem;
 import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
@@ -37,7 +37,7 @@ import org.cqfn.astranaut.dsl.UntypedHole;
  *  of a transformation rule.
  * @since 1.0.0
  */
-public class ResultingItemParser {
+public class RightSideItemParser {
     /**
      * Scanner that produces a sequence of tokens.
      */
@@ -58,7 +58,7 @@ public class ResultingItemParser {
      * @param scanner Scanner
      * @param nesting Descriptor nesting level
      */
-    public ResultingItemParser(final Scanner scanner, final int nesting) {
+    public RightSideItemParser(final Scanner scanner, final int nesting) {
         this.scanner = scanner;
         this.nesting = nesting;
     }
@@ -70,9 +70,9 @@ public class ResultingItemParser {
      *  or {@code null} the scanner does not contain any more tokens
      * @throws ParsingException If the parse fails
      */
-    public ResultingItem parseItem() throws ParsingException {
+    public RightSideItem parseItem() throws ParsingException {
         final Token first = this.scanner.getToken();
-        final ResultingItem item;
+        final RightSideItem item;
         if (first instanceof HashSymbol) {
             item = this.parseUntypedHole();
         } else if (first instanceof Identifier) {
@@ -126,7 +126,7 @@ public class ResultingItemParser {
             data = this.parseData();
             next = this.scanner.getToken();
         }
-        List<ResultingItem> children = Collections.emptyList();
+        List<RightSideItem> children = Collections.emptyList();
         if (next instanceof OpeningRoundBracket) {
             children = this.parseChildren();
             next = this.scanner.getToken();
@@ -180,14 +180,14 @@ public class ResultingItemParser {
      * @return List of child descriptors
      * @throws ParsingException If the parse fails
      */
-    private List<ResultingItem> parseChildren() throws ParsingException {
-        final List<ResultingItem> list = new ArrayList<>(0);
+    private List<RightSideItem> parseChildren() throws ParsingException {
+        final List<RightSideItem> list = new ArrayList<>(0);
         do {
-            final ResultingItemParser parser = new ResultingItemParser(
+            final RightSideItemParser parser = new RightSideItemParser(
                 this.scanner,
                 this.nesting + 1
             );
-            final ResultingItem child = parser.parseItem();
+            final RightSideItem child = parser.parseItem();
             if (child == null) {
                 break;
             }

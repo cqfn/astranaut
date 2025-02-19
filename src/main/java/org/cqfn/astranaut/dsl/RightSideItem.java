@@ -24,23 +24,9 @@
 package org.cqfn.astranaut.dsl;
 
 /**
- * Represents a hole (wildcard) in a pattern matching system, where a hole can be used to match
- *  any node or data within the pattern. Each hole is identified by a non-negative number
- *  (e.g. #1, #2, etc.). Holes are used to capture parts of a syntax tree or data
- *  during pattern matching.
+ * Root or child element of the resulting subtree, that is, the descriptor or hole.
+ *  Located on the right side of the transformation rules.
  * @since 1.0.0
  */
-public interface Hole extends Comparable<Hole>, PatternItem {
-
-    /**
-     * Returns the unique number associated with this hole.
-     *  The number identifies the specific hole (e.g., #1, #2, etc.).
-     * @return The non-negative number of the hole
-     */
-    int getNumber();
-
-    @Override
-    default int compareTo(Hole other) {
-        return Integer.compare(this.getNumber(), other.getNumber());
-    }
+public interface RightSideItem {
 }

@@ -25,19 +25,19 @@ package org.cqfn.astranaut.parser;
 
 import java.util.List;
 import org.cqfn.astranaut.dsl.DataDescriptor;
-import org.cqfn.astranaut.dsl.ResultingItem;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
+import org.cqfn.astranaut.dsl.RightSideItem;
 import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.UntypedHole;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link ResultingItemParser} class.
+ * Tests covering {@link RightSideItemParser} class.
  * @since 1.0.0
  */
 @SuppressWarnings("PMD.TooManyMethods")
-class ResultingItemParsingTest {
+class RightSideItemParsingTest {
     /**
      * Fake location for testing purposes.
      */
@@ -45,10 +45,10 @@ class ResultingItemParsingTest {
 
     @Test
     void untypedHole() {
-        final ResultingItemParser parser = this.createParser("#17");
+        final RightSideItemParser parser = this.createParser("#17");
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertTrue(item instanceof UntypedHole);
             Assertions.assertEquals(17, ((UntypedHole) item).getNumber());
             Assertions.assertEquals("#17", item.toString());
@@ -60,13 +60,13 @@ class ResultingItemParsingTest {
 
     @Test
     void badHole() {
-        final ResultingItemParser parser = this.createParser("#");
+        final RightSideItemParser parser = this.createParser("#");
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
     }
 
     @Test
     void inappropriateToken() {
-        ResultingItemParser parser = this.createParser("{");
+        RightSideItemParser parser = this.createParser("{");
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
         parser = this.createParser(")");
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
@@ -75,10 +75,10 @@ class ResultingItemParsingTest {
     @Test
     void simpleName() {
         final String type = "Addition";
-        final ResultingItemParser parser = this.createParser(type);
+        final RightSideItemParser parser = this.createParser(type);
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertTrue(item instanceof ResultingSubtreeDescriptor);
             final ResultingSubtreeDescriptor descr = (ResultingSubtreeDescriptor) item;
             Assertions.assertEquals(type, descr.getType());
@@ -94,10 +94,10 @@ class ResultingItemParsingTest {
     @Test
     void nameAndDataAsAHole() {
         final String code = "Identifier<#17>";
-        final ResultingItemParser parser = this.createParser(code);
+        final RightSideItemParser parser = this.createParser(code);
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertTrue(item instanceof ResultingSubtreeDescriptor);
             final ResultingSubtreeDescriptor descr = (ResultingSubtreeDescriptor) item;
             Assertions.assertEquals("Identifier", descr.getType());
@@ -112,23 +112,23 @@ class ResultingItemParsingTest {
 
     @Test
     void badData() {
-        final ResultingItemParser parser = this.createParser("Identifier<?>");
+        final RightSideItemParser parser = this.createParser("Identifier<?>");
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
     }
 
     @Test
     void unclosedData() {
-        final ResultingItemParser parser = this.createParser("Identifier<#17");
+        final RightSideItemParser parser = this.createParser("Identifier<#17");
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
     }
 
     @Test
     void nameAndDataAsAString() {
         final String code = "Name<'abc'>";
-        final ResultingItemParser parser = this.createParser(code);
+        final RightSideItemParser parser = this.createParser(code);
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertTrue(item instanceof ResultingSubtreeDescriptor);
             final ResultingSubtreeDescriptor descr = (ResultingSubtreeDescriptor) item;
             Assertions.assertEquals("Name", descr.getType());
@@ -147,10 +147,10 @@ class ResultingItemParsingTest {
     void descriptorWithoutChildren() {
         final String type = "Break";
         final String code = String.format("%s()", type);
-        final ResultingItemParser parser = this.createParser(code);
+        final RightSideItemParser parser = this.createParser(code);
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertTrue(item instanceof ResultingSubtreeDescriptor);
             final ResultingSubtreeDescriptor descr = (ResultingSubtreeDescriptor) item;
             Assertions.assertEquals(type, descr.getType());
@@ -166,10 +166,10 @@ class ResultingItemParsingTest {
     @Test
     void innerDescriptorWithoutChildren() {
         final String code = "StatementExpression(This())";
-        final ResultingItemParser parser = this.createParser(code);
+        final RightSideItemParser parser = this.createParser(code);
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertEquals("StatementExpression(This)", item.toString());
         } catch (final ParsingException ignored) {
             oops = true;
@@ -180,15 +180,15 @@ class ResultingItemParsingTest {
     @Test
     void descriptorWithOneChild() {
         final String code = "Return(#1)";
-        final ResultingItemParser parser = this.createParser(code);
+        final RightSideItemParser parser = this.createParser(code);
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertTrue(item instanceof ResultingSubtreeDescriptor);
             final ResultingSubtreeDescriptor descr = (ResultingSubtreeDescriptor) item;
             Assertions.assertEquals("Return", descr.getType());
             Assertions.assertNull(descr.getData());
-            final List<ResultingItem> children = descr.getChildren();
+            final List<RightSideItem> children = descr.getChildren();
             Assertions.assertEquals(1, children.size());
             Assertions.assertTrue(children.get(0) instanceof UntypedHole);
             Assertions.assertEquals(code, descr.toString());
@@ -201,10 +201,10 @@ class ResultingItemParsingTest {
     @Test
     void descriptorWithTwoChildren() {
         final String code = "Addition(#1, #2)";
-        final ResultingItemParser parser = this.createParser(code);
+        final RightSideItemParser parser = this.createParser(code);
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertEquals(code, item.toString());
         } catch (final ParsingException ignored) {
             oops = true;
@@ -215,10 +215,10 @@ class ResultingItemParsingTest {
     @Test
     void descriptorWithExtraComma() {
         final String code = "Subtraction(#1, #2, )";
-        final ResultingItemParser parser = this.createParser(code);
+        final RightSideItemParser parser = this.createParser(code);
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertEquals("Subtraction(#1, #2)", item.toString());
         } catch (final ParsingException ignored) {
             oops = true;
@@ -229,10 +229,10 @@ class ResultingItemParsingTest {
     @Test
     void descriptorWithThreeChildren() {
         final String code = "VariableDeclaration(#1, Identifier<#2>, #3)";
-        final ResultingItemParser parser = this.createParser(code);
+        final RightSideItemParser parser = this.createParser(code);
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertEquals(code, item.toString());
         } catch (final ParsingException ignored) {
             oops = true;
@@ -244,10 +244,10 @@ class ResultingItemParsingTest {
     void complexCase() {
         final String code =
             "AAA(BBB(CCC, DDD, EEE, #1), FFF<'ggg'>, HHH<'iii'>(#2, JJJ(KKK), LLL))";
-        final ResultingItemParser parser = this.createParser(code);
+        final RightSideItemParser parser = this.createParser(code);
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertEquals(code, item.toString());
         } catch (final ParsingException ignored) {
             oops = true;
@@ -257,34 +257,34 @@ class ResultingItemParsingTest {
 
     @Test
     void missingCommaSeparator() {
-        final ResultingItemParser parser = this.createParser("Addition(#1 #2)");
+        final RightSideItemParser parser = this.createParser("Addition(#1 #2)");
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
     }
 
     @Test
     void invalidData() {
-        final ResultingItemParser parser = this.createParser("Name<Name>");
+        final RightSideItemParser parser = this.createParser("Name<Name>");
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
     }
 
     @Test
     void unmatchedOpeningParenthesis() {
-        final ResultingItemParser parser = this.createParser("Name(First, Second");
+        final RightSideItemParser parser = this.createParser("Name(First, Second");
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
     }
 
     @Test
     void unmatchedClosingParenthesis() {
-        final ResultingItemParser parser = this.createParser("Name)");
+        final RightSideItemParser parser = this.createParser("Name)");
         Assertions.assertThrows(ParsingException.class, parser::parseItem);
     }
 
     @Test
     void emptyInput() {
-        final ResultingItemParser parser = this.createParser(" ");
+        final RightSideItemParser parser = this.createParser(" ");
         boolean oops = false;
         try {
-            final ResultingItem item = parser.parseItem();
+            final RightSideItem item = parser.parseItem();
             Assertions.assertNull(item);
         } catch (final ParsingException ignored) {
             oops = true;
@@ -298,8 +298,8 @@ class ResultingItemParsingTest {
      * @param code DSL code to parse
      * @return Resulting item parser
      */
-    private ResultingItemParser createParser(final String code) {
-        final Scanner scanner = new Scanner(ResultingItemParsingTest.LOCATION, code);
-        return new ResultingItemParser(scanner, 0);
+    private RightSideItemParser createParser(final String code) {
+        final Scanner scanner = new Scanner(RightSideItemParsingTest.LOCATION, code);
+        return new RightSideItemParser(scanner, 0);
     }
 }

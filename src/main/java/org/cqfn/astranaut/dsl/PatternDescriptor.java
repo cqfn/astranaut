@@ -33,7 +33,7 @@ import java.util.List;
  *  themselves. This is used to describe the left side of a transformation rule.
  * @since 1.0.0
  */
-public final class PatternDescriptor implements PatternChildItem {
+public final class PatternDescriptor implements PatternItem {
     /**
      * The type of the node. A pattern is considered matched if the type name matches.
      */
@@ -53,7 +53,7 @@ public final class PatternDescriptor implements PatternChildItem {
      *  resulting subtree. If a child is an untyped hole, then it is moved to the resulting subtree
      *  without checking.
      */
-    private final List<PatternChildItem> children;
+    private final List<PatternItem> children;
 
     /**
      * The matching compatibility of a pattern descriptor.
@@ -68,7 +68,7 @@ public final class PatternDescriptor implements PatternChildItem {
      * @param children The list of child nodes (subtrees) under this node
      */
     public PatternDescriptor(final String type, final LeftDataDescriptor data,
-        final List<PatternChildItem> children) {
+        final List<PatternItem> children) {
         this.type = type;
         this.data = data;
         this.children = Collections.unmodifiableList(children);
@@ -95,7 +95,7 @@ public final class PatternDescriptor implements PatternChildItem {
      * Returns an unmodifiable list of child nodes (subtrees) under this node.
      * @return The list of child nodes
      */
-    public List<PatternChildItem> getChildren() {
+    public List<PatternItem> getChildren() {
         return this.children;
     }
 
@@ -122,7 +122,7 @@ public final class PatternDescriptor implements PatternChildItem {
         if (!this.children.isEmpty()) {
             builder.append('(');
             boolean flag = false;
-            for (final PatternChildItem item : this.children) {
+            for (final PatternItem item : this.children) {
                 if (flag) {
                     builder.append(", ");
                 }

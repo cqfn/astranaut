@@ -25,6 +25,7 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
@@ -36,9 +37,14 @@ import org.cqfn.astranaut.codegen.java.RuleGenerator;
  */
 public final class TransformationDescriptor implements Rule {
     /**
+     * Left side of the rule, that is, at least one pattern or typed hole.
+     */
+    private final List<LeftSideItem> left;
+
+    /**
      * Right side of the rule, that is, the description of the resulting subtree.
      */
-    private final ResultingItem right;
+    private final RightSideItem right;
 
     /**
      * Name of the programming language for which this transformation descriptor is described.
@@ -52,9 +58,11 @@ public final class TransformationDescriptor implements Rule {
 
     /**
      * Constructor.
+     * @param left Left side of the rule, that is, at least one pattern or typed hole
      * @param right Right side of the rule, that is, the description of the resulting subtree
      */
-    public TransformationDescriptor(final ResultingItem right) {
+    public TransformationDescriptor(final List<LeftSideItem> left, final RightSideItem right) {
+        this.left = TransformationDescriptor.checkLeftSide(left);
         this.right = right;
         this.language = "common";
         this.dependencies = new HashSet<>();
@@ -64,7 +72,7 @@ public final class TransformationDescriptor implements Rule {
      * Returns right side of the rule.
      * @return A hole or description of the resulting subtree.
      */
-    public ResultingItem getRight() {
+    public RightSideItem getRight() {
         return this.right;
     }
 
@@ -102,6 +110,28 @@ public final class TransformationDescriptor implements Rule {
 
     @Override
     public String toString() {
-        return String.format("-> %s", this.right.toString());
+        final StringBuilder builder = new StringBuilder();
+        boolean flag = false;
+        for (final LeftSideItem item : this.left) {
+            if (flag) {
+                builder.append(", ");
+            }
+            flag = true;
+            builder.append(item.toString());
+        }
+        builder.append(" -> ").append(this.right.toString());
+        return builder.toString();
+    }
+
+    /**
+     * Checks the left side of the rule (list of items) for correctness.
+     * @param left Left size of the rule as a list of left items
+     * @return Unmodifiable list of left items
+     */
+    private static List<LeftSideItem> checkLeftSide(final List<LeftSideItem> left) {
+        if (left.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        return Collections.unmodifiableList(left);
     }
 }

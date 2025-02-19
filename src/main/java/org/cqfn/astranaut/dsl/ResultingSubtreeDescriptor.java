@@ -32,7 +32,7 @@ import java.util.List;
  *  which themselves are subtrees.
  * @since 1.0.0
  */
-public final class ResultingSubtreeDescriptor implements ResultingItem {
+public final class ResultingSubtreeDescriptor implements RightSideItem {
     /**
      * The type of the node.
      */
@@ -48,7 +48,7 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
      * The list of child nodes (subtrees) under this node. Each child can be either
      *  a descriptor or a hole.
      */
-    private final List<ResultingItem> children;
+    private final List<RightSideItem> children;
 
     /**
      * Constructs a new {@code ResultingSubtreeDescriptor} with the specified type, data, and list
@@ -58,7 +58,7 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
      * @param children The list of child nodes (subtrees) under this node
      */
     public ResultingSubtreeDescriptor(final String type, final RightDataDescriptor data,
-        final List<ResultingItem> children) {
+        final List<RightSideItem> children) {
         this.type = type;
         this.data = data;
         this.children = Collections.unmodifiableList(children);
@@ -84,7 +84,7 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
      * Returns an unmodifiable list of child nodes (subtrees) under this node.
      * @return The list of child nodes
      */
-    public List<ResultingItem> getChildren() {
+    public List<RightSideItem> getChildren() {
         return this.children;
     }
 
@@ -98,7 +98,7 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
         if (!this.children.isEmpty()) {
             builder.append('(');
             boolean flag = false;
-            for (final ResultingItem item : this.children) {
+            for (final RightSideItem item : this.children) {
                 if (flag) {
                     builder.append(", ");
                 }

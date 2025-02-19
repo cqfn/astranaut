@@ -24,8 +24,8 @@
 package org.cqfn.astranaut.dsl;
 
 /**
- * Root or child element of the resulting subtree, that is, the descriptor or hole.
+ * A pattern descriptor or typed hole. It is located on the left side of the transformation rules.
  * @since 1.0.0
  */
-public interface ResultingItem {
+public interface LeftSideItem {
 }

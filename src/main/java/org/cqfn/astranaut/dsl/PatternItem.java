@@ -27,5 +27,5 @@ package org.cqfn.astranaut.dsl;
  * A child element of the pattern, which can either be a pattern descriptor or a hole.
  * @since 1.0.0
  */
-public interface PatternChildItem {
+public interface PatternItem {
 }

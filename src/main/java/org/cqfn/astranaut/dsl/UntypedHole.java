@@ -32,7 +32,7 @@ import java.util.Map;
  * @since 1.0.0
  */
 public final class UntypedHole
-    implements Hole, LeftDataDescriptor, RightDataDescriptor, ResultingItem {
+    implements Hole, LeftDataDescriptor, RightDataDescriptor, RightSideItem {
     /**
      * A cache to store commonly used UntypedHoles (e.g., #0, #1, etc.)
      *  This reduces the number of duplicate objects.
