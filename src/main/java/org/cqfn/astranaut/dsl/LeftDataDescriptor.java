@@ -23,36 +23,10 @@
  */
 package org.cqfn.astranaut.dsl;
 
-import org.cqfn.astranaut.parser.StringToken;
-
 /**
- * Entity that represents a static string.
+ * Extension of DataDescriptor used specifically for the left side of a transformation rule.
+ *  This allows for more specialized behavior for the pattern side of the transformation.
  * @since 1.0.0
  */
-public final class StaticString implements LeftDataDescriptor, RightDataDescriptor {
-    /**
-     * Token from which this descriptor is generated.
-     */
-    private final StringToken token;
-
-    /**
-     * Constructor to initialize the StaticString with the provided value.
-     * @param token Token from which this descriptor is generated
-     */
-    public StaticString(final StringToken token) {
-        this.token = token;
-    }
-
-    /**
-     * Gets the value of the static string.
-     * @return The string value
-     */
-    public String getValue() {
-        return this.token.getValue();
-    }
-
-    @Override
-    public String toString() {
-        return this.token.toString();
-    }
+public interface LeftDataDescriptor extends DataDescriptor {
 }

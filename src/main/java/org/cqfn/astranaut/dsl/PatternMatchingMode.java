@@ -23,36 +23,23 @@
  */
 package org.cqfn.astranaut.dsl;
 
-import org.cqfn.astranaut.parser.StringToken;
-
 /**
- * Entity that represents a static string.
+ * Enum representing the matching compatibility of a pattern descriptor.
  * @since 1.0.0
  */
-public final class StaticString implements LeftDataDescriptor, RightDataDescriptor {
+public enum PatternMatchingMode {
     /**
-     * Token from which this descriptor is generated.
+     * The descriptor must match the pattern exactly once.
      */
-    private final StringToken token;
+    NORMAL,
 
     /**
-     * Constructor to initialize the StaticString with the provided value.
-     * @param token Token from which this descriptor is generated
+     * The descriptor may match the pattern zero or one time.
      */
-    public StaticString(final StringToken token) {
-        this.token = token;
-    }
+    OPTIONAL,
 
     /**
-     * Gets the value of the static string.
-     * @return The string value
+     * The descriptor must match the pattern one or more times.
      */
-    public String getValue() {
-        return this.token.getValue();
-    }
-
-    @Override
-    public String toString() {
-        return this.token.toString();
-    }
+    REPEATED;
 }

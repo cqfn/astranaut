@@ -25,7 +25,7 @@ package org.cqfn.astranaut.dsl;
 
 /**
  * Extension of DataDescriptor that is used specifically for the result (right part)
- *  of the transformation. This allows for more specialized behavior for the result side
+ *  of a transformation rule. This allows for more specialized behavior for the result side
  *  of a transformation.
  * @since 1.0.0
  */

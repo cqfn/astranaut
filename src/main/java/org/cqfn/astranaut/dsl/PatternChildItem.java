@@ -23,36 +23,9 @@
  */
 package org.cqfn.astranaut.dsl;
 
-import org.cqfn.astranaut.parser.StringToken;
-
 /**
- * Entity that represents a static string.
+ * A child element of the pattern, which can either be a pattern descriptor or a hole.
  * @since 1.0.0
  */
-public final class StaticString implements LeftDataDescriptor, RightDataDescriptor {
-    /**
-     * Token from which this descriptor is generated.
-     */
-    private final StringToken token;
-
-    /**
-     * Constructor to initialize the StaticString with the provided value.
-     * @param token Token from which this descriptor is generated
-     */
-    public StaticString(final StringToken token) {
-        this.token = token;
-    }
-
-    /**
-     * Gets the value of the static string.
-     * @return The string value
-     */
-    public String getValue() {
-        return this.token.getValue();
-    }
-
-    @Override
-    public String toString() {
-        return this.token.toString();
-    }
+public interface PatternChildItem {
 }

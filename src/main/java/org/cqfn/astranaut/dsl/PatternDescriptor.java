@@ -27,41 +27,52 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Descriptor representing the resulting subtree after a transformation.
- *  This descriptor encapsulates the node type, its associated data, and all its child nodes,
- *  which themselves are subtrees.
+ * Descriptor representing a pattern in the transformation rule.
+ *  This descriptor encapsulates the type of the node, the associated data (such as a static string
+ *  or hole), and the child nodes that form subtrees, which are either patterns or holes
+ *  themselves. This is used to describe the left side of a transformation rule.
  * @since 1.0.0
  */
-public final class ResultingSubtreeDescriptor implements ResultingItem {
+public final class PatternDescriptor implements PatternChildItem {
     /**
-     * The type of the node.
+     * The type of the node. A pattern is considered matched if the type name matches.
      */
     private final String type;
 
     /**
      * The data associated with the node. This could be a static string, untyped hole,
-     *  or other data descriptor.
+     *  or other data descriptor. A pattern is considered matched if the data matches
+     *  or is a hole (in which case the data is transferred to the resulting tree).
      */
-    private final RightDataDescriptor data;
+    private final LeftDataDescriptor data;
 
     /**
      * The list of child nodes (subtrees) under this node. Each child can be either
-     *  a descriptor or a hole.
+     *  a descriptor or a hole. A pattern is considered matched if all of its children are matched.
+     *  If a child is a typed hole, then the type is checked and the child is moved to the
+     *  resulting subtree. If a child is an untyped hole, then it is moved to the resulting subtree
+     *  without checking.
      */
-    private final List<ResultingItem> children;
+    private final List<PatternChildItem> children;
 
     /**
-     * Constructs a new {@code ResultingSubtreeDescriptor} with the specified type, data, and list
+     * The matching compatibility of a pattern descriptor.
+     */
+    private PatternMatchingMode mode;
+
+    /**
+     * Constructs a new {@code PatternDescriptor} with the specified type, data, and list
      *  of child nodes.
      * @param type The type of the node
      * @param data The data associated with the node
      * @param children The list of child nodes (subtrees) under this node
      */
-    public ResultingSubtreeDescriptor(final String type, final RightDataDescriptor data,
-        final List<ResultingItem> children) {
+    public PatternDescriptor(final String type, final LeftDataDescriptor data,
+        final List<PatternChildItem> children) {
         this.type = type;
         this.data = data;
         this.children = Collections.unmodifiableList(children);
+        this.mode = PatternMatchingMode.NORMAL;
     }
 
     /**
@@ -76,7 +87,7 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
      * Returns the data associated with this node.
      * @return The data descriptor of the node
      */
-    public RightDataDescriptor getData() {
+    public LeftDataDescriptor getData() {
         return this.data;
     }
 
@@ -84,13 +95,26 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
      * Returns an unmodifiable list of child nodes (subtrees) under this node.
      * @return The list of child nodes
      */
-    public List<ResultingItem> getChildren() {
+    public List<PatternChildItem> getChildren() {
         return this.children;
+    }
+
+    /**
+     * Sets the matching compatibility.
+     * @param value Matching compatibility
+     */
+    public void setMatchingMode(final PatternMatchingMode value) {
+        this.mode = value;
     }
 
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
+        if (this.mode == PatternMatchingMode.OPTIONAL) {
+            builder.append('[');
+        } else if (this.mode == PatternMatchingMode.REPEATED) {
+            builder.append('{');
+        }
         builder.append(this.type);
         if (this.data != null) {
             builder.append('<').append(this.data.toString()).append('>');
@@ -98,7 +122,7 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
         if (!this.children.isEmpty()) {
             builder.append('(');
             boolean flag = false;
-            for (final ResultingItem item : this.children) {
+            for (final PatternChildItem item : this.children) {
                 if (flag) {
                     builder.append(", ");
                 }
@@ -106,6 +130,11 @@ public final class ResultingSubtreeDescriptor implements ResultingItem {
                 flag = true;
             }
             builder.append(')');
+        }
+        if (this.mode == PatternMatchingMode.OPTIONAL) {
+            builder.append(']');
+        } else if (this.mode == PatternMatchingMode.REPEATED) {
+            builder.append('}');
         }
         return builder.toString();
     }

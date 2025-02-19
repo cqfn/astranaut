@@ -30,7 +30,7 @@ package org.cqfn.astranaut.dsl;
  *  during pattern matching.
  * @since 1.0.0
  */
-public interface Hole extends Comparable<Hole> {
+public interface Hole extends Comparable<Hole>, PatternChildItem {
 
     /**
      * Returns the unique number associated with this hole.
