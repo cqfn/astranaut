@@ -25,6 +25,7 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -75,5 +76,62 @@ class AbstractNodeDescriptorTest {
         final String actual = rule.toString();
         final String expected = "LogicalOperation <- And | Or | Xor";
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void mergeTags() {
+        final String exprtype = "Expression";
+        final AbstractNodeDescriptor abstrakt = new AbstractNodeDescriptor(
+            exprtype,
+            Arrays.asList("FieldAccess", "BinaryOperation")
+        );
+        Assertions.assertTrue(abstrakt.getTags().isEmpty());
+        final LiteralDescriptor.Constructor ctor =
+            new LiteralDescriptor.Constructor("Identifier");
+        ctor.setType("String");
+        ctor.setInitial("\"\"");
+        final NodeDescriptor identifier = ctor.createDescriptor();
+        final String lefttag = "left";
+        ChildDescriptorExt left = new ChildDescriptorExt(
+            false,
+            lefttag,
+            exprtype
+        );
+        left.setRule(abstrakt);
+        final String righttag = "right";
+        ChildDescriptorExt right = new ChildDescriptorExt(
+            false,
+            righttag,
+            "Identifier"
+        );
+        right.setRule(identifier);
+        final RegularNodeDescriptor access = new RegularNodeDescriptor(
+            "FieldAccess",
+            Arrays.asList(left, right)
+        );
+        abstrakt.mergeTags(access.getTags());
+        Map<String, ChildDescriptorExt> tags = abstrakt.getTags();
+        Assertions.assertTrue(tags.containsKey(lefttag));
+        Assertions.assertTrue(tags.containsKey(righttag));
+        left = new ChildDescriptorExt(
+            false,
+            lefttag,
+            exprtype
+        );
+        left.setRule(abstrakt);
+        right = new ChildDescriptorExt(
+            false,
+            righttag,
+            exprtype
+        );
+        right.setRule(abstrakt);
+        final RegularNodeDescriptor binary = new RegularNodeDescriptor(
+            "BinaryOperation",
+            Arrays.asList(left, right)
+        );
+        abstrakt.mergeTags(binary.getTags());
+        tags = abstrakt.getTags();
+        Assertions.assertTrue(tags.containsKey(lefttag));
+        Assertions.assertFalse(tags.containsKey(righttag));
     }
 }
