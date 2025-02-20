@@ -75,7 +75,7 @@ public class LeftSideParser {
         final LeftSideItem item;
         if (first instanceof Identifier) {
             item = this.parsePatternOrTypedHole(first.toString());
-        } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
+        } else if (first == null) {
             item = null;
         } else if (first instanceof HashSymbol) {
             throw new CommonParsingException(
