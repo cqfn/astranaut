@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.parser;
 
+import java.util.List;
 import org.cqfn.astranaut.dsl.DataDescriptor;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.PatternDescriptor;
@@ -219,6 +220,155 @@ class LeftSideParsingTest {
             final LeftSideItem item = parser.parseLeftSideItem();
             Assertions.assertTrue(item instanceof PatternDescriptor);
             Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void descriptorWithoutChildren() {
+        final String type = "Break";
+        final String code = String.format("%s()", type);
+        final LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            final PatternDescriptor descr = (PatternDescriptor) item;
+            Assertions.assertEquals(type, descr.getType());
+            Assertions.assertNull(descr.getData());
+            Assertions.assertTrue(descr.getChildren().isEmpty());
+            Assertions.assertEquals(type, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void innerDescriptorWithoutChildren() {
+        final String code = "StatementExpression(This())";
+        final LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertEquals("StatementExpression(This)", item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void descriptorWithOneChild() {
+        final String code = "Return(#1)";
+        final LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            final PatternDescriptor descr = (PatternDescriptor) item;
+            Assertions.assertEquals("Return", descr.getType());
+            Assertions.assertNull(descr.getData());
+            final List<PatternItem> children = descr.getChildren();
+            Assertions.assertEquals(1, children.size());
+            Assertions.assertTrue(children.get(0) instanceof UntypedHole);
+            Assertions.assertEquals(code, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void descriptorWithTwoChildren() {
+        final String code = "Addition(#1, #2)";
+        final LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void descriptorWithExtraComma() {
+        final String code = "Subtraction(#1, #2, )";
+        final LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertEquals("Subtraction(#1, #2)", item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void descriptorWithThreeChildren() {
+        final String code = "VariableDeclaration(#1, Identifier<#2>, #3)";
+        final LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void complexCase() {
+        final String code =
+            "AAA(BBB(CCC, DDD, EEE, #1), FFF<'ggg'>, HHH<'iii'>(#2, JJJ(KKK), LLL))";
+        final LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void missingCommaSeparator() {
+        final LeftSideParser parser = this.createParser("Addition(#1 #2)");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void invalidData() {
+        final LeftSideParser parser = this.createParser("Name<Name>");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void unmatchedOpeningParenthesis() {
+        final LeftSideParser parser = this.createParser("Name(First, Second");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void unmatchedClosingParenthesis() {
+        final LeftSideParser parser = this.createParser("Name)");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void emptyInput() {
+        final LeftSideParser parser = this.createParser(" ");
+        boolean oops = false;
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertNull(item);
         } catch (final ParsingException ignored) {
             oops = true;
         }
