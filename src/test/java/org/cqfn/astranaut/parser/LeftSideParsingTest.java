@@ -23,7 +23,12 @@
  */
 package org.cqfn.astranaut.parser;
 
+import org.cqfn.astranaut.dsl.DataDescriptor;
+import org.cqfn.astranaut.dsl.LeftSideItem;
+import org.cqfn.astranaut.dsl.PatternDescriptor;
 import org.cqfn.astranaut.dsl.PatternItem;
+import org.cqfn.astranaut.dsl.StaticString;
+import org.cqfn.astranaut.dsl.TypedHole;
 import org.cqfn.astranaut.dsl.UntypedHole;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,17 +46,20 @@ class LeftSideParsingTest {
 
     @Test
     void untypedHole() {
-        final LeftSideParser parser = this.createParser("#17");
+        final String code = "#17";
+        LeftSideParser parser = this.createParser(code);
         boolean oops = false;
         try {
             final PatternItem item = parser.parsePatternItem();
             Assertions.assertTrue(item instanceof UntypedHole);
             Assertions.assertEquals(17, ((UntypedHole) item).getNumber());
-            Assertions.assertEquals("#17", item.toString());
+            Assertions.assertEquals(code, item.toString());
         } catch (final ParsingException ignored) {
             oops = true;
         }
         Assertions.assertFalse(oops);
+        parser = this.createParser(code);
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
     }
 
     @Test
@@ -90,6 +98,131 @@ class LeftSideParsingTest {
         Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
         parser = this.createParser(")");
         Assertions.assertThrows(ParsingException.class, parser::parsePatternItem);
+    }
+
+    @Test
+    void simpleName() {
+        final String type = "Addition";
+        LeftSideParser parser = this.createParser(type);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            final PatternDescriptor descr = (PatternDescriptor) item;
+            Assertions.assertEquals(type, descr.getType());
+            Assertions.assertNull(descr.getData());
+            Assertions.assertTrue(descr.getChildren().isEmpty());
+            Assertions.assertEquals(type, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        parser = this.createParser(type);
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            Assertions.assertEquals(type, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void typedHole() {
+        final String type = "Subtraction";
+        final String code = String.format("%s#19", type);
+        LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof TypedHole);
+            final TypedHole hole = (TypedHole) item;
+            Assertions.assertEquals(type, hole.getType());
+            Assertions.assertEquals(19, hole.getNumber());
+            Assertions.assertEquals(code, hole.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        parser = this.createParser(code);
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof TypedHole);
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void nameAndDataAsAHole() {
+        final String code = "Identifier<#17>";
+        LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        parser = this.createParser(code);
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void badData() {
+        final String code = "Identifier<?>";
+        LeftSideParser parser = this.createParser(code);
+        Assertions.assertThrows(ParsingException.class, parser::parsePatternItem);
+        parser = this.createParser(code);
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void unclosedData() {
+        final String code = "Identifier<#17";
+        LeftSideParser parser = this.createParser(code);
+        Assertions.assertThrows(ParsingException.class, parser::parsePatternItem);
+        parser = this.createParser(code);
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void nameAndDataAsAString() {
+        final String code = "Name<'abc'>";
+        LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            final PatternDescriptor descr = (PatternDescriptor) item;
+            Assertions.assertEquals("Name", descr.getType());
+            final DataDescriptor data = descr.getData();
+            Assertions.assertTrue(data instanceof StaticString);
+            Assertions.assertEquals("abc", ((StaticString) data).getValue());
+            Assertions.assertTrue(descr.getChildren().isEmpty());
+            Assertions.assertEquals(code, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        parser = this.createParser(code);
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 
     /**
