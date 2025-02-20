@@ -158,6 +158,12 @@ class LeftSideParsingTest {
     }
 
     @Test
+    void badTypedHole() {
+        final LeftSideParser parser = this.createParser("Expression#aaa");
+        Assertions.assertThrows(ParsingException.class, parser::parsePatternItem);
+    }
+
+    @Test
     void nameAndDataAsAHole() {
         final String code = "Identifier<#17>";
         LeftSideParser parser = this.createParser(code);
@@ -326,7 +332,7 @@ class LeftSideParsingTest {
     @Test
     void complexCase() {
         final String code =
-            "AAA(BBB(CCC, DDD, EEE, #1), FFF<'ggg'>, HHH<'iii'>(#2, JJJ(KKK), LLL))";
+            "AAA(BBB(CCC, DDD, EEE#1, #2), FFF<'ggg'>, HHH<#3>(#4, JJJ(KKK), LLL))";
         final LeftSideParser parser = this.createParser(code);
         boolean oops = false;
         try {
@@ -364,10 +370,18 @@ class LeftSideParsingTest {
 
     @Test
     void emptyInput() {
-        final LeftSideParser parser = this.createParser(" ");
+        LeftSideParser parser = this.createParser(" ");
         boolean oops = false;
         try {
             final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertNull(item);
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        parser = this.createParser(" ");
+        try {
+            final PatternItem item = parser.parsePatternItem();
             Assertions.assertNull(item);
         } catch (final ParsingException ignored) {
             oops = true;
