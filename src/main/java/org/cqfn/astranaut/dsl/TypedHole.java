@@ -42,6 +42,11 @@ public final class TypedHole implements Hole, LeftSideItem {
     private final int number;
 
     /**
+     * The matching compatibility of the typed hole descriptor.
+     */
+    private PatternMatchingMode mode;
+
+    /**
      * Constructor to create a typed hole.
      * @param type The type of the node that this hole can match.
      * @param number The unique number for this hole.
@@ -65,7 +70,29 @@ public final class TypedHole implements Hole, LeftSideItem {
     }
 
     @Override
+    public void setMatchingMode(final PatternMatchingMode value) {
+        this.mode = value;
+    }
+
+    @Override
+    public PatternMatchingMode getMatchingMode() {
+        return this.mode;
+    }
+
+    @Override
     public String toString() {
-        return String.format("%s#%d", this.type, this.number);
+        final StringBuilder builder = new StringBuilder();
+        if (this.mode == PatternMatchingMode.OPTIONAL) {
+            builder.append('[');
+        } else if (this.mode == PatternMatchingMode.REPEATED) {
+            builder.append('{');
+        }
+        builder.append(this.type).append('#').append(this.number);
+        if (this.mode == PatternMatchingMode.OPTIONAL) {
+            builder.append(']');
+        } else if (this.mode == PatternMatchingMode.REPEATED) {
+            builder.append('}');
+        }
+        return builder.toString();
     }
 }

@@ -33,7 +33,7 @@ import java.util.List;
  *  themselves. This is used to describe the left side of a transformation rule.
  * @since 1.0.0
  */
-public final class PatternDescriptor implements PatternItem {
+public final class PatternDescriptor implements PatternItem, LeftSideItem {
     /**
      * The type of the node. A pattern is considered matched if the type name matches.
      */
@@ -56,7 +56,7 @@ public final class PatternDescriptor implements PatternItem {
     private final List<PatternItem> children;
 
     /**
-     * The matching compatibility of a pattern descriptor.
+     * The matching compatibility of the pattern descriptor.
      */
     private PatternMatchingMode mode;
 
@@ -99,12 +99,14 @@ public final class PatternDescriptor implements PatternItem {
         return this.children;
     }
 
-    /**
-     * Sets the matching compatibility.
-     * @param value Matching compatibility
-     */
+    @Override
     public void setMatchingMode(final PatternMatchingMode value) {
         this.mode = value;
+    }
+
+    @Override
+    public PatternMatchingMode getMatchingMode() {
+        return this.mode;
     }
 
     @Override

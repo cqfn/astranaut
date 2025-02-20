@@ -28,4 +28,15 @@ package org.cqfn.astranaut.dsl;
  * @since 1.0.0
  */
 public interface LeftSideItem {
+    /**
+     * Sets the matching mode.
+     * @param mode Matching mode
+     */
+    void setMatchingMode(PatternMatchingMode mode);
+
+    /**
+     * Returns current matching mode.
+     * @return Matching mode
+     */
+    PatternMatchingMode getMatchingMode();
 }
