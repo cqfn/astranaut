@@ -69,6 +69,14 @@ public final class TransformationDescriptor implements Rule {
     }
 
     /**
+     * Returns left side of the rule, that is, at least one pattern or typed hole.
+     * @return List of left descriptors
+     */
+    public List<LeftSideItem> getLeft() {
+        return this.left;
+    }
+
+    /**
      * Returns right side of the rule.
      * @return A hole or description of the resulting subtree.
      */
