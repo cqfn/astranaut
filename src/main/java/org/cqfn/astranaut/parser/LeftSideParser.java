@@ -279,10 +279,7 @@ public class LeftSideParser {
                 "An identifier after '[' is expected. Only patterns or typed holes can be optional"
             );
         }
-        final LeftSideParser parser = new LeftSideParser(
-            this.scanner,
-            this.nesting + 1
-        );
+        final LeftSideParser parser = new LeftSideParser(this.scanner, 0);
         final LeftSideItem item = parser.parsePatternOrTypedHole(first.toString());
         item.setMatchingMode(PatternMatchingMode.OPTIONAL);
         Token next = parser.getLastToken();

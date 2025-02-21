@@ -453,7 +453,7 @@ class LeftSideParsingTest {
 
     @Test
     void badOptionalDescriptor() {
-        final LeftSideParser parser = this.createParser("[?]");
+        final LeftSideParser parser = this.createParser("[,]");
         Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
     }
 
