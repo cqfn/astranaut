@@ -78,6 +78,8 @@ public class LeftSideParser {
             item = this.parsePatternOrTypedHole(first.toString());
         } else if (first instanceof OpeningSquareBracket) {
             item = this.parseOptionalItem();
+        } else if (first instanceof OpeningCurlyBracket) {
+            item = this.parseRepeatedItem();
         } else if (first == null) {
             item = null;
         } else if (first instanceof HashSymbol) {
@@ -104,6 +106,8 @@ public class LeftSideParser {
             item = (PatternItem) this.parsePatternOrTypedHole(first.toString());
         } else if (first instanceof OpeningSquareBracket) {
             item = (PatternItem) this.parseOptionalItem();
+        } else if (first instanceof OpeningCurlyBracket) {
+            item = (PatternItem) this.parseRepeatedItem();
         } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
             item = null;
         } else if (first instanceof HashSymbol) {
@@ -268,7 +272,7 @@ public class LeftSideParser {
 
     /**
      * Parses a sequence of tokens as an optional item.
-     * @return Left side item with 'optional' flag set
+     * @return Left side item with {@link PatternMatchingMode#OPTIONAL} flag set
      * @throws ParsingException If the parse fails
      */
     private LeftSideItem parseOptionalItem() throws ParsingException {
@@ -290,6 +294,35 @@ public class LeftSideParser {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
                 "Missing square closing bracket ']'"
+            );
+        }
+        return item;
+    }
+
+    /**
+     * Parses a sequence of tokens as a repeated item.
+     * @return Left side item with {@link PatternMatchingMode#REPEATED} flag set
+     * @throws ParsingException If the parse fails
+     */
+    private LeftSideItem parseRepeatedItem() throws ParsingException {
+        final Token first = this.scanner.getToken();
+        if (!(first instanceof Identifier)) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                "An identifier after '{' is expected. Only patterns or typed holes can be repeated"
+            );
+        }
+        final LeftSideParser parser = new LeftSideParser(this.scanner, 0);
+        final LeftSideItem item = parser.parsePatternOrTypedHole(first.toString());
+        item.setMatchingMode(PatternMatchingMode.REPEATED);
+        Token next = parser.getLastToken();
+        if (next == null) {
+            next = this.scanner.getToken();
+        }
+        if (!(next instanceof ClosingCurlyBracket)) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                "Missing curly closing bracket '}'"
             );
         }
         return item;

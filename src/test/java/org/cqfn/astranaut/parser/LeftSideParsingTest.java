@@ -483,6 +483,99 @@ class LeftSideParsingTest {
         Assertions.assertFalse(oops);
     }
 
+    @Test
+    void simpleRepetitiveName() {
+        final String type = "Statement";
+        final String code = String.format("{%s}", type);
+        LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            final PatternDescriptor descr = (PatternDescriptor) item;
+            Assertions.assertEquals(type, descr.getType());
+            Assertions.assertNull(descr.getData());
+            Assertions.assertTrue(descr.getChildren().isEmpty());
+            Assertions.assertEquals(PatternMatchingMode.REPEATED, descr.getMatchingMode());
+            Assertions.assertEquals(code, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        parser = this.createParser(code);
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void repetitiveNameWithChildren() {
+        final String code = "{Division(#1, #2)}";
+        LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            final PatternDescriptor descr = (PatternDescriptor) item;
+            Assertions.assertEquals(PatternMatchingMode.REPEATED, descr.getMatchingMode());
+            Assertions.assertEquals(code, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        parser = this.createParser(code);
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void unclosedCurlyBracket() {
+        final LeftSideParser parser = this.createParser("{Name");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void badRepetitiveDescriptor() {
+        final LeftSideParser parser = this.createParser("{,}");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void repetitiveTypedHole() {
+        final String code = "{Variable#21}";
+        LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof TypedHole);
+            final TypedHole hole = (TypedHole) item;
+            Assertions.assertEquals(PatternMatchingMode.REPEATED, hole.getMatchingMode());
+            Assertions.assertEquals(code, hole.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        parser = this.createParser(code);
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof TypedHole);
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
     /**
      * Creates a parser that parses an item that is part of the left side of
      *  a transformation rule.
