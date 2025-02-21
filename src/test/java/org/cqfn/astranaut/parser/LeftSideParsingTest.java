@@ -28,6 +28,7 @@ import org.cqfn.astranaut.dsl.DataDescriptor;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.PatternDescriptor;
 import org.cqfn.astranaut.dsl.PatternItem;
+import org.cqfn.astranaut.dsl.PatternMatchingMode;
 import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.TypedHole;
 import org.cqfn.astranaut.dsl.UntypedHole;
@@ -383,6 +384,99 @@ class LeftSideParsingTest {
         try {
             final PatternItem item = parser.parsePatternItem();
             Assertions.assertNull(item);
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void simpleOptionalName() {
+        final String type = "Operator";
+        final String code = String.format("[%s]", type);
+        LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            final PatternDescriptor descr = (PatternDescriptor) item;
+            Assertions.assertEquals(type, descr.getType());
+            Assertions.assertNull(descr.getData());
+            Assertions.assertTrue(descr.getChildren().isEmpty());
+            Assertions.assertEquals(PatternMatchingMode.OPTIONAL, descr.getMatchingMode());
+            Assertions.assertEquals(code, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        parser = this.createParser(code);
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void optionalNameWithChildren() {
+        final String code = "[Multiplication(#1, #2)]";
+        LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof PatternDescriptor);
+            final PatternDescriptor descr = (PatternDescriptor) item;
+            Assertions.assertEquals(PatternMatchingMode.OPTIONAL, descr.getMatchingMode());
+            Assertions.assertEquals(code, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        parser = this.createParser(code);
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void unclosedSquareBracket() {
+        final LeftSideParser parser = this.createParser("[Name");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void badOptionalDescriptor() {
+        final LeftSideParser parser = this.createParser("[?]");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void optionalTypedHole() {
+        final String code = "[Variable#31]";
+        LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof TypedHole);
+            final TypedHole hole = (TypedHole) item;
+            Assertions.assertEquals(PatternMatchingMode.OPTIONAL, hole.getMatchingMode());
+            Assertions.assertEquals(code, hole.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        parser = this.createParser(code);
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof TypedHole);
+            Assertions.assertEquals(code, item.toString());
         } catch (final ParsingException ignored) {
             oops = true;
         }

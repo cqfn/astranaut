@@ -30,6 +30,7 @@ import org.cqfn.astranaut.dsl.LeftDataDescriptor;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.PatternDescriptor;
 import org.cqfn.astranaut.dsl.PatternItem;
+import org.cqfn.astranaut.dsl.PatternMatchingMode;
 import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.TypedHole;
 import org.cqfn.astranaut.dsl.UntypedHole;
@@ -75,6 +76,8 @@ public class LeftSideParser {
         final LeftSideItem item;
         if (first instanceof Identifier) {
             item = this.parsePatternOrTypedHole(first.toString());
+        } else if (first instanceof OpeningSquareBracket) {
+            item = this.parseOptionalItem();
         } else if (first == null) {
             item = null;
         } else if (first instanceof HashSymbol) {
@@ -99,6 +102,8 @@ public class LeftSideParser {
         final PatternItem item;
         if (first instanceof Identifier) {
             item = (PatternItem) this.parsePatternOrTypedHole(first.toString());
+        } else if (first instanceof OpeningSquareBracket) {
+            item = (PatternItem) this.parseOptionalItem();
         } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
             item = null;
         } else if (first instanceof HashSymbol) {
@@ -259,5 +264,37 @@ public class LeftSideParser {
             }
         } while (true);
         return list;
+    }
+
+    /**
+     * Parses a sequence of tokens as an optional item.
+     * @return Left side item with 'optional' flag set
+     * @throws ParsingException If the parse fails
+     */
+    private LeftSideItem parseOptionalItem() throws ParsingException {
+        final Token first = this.scanner.getToken();
+        if (!(first instanceof Identifier)) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                "An identifier after '[' is expected. Only patterns or typed holes can be optional"
+            );
+        }
+        final LeftSideParser parser = new LeftSideParser(
+            this.scanner,
+            this.nesting + 1
+        );
+        final LeftSideItem item = parser.parsePatternOrTypedHole(first.toString());
+        item.setMatchingMode(PatternMatchingMode.OPTIONAL);
+        Token next = parser.getLastToken();
+        if (next == null) {
+            next = this.scanner.getToken();
+        }
+        if (!(next instanceof ClosingSquareBracket)) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                "Missing square closing bracket ']'"
+            );
+        }
+        return item;
     }
 }
