@@ -54,22 +54,51 @@ class TransformationDescriptionParsingTest {
         Assertions.assertEquals(code, descriptor.toString());
     }
 
+    @Test
+    void invalidDescriptor() {
+        final TransformationDescriptorParser parser = this.createParser("AAA");
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void extraSeparator() {
+        final TransformationDescriptorParser parser = this.createParser("AAA -> BBB -> CCC");
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    /**
+    * Creates a {@link TransformationDescriptorParser} from the given DSL source code.
+    * @param code The DSL source code to be parsed
+    * @return An instance of {@link TransformationDescriptorParser}
+    */
+    private TransformationDescriptorParser createParser(final String code) {
+        final DslReader reader = new DslReader();
+        reader.setSourceCode(code);
+        boolean oops = false;
+        TransformationDescriptorParser parser = null;
+        try {
+            final Statement stmt = reader.getStatement();
+            parser = new TransformationDescriptorParser(
+                TransformationDescriptionParsingTest.LANGUAGE,
+                stmt
+            );
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        return parser;
+    }
+
     /**
      * Parses a single descriptor from the DSL source code.
      * @param code DSL source code
      * @return Descriptor
      */
     private TransformationDescriptor parseDescriptor(final String code) {
-        final DslReader reader = new DslReader();
-        reader.setSourceCode(code);
-        boolean oops = false;
         TransformationDescriptor descriptor = null;
+        boolean oops = false;
         try {
-            final Statement stmt = reader.getStatement();
-            final TransformationDescriptorParser parser = new TransformationDescriptorParser(
-                TransformationDescriptionParsingTest.LANGUAGE,
-                stmt
-            );
+            final TransformationDescriptorParser parser = this.createParser(code);
             descriptor = parser.parseDescriptor();
         } catch (final BaseException ignored) {
             oops = true;
