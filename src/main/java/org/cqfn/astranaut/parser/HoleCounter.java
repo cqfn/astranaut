@@ -32,7 +32,7 @@ import java.util.TreeSet;
 * that replace entire nodes and holes that replace node data separately.
 * @since 1.0.0
 */
-final class HoleCounter {
+class HoleCounter {
     /**
      * A set of hole numbers that replace entire nodes in the syntax tree.
      */

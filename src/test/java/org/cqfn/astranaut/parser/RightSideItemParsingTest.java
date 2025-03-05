@@ -300,6 +300,22 @@ class RightSideItemParsingTest {
      */
     private RightSideItemParser createParser(final String code) {
         final Scanner scanner = new Scanner(RightSideItemParsingTest.LOCATION, code);
-        return new RightSideItemParser(scanner, 0);
+        return new RightSideItemParser(scanner, 0, new FakeHoleCounter());
+    }
+
+    /**
+     * Fake hole counter for testing purposes (to prevent exceptions).
+     * @since 1.0.0
+     */
+    private static class FakeHoleCounter extends HoleCounter {
+        @Override
+        public boolean hasNodeHole(final int number) {
+            return true;
+        }
+
+        @Override
+        public boolean hasDataHole(final int number) {
+            return true;
+        }
     }
 }

@@ -49,6 +49,11 @@ public class RightSideItemParser {
     private final int nesting;
 
     /**
+     * Count of holes resulting from parsing.
+     */
+    private final HoleCounter holes;
+
+    /**
      * The last token received from the scanner but not accepted by the parser.
      */
     private Token last;
@@ -57,10 +62,12 @@ public class RightSideItemParser {
      * Constructor.
      * @param scanner Scanner
      * @param nesting Descriptor nesting level
+     * @param holes Count of holes resulting from parsing
      */
-    public RightSideItemParser(final Scanner scanner, final int nesting) {
+    public RightSideItemParser(final Scanner scanner, final int nesting, final HoleCounter holes) {
         this.scanner = scanner;
         this.nesting = nesting;
+        this.holes = holes;
     }
 
     /**
@@ -74,7 +81,7 @@ public class RightSideItemParser {
         final Token first = this.scanner.getToken();
         final RightSideItem item;
         if (first instanceof HashSymbol) {
-            item = this.parseUntypedHole();
+            item = this.parseNodeHole();
         } else if (first instanceof Identifier) {
             item = this.parseSubtree(first.toString());
         } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
@@ -94,16 +101,48 @@ public class RightSideItemParser {
     }
 
     /**
-     * Parses a sequence of tokens as an untyped hole.
+     * Parses a sequence of tokens as an untyped hole replacing a node.
      * @return An untyped hole
      * @throws ParsingException If the parse fails
      */
-    private UntypedHole parseUntypedHole() throws ParsingException {
+    private UntypedHole parseNodeHole() throws ParsingException {
         final Token token = this.scanner.getToken();
         if (!(token instanceof Number)) {
             throw new BadHole(this.scanner.getLocation());
         }
         final int value = ((Number) token).getValue();
+        if (!this.holes.hasNodeHole(value)) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                String.format(
+                    "The left side of the rule does not have a corresponding hole numbered #%d replacing a node",
+                    value
+                )
+            );
+        }
+        return UntypedHole.getInstance(value);
+    }
+
+    /**
+     * Parses a sequence of tokens as an untyped hole replacing data.
+     * @return An untyped hole
+     * @throws ParsingException If the parse fails
+     */
+    private UntypedHole parseDataHole() throws ParsingException {
+        final Token token = this.scanner.getToken();
+        if (!(token instanceof Number)) {
+            throw new BadHole(this.scanner.getLocation());
+        }
+        final int value = ((Number) token).getValue();
+        if (!this.holes.hasNodeHole(value)) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                String.format(
+                    "The left side of the rule does not have a corresponding hole numbered #%d replacing data",
+                    value
+                )
+            );
+        }
         return UntypedHole.getInstance(value);
     }
 
@@ -150,7 +189,7 @@ public class RightSideItemParser {
         final RightDataDescriptor data;
         final Token first = this.scanner.getToken();
         if (first instanceof HashSymbol) {
-            data = this.parseUntypedHole();
+            data = this.parseDataHole();
         } else if (first instanceof StringToken) {
             data = new StaticString((StringToken) first);
         } else {
@@ -179,7 +218,8 @@ public class RightSideItemParser {
         do {
             final RightSideItemParser parser = new RightSideItemParser(
                 this.scanner,
-                this.nesting + 1
+                this.nesting + 1,
+                this.holes
             );
             final RightSideItem child = parser.parseItem();
             if (child == null) {

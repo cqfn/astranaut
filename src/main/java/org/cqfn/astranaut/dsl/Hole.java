@@ -30,7 +30,7 @@ package org.cqfn.astranaut.dsl;
  *  during pattern matching.
  * @since 1.0.0
  */
-public interface Hole extends Comparable<Hole>, PatternItem {
+public interface Hole extends PatternItem {
 
     /**
      * Returns the unique number associated with this hole.
@@ -38,9 +38,4 @@ public interface Hole extends Comparable<Hole>, PatternItem {
      * @return The non-negative number of the hole
      */
     int getNumber();
-
-    @Override
-    default int compareTo(Hole other) {
-        return Integer.compare(this.getNumber(), other.getNumber());
-    }
 }
