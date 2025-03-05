@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ import org.cqfn.astranaut.dsl.NodeDescriptor;
  * @since 1.0.0
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public abstract class NonAbstractNodeGenerator implements RuleGenerator {
+public abstract class NonAbstractNodeGenerator extends RuleGenerator {
     /**
      * Flag indicating that the 'java.util.Collections' class should be included
      *  in the generated code.
@@ -129,6 +129,7 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
         if (this.chldecr) {
             unit.addImport(base.concat(Strings.TYPE_CHLD_DESCR));
         }
+        this.resolveDependencies(unit, context);
         return Collections.singleton(unit);
     }
 
@@ -420,10 +421,7 @@ public abstract class NonAbstractNodeGenerator implements RuleGenerator {
      */
     private void createPropertiesGetter(final Klass klass) {
         final Method method = new Method(Strings.TYPE_MAP_STRINGS, "getProperties");
-        String language = this.getRule().getLanguage();
-        if (language.isEmpty()) {
-            language = "common";
-        }
+        final String language = this.getRule().getLanguage();
         method.makePublic();
         method.setBody(
             String.format(

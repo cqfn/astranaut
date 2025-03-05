@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -214,6 +214,11 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
     @Override
     public Builder createBuilder() {
         return new LiteralBuilder(this);
+    }
+
+    @Override
+    public Map<String, ChildDescriptorExt> getTags() {
+        return Collections.emptyMap();
     }
 
     /**

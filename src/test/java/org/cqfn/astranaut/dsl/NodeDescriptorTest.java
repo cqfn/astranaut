@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -110,7 +110,8 @@ class NodeDescriptorTest {
             "Null",
             Collections.emptyList()
         );
-        Assertions.assertEquals("", descriptor.getLanguage());
+        Assertions.assertEquals("common", descriptor.getLanguage());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> descriptor.setLanguage(""));
         descriptor.setLanguage("Java");
         Assertions.assertEquals("java", descriptor.getLanguage());
     }

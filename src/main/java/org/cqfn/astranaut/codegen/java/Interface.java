@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,8 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -51,6 +53,11 @@ public final class Interface implements ClassOrInterface {
     private String[] ext;
 
     /**
+     * List of method signatures.
+     */
+    private final List<MethodSignature> signatures;
+
+    /**
      * Constructor.
      * @param name Name of the interface.
      * @param brief Brief description of the interface
@@ -59,6 +66,7 @@ public final class Interface implements ClassOrInterface {
         this.name = name;
         this.doc = new JavaDoc(brief);
         this.ext = new String[0];
+        this.signatures = new ArrayList<>(0);
     }
 
     @Override
@@ -89,10 +97,24 @@ public final class Interface implements ClassOrInterface {
         this.ext = names.clone();
     }
 
+    /**
+     * Adds a method signature.
+     * @param signature Method signature
+     */
+    public void addMethodSignature(final MethodSignature signature) {
+        this.signatures.add(signature);
+    }
+
     @Override
     public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
         this.doc.build(indent, code);
         code.add(indent, this.composeHeader());
+        boolean flag = false;
+        for (final MethodSignature signature : this.signatures) {
+            code.addEmpty(flag);
+            signature.build(indent + 1, code);
+            flag = true;
+        }
         code.add(indent, "}");
     }
 

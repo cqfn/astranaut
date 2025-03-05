@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,16 @@ import org.junit.jupiter.api.io.TempDir;
  */
 @SuppressWarnings("PMD.TooManyMethods")
 class GenerateTest extends EndToEndTest {
+    /**
+     * Name of the parser module that initiates the exception.
+     */
+    private static final String PARSER_EXCERT = "Parser";
+
+    /**
+     * Name of the analyzer module that initiates the exception.
+     */
+    private static final String ANALYZER_EXCERT = "Analyzer";
+
     @Test
     void nodeWithoutChildren(final @TempDir Path temp) {
         final String expected = this.loadStringResource("node_without_children.txt");
@@ -70,6 +80,13 @@ class GenerateTest extends EndToEndTest {
     }
 
     @Test
+    void nodeWithMultipleInheritance(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("node_with_multiple_inheritance.txt");
+        final String actual = this.run("node_with_multiple_inheritance.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
     void listNode(final @TempDir Path temp) {
         final String expected = this.loadStringResource("list_node.txt");
         final String actual = this.run("list_node.dsl", temp);
@@ -91,10 +108,47 @@ class GenerateTest extends EndToEndTest {
     }
 
     @Test
+    void nodesFromDifferentLanguages(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("nodes_from_different_languages.txt");
+        final String actual = this.run("nodes_from_different_languages.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
     void readBadDsl(final @TempDir Path temp) {
-        final String message = this.runAndReadErrorMessage("bad.dsl", temp);
+        final String message = this.runAndReadErrorMessage(
+            "rule_without_separator.dsl",
+            temp,
+            GenerateTest.PARSER_EXCERT
+        );
         Assertions.assertEquals(
-            "bad.dsl, 26: The rule does not contain a separator",
+            "rule_without_separator.dsl, 26: The rule does not contain a separator",
+            message
+        );
+    }
+
+    @Test
+    void badAbstractNode(final @TempDir Path temp) {
+        final String message = this.runAndReadErrorMessage(
+            "bad_abstract_node.dsl",
+            temp,
+            GenerateTest.ANALYZER_EXCERT
+        );
+        Assertions.assertEquals(
+            "bad_abstract_node.dsl, 31: The abstract node 'Expression' is the base for the node 'UnaryExpression' which is not defined",
+            message
+        );
+    }
+
+    @Test
+    void notDefinedChildType(final @TempDir Path temp) {
+        final String message = this.runAndReadErrorMessage(
+            "not_defined_child_type.dsl",
+            temp,
+            GenerateTest.ANALYZER_EXCERT
+        );
+        Assertions.assertEquals(
+            "not_defined_child_type.dsl, 29: The 'Assignment' node contains a child node 'LeftExpression' which is not defined",
             message
         );
     }
@@ -150,6 +204,13 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertFalse(oops);
     }
 
+    @Test
+    void differentLevelsOfInheritance(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("different_levels_of_inheritance.txt");
+        final String actual = this.run("different_levels_of_inheritance.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.
@@ -180,9 +241,11 @@ class GenerateTest extends EndToEndTest {
      * Starts the project in generation mode, but expect the execution to terminate with an error.
      * @param rules Name of the file containing the rules (DSL code)
      * @param dir Temporary folder path
+     * @param initiator Name of the module that triggered the exception
      * @return Error message
      */
-    private String runAndReadErrorMessage(final String rules, final Path dir) {
+    private String runAndReadErrorMessage(final String rules, final Path dir,
+        final String initiator) {
         String message = "";
         final Path output = dir.resolve("output");
         final String[] args = {
@@ -203,6 +266,7 @@ class GenerateTest extends EndToEndTest {
         } catch (final BaseException exception) {
             oops = true;
             message = exception.getErrorMessage();
+            Assertions.assertEquals(initiator, exception.getInitiator());
         }
         Assertions.assertTrue(oops);
         return message;

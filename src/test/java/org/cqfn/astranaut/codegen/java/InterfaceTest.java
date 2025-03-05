@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
  * Tests covering {@link Interface} class.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class InterfaceTest {
     @Test
     void simpleEmptyInterface() {
@@ -104,6 +105,41 @@ class InterfaceTest {
         );
         final Interface iface = new Interface("Test4", "Interface inherits other two");
         iface.setExtendsList("Test5", "Test6");
+        final boolean result = this.testCodegen(iface, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void interfaceWithMethod() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Interface with a method.",
+                " */",
+                "interface Adder {",
+                "    /**",
+                "     * Adds one integer value to another.",
+                "     * @param first First value",
+                "     * @param second Second value",
+                "     * @return Sum of two values",
+                "     */",
+                "    int add(int first, int second);",
+                "}",
+                ""
+            )
+        );
+        final Interface iface = new Interface("Adder", "Interface with a method");
+        final String type = "int";
+        final MethodSignature method = new MethodSignature(
+            type,
+            "add",
+            "Adds one integer value to another"
+        );
+        method.setReturnsDescription("Sum of two values");
+        method.addArgument(type, "first", "First value");
+        method.addArgument(type, "second", "Second value");
+        iface.addMethodSignature(method);
         final boolean result = this.testCodegen(iface, expected);
         Assertions.assertTrue(result);
     }

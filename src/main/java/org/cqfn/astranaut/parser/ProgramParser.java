@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,10 @@
 package org.cqfn.astranaut.parser;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.Program;
 import org.cqfn.astranaut.dsl.Rule;
@@ -42,10 +45,16 @@ public class ProgramParser {
     private String language;
 
     /**
+     * Rules in relation to the location of the DSL code from which they are parsed.
+     */
+    private final Map<Rule, Location> locations;
+
+    /**
      * Constructor.
      */
     public ProgramParser() {
-        this.language = "";
+        this.language = "common";
+        this.locations = new HashMap<>();
     }
 
     /**
@@ -67,6 +76,7 @@ public class ProgramParser {
                 final NodeDescriptorParser parser = new NodeDescriptorParser(this.language, stmt);
                 final NodeDescriptor descr = parser.parseDescriptor();
                 list.add(descr);
+                this.locations.put(descr, stmt.getLocation());
             } else {
                 throw new CommonParsingException(
                     stmt.getLocation(),
@@ -76,5 +86,13 @@ public class ProgramParser {
             stmt = reader.getStatement();
         }
         return new Program(list);
+    }
+
+    /**
+     * Returns rules in relation to the location of the DSL code from which they are parsed.
+     * @return Locations map
+     */
+    public Map<Rule, Location> getLocations() {
+        return Collections.unmodifiableMap(this.locations);
     }
 }

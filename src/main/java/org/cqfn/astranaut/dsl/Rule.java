@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import java.util.Set;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 
 /**
@@ -32,12 +33,25 @@ import org.cqfn.astranaut.codegen.java.RuleGenerator;
 public interface Rule {
     /**
      * Returns the name of the programming language for which this rule is described.
-     * @return The name of the programming language or an empty string if no language is defined
+     * If no language is defined, returns the string "common".
+     * @return The name of the programming language, never null or empty.
      */
     String getLanguage();
 
     @Override
     String toString();
+
+    /**
+     * Adds a node descriptor as a dependency.
+     * @param descriptor The node descriptor to add
+     */
+    void addDependency(NodeDescriptor descriptor);
+
+    /**
+     * Returns the set of dependencies for this rule.
+     * @return Set of node descriptors
+     */
+    Set<NodeDescriptor> getDependencies();
 
     /**
      * Creates a suitable generator that generates Java code.

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,7 @@ class LiteralDescriptorTest {
         Assertions.assertEquals("Identifier <- 'String', ?, ?, ?, ?", ctor.toString());
         final LiteralDescriptor descriptor = ctor.createDescriptor();
         Assertions.assertEquals("Identifier <- 'String'", descriptor.toString());
+        Assertions.assertTrue(descriptor.getTags().isEmpty());
     }
 
     @Test

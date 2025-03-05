@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.cqfn.astranaut.codegen.java.ListNodeGenerator;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.base.Builder;
@@ -78,5 +79,10 @@ public final class ListNodeDescriptor extends NonAbstractNodeDescriptor {
     @Override
     public Builder createBuilder() {
         return new ListBuilder(this);
+    }
+
+    @Override
+    public Map<String, ChildDescriptorExt> getTags() {
+        return Collections.emptyMap();
     }
 }

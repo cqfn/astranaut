@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -87,6 +87,20 @@ class ScannerTest {
             final Token token = scanner.getToken();
             Assertions.assertTrue(token instanceof AtSymbol);
             Assertions.assertEquals("@", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void hashSymbol() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " # ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof HashSymbol);
+            Assertions.assertEquals("#", token.toString());
         } catch (final BaseException ignored) {
             oops = true;
         }
@@ -198,6 +212,62 @@ class ScannerTest {
             final Token token = scanner.getToken();
             Assertions.assertTrue(token instanceof ClosingSquareBracket);
             Assertions.assertEquals("]", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void openingAngleBracket() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " < ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof OpeningAngleBracket);
+            Assertions.assertEquals("<", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void closingAngleBracket() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " > ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof ClosingAngleBracket);
+            Assertions.assertEquals(">", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void openingRoundBracket() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " ( ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof OpeningRoundBracket);
+            Assertions.assertEquals("(", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void closingRoundBracket() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " ) ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof ClosingRoundBracket);
+            Assertions.assertEquals(")", token.toString());
         } catch (final BaseException ignored) {
             oops = true;
         }

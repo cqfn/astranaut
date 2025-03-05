@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,28 +34,68 @@ import org.cqfn.astranaut.exceptions.BaseException;
  */
 public final class Package implements Entity {
     /**
+     * Parent package of the current package, or null if this is the root package.
+     */
+    private final Package parent;
+
+    /**
      * Full name of the Java package.
      */
     private final String name;
 
     /**
-     * Constructor.
-     * @param parts Parts of the package name
+     * Constructor for creating a package from a sequence of parts.
+     *  This constructor parses the parts and creates the package object.
+     *  The root package (if any) is implicitly created.
+     * @param parts Parts of the package name (may contain dots, slashes, or backslashes).
      */
     public Package(final String... parts) {
-        this.name = Package.prepareName(parts);
+        this(Package.parseParts(parts));
     }
 
     /**
-     * Returns the packet that is inside the current packet.
-     * @param parts Parts of the subpackage name
-     * @return Subpackage
+     * Private constructor used for creating a package with the parent package.
+     *  The package name is built by joining all parts into a single string.
+     * @param parts List of parts of the package name
+     */
+    private Package(final List<String> parts) {
+        this(
+            Package.createPackage(parts.subList(0, parts.size() - 1)),
+            String.join(".", parts)
+        );
+    }
+
+    /**
+     * Private constructor used to set the parent package and name of the current package.
+     * @param parent The parent package of this package
+     * @param name The name of this package
+     */
+    private Package(final Package parent, final String name) {
+        this.parent = parent;
+        this.name = name;
+    }
+
+    /**
+     * Returns the subpackage that is inside the current package.
+     *  The new subpackage is created by appending the parts to the current package name.
+     * @param parts Parts of the subpackage name to append
+     * @return Subpackage object representing the subpackage
      */
     public Package getSubpackage(final String... parts) {
-        final String[] args = new String[parts.length + 1];
-        args[0] = this.name;
-        System.arraycopy(parts, 0, args, 1, parts.length);
-        return new Package(args);
+        final List<String> parsed = Package.parseParts(parts);
+        Package pkg = this;
+        for (final String part : parsed) {
+            pkg = new Package(pkg, String.format("%s.%s", pkg.name, part));
+        }
+        return pkg;
+    }
+
+    /**
+     * Returns the parent package of the current package.
+     * @return The parent package, or null if this is the root package
+     */
+    public Package getParent() {
+        return this.parent;
     }
 
     @Override
@@ -69,11 +109,12 @@ public final class Package implements Entity {
     }
 
     /**
-     * Prepares the name of the package from the parts.
-     * @param parts Parts of the package name
-     * @return Full name of the Java package
+     * Parses the parts of a package name (handling slashes, backslashes, and dots).
+     *  The parts are normalized into a list of strings representing each component of the package.
+     * @param parts Parts of the package name (can include slashes or backslashes)
+     * @return A list of strings representing the parsed parts of the package
      */
-    private static String prepareName(final String... parts) {
+    private static List<String> parseParts(final String... parts) {
         final List<String> list = new LinkedList<>();
         for (final String part : parts) {
             final String prepared = part
@@ -82,6 +123,22 @@ public final class Package implements Entity {
                 .replace('/', '.');
             list.addAll(Arrays.asList(prepared.split("\\.")));
         }
-        return String.join(".", list);
+        return list;
+    }
+
+    /**
+     * Creates a new Package object based on the provided list of parts.
+     *  If the list is empty, null is returned.
+     * @param parts List of parts representing the package name
+     * @return A Package object representing the given parts, or null if the list is empty
+     */
+    private static Package createPackage(final List<String> parts) {
+        final Package pkg;
+        if (parts.isEmpty()) {
+            pkg = null;
+        } else {
+            pkg = new Package(parts);
+        }
+        return pkg;
     }
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +25,18 @@ package org.cqfn.astranaut.codegen.java;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
+import org.cqfn.astranaut.dsl.ChildDescriptorExt;
+import org.cqfn.astranaut.dsl.Rule;
 
 /**
  * Generator that creates compilation units that describe an abstract node.
  * @since 1.0.0
  */
-public final class AbstractNodeGenerator implements  RuleGenerator {
+public final class AbstractNodeGenerator extends RuleGenerator {
     /**
      * Descriptor on the basis of which the source code will be built.
      */
@@ -44,6 +48,11 @@ public final class AbstractNodeGenerator implements  RuleGenerator {
      */
     public AbstractNodeGenerator(final AbstractNodeDescriptor rule) {
         this.rule = rule;
+    }
+
+    @Override
+    public Rule getRule() {
+        return this.rule;
     }
 
     @Override
@@ -65,6 +74,7 @@ public final class AbstractNodeGenerator implements  RuleGenerator {
             );
         }
         iface.setVersion(context.getVersion());
+        this.createGettersForTaggedFields(iface);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
@@ -74,6 +84,41 @@ public final class AbstractNodeGenerator implements  RuleGenerator {
             final String base = "org.cqfn.astranaut.core.base.";
             unit.addImport(base.concat(Strings.TYPE_NODE));
         }
+        this.resolveDependencies(unit, context);
         return Collections.singleton(unit);
+    }
+
+    /**
+     * Creates getters for all tagged children.
+     * @param iface Interface describing abstract node
+     */
+    private void createGettersForTaggedFields(final Interface iface) {
+        final Map<String, ChildDescriptorExt> tags = this.rule.getTags();
+        for (final Map.Entry<String, ChildDescriptorExt> entry : tags.entrySet()) {
+            final String tag = entry.getKey();
+            if (this.rule.baseHasTag(tag)) {
+                continue;
+            }
+            final MethodSignature getter = new MethodSignature(
+                entry.getValue().getType(),
+                String.format(
+                    "get%s%s",
+                    tag.substring(0, 1).toUpperCase(Locale.ENGLISH),
+                    tag.substring(1)
+                ),
+                String.format("Returns child node with '%s' tag", tag)
+            );
+            if (entry.getValue().isOptional()) {
+                getter.setReturnsDescription(
+                    String.format(
+                        "Child node or {@code null} if the node with '%s' tag is not specified",
+                        tag
+                    )
+                );
+            } else {
+                getter.setReturnsDescription("Child node (can't be {@code null})");
+            }
+            iface.addMethodSignature(getter);
+        }
     }
 }

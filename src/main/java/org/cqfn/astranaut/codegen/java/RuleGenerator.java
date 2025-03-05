@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,45 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.Set;
+import org.cqfn.astranaut.dsl.NodeDescriptor;
+import org.cqfn.astranaut.dsl.Rule;
 
 /**
  * Generator that creates compilation units that describe a node or transformation.
  * @since 1.0.0
  */
-public interface RuleGenerator {
+public abstract class RuleGenerator {
+    /**
+     * Returns the rule for which the source code is generated.
+     * @return Rule
+     */
+    public abstract Rule getRule();
+
     /**
      * Creates compilation units that describe a node or transformation.
      * @param context Data required to generate Java source code
      * @return Set of created compilation units (contains at least one)
      */
-    Set<CompilationUnit> createUnits(Context context);
+    public abstract Set<CompilationUnit> createUnits(Context context);
+
+    /**
+     * Resolves dependencies for the given compilation unit by adding the necessary imports.
+     * @param unit The compilation unit to which imports are being added
+     * @param context Data required to generate Java source code
+     */
+    protected void resolveDependencies(final CompilationUnit unit, final Context context) {
+        final Rule rule = this.getRule();
+        final String language = rule.getLanguage();
+        final Set<NodeDescriptor> dependencies = rule.getDependencies();
+        for (final NodeDescriptor descriptor : dependencies) {
+            if (!descriptor.getLanguage().equals(language)) {
+                final Package pkg = context
+                    .getPackage()
+                    .getParent()
+                    .getParent()
+                    .getSubpackage(descriptor.getLanguage(), "nodes");
+                unit.addImport(String.format("%s.%s", pkg.toString(), descriptor.getName()));
+            }
+        }
+    }
 }

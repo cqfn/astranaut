@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ class ContextTest {
     void testBaseInterface() {
         final Context.Constructor ctor = new Context.Constructor();
         Assertions.assertThrows(IllegalStateException.class, ctor::createContext);
-        ctor.setLicense(new License("Copyright (c) 2024 John Doe"));
+        ctor.setLicense(new License("Copyright (c) 2025 John Doe"));
         Assertions.assertThrows(IllegalStateException.class, ctor::createContext);
         ctor.setPackage(new Package("org.cqfn.astranaut.test"));
         Assertions.assertThrows(IllegalStateException.class, ctor::createContext);

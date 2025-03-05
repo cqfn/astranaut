@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 class CompilationUnitTest {
     @Test
     void withoutImports() {
-        final License license = new License("Copyright (c) 2024 John Doe");
+        final License license = new License("Copyright (c) 2025 John Doe");
         final Package pkg = new Package("org.cqfn.astranaut.test0");
         final Klass klass = new Klass("Test0", "This class does nothing.");
         klass.setVersion("0.0.1");
@@ -44,7 +44,7 @@ class CompilationUnitTest {
             "\n",
             Arrays.asList(
                 "/*",
-                " * Copyright (c) 2024 John Doe",
+                " * Copyright (c) 2025 John Doe",
                 " */",
                 "package org.cqfn.astranaut.test0;",
                 "",
@@ -70,7 +70,7 @@ class CompilationUnitTest {
 
     @Test
     void withImports() {
-        final License license = new License("Copyright (c) 2024 Jane Doe");
+        final License license = new License("Copyright (c) 2025 Jane Doe");
         final Package pkg = new Package("org.cqfn.astranaut.test1");
         final Klass klass = new Klass("Test1", "This class needs imports.");
         klass.setVersion("0.0.2");
@@ -82,7 +82,7 @@ class CompilationUnitTest {
             "\n",
             Arrays.asList(
                 "/*",
-                " * Copyright (c) 2024 Jane Doe",
+                " * Copyright (c) 2025 Jane Doe",
                 " */",
                 "package org.cqfn.astranaut.test1;",
                 "",

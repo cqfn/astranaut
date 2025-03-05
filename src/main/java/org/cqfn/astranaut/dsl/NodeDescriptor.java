@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import org.cqfn.astranaut.exceptions.BaseException;
 
@@ -57,26 +58,56 @@ public abstract class NodeDescriptor implements Rule {
     private final List<AbstractNodeDescriptor> bases;
 
     /**
+     * Set of nodes on which this node depends. These can be child or base node types.
+     */
+    private final Set<NodeDescriptor> dependencies;
+
+    /**
+     * Inheritance topology (cached list).
+     */
+    private List<NodeDescriptor> topology;
+
+    /**
      * Constructor.
      * @param name Name of the type of the node (left side of the rule)
      */
     public NodeDescriptor(final String name) {
-        this.language = "";
+        this.language = "common";
         this.name = name;
         this.bases = new ArrayList<>(1);
+        this.dependencies = new HashSet<>();
     }
+
+    /**
+     * Returns the set of tags that have child nodes and their corresponding descriptors.
+     * @return Tags correlated with descriptors
+     */
+    public abstract Map<String, ChildDescriptorExt> getTags();
 
     /**
      * Sets the name of the programming language for which this node descriptor is described.
      * @param value Name of the programming language
      */
     public void setLanguage(final String value) {
+        if (value.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
         this.language = value.toLowerCase(Locale.ENGLISH);
     }
 
     @Override
     public final String getLanguage() {
         return this.language;
+    }
+
+    @Override
+    public final void addDependency(final NodeDescriptor descriptor) {
+        this.dependencies.add(descriptor);
+    }
+
+    @Override
+    public final Set<NodeDescriptor> getDependencies() {
+        return Collections.unmodifiableSet(this.dependencies);
     }
 
     /**
@@ -98,6 +129,7 @@ public abstract class NodeDescriptor implements Rule {
             throw new CycleException(descriptor);
         }
         this.bases.add(descriptor);
+        this.dependencies.add(descriptor);
     }
 
     /**
@@ -114,10 +146,45 @@ public abstract class NodeDescriptor implements Rule {
      * @return A list of descriptors consisting of at least one descriptor (this one)
      */
     public List<NodeDescriptor> getTopology() {
-        final List<NodeDescriptor> topology = new LinkedList<>();
-        final Set<NodeDescriptor> visited = new HashSet<>();
-        this.buildTopology(topology, visited);
-        return topology;
+        if (this.topology == null) {
+            this.topology = new LinkedList<>();
+            final Set<NodeDescriptor> visited = new HashSet<>();
+            this.buildTopology(this.topology, visited);
+        }
+        return this.topology;
+    }
+
+    /**
+     * Checks if the given tag exists in the current descriptor or any of its base descriptors.
+     * @param tag The tag to search for
+     * @return Checking result, {@code true} if the tag exists, either in the current descriptor
+     *  or one of its base descriptors, {@code false} otherwise.
+     */
+    public boolean hasTag(final String tag) {
+        final Map<String, ChildDescriptorExt> tags = this.getTags();
+        boolean result = tags.containsKey(tag);
+        if (!result) {
+            result = this.baseHasTag(tag);
+        }
+        return result;
+    }
+
+    /**
+     * Checks if the given tag exists in any of the base descriptors.
+     * It iterates over all base descriptors and checks if the tag is present in any of them.
+     * @param tag The tag to search for.
+     * @return Checking result, {@code true} if the tag exists in any of the base descriptors,
+     *  {@code false} otherwise.
+     */
+    public boolean baseHasTag(final String tag) {
+        boolean result = false;
+        for (final AbstractNodeDescriptor base : this.bases) {
+            if (base.hasTag(tag)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
     /**
@@ -143,19 +210,19 @@ public abstract class NodeDescriptor implements Rule {
 
     /**
      * Recursively performs topological sorting of the inheritance graph.
-     * @param topology List to which the sorted descriptors will be added
+     * @param list List to which the sorted descriptors will be added
      * @param visited Visited descriptors, it is necessary not to process them repeatedly
      */
-    private void buildTopology(final List<NodeDescriptor> topology,
+    private void buildTopology(final List<NodeDescriptor> list,
         final Set<NodeDescriptor> visited) {
         if (!visited.contains(this)) {
             final ListIterator<AbstractNodeDescriptor> iterator =
                 this.bases.listIterator(this.bases.size());
             while (iterator.hasPrevious()) {
                 final NodeDescriptor base = iterator.previous();
-                base.buildTopology(topology, visited);
+                base.buildTopology(list, visited);
             }
-            topology.add(0, this);
+            list.add(0, this);
             visited.add(this);
         }
     }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -90,7 +90,7 @@ public final class Main {
         reader.readFile(args[1]);
         final ProgramParser parser = new ProgramParser();
         final Program program = parser.parse(reader);
-        final Analyzer analyzer = new Analyzer(program);
+        final Analyzer analyzer = new Analyzer(program, parser.getLocations());
         analyzer.analyze();
         action.perform(program, Arrays.asList(args).subList(2, args.length));
     }

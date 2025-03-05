@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,11 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.Program;
@@ -80,7 +84,7 @@ public class FactoryGenerator {
         instance.makeFinal(String.format("new %s()", classname));
         klass.addField(instance);
         FactoryGenerator.createMapOfProperties(language, klass);
-        this.createMapOfTypes(language, klass);
+        final Set<NodeDescriptor> dependencies = this.createMapOfTypes(language, klass);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
@@ -91,6 +95,16 @@ public class FactoryGenerator {
         unit.addImport("org.cqfn.astranaut.core.base.Factory");
         unit.addImport("org.cqfn.astranaut.core.base.Type");
         unit.addImport("org.cqfn.astranaut.core.utils.MapUtils");
+        for (final NodeDescriptor dependency : dependencies) {
+            if (!dependency.getLanguage().equals(language)) {
+                final Package pkg = context
+                    .getPackage()
+                    .getParent()
+                    .getParent()
+                    .getSubpackage(dependency.getLanguage(), "nodes");
+                unit.addImport(String.format("%s.%s", pkg.toString(), dependency.getName()));
+            }
+        }
         return unit;
     }
 
@@ -126,8 +140,10 @@ public class FactoryGenerator {
      * Creates a collection that contains types supported by this factory.
      * @param language Language for which the factory is generated
      * @param klass The class to which to add the field
+     * @return Dependencies Set of descriptors to be imported
      */
-    private void createMapOfTypes(final String language, final Klass klass) {
+    private Set<NodeDescriptor> createMapOfTypes(final String language, final Klass klass) {
+        final Set<NodeDescriptor> dependencies = new HashSet<>();
         final Field field = new Field(
             "Map<String, Type>",
             "TYPES",
@@ -137,7 +153,17 @@ public class FactoryGenerator {
         field.makeStatic();
         final StringBuilder builder = new StringBuilder(128);
         builder.append("new MapUtils<String, Type>()");
-        for (final NodeDescriptor rule : this.program.getNodeDescriptorsForLanguage(language)) {
+        final Map<String, NodeDescriptor> rules;
+        if (language.equals("common")) {
+            rules = this.program.getNodeDescriptorsByLanguage(language);
+        } else {
+            rules = new TreeMap<>(this.program.getNodeDescriptorsByLanguage(language));
+            final Map<String, NodeDescriptor> common =
+                this.program.getNodeDescriptorsByLanguage("common");
+            rules.putAll(common);
+        }
+        for (final Map.Entry<String, NodeDescriptor> entry : rules.entrySet()) {
+            final NodeDescriptor rule = entry.getValue();
             if (!(rule instanceof AbstractNodeDescriptor)) {
                 builder
                     .append(".put(")
@@ -145,10 +171,12 @@ public class FactoryGenerator {
                     .append(".NAME, ")
                     .append(rule.getName())
                     .append(".TYPE)");
+                dependencies.add(rule);
             }
         }
         builder.append(".make()");
         field.makeFinal(builder.toString());
         klass.addField(field);
+        return dependencies;
     }
 }

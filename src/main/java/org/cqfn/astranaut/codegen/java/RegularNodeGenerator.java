@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,19 +47,12 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
     private final String[] names;
 
     /**
-     * Flag indicating that this node is a wrapper (decorator) of another node.
-     */
-    private final boolean decorator;
-
-    /**
      * Constructor.
      * @param rule The rule that describes regular node
      */
     public RegularNodeGenerator(final RegularNodeDescriptor rule) {
         this.rule = rule;
         this.names = RegularNodeGenerator.generateVariableNames(rule);
-        this.decorator = rule.getExtChildTypes().size() == 1
-            && !rule.getExtChildTypes().get(0).isOptional();
     }
 
     @Override
@@ -167,7 +160,7 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
         final List<String> lines = new ArrayList<>(1);
         if (this.names.length == 0) {
             lines.add("return list.isEmpty();");
-        } else if (this.decorator) {
+        } else if (this.names.length == 1 && !children.get(0).isOptional()) {
             final String type = children.get(0).getType();
             lines.add("boolean result = false;");
             lines.add(
@@ -253,7 +246,7 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
                 );
             }
         }
-        if (this.decorator) {
+        if (this.names.length == 1 && !children.get(0).isOptional()) {
             this.needCollectionsClass();
             lines.add(
                 String.format(
@@ -300,6 +293,10 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
             );
             field.makePrivate();
             klass.addField(field);
+            String brief = "";
+            if (!this.rule.baseHasTag(tag)) {
+                brief = String.format("Returns child node with '%s' tag", tag);
+            }
             final Method getter = new Method(
                 descriptor.getType(),
                 String.format(
@@ -307,7 +304,7 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
                     tag.substring(0, 1).toUpperCase(Locale.ENGLISH),
                     tag.substring(1)
                 ),
-                String.format("Returns child node with '%s' tag", tag)
+                brief
             );
             getter.makePublic();
             if (descriptor.isOptional()) {

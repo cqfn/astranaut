@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,11 @@
 package org.cqfn.astranaut.dsl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -34,60 +37,90 @@ import java.util.TreeSet;
  */
 public final class Program {
     /**
-     * List of all rules.
+     * List of all rules (immutable).
      */
     private final List<Rule> all;
+
+    /**
+     * Cached result for getAllLanguages().
+     */
+    private Set<String> languages;
+
+    /**
+     * Cached result for getNodeDescriptorsByLanguage().
+     */
+    private final Map<String, Map<String, NodeDescriptor>> nodes;
 
     /**
      * Constructor.
      * @param all List of all rules
      */
     public Program(final List<Rule> all) {
-        this.all = all;
+        this.all = Collections.unmodifiableList(new ArrayList<>(all));
+        this.nodes = new TreeMap<>();
+    }
+
+    /**
+     * Returns all rules in the order they are declared in the DSL file.
+     * @return A list of rules.
+     */
+    public List<Rule> getAllRules() {
+        return this.all;
     }
 
     /**
      * Returns a list of all languages for which at least one rule is described.
-     * @return A list containing at least one element
+     * @return A set containing at least one element
      */
     public Set<String> getAllLanguages() {
-        final Set<String> list = new TreeSet<>();
-        for (final Rule rule : this.all) {
-            list.add(Program.fixLanguage(rule.getLanguage()));
-        }
-        return list;
-    }
-
-    /**
-     * Returns a list of node descriptors for one language.
-     * @param name Language name
-     * @return List of node descriptors for this language
-     */
-    public List<NodeDescriptor> getNodeDescriptorsForLanguage(final String name) {
-        final String fixed = Program.fixLanguage(name);
-        final List<NodeDescriptor> list = new ArrayList<>(0);
-        for (final Rule rule : this.all) {
-            if (rule instanceof NodeDescriptor
-                && Program.fixLanguage(rule.getLanguage()).equals(fixed)) {
-                list.add((NodeDescriptor) rule);
+        if (this.languages == null) {
+            final Set<String> set = new TreeSet<>();
+            for (final Rule rule : this.all) {
+                set.add(rule.getLanguage());
             }
+            this.languages = Collections.unmodifiableSet(set);
         }
-        return list;
+        return this.languages;
     }
 
     /**
-     * Fixes the language name, so that an empty name becomes “common”.
-     *  This gives us a non-empty folder and package name.
-     * @param name Language name
-     * @return Fixed language name
+     * Returns an immutable map of node descriptors for the specified language.
+     * The map is cached for performance.
+     * @param language The language to get the node descriptors for
+     * @return An immutable map of node descriptors
      */
-    private static String fixLanguage(final String name) {
-        final String result;
-        if (name.isEmpty()) {
-            result = "common";
+    public Map<String, NodeDescriptor> getNodeDescriptorsByLanguage(final String language) {
+        final Map<String, NodeDescriptor> result;
+        if (this.nodes.containsKey(language)) {
+            result = this.nodes.get(language);
         } else {
-            result = name;
+            final Map<String, NodeDescriptor> descriptors = new TreeMap<>();
+            for (final Rule rule : this.all) {
+                if (rule instanceof NodeDescriptor && rule.getLanguage().equals(language)) {
+                    final NodeDescriptor descriptor = (NodeDescriptor) rule;
+                    descriptors.put(descriptor.getName(), descriptor);
+                }
+            }
+            result = Collections.unmodifiableMap(descriptors);
+            this.nodes.put(language, result);
         }
         return result;
+    }
+
+    /**
+     * Returns a node descriptor by name and language.
+     * If the descriptor is not found in the specified language, it searches in the "common"
+     * language (if the specified language is not "common").
+     * @param name The name of the node descriptor
+     * @param language The language to search in
+     * @return The node descriptor, or {@code null} if not found
+     */
+    public NodeDescriptor getNodeDescriptorByNameAndLanguage(final String name,
+        final String language) {
+        NodeDescriptor descriptor = this.getNodeDescriptorsByLanguage(language).get(name);
+        if (descriptor == null && !"common".equals(language)) {
+            descriptor = this.getNodeDescriptorsByLanguage("common").get(name);
+        }
+        return descriptor;
     }
 }

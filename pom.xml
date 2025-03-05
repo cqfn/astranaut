@@ -2,7 +2,7 @@
 <!--
 The MIT License (MIT)
 
-Copyright (c) 2024 Ivan Kniazkov
+Copyright (c) 2025 Ivan Kniazkov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -67,7 +67,7 @@ SOFTWARE.
     <maven.compiler.target>8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <qulice.license>${project.basedir}/LICENSE.txt</qulice.license>
-    <core.version>1.2.2</core.version>
+    <core.version>1.2.6</core.version>
   </properties>
   <build>
     <plugins>

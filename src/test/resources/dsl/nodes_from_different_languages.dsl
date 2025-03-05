@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,5 +22,15 @@
  * SOFTWARE.
  */
 
-This <- 0;
-XXX
+    IntegerLiteral <- 'int';
+    StringLiteral <- 'String', '""';
+    Expression <- IntegerLiteral | StringLiteral;
+
+    Return <- [expr@Expression];
+    Statement <- Return | 0;
+
+    StrangeButValidStatement <- 0;
+
+java:
+    Synchronized <- obj@Expression, stmt@Statement;
+    JavaStatement <- Statement | Synchronized | StrangeButValidStatement;
