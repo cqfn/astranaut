@@ -90,9 +90,6 @@ public class TransformationDescriptorParser {
         while (true) {
             final LeftSideParser parser = new LeftSideParser(scanner, 0);
             final LeftSideItem item = parser.parseLeftSideItem();
-            if (item == null) {
-                break;
-            }
             list.add(item);
             Token next = parser.getLastToken();
             if (next == null) {
@@ -108,12 +105,6 @@ public class TransformationDescriptorParser {
                 );
             }
         }
-        if (list.isEmpty()) {
-            throw new CommonParsingException(
-                this.stmt.getLocation(),
-                "The left side must contain at least one descriptor"
-            );
-        }
         return list;
     }
 
@@ -123,16 +114,11 @@ public class TransformationDescriptorParser {
      * @return Resulting descriptor
      * @throws ParsingException  If the parse fails
      */
+    @SuppressWarnings("PMD.PrematureDeclaration")
     private RightSideItem parseRightSide(final String code) throws ParsingException {
         final Scanner scanner = new Scanner(this.stmt.getLocation(), code);
         final RightSideItemParser parser = new RightSideItemParser(scanner, 0);
         final RightSideItem item = parser.parseItem();
-        if (item == null) {
-            throw new CommonParsingException(
-                this.stmt.getLocation(),
-                "There should be a subtree or an untyped hole to the right of the delimiter '->'"
-            );
-        }
         Token next = parser.getLastToken();
         if (next == null) {
             next = scanner.getToken();

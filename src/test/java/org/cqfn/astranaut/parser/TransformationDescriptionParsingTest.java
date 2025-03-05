@@ -66,6 +66,19 @@ class TransformationDescriptionParsingTest {
         Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
     }
 
+    @Test
+    void listOfNodesToNode() {
+        final String code = "AAA, BBB<'ccc'>, DDD#3, EEE<#4> -> XXX";
+        final TransformationDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertEquals(code, descriptor.toString());
+    }
+
+    @Test
+    void extraToken() {
+        final TransformationDescriptorParser parser = this.createParser("AAA -> BBB, CCC");
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
     /**
     * Creates a {@link TransformationDescriptorParser} from the given DSL source code.
     * @param code The DSL source code to be parsed
