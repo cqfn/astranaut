@@ -458,6 +458,12 @@ class LeftSideParsingTest {
     }
 
     @Test
+    void badHoleData() {
+        final LeftSideParser parser = this.createParser("AAA<#BBB>");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
     void optionalTypedHole() {
         final String code = "[Variable#31]";
         LeftSideParser parser = this.createParser(code);
