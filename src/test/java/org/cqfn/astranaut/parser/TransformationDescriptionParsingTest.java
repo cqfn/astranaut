@@ -79,6 +79,12 @@ class TransformationDescriptionParsingTest {
         Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
     }
 
+    @Test
+    void badDelimeter() {
+        final TransformationDescriptorParser parser = this.createParser("AAA BBB -> CCC");
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
     /**
     * Creates a {@link TransformationDescriptorParser} from the given DSL source code.
     * @param code The DSL source code to be parsed
