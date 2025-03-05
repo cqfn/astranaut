@@ -584,6 +584,6 @@ class LeftSideParsingTest {
      */
     private LeftSideParser createParser(final String code) {
         final Scanner scanner = new Scanner(LeftSideParsingTest.LOCATION, code);
-        return new LeftSideParser(scanner, 0);
+        return new LeftSideParser(scanner, 0, new HoleCounter());
     }
 }

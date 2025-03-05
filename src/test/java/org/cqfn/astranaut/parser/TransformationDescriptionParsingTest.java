@@ -85,6 +85,30 @@ class TransformationDescriptionParsingTest {
         Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
     }
 
+    @Test
+    void duplicateTypedNode() {
+        final TransformationDescriptorParser parser = this.createParser(
+            "AAA#1, BBB#1 -> CCC(#1)"
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void duplicateUntypedHole() {
+        final TransformationDescriptorParser parser = this.createParser(
+            "AAA(#1, #1) -> BBB(#1)"
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void duplicateDataHole() {
+        final TransformationDescriptorParser parser = this.createParser(
+            "AAA<#1>, BBB<#1> -> CCC<#1>"
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
     /**
     * Creates a {@link TransformationDescriptorParser} from the given DSL source code.
     * @param code The DSL source code to be parsed

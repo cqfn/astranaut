@@ -39,6 +39,7 @@ import org.cqfn.astranaut.dsl.UntypedHole;
  * Parses an item that is part of the left side of a transformation rule.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class LeftSideParser {
     /**
      * Scanner that produces a sequence of tokens.
@@ -51,18 +52,26 @@ public class LeftSideParser {
     private final int nesting;
 
     /**
+     * Count of holes resulting from parsing.
+     */
+    private final HoleCounter holes;
+
+    /**
      * The last token received from the scanner but not accepted by the parser.
      */
     private Token last;
 
     /**
      * Constructor.
+     *
      * @param scanner Scanner
      * @param nesting Descriptor nesting level
+     * @param holes Count of holes resulting from parsing
      */
-    public LeftSideParser(final Scanner scanner, final int nesting) {
+    public LeftSideParser(final Scanner scanner, final int nesting, final HoleCounter holes) {
         this.scanner = scanner;
         this.nesting = nesting;
+        this.holes = holes;
     }
 
     /**
@@ -111,7 +120,7 @@ public class LeftSideParser {
         } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
             item = null;
         } else if (first instanceof HashSymbol) {
-            item = this.parseUntypedHole();
+            item = this.parseUntypedNodeHole();
         } else {
             throw new InappropriateToken(this.scanner.getLocation(), first);
         }
@@ -127,16 +136,44 @@ public class LeftSideParser {
     }
 
     /**
-     * Parses a sequence of tokens as an untyped hole.
+     * Parses a sequence of tokens as an untyped node hole.
      * @return An untyped hole
      * @throws ParsingException If the parse fails
      */
-    private UntypedHole parseUntypedHole() throws ParsingException {
+    private UntypedHole parseUntypedNodeHole() throws ParsingException {
         final Token token = this.scanner.getToken();
         if (!(token instanceof Number)) {
             throw new BadHole(this.scanner.getLocation());
         }
         final int value = ((Number) token).getValue();
+        if (this.holes.hasNodeHole(value)) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                String.format("Hole with number #%d replacing a node has already been used", value)
+            );
+        }
+        this.holes.addNodeHole(value);
+        return UntypedHole.getInstance(value);
+    }
+
+    /**
+     * Parses a sequence of tokens as an untyped data hole.
+     * @return An untyped hole
+     * @throws ParsingException If the parse fails
+     */
+    private UntypedHole parseUntypedDataHole() throws ParsingException {
+        final Token token = this.scanner.getToken();
+        if (!(token instanceof Number)) {
+            throw new BadHole(this.scanner.getLocation());
+        }
+        final int value = ((Number) token).getValue();
+        if (this.holes.hasDataHole(value)) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                String.format("Hole with number #%d replacing data has already been used", value)
+            );
+        }
+        this.holes.addDataHole(value);
         return UntypedHole.getInstance(value);
     }
 
@@ -152,6 +189,13 @@ public class LeftSideParser {
             throw new BadHole(this.scanner.getLocation());
         }
         final int value = ((Number) token).getValue();
+        if (this.holes.hasNodeHole(value)) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                String.format("Hole with number #%d replacing a node has already been used", value)
+            );
+        }
+        this.holes.addNodeHole(value);
         return new TypedHole(type, value);
     }
 
@@ -217,7 +261,7 @@ public class LeftSideParser {
         final LeftDataDescriptor data;
         final Token first = this.scanner.getToken();
         if (first instanceof HashSymbol) {
-            data = this.parseUntypedHole();
+            data = this.parseUntypedDataHole();
         } else if (first instanceof StringToken) {
             data = new StaticString((StringToken) first);
         } else {
@@ -246,7 +290,8 @@ public class LeftSideParser {
         do {
             final LeftSideParser parser = new LeftSideParser(
                 this.scanner,
-                this.nesting + 1
+                this.nesting + 1,
+                this.holes
             );
             final PatternItem child = parser.parsePatternItem();
             if (child == null) {
@@ -283,7 +328,7 @@ public class LeftSideParser {
                 "An identifier after '[' is expected. Only patterns or typed holes can be optional"
             );
         }
-        final LeftSideParser parser = new LeftSideParser(this.scanner, 0);
+        final LeftSideParser parser = new LeftSideParser(this.scanner, 0, this.holes);
         final LeftSideItem item = parser.parsePatternOrTypedHole(first.toString());
         item.setMatchingMode(PatternMatchingMode.OPTIONAL);
         Token next = parser.getLastToken();
@@ -312,7 +357,7 @@ public class LeftSideParser {
                 "An identifier after '{' is expected. Only patterns or typed holes can be repeated"
             );
         }
-        final LeftSideParser parser = new LeftSideParser(this.scanner, 0);
+        final LeftSideParser parser = new LeftSideParser(this.scanner, 0, this.holes);
         final LeftSideItem item = parser.parsePatternOrTypedHole(first.toString());
         item.setMatchingMode(PatternMatchingMode.REPEATED);
         Token next = parser.getLastToken();

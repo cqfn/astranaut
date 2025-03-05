@@ -71,7 +71,8 @@ public class TransformationDescriptorParser {
                 "One and only one '->' separator is allowed"
             );
         }
-        final List<LeftSideItem> left = this.parseLeftSide(parts[0]);
+        final HoleCounter lholes = new HoleCounter();
+        final List<LeftSideItem> left = this.parseLeftSide(parts[0], lholes);
         final RightSideItem right = this.parseRightSide(parts[1]);
         final TransformationDescriptor result = new TransformationDescriptor(left, right);
         result.setLanguage(this.language);
@@ -81,14 +82,16 @@ public class TransformationDescriptorParser {
     /**
      * Parses Parses the left side of the transformation rule, i.e., the list of patterns.
      * @param code Source code of the left part
+     * @param holes Count of holes resulting from parsing
      * @return List of patterns containing at least one pattern
      * @throws ParsingException  If the parse fails
      */
-    private List<LeftSideItem> parseLeftSide(final String code) throws ParsingException {
+    private List<LeftSideItem> parseLeftSide(final String code, final HoleCounter holes)
+        throws ParsingException {
         final List<LeftSideItem> list = new ArrayList<>(1);
         final Scanner scanner = new Scanner(this.stmt.getLocation(), code);
         while (true) {
-            final LeftSideParser parser = new LeftSideParser(scanner, 0);
+            final LeftSideParser parser = new LeftSideParser(scanner, 0, holes);
             final LeftSideItem item = parser.parseLeftSideItem();
             list.add(item);
             Token next = parser.getLastToken();
