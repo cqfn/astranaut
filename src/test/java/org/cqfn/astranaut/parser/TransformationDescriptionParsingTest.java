@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.parser;
 
+import org.cqfn.astranaut.dsl.RightSideItem;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
@@ -45,6 +46,12 @@ class TransformationDescriptionParsingTest {
         final TransformationDescriptor descriptor = this.parseDescriptor(code);
         Assertions.assertEquals(code, descriptor.toString());
         Assertions.assertEquals(1, descriptor.getLeft().size());
+        final RightSideItem right = descriptor.getRight();
+        Assertions.assertEquals("This", right.toString());
+        Assertions.assertEquals("common", descriptor.getLanguage());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> descriptor.setLanguage(""));
+        descriptor.setLanguage("JAVA");
+        Assertions.assertEquals("java", descriptor.getLanguage());
     }
 
     @Test

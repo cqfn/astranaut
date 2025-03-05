@@ -280,6 +280,12 @@ class RightSideItemParsingTest {
     }
 
     @Test
+    void badDataHole() {
+        final RightSideItemParser parser = this.createParser("AAA<#BBB>");
+        Assertions.assertThrows(ParsingException.class, parser::parseItem);
+    }
+
+    @Test
     void emptyInput() {
         final RightSideItemParser parser = this.createParser(" ");
         boolean oops = false;
