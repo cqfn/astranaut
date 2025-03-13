@@ -189,6 +189,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -314,6 +315,13 @@ public final class IntegerLiteral implements Expression {
          */
         private int data;
 
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
@@ -389,6 +397,7 @@ import java.util.Map;
 import org.cqfn.astranaut.core.algorithms.NodeAllocator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -536,6 +545,13 @@ public final class Return implements Statement {
          */
         private Expression expr;
 
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
@@ -645,6 +661,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -762,6 +779,13 @@ public final class StrangeButValidStatement implements JavaStatement {
          */
         private Fragment fragment;
 
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
@@ -821,6 +845,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -949,7 +974,8 @@ public final class StringLiteral implements Expression {
         /**
          * Constructor.
          */
-        Constructor() {
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
             this.data = "";
         }
 
@@ -1158,6 +1184,7 @@ import java.util.Map;
 import org.cqfn.astranaut.core.algorithms.NodeAllocator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -1337,6 +1364,13 @@ public final class Synchronized implements JavaStatement {
          * Child node with 'stmt' tag.
          */
         private Statement stmt;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
 
         @Override
         public void setFragment(final Fragment object) {

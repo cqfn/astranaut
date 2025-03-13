@@ -126,6 +126,7 @@ public abstract class NonAbstractNodeGenerator extends RuleGenerator {
         final String base = "org.cqfn.astranaut.core.base.";
         unit.addImport(base.concat(Strings.TYPE_NODE));
         unit.addImport(base.concat(Strings.TYPE_FRAGMENT));
+        unit.addImport(base.concat(Strings.TYPE_EMPTY_FRAG));
         unit.addImport(base.concat(Strings.TYPE_TYPE));
         unit.addImport(base.concat(Strings.TYPE_BUILDER));
         if (this.chldecr) {
