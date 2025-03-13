@@ -130,6 +130,12 @@ public final class Addition implements BinaryExpression {
      */
     private List<Node> children;
 
+    /**
+     * Constructor.
+     */
+    private Addition() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -518,6 +524,12 @@ public final class IntegerLiteral implements Expression {
      */
     private int data;
 
+    /**
+     * Constructor.
+     */
+    private IntegerLiteral() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -708,6 +720,12 @@ public final class PostfixDecrement implements PostfixOperator, UnaryExpression 
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private PostfixDecrement() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -935,6 +953,12 @@ public final class PostfixIncrement implements PostfixOperator, UnaryExpression 
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private PostfixIncrement() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -1202,6 +1226,12 @@ public final class PrefixDecrement implements PrefixOperator, UnaryExpression {
      */
     private List<Node> children;
 
+    /**
+     * Constructor.
+     */
+    private PrefixDecrement() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -1428,6 +1458,12 @@ public final class PrefixIncrement implements PrefixOperator, UnaryExpression {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private PrefixIncrement() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -1689,6 +1725,12 @@ public final class StringLiteral implements Expression {
      */
     private String data;
 
+    /**
+     * Constructor.
+     */
+    private StringLiteral() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -1888,6 +1930,12 @@ public final class Subtraction implements BinaryExpression {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private Subtraction() {
+    }
 
     @Override
     public Fragment getFragment() {

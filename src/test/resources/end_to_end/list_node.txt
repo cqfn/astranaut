@@ -181,6 +181,12 @@ public final class Entities implements Node {
      */
     private List<Entity> children;
 
+    /**
+     * Constructor.
+     */
+    private Entities() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -361,6 +367,12 @@ public final class Entity implements Node {
      * Fragment of source code that is associated with the node.
      */
     private Fragment fragment;
+
+    /**
+     * Constructor.
+     */
+    private Entity() {
+    }
 
     @Override
     public Fragment getFragment() {

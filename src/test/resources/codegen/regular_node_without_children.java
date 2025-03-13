@@ -31,6 +31,12 @@ public final class This implements Node {
      */
     private Fragment fragment;
 
+    /**
+     * Constructor.
+     */
+    private This() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;

@@ -216,6 +216,12 @@ public final class Identifier implements Node {
      */
     private String data;
 
+    /**
+     * Constructor.
+     */
+    private Identifier() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -396,6 +402,12 @@ public final class IntegerLiteral implements Expression {
      * Value of the node.
      */
     private int data;
+
+    /**
+     * Constructor.
+     */
+    private IntegerLiteral() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -581,6 +593,12 @@ public final class StringLiteral implements Expression {
      * Value of the node.
      */
     private String data;
+
+    /**
+     * Constructor.
+     */
+    private StringLiteral() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -786,6 +804,12 @@ public final class VariableDeclaration implements Node {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private VariableDeclaration() {
+    }
 
     @Override
     public Fragment getFragment() {

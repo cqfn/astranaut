@@ -85,6 +85,8 @@ public abstract class NonAbstractNodeGenerator extends RuleGenerator {
         final Klass klass = new Klass(name, brief);
         klass.makePublic();
         klass.makeFinal();
+        final Constructor ctor = klass.createConstructor();
+        ctor.makePrivate();
         final List<AbstractNodeDescriptor> bases = this.getRule().getBaseDescriptors();
         if (bases.isEmpty()) {
             klass.setImplementsList(Strings.TYPE_NODE);

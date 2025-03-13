@@ -130,6 +130,12 @@ public final class Addition implements BinaryExpression {
      */
     private List<Node> children;
 
+    /**
+     * Constructor.
+     */
+    private Addition() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -383,6 +389,12 @@ public final class Assignment implements BinaryExpression {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private Assignment() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -831,6 +843,12 @@ public final class FieldAccess implements NamedExpression {
      */
     private List<Node> children;
 
+    /**
+     * Constructor.
+     */
+    private FieldAccess() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -1085,6 +1103,12 @@ public final class Identifier implements Node {
      */
     private String data;
 
+    /**
+     * Constructor.
+     */
+    private Identifier() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -1283,6 +1307,12 @@ public final class If implements Statement {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private If() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -1552,6 +1582,12 @@ public final class IntegerLiteral implements Expression {
      */
     private int data;
 
+    /**
+     * Constructor.
+     */
+    private IntegerLiteral() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -1813,6 +1849,12 @@ public final class Return implements Decorator, Statement {
      */
     private List<Node> children;
 
+    /**
+     * Constructor.
+     */
+    private Return() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -2065,6 +2107,12 @@ public final class StatementExpression implements Decorator, Statement {
      */
     private List<Node> children;
 
+    /**
+     * Constructor.
+     */
+    private StatementExpression() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -2297,6 +2345,12 @@ public final class Subtraction implements BinaryExpression {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private Subtraction() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -2544,6 +2598,12 @@ public final class Variable implements NamedExpression {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private Variable() {
+    }
 
     @Override
     public Fragment getFragment() {

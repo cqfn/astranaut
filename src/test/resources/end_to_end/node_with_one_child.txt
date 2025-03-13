@@ -217,6 +217,12 @@ public final class IntegerLiteral implements Expression {
      */
     private int data;
 
+    /**
+     * Constructor.
+     */
+    private IntegerLiteral() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -404,6 +410,12 @@ public final class Return implements Node {
      */
     private List<Node> children;
 
+    /**
+     * Constructor.
+     */
+    private Return() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -590,6 +602,12 @@ public final class StatementExpression implements Node {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private StatementExpression() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -780,6 +798,12 @@ public final class StringLiteral implements Expression {
      * Value of the node.
      */
     private String data;
+
+    /**
+     * Constructor.
+     */
+    private StringLiteral() {
+    }
 
     @Override
     public Fragment getFragment() {

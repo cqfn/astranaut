@@ -117,6 +117,12 @@ public final class BooleanLiteral implements Literals {
      */
     private boolean data;
 
+    /**
+     * Constructor.
+     */
+    private BooleanLiteral() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -364,6 +370,12 @@ public final class IntegerLiteral implements Literals {
      */
     private int data;
 
+    /**
+     * Constructor.
+     */
+    private IntegerLiteral() {
+    }
+
     @Override
     public Fragment getFragment() {
         return this.fragment;
@@ -548,6 +560,12 @@ public final class JsonLiteral implements Literals {
      * Value of the node.
      */
     private com.kniazkov.json.JsonElement data;
+
+    /**
+     * Constructor.
+     */
+    private JsonLiteral() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -774,6 +792,12 @@ public final class StringLiteral implements Literals {
      * Value of the node.
      */
     private String data;
+
+    /**
+     * Constructor.
+     */
+    private StringLiteral() {
+    }
 
     @Override
     public Fragment getFragment() {
