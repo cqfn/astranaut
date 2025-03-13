@@ -1205,6 +1205,14 @@ public final class Identifier implements Node {
             this.fragment = object;
         }
 
+        /**
+         * Sets the value of the node to be created.
+         * @param value Value of the node
+         */
+        public void setValue(final String value) {
+            this.data = value;
+        }
+
         @Override
         public boolean setData(final String value) {
             this.data = value;
@@ -1681,6 +1689,14 @@ public final class IntegerLiteral implements Expression {
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
+        }
+
+        /**
+         * Sets the value of the node to be created.
+         * @param value Value of the node
+         */
+        public void setValue(final int value) {
+            this.data = value;
         }
 
         @Override

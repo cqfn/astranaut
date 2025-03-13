@@ -125,6 +125,15 @@ public final class LiteralGenerator extends NonAbstractNodeGenerator {
         );
         value.makePrivate();
         klass.addField(value);
+        final Method setter = new Method(
+            "void",
+            "setValue",
+            "Sets the value of the node to be created."
+        );
+        setter.makePublic();
+        setter.addArgument(this.rule.getDataType(), "value", "Value of the node");
+        setter.setBody("this.data = value;");
+        klass.addMethod(setter);
     }
 
     @Override
