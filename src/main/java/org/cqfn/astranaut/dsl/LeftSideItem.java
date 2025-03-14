@@ -23,6 +23,12 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import java.util.Map;
+import java.util.function.Function;
+import org.cqfn.astranaut.codegen.java.Klass;
+import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
+import org.cqfn.astranaut.codegen.java.NumberedLabelGenerator;
+
 /**
  * A pattern descriptor or typed hole. It is located on the left side of the transformation rules.
  * @since 1.0.0
@@ -39,4 +45,27 @@ public interface LeftSideItem {
      * @return Matching mode
      */
     PatternMatchingMode getMatchingMode();
+
+    /**
+     * Creates a generator that generates a class that implements the left side
+     *  of the transformation rule.
+     * @return A generator for creating corresponding class
+     */
+    LeftSideItemGenerator createGenerator();
+
+    /**
+     * Generates or retrieves a matcher class for this left-side item.
+     *  If a matcher for this item already exists in the provided map, it is returned.
+     *  Otherwise, a new matcher is generated and stored in the map.
+     * @param matchers A map storing previously generated matcher classes
+     * @param labels A generator for sequential labels used in class naming
+     * @return A {@link Klass} instance representing a left-side implementation
+     */
+    default Klass generateMatcher(final Map<String, Klass> matchers,
+        final NumberedLabelGenerator labels) {
+        return matchers.computeIfAbsent(
+            this.toString(),
+            s -> LeftSideItem.this.createGenerator().generate(labels)
+        );
+    }
 }

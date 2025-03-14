@@ -25,6 +25,7 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.Collections;
 import java.util.List;
+import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
 
 /**
  * Descriptor representing a pattern in the transformation rule.
@@ -107,6 +108,11 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
     @Override
     public PatternMatchingMode getMatchingMode() {
         return this.mode;
+    }
+
+    @Override
+    public LeftSideItemGenerator createGenerator() {
+        return null;
     }
 
     @Override
