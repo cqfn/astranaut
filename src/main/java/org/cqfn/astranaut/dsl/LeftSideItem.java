@@ -24,7 +24,6 @@
 package org.cqfn.astranaut.dsl;
 
 import java.util.Map;
-import java.util.function.Function;
 import org.cqfn.astranaut.codegen.java.Klass;
 import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
 import org.cqfn.astranaut.codegen.java.NumberedLabelGenerator;
@@ -63,9 +62,14 @@ public interface LeftSideItem {
      */
     default Klass generateMatcher(final Map<String, Klass> matchers,
         final NumberedLabelGenerator labels) {
-        return matchers.computeIfAbsent(
-            this.toString(),
-            s -> LeftSideItem.this.createGenerator().generate(labels)
-        );
+        final String key = this.toString();
+        final Klass result;
+        if (matchers.containsKey(key)) {
+            result = matchers.get(key);
+        } else {
+            result = this.createGenerator().generate(labels);
+            matchers.put(key, result);
+        }
+        return result;
     }
 }
