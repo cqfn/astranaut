@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
+import org.cqfn.astranaut.codegen.java.TransformationGenerator;
 
 /**
  * Transformation descriptor describing the transformation of one or more subtrees into a single
@@ -113,7 +114,7 @@ public final class TransformationDescriptor implements Rule {
 
     @Override
     public RuleGenerator createGenerator() {
-        return null;
+        return new TransformationGenerator(this);
     }
 
     @Override

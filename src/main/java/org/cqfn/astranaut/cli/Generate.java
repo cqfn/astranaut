@@ -40,6 +40,7 @@ import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.utils.FilesWriter;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.Program;
+import org.cqfn.astranaut.dsl.TransformationDescriptor;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -91,6 +92,7 @@ public final class Generate implements Action {
         this.factories = new FactoryGenerator(program);
         for (final String language : program.getAllLanguages()) {
             this.generateNodes(program, language);
+            this.generateTransformationsIfAny(program, language);
         }
         final PackageInfo info = new PackageInfo(
             this.license,
@@ -145,6 +147,59 @@ public final class Generate implements Action {
         final CompilationUnit factory = this.factories.createUnit(language, context);
         Generate.writeFile(new File(folder, factory.getFileName()), factory.generateJavaCode());
         for (final NodeDescriptor rule : program.getNodeDescriptorsByLanguage(language).values()) {
+            final RuleGenerator generator = rule.createGenerator();
+            final Set<CompilationUnit> units = generator.createUnits(context);
+            for (final CompilationUnit unit : units) {
+                Generate.writeFile(new File(folder, unit.getFileName()), unit.generateJavaCode());
+            }
+        }
+    }
+
+    /**
+     * Generates transformations for the specified programming language, if any.
+     * @param program Program implemented in DSL
+     * @param language Language name
+     * @throws BaseException If files cannot be generated
+     */
+    private void generateTransformationsIfAny(final Program program, final String language)
+        throws BaseException {
+        final List<TransformationDescriptor> rules =
+            program.getTransformationDescriptorsByLanguage(language);
+        if (!rules.isEmpty()) {
+            this.generateTransformations(rules, language);
+        }
+    }
+
+    /**
+     * Generates transformations for the specified programming language.
+     * @param rules List of transformation rules
+     * @param language Language name
+     * @throws BaseException If files cannot be generated
+     */
+    private void generateTransformations(
+        final List<TransformationDescriptor> rules, final String language) throws BaseException {
+        final Package pkg = this.basepkg.getSubpackage(language, "rules");
+        final File folder = this.root.resolve(String.format("%s/rules", language)).toFile();
+        folder.mkdirs();
+        final String brief;
+        if (language.equals("common")) {
+            brief = "This package contains transformation rules for common ('green') nodes";
+        } else {
+            brief = String.format(
+                "This package contains transformation rules for %s%s language",
+                language.substring(0, 1).toUpperCase(Locale.ENGLISH),
+                language.substring(1)
+            );
+        }
+        final PackageInfo info = new PackageInfo(this.license, brief, pkg);
+        info.setVersion(this.options.getVersion());
+        Generate.writeFile(new File(folder, "package-info.java"), info.generateJavaCode());
+        final Context.Constructor cct = new Context.Constructor();
+        cct.setLicense(this.license);
+        cct.setPackage(pkg);
+        cct.setVersion(this.options.getVersion());
+        final Context context = cct.createContext();
+        for (final TransformationDescriptor rule : rules) {
             final RuleGenerator generator = rule.createGenerator();
             final Set<CompilationUnit> units = generator.createUnits(context);
             for (final CompilationUnit unit : units) {

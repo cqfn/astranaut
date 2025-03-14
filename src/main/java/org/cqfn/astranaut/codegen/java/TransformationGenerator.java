@@ -21,36 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.codegen.java;
 
 import java.util.Collections;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.util.Set;
+import org.cqfn.astranaut.dsl.Rule;
+import org.cqfn.astranaut.dsl.TransformationDescriptor;
 
 /**
- * Tests covering {@link TransformationDescriptor} class.
+ * Generates the compilation units described by the transformation rule
+ *  (i.e., converter and matchers).
  * @since 1.0.0
  */
-class TransformationDescriptorTest {
-    @Test
-    void testBaseInterface() {
-        Assertions.assertThrows(
-            IllegalArgumentException.class,
-            () -> new TransformationDescriptor(
-                Collections.emptyList(),
-                UntypedHole.getInstance(0)
-            )
-        );
-        final TransformationDescriptor transform = new TransformationDescriptor(
-            Collections.singletonList(
-                new PatternDescriptor("AAA", null, Collections.emptyList())
-            ),
-            new ResultingSubtreeDescriptor("BBB", null, Collections.emptyList())
-        );
-        Assertions.assertTrue(transform.getDependencies().isEmpty());
-        final NodeDescriptor node = new RegularNodeDescriptor("BBB", Collections.emptyList());
-        transform.addDependency(node);
-        Assertions.assertEquals(1, transform.getDependencies().size());
-        Assertions.assertNotNull(transform.createGenerator());
+public final class TransformationGenerator extends RuleGenerator {
+    /**
+     * Transformation rule.
+     */
+    private final TransformationDescriptor rule;
+
+    /**
+     * Constructor.
+     * @param rule The transformation rule from which the source code is generated
+     */
+    public TransformationGenerator(final TransformationDescriptor rule) {
+        this.rule = rule;
+    }
+
+    @Override
+    public Rule getRule() {
+        return this.rule;
+    }
+
+    @Override
+    public Set<CompilationUnit> createUnits(final Context context) {
+        return Collections.emptySet();
     }
 }
