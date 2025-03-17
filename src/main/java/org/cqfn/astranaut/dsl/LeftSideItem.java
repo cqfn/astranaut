@@ -53,23 +53,14 @@ public interface LeftSideItem {
     LeftSideItemGenerator createGenerator();
 
     /**
-     * Generates or retrieves a matcher class for this left-side item.
-     *  If a matcher for this item already exists in the provided map, it is returned.
+     * Ensures that a matcher class for this left-side item exists in the provided map.
+     *  If a matcher for this item already exists in the map, the method does nothing.
      *  Otherwise, a new matcher is generated and stored in the map.
      * @param matchers A map storing previously generated matcher classes
      * @param labels A generator for sequential labels used in class naming
-     * @return A {@link Klass} instance representing a left-side implementation
      */
-    default Klass generateMatcher(final Map<String, Klass> matchers,
+    default void generateMatcher(final Map<String, Klass> matchers,
         final NumberedLabelGenerator labels) {
-        final String key = this.toString();
-        final Klass result;
-        if (matchers.containsKey(key)) {
-            result = matchers.get(key);
-        } else {
-            result = this.createGenerator().generate(labels);
-            matchers.put(key, result);
-        }
-        return result;
+        matchers.computeIfAbsent(this.toString(), key -> this.createGenerator().generate(labels));
     }
 }

@@ -23,6 +23,9 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * Data required to generate Java source code, used in all (or almost all) generated files.
  * @since 1.0.0
@@ -42,6 +45,11 @@ public final class Context {
      * Version number.
      */
     private String version;
+
+    /**
+     * Collection of matchers mapped to textual representations of rules.
+     */
+    private Map<String, Klass> matchers;
 
     /**
      * Private constructor.
@@ -74,6 +82,15 @@ public final class Context {
     }
 
     /**
+     * Returns the matchers collection.
+     * If matchers were not explicitly set, returns an empty map.
+     * @return An immutable map of matchers
+     */
+    public Map<String, Klass> getMatchers() {
+        return this.matchers;
+    }
+
+    /**
      * Class that helps to build context.
      * @since 1.0.0
      */
@@ -92,6 +109,11 @@ public final class Context {
          * Version number.
          */
         private String version;
+
+        /**
+         * Collection of matchers.
+         */
+        private Map<String, Klass> matchers = Collections.emptyMap();
 
         /**
          * Sets the license.
@@ -118,6 +140,14 @@ public final class Context {
         }
 
         /**
+         * Sets the matchers collection.
+         * @param collection The map of matchers to be stored in the context
+         */
+        public void setMatchers(final Map<String, Klass> collection) {
+            this.matchers = collection;
+        }
+
+        /**
          * Constructs a context from the specified data.
          * @return Context object
          */
@@ -129,6 +159,7 @@ public final class Context {
             ctx.license = this.license;
             ctx.pkg = this.pkg;
             ctx.version = this.version;
+            ctx.matchers = this.matchers;
             return ctx;
         }
     }

@@ -131,6 +131,20 @@ public final class Program {
     }
 
     /**
+     * Returns an immutable list of all transformation descriptors, regardless of language.
+     * @return An immutable list of all transformation descriptors.
+     */
+    public List<TransformationDescriptor> getAllTransformationDescriptors() {
+        final List<TransformationDescriptor> descriptors = new ArrayList<>(0);
+        for (final Rule rule : this.all) {
+            if (rule instanceof TransformationDescriptor) {
+                descriptors.add((TransformationDescriptor) rule);
+            }
+        }
+        return Collections.unmodifiableList(descriptors);
+    }
+
+    /**
      * Returns an immutable list of transformation descriptors for the specified language.
      * The map is cached for performance.
      * @param language The language to get the transformation descriptors for

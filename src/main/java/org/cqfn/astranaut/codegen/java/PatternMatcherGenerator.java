@@ -58,6 +58,25 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
         typename.makeStatic();
         typename.makeFinal(String.format("\"%s\"", this.item.getType()));
         klass.addField(typename);
+        PatternMatcherGenerator.generateMatchMethod(klass);
         return klass;
+    }
+
+    /**
+     * Generates and adds a {@code match} method to the given class.
+     * @param klass The class to which the {@code match} method will be added
+     */
+    private static void generateMatchMethod(final Klass klass) {
+        final Method method = new Method("boolean", "match");
+        klass.addMethod(method);
+        method.makePublic();
+        method.addArgument("Node", "node");
+        method.addArgument("Extracted", "extracted");
+        method.setBody(
+            String.format(
+                "return node.getTypeName().equals(%s.TYPE_NAME);",
+                klass.getName()
+            )
+        );
     }
 }
