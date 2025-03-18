@@ -23,10 +23,13 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.cqfn.astranaut.dsl.LeftDataDescriptor;
 import org.cqfn.astranaut.dsl.PatternDescriptor;
 import org.cqfn.astranaut.dsl.PatternItem;
+import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
@@ -84,6 +87,16 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
             number.makeStatic();
             number.makeFinal(String.valueOf(((UntypedHole) data).getNumber()));
             klass.addField(number);
+        } else if (data instanceof StaticString) {
+            final Field str = new Field(
+                Strings.TYPE_STRING,
+                "DATA",
+                "Expected data"
+            );
+            str.makePrivate();
+            str.makeStatic();
+            str.makeFinal(((StaticString) data).toJavaCode());
+            klass.addField(str);
         }
     }
 
@@ -100,12 +113,34 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
         final LeftDataDescriptor data = this.item.getData();
         final List<PatternItem> children = this.item.getChildren();
         if (children.isEmpty() && !(data instanceof UntypedHole)) {
-            method.setBody(
+            method.setBody(String.format("return %s;", this.composeCondition(klass)));
+        } else if (data instanceof UntypedHole) {
+            final List<String> code = Arrays.asList(
+                String.format("final boolean matches = %s;", this.composeCondition(klass)),
+                "if (matches) {",
                 String.format(
-                    "return node.getTypeName().equals(%s.TYPE_NAME);",
+                    "extracted.addData(%s.HOLE_NUMBER, node.getData());",
                     klass.getName()
-                )
+                ),
+                "}",
+                "return matches;"
             );
+            method.setBody(String.join("\n", code));
         }
+    }
+
+    /**
+     * Composes a chain of conditions that check if a pattern has matched.
+     * @param klass The class to which the {@code match} method will be added
+     * @return Java boolean expression
+     */
+    private String composeCondition(final Klass klass) {
+        final List<String> list = new ArrayList<>(1);
+        final String name = klass.getName();
+        list.add(String.format("node.belongsToGroup(%s.TYPE_NAME)", name));
+        if (this.item.getData() instanceof StaticString) {
+            list.add(String.format("node.getData().equals(%s.DATA)", name));
+        }
+        return String.join(" && ", list);
     }
 }
