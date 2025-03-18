@@ -101,6 +101,22 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
         return this.children;
     }
 
+    /**
+     * Checks if there are optional or repeated child descriptors.
+     * @return Check result, {@code true} if any
+     */
+    public boolean hasOptionalOrRepeated() {
+        boolean found = false;
+        for (final PatternItem item : this.children) {
+            if (item instanceof LeftSideItem
+                && ((LeftSideItem) item).getMatchingMode() != PatternMatchingMode.NORMAL) {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
     @Override
     public void setMatchingMode(final PatternMatchingMode value) {
         this.mode = value;

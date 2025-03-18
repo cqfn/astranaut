@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.cqfn.astranaut.dsl.LeftDataDescriptor;
 import org.cqfn.astranaut.dsl.PatternDescriptor;
-import org.cqfn.astranaut.dsl.PatternItem;
 import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
@@ -110,11 +109,9 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
         method.makePublic();
         method.addArgument("Node", "node");
         method.addArgument("Extracted", "extracted");
-        final LeftDataDescriptor data = this.item.getData();
-        final List<PatternItem> children = this.item.getChildren();
-        if (children.isEmpty() && !(data instanceof UntypedHole)) {
-            method.setBody(String.format("return %s;", this.composeCondition(klass)));
-        } else if (data instanceof UntypedHole) {
+        if (this.item.hasOptionalOrRepeated()) {
+            method.setBody(this.generateBodyWithComplexCondition(klass));
+        } else if (this.item.getData() instanceof UntypedHole) {
             final List<String> code = Arrays.asList(
                 String.format("final boolean matches = %s;", this.composeCondition(klass)),
                 "if (matches) {",
@@ -126,6 +123,8 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
                 "return matches;"
             );
             method.setBody(String.join("\n", code));
+        } else {
+            method.setBody(String.format("return %s;", this.composeCondition(klass)));
         }
     }
 
@@ -142,5 +141,30 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
             list.add(String.format("node.getData().equals(%s.DATA)", name));
         }
         return String.join(" && ", list);
+    }
+
+    /**
+     * Creates a {@code match} method body with a complex matching condition.
+     *  Such a condition, for example, can be if a descriptor contains optional or repeating
+     *  child descriptors.
+     * @param klass The class to which the {@code match} method will be added
+     * @return Body content as a string
+     */
+    private String generateBodyWithComplexCondition(final Klass klass) {
+        final List<String> code = new ArrayList<>(2);
+        if (this.item.getData() instanceof UntypedHole) {
+            code.addAll(
+                Arrays.asList(
+                    "if (matches) {",
+                    String.format(
+                        "extracted.addData(%s.HOLE_NUMBER, node.getData());",
+                        klass.getName()
+                    ),
+                    "}"
+                )
+            );
+        }
+        code.add("return matches;");
+        return String.join("\n", code);
     }
 }
