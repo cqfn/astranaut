@@ -23,7 +23,11 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.List;
+import org.cqfn.astranaut.dsl.LeftDataDescriptor;
 import org.cqfn.astranaut.dsl.PatternDescriptor;
+import org.cqfn.astranaut.dsl.PatternItem;
+import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
  * Generates a matcher class for matching patterns.
@@ -45,10 +49,21 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
 
     @Override
     public Klass generate(final NumberedLabelGenerator labels) {
-        final Klass klass = new Klass(
-            labels.getLabel(),
-            "Matches a node to the pattern and extracts it if matched"
+        final String brief = String.format(
+            "Matches a node to the pattern '%s' and extracts it if matched",
+            this.item.toString()
         );
+        final Klass klass = new Klass(labels.getLabel(), brief);
+        this.generateStaticFields(klass);
+        this.generateMatchMethod(klass);
+        return klass;
+    }
+
+    /**
+     * Generates static fields containing the necessary information for matching and extraction.
+     * @param klass The class to which the fields will be added
+     */
+    private void generateStaticFields(final Klass klass) {
         final Field typename = new Field(
             Strings.TYPE_STRING,
             "TYPE_NAME",
@@ -58,25 +73,39 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
         typename.makeStatic();
         typename.makeFinal(String.format("\"%s\"", this.item.getType()));
         klass.addField(typename);
-        PatternMatcherGenerator.generateMatchMethod(klass);
-        return klass;
+        final LeftDataDescriptor data = this.item.getData();
+        if (data instanceof UntypedHole) {
+            final Field number = new Field(
+                Strings.TYPE_INT,
+                "HOLE_NUMBER",
+                "Number of the cell into which the data is extracted"
+            );
+            number.makePrivate();
+            number.makeStatic();
+            number.makeFinal(String.valueOf(((UntypedHole) data).getNumber()));
+            klass.addField(number);
+        }
     }
 
     /**
      * Generates and adds a {@code match} method to the given class.
      * @param klass The class to which the {@code match} method will be added
      */
-    private static void generateMatchMethod(final Klass klass) {
+    private void generateMatchMethod(final Klass klass) {
         final Method method = new Method("boolean", "match");
         klass.addMethod(method);
         method.makePublic();
         method.addArgument("Node", "node");
         method.addArgument("Extracted", "extracted");
-        method.setBody(
-            String.format(
-                "return node.getTypeName().equals(%s.TYPE_NAME);",
-                klass.getName()
-            )
-        );
+        final LeftDataDescriptor data = this.item.getData();
+        final List<PatternItem> children = this.item.getChildren();
+        if (children.isEmpty() && !(data instanceof UntypedHole)) {
+            method.setBody(
+                String.format(
+                    "return node.getTypeName().equals(%s.TYPE_NAME);",
+                    klass.getName()
+                )
+            );
+        }
     }
 }
