@@ -23,17 +23,36 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Map;
+
 /**
  * This generator is responsible for creating a class that implements a pattern descriptor
  *  or a typed hole located on the left side of transformation rules.
  * @since 1.0.0
  */
-public interface LeftSideItemGenerator {
+public abstract class LeftSideItemGenerator {
     /**
      * Generates a class that implements a pattern descriptor or a typed hole located
      *  on the left side of transformation rules.
+     * @param matchers A map storing previously generated matcher classes
      * @param labels A generator for sequential labels used in class naming
      * @return A {@link Klass} instance representing a left-side implementation
      */
-    Klass generate(NumberedLabelGenerator labels);
+    public abstract Klass generate(Map<String, Klass> matchers,
+        NumberedLabelGenerator labels);
+
+    /**
+     * Generates an instance field and a private constructor, and that turns the generated class
+     *  into a singleton.
+     * @param klass Class
+     */
+    protected static void generateInstanceAndConstructor(final Klass klass) {
+        final Field instance = new Field("Matcher", "INSTANCE", "The instance");
+        instance.makePublic();
+        instance.makeStatic();
+        instance.makeFinal(String.format("new %s()", klass.getName()));
+        klass.addField(instance);
+        final Constructor ctor = klass.createConstructor();
+        ctor.makePrivate();
+    }
 }

@@ -177,8 +177,7 @@ public abstract  class BaseMethod implements Entity {
      */
     private static List<Pair<String, Integer>> fixLinesThatAreTooLong(
         final List<Pair<String, Integer>> list, final int indent) throws BaseException {
-        List<Pair<String, Integer>> result = new ArrayList<>(list.size());
-        boolean flag = false;
+        final List<Pair<String, Integer>> result = new ArrayList<>(list.size());
         for (final Pair<String, Integer> line : list) {
             final String code = line.getKey();
             final int offset = line.getValue();
@@ -186,17 +185,33 @@ public abstract  class BaseMethod implements Entity {
                 result.add(line);
                 continue;
             }
-            final int index = code.indexOf('=');
+            String tail = code;
+            int bias = 0;
+            int index = code.indexOf('=');
             if (index > 0) {
                 result.add(new Pair<>(code.substring(0, index + 1), offset));
-                result.add(new Pair<>(code.substring(index + 1).trim(), offset + 1));
-                flag = true;
+                tail = code.substring(index + 1).trim();
+                bias = 1;
+            }
+            if (bias == 1 && SourceCodeBuilder.tryOn(indent + offset + 1, tail)) {
+                result.add(new Pair<>(tail, offset + 1));
                 continue;
             }
-            throw new SourceCodeBuilder.CodeLineIsTooLong(code);
-        }
-        if (flag) {
-            result = BaseMethod.fixLinesThatAreTooLong(result, indent);
+            index = tail.indexOf("&&");
+            boolean flag = false;
+            while (!flag && index > 0) {
+                result.add(new Pair<>(tail.substring(0, index).trim(), offset + bias));
+                tail = tail.substring(index).trim();
+                bias = 1;
+                if (SourceCodeBuilder.tryOn(indent + offset + 1, tail)) {
+                    result.add(new Pair<>(tail, offset + 1));
+                    flag = true;
+                }
+                index = tail.indexOf("&&", 2);
+            }
+            if (!flag) {
+                throw new SourceCodeBuilder.CodeLineIsTooLong(code);
+            }
         }
         return result;
     }

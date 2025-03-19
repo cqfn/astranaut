@@ -26,8 +26,11 @@ package org.cqfn.astranaut.codegen.java;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.cqfn.astranaut.dsl.LeftDataDescriptor;
+import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.PatternDescriptor;
+import org.cqfn.astranaut.dsl.PatternItem;
 import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
@@ -35,7 +38,7 @@ import org.cqfn.astranaut.dsl.UntypedHole;
  * Generates a matcher class for matching patterns.
  * @since 1.0.0
  */
-public final class PatternMatcherGenerator implements LeftSideItemGenerator {
+public final class PatternMatcherGenerator extends LeftSideItemGenerator {
     /**
      * Item for which the matcher is generated.
      */
@@ -50,14 +53,15 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
     }
 
     @Override
-    public Klass generate(final NumberedLabelGenerator labels) {
+    public Klass generate(final Map<String, Klass> matchers, final NumberedLabelGenerator labels) {
         final String brief = String.format(
             "Matches a node to the pattern '%s' and extracts it if matched",
             this.item.toString()
         );
         final Klass klass = new Klass(labels.getLabel(), brief);
+        LeftSideItemGenerator.generateInstanceAndConstructor(klass);
         this.generateStaticFields(klass);
-        this.generateMatchMethod(klass);
+        this.generateMatchMethod(klass, matchers, labels);
         return klass;
     }
 
@@ -102,8 +106,11 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
     /**
      * Generates and adds a {@code match} method to the given class.
      * @param klass The class to which the {@code match} method will be added
+     * @param matchers A map storing previously generated matcher classes
+     * @param labels A generator for sequential labels used in class naming
      */
-    private void generateMatchMethod(final Klass klass) {
+    private void generateMatchMethod(final Klass klass, final Map<String, Klass> matchers,
+        final NumberedLabelGenerator labels) {
         final Method method = new Method("boolean", "match");
         klass.addMethod(method);
         method.makePublic();
@@ -113,7 +120,10 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
             method.setBody(this.generateBodyWithComplexCondition(klass));
         } else if (this.item.getData() instanceof UntypedHole) {
             final List<String> code = Arrays.asList(
-                String.format("final boolean matches = %s;", this.composeCondition(klass)),
+                String.format(
+                    "final boolean matches = %s;",
+                    this.composeCondition(klass, matchers, labels)
+                ),
                 "if (matches) {",
                 String.format(
                     "extracted.addData(%s.HOLE_NUMBER, node.getData());",
@@ -124,21 +134,43 @@ public final class PatternMatcherGenerator implements LeftSideItemGenerator {
             );
             method.setBody(String.join("\n", code));
         } else {
-            method.setBody(String.format("return %s;", this.composeCondition(klass)));
+            method.setBody(
+                String.format(
+                    "return %s;",
+                    this.composeCondition(klass, matchers, labels)
+                )
+            );
         }
     }
 
     /**
      * Composes a chain of conditions that check if a pattern has matched.
      * @param klass The class to which the {@code match} method will be added
+     * @param matchers A map storing previously generated matcher classes
+     * @param labels A generator for sequential labels used in class naming
      * @return Java boolean expression
      */
-    private String composeCondition(final Klass klass) {
+    private String composeCondition(final Klass klass, final Map<String, Klass> matchers,
+        final NumberedLabelGenerator labels) {
         final List<String> list = new ArrayList<>(1);
         final String name = klass.getName();
         list.add(String.format("node.belongsToGroup(%s.TYPE_NAME)", name));
         if (this.item.getData() instanceof StaticString) {
             list.add(String.format("node.getData().equals(%s.DATA)", name));
+        }
+        final List<PatternItem> children = this.item.getChildren();
+        for (int index = 0; index < children.size(); index = index + 1) {
+            final PatternItem child = children.get(index);
+            if (child instanceof LeftSideItem) {
+                final Klass matcher = ((LeftSideItem) child).generateMatcher(matchers, labels);
+                list.add(
+                    String.format(
+                        "%s.INSTANCE.match(node.getChild(%d), extracted)",
+                        matcher.getName(),
+                        index
+                    )
+                );
+            }
         }
         return String.join(" && ", list);
     }

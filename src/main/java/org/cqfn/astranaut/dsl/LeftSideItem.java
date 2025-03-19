@@ -58,9 +58,18 @@ public interface LeftSideItem {
      *  Otherwise, a new matcher is generated and stored in the map.
      * @param matchers A map storing previously generated matcher classes
      * @param labels A generator for sequential labels used in class naming
+     * @return The matcher class for this left-side item
      */
-    default void generateMatcher(final Map<String, Klass> matchers,
+    default Klass generateMatcher(final Map<String, Klass> matchers,
         final NumberedLabelGenerator labels) {
-        matchers.computeIfAbsent(this.toString(), key -> this.createGenerator().generate(labels));
+        final String key = this.toString();
+        final Klass klass;
+        if (matchers.containsKey(key)) {
+            klass = matchers.get(key);
+        } else {
+            klass = this.createGenerator().generate(matchers, labels);
+            matchers.put(key, klass);
+        }
+        return klass;
     }
 }
