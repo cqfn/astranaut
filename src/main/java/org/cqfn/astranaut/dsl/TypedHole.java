@@ -57,6 +57,7 @@ public final class TypedHole implements Hole, LeftSideItem {
     public TypedHole(final String type, final int number) {
         this.type = type;
         this.number = number;
+        this.mode = PatternMatchingMode.NORMAL;
     }
 
     /**

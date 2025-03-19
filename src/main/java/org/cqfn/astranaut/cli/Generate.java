@@ -31,14 +31,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import org.cqfn.astranaut.codegen.java.CompilationUnit;
 import org.cqfn.astranaut.codegen.java.Context;
 import org.cqfn.astranaut.codegen.java.FactoryGenerator;
 import org.cqfn.astranaut.codegen.java.FactoryProviderGenerator;
 import org.cqfn.astranaut.codegen.java.Klass;
+import org.cqfn.astranaut.codegen.java.LeftSideGenerationContext;
 import org.cqfn.astranaut.codegen.java.License;
-import org.cqfn.astranaut.codegen.java.NumberedLabelGenerator;
 import org.cqfn.astranaut.codegen.java.Package;
 import org.cqfn.astranaut.codegen.java.PackageInfo;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
@@ -201,13 +200,13 @@ public final class Generate implements Action {
         );
         info.setVersion(this.options.getVersion());
         Generate.writeFile(new File(folder, "package-info.java"), info.generateJavaCode());
-        final Map<String, Klass> matchers = new TreeMap<>();
-        final NumberedLabelGenerator labels = new NumberedLabelGenerator("Matcher");
+        final LeftSideGenerationContext context = new LeftSideGenerationContext();
         for (final TransformationDescriptor rule : rules) {
             for (final LeftSideItem item : rule.getLeft()) {
-                item.generateMatcher(matchers, labels);
+                item.generateMatcher(context);
             }
         }
+        final Map<String, Klass> matchers = context.getMatchers();
         for (final Klass klass : matchers.values()) {
             klass.setVersion(this.options.getVersion());
             klass.makePublic();

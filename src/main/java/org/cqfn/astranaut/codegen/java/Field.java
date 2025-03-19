@@ -94,6 +94,14 @@ public final class Field implements Entity {
     }
 
     /**
+     * Returns the name the field.
+     * @return The name of the field
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
      * Makes the field public.
      */
     public void makePublic() {

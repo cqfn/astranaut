@@ -25,7 +25,6 @@ package org.cqfn.astranaut.codegen.java;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import org.cqfn.astranaut.dsl.TypedHole;
 
 /**
@@ -47,12 +46,12 @@ public final class TypedHoleMatcherGenerator extends LeftSideItemGenerator {
     }
 
     @Override
-    public Klass generate(final Map<String, Klass> matchers, final NumberedLabelGenerator labels) {
+    public Klass generate(final LeftSideGenerationContext context) {
         final String brief = String.format(
             "Matches a node with the pattern '%s' and extracts it if matched",
             this.item.toString()
         );
-        final Klass klass = new Klass(labels.getLabel(), brief);
+        final Klass klass = new Klass(context.generateClassName(), brief);
         LeftSideItemGenerator.generateInstanceAndConstructor(klass);
         this.generateStaticFields(klass);
         TypedHoleMatcherGenerator.generateMatchMethod(klass);

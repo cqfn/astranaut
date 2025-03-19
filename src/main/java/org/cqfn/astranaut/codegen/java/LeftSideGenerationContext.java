@@ -23,32 +23,45 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
- * This generator is responsible for creating a class that implements a pattern descriptor
- *  or a typed hole located on the left side of transformation rules.
+ * All that is needed to generate a set of matchers from a set of rules.
  * @since 1.0.0
  */
-public abstract class LeftSideItemGenerator {
+public final class LeftSideGenerationContext {
     /**
-     * Generates a class that implements a pattern descriptor or a typed hole located
-     *  on the left side of transformation rules.
-     * @param context Generation context
-     * @return A {@link Klass} instance representing a left-side implementation
+     * Map storing generated matcher classes.
      */
-    public abstract Klass generate(LeftSideGenerationContext context);
+    private final Map<String, Klass> matchers;
 
     /**
-     * Generates an instance field and a private constructor, and that turns the generated class
-     *  into a singleton.
-     * @param klass Class
+     * Generator for sequential labels used in class naming.
      */
-    protected static void generateInstanceAndConstructor(final Klass klass) {
-        final Field instance = new Field("Matcher", "INSTANCE", "The instance");
-        instance.makePublic();
-        instance.makeStatic();
-        instance.makeFinal(String.format("new %s()", klass.getName()));
-        klass.addField(instance);
-        final Constructor ctor = klass.createConstructor();
-        ctor.makePrivate();
+    private final NumberedLabelGenerator labels;
+
+    /**
+     * Constructor.
+     */
+    public LeftSideGenerationContext() {
+        this.matchers = new TreeMap<>();
+        this.labels = new NumberedLabelGenerator("Matcher");
+    }
+
+    /**
+     * Returns a collection of generated matcher classes correlated with [sub]rules in text form.
+     * @return Map storing generated matcher classes
+     */
+    public Map<String, Klass> getMatchers() {
+        return this.matchers;
+    }
+
+    /**
+     * Generates a class name for a new matcher.
+     * @return Unique class name
+     */
+    public String generateClassName() {
+        return this.labels.getLabel();
     }
 }

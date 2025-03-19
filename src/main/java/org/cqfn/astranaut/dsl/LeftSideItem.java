@@ -25,8 +25,8 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.Map;
 import org.cqfn.astranaut.codegen.java.Klass;
+import org.cqfn.astranaut.codegen.java.LeftSideGenerationContext;
 import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
-import org.cqfn.astranaut.codegen.java.NumberedLabelGenerator;
 
 /**
  * A pattern descriptor or typed hole. It is located on the left side of the transformation rules.
@@ -56,18 +56,17 @@ public interface LeftSideItem {
      * Ensures that a matcher class for this left-side item exists in the provided map.
      *  If a matcher for this item already exists in the map, the method does nothing.
      *  Otherwise, a new matcher is generated and stored in the map.
-     * @param matchers A map storing previously generated matcher classes
-     * @param labels A generator for sequential labels used in class naming
+     * @param context Generation context
      * @return The matcher class for this left-side item
      */
-    default Klass generateMatcher(final Map<String, Klass> matchers,
-        final NumberedLabelGenerator labels) {
+    default Klass generateMatcher(final LeftSideGenerationContext context) {
         final String key = this.toString();
         final Klass klass;
+        final Map<String, Klass> matchers = context.getMatchers();
         if (matchers.containsKey(key)) {
             klass = matchers.get(key);
         } else {
-            klass = this.createGenerator().generate(matchers, labels);
+            klass = this.createGenerator().generate(context);
             matchers.put(key, klass);
         }
         return klass;
