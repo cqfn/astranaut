@@ -49,7 +49,7 @@ public final class TypedHoleMatcherGenerator extends LeftSideItemGenerator {
     @Override
     public Klass generate(final Map<String, Klass> matchers, final NumberedLabelGenerator labels) {
         final String brief = String.format(
-            "Matches a node to the pattern '%s' and extracts it if matched",
+            "Matches a node with the pattern '%s' and extracts it if matched",
             this.item.toString()
         );
         final Klass klass = new Klass(labels.getLabel(), brief);
