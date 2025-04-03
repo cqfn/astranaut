@@ -187,10 +187,10 @@ public abstract  class BaseMethod implements Entity {
             }
             String tail = code;
             int bias = 0;
-            int index = code.indexOf('=');
+            int index = code.indexOf(" = ");
             if (index > 0) {
-                result.add(new Pair<>(code.substring(0, index + 1), offset));
-                tail = code.substring(index + 1).trim();
+                result.add(new Pair<>(code.substring(0, index + 2), offset));
+                tail = code.substring(index + 3).trim();
                 bias = 1;
             }
             if (bias == 1 && SourceCodeBuilder.tryOn(indent + offset + 1, tail)) {

@@ -53,51 +53,27 @@ public final class TypedHoleMatcherGenerator extends LeftSideItemGenerator {
         );
         final Klass klass = new Klass(context.generateClassName(), brief);
         LeftSideItemGenerator.generateInstanceAndConstructor(klass);
-        this.generateStaticFields(klass);
-        TypedHoleMatcherGenerator.generateMatchMethod(klass);
+        this.generateMatchMethod(klass);
         return klass;
-    }
-
-    /**
-     * Generates static fields containing the necessary information for matching and extraction.
-     * @param klass The class to which the fields will be added
-     */
-    private void generateStaticFields(final Klass klass) {
-        final Field typename = new Field(
-            Strings.TYPE_STRING,
-            "TYPE_NAME",
-            "Expected type name"
-        );
-        typename.makePrivate();
-        typename.makeStatic();
-        typename.makeFinal(String.format("\"%s\"", this.item.getType()));
-        klass.addField(typename);
-        final Field number = new Field(
-            Strings.TYPE_INT,
-            "HOLE_NUMBER",
-            "Number of the cell into which the node is extracted"
-        );
-        number.makePrivate();
-        number.makeStatic();
-        number.makeFinal(String.valueOf(this.item.getNumber()));
-        klass.addField(number);
     }
 
     /**
      * Generates and adds a {@code match} method to the given class.
      * @param klass The class to which the {@code match} method will be added
      */
-    private static void generateMatchMethod(final Klass klass) {
+    private void generateMatchMethod(final Klass klass) {
         final Method method = new Method("boolean", "match");
         klass.addMethod(method);
         method.makePublic();
         method.addArgument("Node", "node");
         method.addArgument("Extracted", "extracted");
-        final String name = klass.getName();
         final List<String> code = Arrays.asList(
-            String.format("final boolean matches = node.belongsToGroup(%s.TYPE_NAME);", name),
+            String.format(
+                "final boolean matches = node.belongsToGroup(\"%s\");",
+                this.item.getType()
+            ),
             "if (matches) {",
-            String.format("extracted.addNode(%s.HOLE_NUMBER, node);", name),
+            String.format("extracted.addNode(%d, node);", this.item.getNumber()),
             "}",
             "return matches;"
         );

@@ -26,9 +26,7 @@ package org.cqfn.astranaut.codegen.java;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import org.cqfn.astranaut.core.utils.Pair;
-import org.cqfn.astranaut.dsl.LeftDataDescriptor;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.PatternDescriptor;
 import org.cqfn.astranaut.dsl.PatternItem;
@@ -81,85 +79,21 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
         }
         final Klass klass = new Klass(context.generateClassName(), brief);
         LeftSideItemGenerator.generateInstanceAndConstructor(klass);
-        this.generateCommonStaticFields(klass);
         this.generateMatchMethod(klass, context);
         return klass;
     }
 
     /**
-     * Generates static fields containing the necessary information for matching and extraction.
-     * @param klass The class to which the fields will be added
+     * Gets the numbers of untyped holes and the indices of the corresponding nodes.
+     * @return A list of pairs where key is the hole number and value is the node index
      */
-    private void generateCommonStaticFields(final Klass klass) {
-        final Field typename = new Field(
-            Strings.TYPE_STRING,
-            "TYPE_NAME",
-            "Expected type name"
-        );
-        typename.makePrivate();
-        typename.makeStatic();
-        typename.makeFinal(String.format("\"%s\"", this.item.getType()));
-        klass.addField(typename);
-        final LeftDataDescriptor data = this.item.getData();
-        if (data instanceof UntypedHole) {
-            final Field hole = new Field(
-                Strings.TYPE_INT,
-                "DATA_HOLE",
-                "Number of the cell into which the data is extracted"
-            );
-            hole.makePrivate();
-            hole.makeStatic();
-            hole.makeFinal(String.valueOf(((UntypedHole) data).getNumber()));
-            klass.addField(hole);
-        } else if (data instanceof StaticString) {
-            final Field field = new Field(
-                Strings.TYPE_STRING,
-                "DATA",
-                "Expected data"
-            );
-            field.makePrivate();
-            field.makeStatic();
-            field.makeFinal(((StaticString) data).toJavaCode());
-            klass.addField(field);
-        }
-    }
-
-    /**
-     * Generates static fields to designate child indices and hole numbers for node extraction.
-     * @param klass The class to which the fields will be added
-     * @return Names of index fields in relation to hole fields
-     */
-    private List<Pair<String, String>> generateStaticFieldsForUntypedHoles(final Klass klass) {
-        final List<Pair<String, String>> list = new ArrayList<>(0);
-        final NameGenerator names = new NameGenerator();
+    private List<Pair<Integer, Integer>> getNumbersOfUntypedHoles() {
+        final List<Pair<Integer, Integer>> list = new ArrayList<>(0);
         final List<PatternItem> children = this.item.getChildren();
         for (int index = 0; index < children.size(); index = index + 1) {
             final PatternItem child = children.get(index);
             if (child instanceof UntypedHole) {
-                final String name = names.nextName();
-                final String upper = name.toUpperCase(Locale.ENGLISH);
-                final Field field = new Field(
-                    Strings.TYPE_INT,
-                    upper.concat("_INDEX"),
-                    String.format("Index of the %s node to be extracted", name)
-                );
-                field.makePrivate();
-                field.makeStatic();
-                field.makeFinal(String.valueOf(index));
-                klass.addField(field);
-                final Field hole = new Field(
-                    Strings.TYPE_INT,
-                    upper.concat("_HOLE"),
-                    String.format(
-                        "Number of the cell into which the node at the %s index is extracted",
-                        name
-                    )
-                );
-                hole.makePrivate();
-                hole.makeStatic();
-                hole.makeFinal(String.valueOf(((UntypedHole) child).getNumber()));
-                klass.addField(hole);
-                list.add(new Pair<>(hole.getName(), field.getName()));
+                list.add(new Pair<>(((UntypedHole) child).getNumber(), index));
             }
         }
         return list;
@@ -181,14 +115,13 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
                 method.setBody(this.generateBodyWithComplexCondition(klass));
                 break;
             }
-            final List<Pair<String, String>> holes =
-                this.generateStaticFieldsForUntypedHoles(klass);
+            final List<Pair<Integer, Integer>> holes = this.getNumbersOfUntypedHoles();
             if (this.item.getData() instanceof UntypedHole || !holes.isEmpty()) {
                 final List<String> code = new ArrayList<>(
                     Arrays.asList(
                         String.format(
                             "final boolean matches = %s;",
-                            this.composeCondition(klass, context)
+                            this.composeCondition(context)
                         ),
                         "if (matches) {"
                     )
@@ -196,18 +129,16 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
                 if (this.item.getData() instanceof UntypedHole) {
                     code.add(
                         String.format(
-                            "extracted.addData(%s.DATA_HOLE, node.getData());",
-                            klass.getName()
+                            "extracted.addData(%d, node.getData());",
+                            ((UntypedHole) this.item.getData()).getNumber()
                         )
                     );
                 }
-                for (final Pair<String, String> hole : holes) {
+                for (final Pair<Integer, Integer> hole : holes) {
                     code.add(
                         String.format(
-                            "extracted.addNode(%s.%s, node.getChild(%s.%s));",
-                            klass.getName(),
+                            "extracted.addNode(%d, node.getChild(%d));",
                             hole.getKey(),
-                            klass.getName(),
                             hole.getValue()
                         )
                     );
@@ -220,7 +151,7 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
             method.setBody(
                 String.format(
                     "return %s;",
-                    this.composeCondition(klass, context)
+                    this.composeCondition(context)
                 )
             );
         } while (false);
@@ -228,18 +159,22 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
 
     /**
      * Composes a chain of conditions that check if a pattern has matched.
-     * @param klass The class to which the {@code match} method will be added
      * @param context Generation context
      * @return Java boolean expression
      */
-    private String composeCondition(final Klass klass, final LeftSideGenerationContext context) {
+    private String composeCondition(final LeftSideGenerationContext context) {
         final List<String> list = new ArrayList<>(1);
-        final String name = klass.getName();
-        list.add(String.format("node.belongsToGroup(%s.TYPE_NAME)", name));
-        if (this.item.getData() instanceof StaticString) {
-            list.add(String.format("node.getData().equals(%s.DATA)", name));
-        }
+        list.add(String.format("node.belongsToGroup(\"%s\")", this.item.getType()));
         final List<PatternItem> children = this.item.getChildren();
+        list.add(String.format("node.getChildCount() == %d", children.size()));
+        if (this.item.getData() instanceof StaticString) {
+            list.add(
+                String.format(
+                    "node.getData().equals(%s)",
+                    ((StaticString) this.item.getData()).toJavaCode()
+                )
+            );
+        }
         for (int index = 0; index < children.size(); index = index + 1) {
             final PatternItem child = children.get(index);
             if (child instanceof LeftSideItem) {
