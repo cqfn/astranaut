@@ -54,6 +54,61 @@ public final class TransformationGenerator extends RuleGenerator {
 
     @Override
     public Set<CompilationUnit> createUnits(final Context context) {
-        return Collections.emptySet();
+        final Klass klass = new Klass(
+            context.getNextConverterName(),
+            String.format(
+                "Converter implementing the rule '%s'",
+                this.rule.toString()
+            )
+        );
+        klass.makePublic();
+        klass.makeFinal();
+        klass.setVersion(context.getVersion());
+        klass.setImplementsList("Converter");
+        TransformationGenerator.createConvertMethod(klass);
+        TransformationGenerator.createGetMinConsumedMethod(klass);
+        final CompilationUnit unit = new CompilationUnit(
+            context.getLicense(),
+            context.getPackage(),
+            klass
+        );
+        unit.addImport("java.util.List");
+        unit.addImport("java.util.Optional");
+        unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.ConversionResult");
+        unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Converter");
+        unit.addImport("org.cqfn.astranaut.core.base.Factory");
+        unit.addImport("org.cqfn.astranaut.core.base.Node");
+        return Collections.singleton(unit);
+    }
+
+    /**
+     * Creates a "convert" method.
+     * @param klass The class to which the method will be added
+     */
+    private static void createConvertMethod(final Klass klass) {
+        final Method method = new Method(
+            "Optional<ConversionResult>",
+            "convert"
+        );
+        method.makePublic();
+        method.addArgument(Strings.TYPE_NODE_LIST, "list");
+        method.addArgument(Strings.TYPE_INT, "index");
+        method.addArgument(Strings.TYPE_FACTORY, "factory");
+        method.setBody("return Optional.empty();");
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates a "getMinConsumed" method.
+     * @param klass The class to which the method will be added
+     */
+    private static void createGetMinConsumedMethod(final Klass klass) {
+        final Method method = new Method(
+            Strings.TYPE_INT,
+            "getMinConsumed"
+        );
+        method.makePublic();
+        method.setBody("return 1;");
+        klass.addMethod(method);
     }
 }

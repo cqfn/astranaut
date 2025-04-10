@@ -52,6 +52,11 @@ public final class Context {
     private Map<String, Klass> matchers;
 
     /**
+     * Labels for converters.
+     */
+    private NumberedLabelGenerator clabels;
+
+    /**
      * Private constructor.
      */
     private Context() {
@@ -88,6 +93,17 @@ public final class Context {
      */
     public Map<String, Klass> getMatchers() {
         return this.matchers;
+    }
+
+    /**
+     * Returns the next unique converter name ('Converter0', 'Converter1', and so on).
+     * @return Unique converter name
+     */
+    public String getNextConverterName() {
+        if (this.clabels == null) {
+            this.clabels = new NumberedLabelGenerator("Converter");
+        }
+        return this.clabels.getLabel();
     }
 
     /**

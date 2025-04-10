@@ -31,7 +31,7 @@ import java.util.List;
  *  when the variable name is not known.
  * @since 1.0.0
  */
-public class NameGenerator {
+public final class NameGenerator {
     /**
      * List of names.
      */

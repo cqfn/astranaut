@@ -94,6 +94,11 @@ final class Strings {
     public static final String TYPE_CHLD_DESCR = "ChildDescriptor";
 
     /**
+     * The 'Factory' type.
+     */
+    public static final String TYPE_FACTORY = "Factory";
+
+    /**
      * Private constructor.
      */
     private Strings() {
