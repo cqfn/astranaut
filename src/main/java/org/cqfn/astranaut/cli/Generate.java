@@ -24,9 +24,12 @@
 package org.cqfn.astranaut.cli;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -85,6 +88,7 @@ public final class Generate implements Action {
         this.options = new ArgumentParser();
     }
 
+    @SuppressWarnings("PMD.PreserveStackTrace")
     @Override
     public void perform(final Program program, final List<String> args) throws BaseException {
         this.options.parse(args);
@@ -94,6 +98,23 @@ public final class Generate implements Action {
             this.options.getOutput(),
             this.options.getPackage().replace('.', '/')
         );
+        try {
+            if (Files.exists(this.root)) {
+                Files.walk(this.root)
+                    .sorted(Comparator.reverseOrder())
+                    .filter(p -> Files.isWritable(p))
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+            }
+            Files.createDirectories(this.root);
+        } catch (final IOException exception) {
+            throw new CommonCliException(
+                String.format(
+                    "Cannot create destination folder '%s'",
+                    this.root.toAbsolutePath()
+                )
+            );
+        }
         final Map<String, Klass> matchers = this.generateMatchersIfAny(program);
         this.factories = new FactoryGenerator(program);
         for (final String language : program.getAllLanguages()) {
