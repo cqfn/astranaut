@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.Rule;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
 
@@ -74,7 +76,8 @@ public final class TransformationGenerator extends RuleGenerator {
         klass.makeFinal();
         klass.setVersion(context.getVersion());
         klass.setImplementsList("Converter");
-        this.createConvertMethod(klass);
+        final Set<String> matchers = new TreeSet<>();
+        this.createConvertMethod(context, klass, matchers);
         this.createGetMinConsumedMethod(klass);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
@@ -88,14 +91,25 @@ public final class TransformationGenerator extends RuleGenerator {
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Extracted");
         unit.addImport("org.cqfn.astranaut.core.base.Factory");
         unit.addImport("org.cqfn.astranaut.core.base.Node");
+        final Package mpkg = context
+            .getPackage()
+            .getParent()
+            .getParent()
+            .getSubpackage("common", "matchers");
+        for (final String matcher : matchers) {
+            unit.addImport(String.format("%s.%s", mpkg, matcher));
+        }
         return Collections.singleton(unit);
     }
 
     /**
      * Creates a "convert" method.
+     * @param context Context
      * @param klass The class to which the method will be added
+     * @param matchers Matcher names that were used for the rule
      */
-    private void createConvertMethod(final Klass klass) {
+    private void createConvertMethod(final Context context, final Klass klass,
+        final Set<String> matchers) {
         final Method method = new Method(
             "Optional<ConversionResult>",
             "convert"
@@ -115,6 +129,9 @@ public final class TransformationGenerator extends RuleGenerator {
                 "final Extracted extracted = new Extracted();"
             )
         );
+        if (!this.rule.hasOptionalOrRepeated()) {
+            this.generateSimpleCondition(context, code, matchers);
+        }
         code.addAll(
             Arrays.asList(
                 "} while (false);",
@@ -123,6 +140,39 @@ public final class TransformationGenerator extends RuleGenerator {
         );
         method.setBody(String.join("\n", code));
         klass.addMethod(method);
+    }
+
+    /**
+     * Generates code for a condition that checks whether all matchers
+     *  from the left side of the transformation rule match corresponding elements.
+     * @param context Context with available matchers
+     * @param code Output list to append generated code
+     * @param matchers Set to collect used matcher names
+     */
+    private void generateSimpleCondition(final Context context, final List<String> code,
+        final Set<String> matchers) {
+        final StringBuilder condition = new StringBuilder(128);
+        condition.append("final boolean matched = ");
+        final List<LeftSideItem> left = this.rule.getLeft();
+        for (int index = 0; index < left.size(); index = index + 1) {
+            if (index > 0) {
+                condition.append(" && ");
+            }
+            final LeftSideItem item = left.get(index);
+            final Klass matcher = context.getMatchers().get(item.toString());
+            final String name = matcher.getName();
+            matchers.add(name);
+            condition
+                .append(name)
+                .append(".INSTANCE.match(list.get(");
+            if (index > 0) {
+                condition.append(index).append(" + index), extracted)");
+            } else {
+                condition.append("index), extracted)");
+            }
+        }
+        condition.append(';');
+        code.add(condition.toString());
     }
 
     /**
