@@ -23,7 +23,10 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import org.cqfn.astranaut.dsl.Rule;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
@@ -40,11 +43,17 @@ public final class TransformationGenerator extends RuleGenerator {
     private final TransformationDescriptor rule;
 
     /**
+     * Minimum number of nodes consumed by the rule.
+     */
+    private final int consumed;
+
+    /**
      * Constructor.
      * @param rule The transformation rule from which the source code is generated
      */
     public TransformationGenerator(final TransformationDescriptor rule) {
         this.rule = rule;
+        this.consumed = rule.getMinConsumed();
     }
 
     @Override
@@ -65,7 +74,7 @@ public final class TransformationGenerator extends RuleGenerator {
         klass.makeFinal();
         klass.setVersion(context.getVersion());
         klass.setImplementsList("Converter");
-        TransformationGenerator.createConvertMethod(klass);
+        this.createConvertMethod(klass);
         this.createGetMinConsumedMethod(klass);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
@@ -76,6 +85,7 @@ public final class TransformationGenerator extends RuleGenerator {
         unit.addImport("java.util.Optional");
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.ConversionResult");
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Converter");
+        unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Extracted");
         unit.addImport("org.cqfn.astranaut.core.base.Factory");
         unit.addImport("org.cqfn.astranaut.core.base.Node");
         return Collections.singleton(unit);
@@ -85,7 +95,7 @@ public final class TransformationGenerator extends RuleGenerator {
      * Creates a "convert" method.
      * @param klass The class to which the method will be added
      */
-    private static void createConvertMethod(final Klass klass) {
+    private void createConvertMethod(final Klass klass) {
         final Method method = new Method(
             "Optional<ConversionResult>",
             "convert"
@@ -94,7 +104,24 @@ public final class TransformationGenerator extends RuleGenerator {
         method.addArgument(Strings.TYPE_NODE_LIST, "list");
         method.addArgument(Strings.TYPE_INT, "index");
         method.addArgument(Strings.TYPE_FACTORY, "factory");
-        method.setBody("return Optional.empty();");
+        final List<String> code = new ArrayList<>(16);
+        code.addAll(
+            Arrays.asList(
+                "Optional<ConversionResult> result = Optional.empty();",
+                "do {",
+                String.format("if (index + %d > list.size()) {", this.consumed),
+                "break;",
+                "}",
+                "final Extracted extracted = new Extracted();"
+            )
+        );
+        code.addAll(
+            Arrays.asList(
+                "} while (false);",
+                "return result;"
+            )
+        );
+        method.setBody(String.join("\n", code));
         klass.addMethod(method);
     }
 

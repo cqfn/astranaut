@@ -111,6 +111,22 @@ public final class TransformationDescriptor implements Rule {
         return TransformationDescriptor.calcMinConsumed(this.left);
     }
 
+    /**
+     * Checks if the left side of this transformation rule contains
+     *  optional or repeated descriptors.
+     * @return Check result, {@code true} if any
+     */
+    public boolean hasOptionalOrRepeated() {
+        boolean found = false;
+        for (final LeftSideItem item : this.left) {
+            if (item.getMatchingMode() != PatternMatchingMode.NORMAL) {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
     @Override
     public void addDependency(final NodeDescriptor descriptor) {
         this.dependencies.add(descriptor);
