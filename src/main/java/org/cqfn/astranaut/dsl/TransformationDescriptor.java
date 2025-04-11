@@ -102,6 +102,15 @@ public final class TransformationDescriptor implements Rule {
         this.language = value.toLowerCase(Locale.ENGLISH);
     }
 
+    /**
+     * Returns the minimum number of elements consumed by the left side
+     *  of this transformation rule.
+     * @return Minimum number of consumed elements
+     */
+    public int getMinConsumed() {
+        return TransformationDescriptor.calcMinConsumed(this.left);
+    }
+
     @Override
     public void addDependency(final NodeDescriptor descriptor) {
         this.dependencies.add(descriptor);
@@ -138,9 +147,29 @@ public final class TransformationDescriptor implements Rule {
      * @return Unmodifiable list of left items
      */
     private static List<LeftSideItem> checkLeftSide(final List<LeftSideItem> left) {
-        if (left.isEmpty()) {
+        if (TransformationDescriptor.calcMinConsumed(left) < 1) {
             throw new IllegalArgumentException();
         }
         return Collections.unmodifiableList(left);
+    }
+
+    /**
+     * Calculates the minimum number of elements consumed by this transformation rule,
+     *  based on the matching mode of each item.
+     * @param list List of left side elements
+     * @return Minimum number of consumed elements
+     */
+    private static int calcMinConsumed(final List<LeftSideItem> list) {
+        int consumed = 0;
+        for (final LeftSideItem item : list) {
+            if (item.getMatchingMode() == PatternMatchingMode.NORMAL) {
+                consumed = consumed + 1;
+            }
+        }
+        if (consumed == 0 && list.size() == 1
+            && list.get(0).getMatchingMode() == PatternMatchingMode.REPEATED) {
+            consumed = 1;
+        }
+        return consumed;
     }
 }

@@ -66,7 +66,7 @@ public final class TransformationGenerator extends RuleGenerator {
         klass.setVersion(context.getVersion());
         klass.setImplementsList("Converter");
         TransformationGenerator.createConvertMethod(klass);
-        TransformationGenerator.createGetMinConsumedMethod(klass);
+        this.createGetMinConsumedMethod(klass);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
@@ -102,13 +102,13 @@ public final class TransformationGenerator extends RuleGenerator {
      * Creates a "getMinConsumed" method.
      * @param klass The class to which the method will be added
      */
-    private static void createGetMinConsumedMethod(final Klass klass) {
+    private void createGetMinConsumedMethod(final Klass klass) {
         final Method method = new Method(
             Strings.TYPE_INT,
             "getMinConsumed"
         );
         method.makePublic();
-        method.setBody("return 1;");
+        method.setBody(String.format("return %d;", this.rule.getMinConsumed()));
         klass.addMethod(method);
     }
 }
