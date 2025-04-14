@@ -134,6 +134,13 @@ public final class TransformationGenerator extends RuleGenerator {
         }
         code.addAll(
             Arrays.asList(
+                "if (!matched) {",
+                "break;",
+                "}"
+            )
+        );
+        code.addAll(
+            Arrays.asList(
                 "} while (false);",
                 "return result;"
             )

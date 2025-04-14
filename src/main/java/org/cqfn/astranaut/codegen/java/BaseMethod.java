@@ -129,43 +129,62 @@ public abstract  class BaseMethod implements Entity {
         final List<Pair<String, Integer>> list = new ArrayList<>(0);
         int offset = 0;
         for (final String line : this.getBody().split("\n")) {
-            String tail = line.trim();
-            while (!tail.isEmpty()) {
-                int extra = 0;
-                if (tail.charAt(0) == '.') {
-                    extra = 1;
-                }
-                int index = tail.indexOf('{');
-                if (index > 0 && tail.charAt(0) == '}') {
-                    offset = offset - 1;
-                }
-                if (index >= 0) {
-                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), offset + extra));
-                    offset = offset + 1;
-                    tail = tail.substring(index + 1).trim();
-                    continue;
-                }
-                index = tail.indexOf(';');
-                if (index >= 0) {
-                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), offset + extra));
-                    tail = tail.substring(index + 1).trim();
-                    continue;
-                }
-                index = tail.indexOf('}');
-                if (index > 0) {
-                    throw new SyntaxErrorInSourceCode(tail);
-                }
-                if (index == 0) {
-                    offset = offset - 1;
-                    list.add(new Pair<>("}", offset));
-                    tail = tail.substring(index + 1).trim();
-                    continue;
-                }
-                list.add(new Pair<>(tail, offset + extra));
-                tail = "";
-            }
+            offset = BaseMethod.splitLine(line, list, offset);
         }
         return BaseMethod.fixLinesThatAreTooLong(list, indent);
+    }
+
+    /**
+     * Splits a single line of code into parts and appends them with calculated indentation.
+     * @param line Source code line
+     * @param list Output list to append indented parts
+     * @param bias Starting indentation offset
+     * @return Final indentation offset after processing the line
+     * @throws BaseException If syntax is incorrect
+     */
+    private static int splitLine(final String line, final List<Pair<String, Integer>> list,
+        final int bias) throws BaseException {
+        int offset = bias;
+        String tail = line.trim();
+        while (!tail.isEmpty()) {
+            int extra = 0;
+            if (tail.charAt(0) == '.') {
+                extra = 1;
+            }
+            int index = tail.indexOf('{');
+            if (index > 0 && tail.charAt(0) == '}') {
+                offset = offset - 1;
+            }
+            if (index >= 0) {
+                list.add(new Pair<>(tail.substring(0, index + 1).trim(), offset + extra));
+                offset = offset + 1;
+                tail = tail.substring(index + 1).trim();
+                continue;
+            }
+            index = tail.indexOf("} while");
+            if (index == 0) {
+                offset = offset - 1;
+            }
+            index = tail.indexOf(';');
+            if (index >= 0) {
+                list.add(new Pair<>(tail.substring(0, index + 1).trim(), offset + extra));
+                tail = tail.substring(index + 1).trim();
+                continue;
+            }
+            index = tail.indexOf('}');
+            if (index > 0) {
+                throw new SyntaxErrorInSourceCode(tail);
+            }
+            if (index == 0) {
+                offset = offset - 1;
+                list.add(new Pair<>("}", offset));
+                tail = tail.substring(index + 1).trim();
+                continue;
+            }
+            list.add(new Pair<>(tail, offset + extra));
+            tail = "";
+        }
+        return offset;
     }
 
     /**
