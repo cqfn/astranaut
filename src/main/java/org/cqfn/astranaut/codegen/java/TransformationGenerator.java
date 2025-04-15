@@ -32,6 +32,7 @@ import java.util.TreeSet;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.Rule;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
+import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
  * Generates the compilation units described by the transformation rule
@@ -139,6 +140,20 @@ public final class TransformationGenerator extends RuleGenerator {
                 "}"
             )
         );
+        if (this.rule.getRight() instanceof UntypedHole) {
+            code.addAll(
+                Arrays.asList(
+                    String.format(
+                        "final Node node = extracted.getNodes(%d).get(0);",
+                        ((UntypedHole) this.rule.getRight()).getNumber()
+                    ),
+                    String.format(
+                        "result = Optional.of(new ConversionResult(node, %d));",
+                        this.consumed
+                    )
+                )
+            );
+        }
         code.addAll(
             Arrays.asList(
                 "} while (false);",
