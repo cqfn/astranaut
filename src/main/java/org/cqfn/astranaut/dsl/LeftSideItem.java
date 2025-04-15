@@ -53,6 +53,13 @@ public interface LeftSideItem {
     LeftSideItemGenerator createGenerator();
 
     /**
+     * Represents the item as a string.
+     * @param full Full format, the matching mode is considered
+     * @return Left side item represented as a string
+     */
+    String toString(boolean full);
+
+    /**
      * Ensures that a matcher class for this left-side item exists in the provided map.
      *  If a matcher for this item already exists in the map, the method does nothing.
      *  Otherwise, a new matcher is generated and stored in the map.
@@ -60,7 +67,7 @@ public interface LeftSideItem {
      * @return The matcher class for this left-side item
      */
     default Klass generateMatcher(final LeftSideGenerationContext context) {
-        final String key = this.toString();
+        final String key = this.toString(false);
         final Klass klass;
         final Map<String, Klass> matchers = context.getMatchers();
         if (matchers.containsKey(key)) {

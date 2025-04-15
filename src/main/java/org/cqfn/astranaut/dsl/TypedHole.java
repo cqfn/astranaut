@@ -89,6 +89,17 @@ public final class TypedHole implements Hole, LeftSideItem {
     }
 
     @Override
+    public String toString(final boolean full) {
+        final String result;
+        if (full) {
+            result = this.toString();
+        } else {
+            result = String.format("%s#%d", this.type, this.number);
+        }
+        return result;
+    }
+
+    @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
         if (this.mode == PatternMatchingMode.OPTIONAL) {

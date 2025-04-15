@@ -59,22 +59,22 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
         if (data && children) {
             brief = String.format(
                 "Matches a node with the pattern '%s' and extracts nested nodes and data if matched",
-                this.item.toString()
+                this.item.toString(false)
             );
         } else if (data) {
             brief = String.format(
                 "Matches a node with the pattern '%s' and extracts data if matched",
-                this.item.toString()
+                this.item.toString(false)
             );
         } else if (children) {
             brief = String.format(
                 "Matches a node with the pattern '%s' and extracts nested nodes if matched",
-                this.item.toString()
+                this.item.toString(false)
             );
         } else {
             brief = String.format(
                 "Matches a node with the pattern '%s'",
-                this.item.toString()
+                this.item.toString(false)
             );
         }
         final Klass klass = new Klass(context.generateClassName(), brief);

@@ -181,7 +181,7 @@ public final class TransformationGenerator extends RuleGenerator {
                 condition.append(" && ");
             }
             final LeftSideItem item = left.get(index);
-            final Klass matcher = context.getMatchers().get(item.toString());
+            final Klass matcher = context.getMatchers().get(item.toString(false));
             final String name = matcher.getName();
             matchers.add(name);
             condition
