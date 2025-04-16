@@ -35,6 +35,7 @@ import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.PatternMatchingMode;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.Rule;
+import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
@@ -532,6 +533,17 @@ public final class TransformationGenerator extends RuleGenerator {
                     String.format(
                         "if (!builder.setData(extracted.getData(%d))) {",
                         ((UntypedHole) descriptor.getData()).getNumber()
+                    ),
+                    "    break;",
+                    "}"
+                )
+            );
+        } else if (descriptor.getData() instanceof StaticString) {
+            code.addAll(
+                Arrays.asList(
+                    String.format(
+                        "if (!builder.setData(%s)) {",
+                        ((StaticString) descriptor.getData()).toJavaCode()
                     ),
                     "    break;",
                     "}"
