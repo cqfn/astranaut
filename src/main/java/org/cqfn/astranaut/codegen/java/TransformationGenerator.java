@@ -56,11 +56,6 @@ public final class TransformationGenerator extends RuleGenerator {
     private final TransformationDescriptor rule;
 
     /**
-     * Minimum number of nodes consumed by the rule.
-     */
-    private final int consumed;
-
-    /**
      * The condition of the rule is complex.
      */
     private final boolean complex;
@@ -71,7 +66,6 @@ public final class TransformationGenerator extends RuleGenerator {
      */
     public TransformationGenerator(final TransformationDescriptor rule) {
         this.rule = rule;
-        this.consumed = rule.getMinConsumed();
         this.complex = rule.hasOptionalOrRepeated() && rule.getLeft().size() > 1;
     }
 
@@ -112,8 +106,10 @@ public final class TransformationGenerator extends RuleGenerator {
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Extracted");
         unit.addImport("org.cqfn.astranaut.core.base.Factory");
         unit.addImport("org.cqfn.astranaut.core.base.Node");
-        unit.addImport("org.cqfn.astranaut.core.base.DummyNode");
-        unit.addImport("org.cqfn.astranaut.core.base.Builder");
+        if (this.rule.getRight() instanceof ResultingSubtreeDescriptor) {
+            unit.addImport("org.cqfn.astranaut.core.base.DummyNode");
+            unit.addImport("org.cqfn.astranaut.core.base.Builder");
+        }
         final Package mpkg = context
             .getPackage()
             .getParent()
@@ -146,7 +142,7 @@ public final class TransformationGenerator extends RuleGenerator {
             Arrays.asList(
                 "Optional<ConversionResult> result = Optional.empty();",
                 "do {",
-                String.format("if (index + %d > list.size()) {", this.consumed),
+                String.format("if (index + %d > list.size()) {", this.rule.getMinConsumed()),
                 "break;",
                 "}",
                 "final Extracted extracted = new Extracted();"
@@ -162,6 +158,12 @@ public final class TransformationGenerator extends RuleGenerator {
         } else {
             this.generateSimpleCondition(context, code, matchers);
         }
+        final String consumed;
+        if (this.rule.hasOptionalOrRepeated()) {
+            consumed = "consumed";
+        } else {
+            consumed = String.valueOf(this.rule.getMinConsumed());
+        }
         if (this.rule.getRight() instanceof UntypedHole) {
             code.addAll(
                 Arrays.asList(
@@ -170,16 +172,44 @@ public final class TransformationGenerator extends RuleGenerator {
                         ((UntypedHole) this.rule.getRight()).getNumber()
                     ),
                     String.format(
-                        "result = Optional.of(new ConversionResult(node, %d));",
-                        this.consumed
+                        "result = Optional.of(new ConversionResult(node, %s));",
+                        consumed
                     )
                 )
             );
         } else if (this.rule.getRight() instanceof ResultingSubtreeDescriptor) {
-            TransformationGenerator.generateBuilder(
+            final Pair<Method, Boolean> builder = TransformationGenerator.generateBuilder(
                 klass,
                 new NameGenerator("root"),
                 (ResultingSubtreeDescriptor) this.rule.getRight()
+            );
+            if (builder.getValue()) {
+                code.add(
+                    String.format(
+                        "final Node node = %s.%s(factory, extracted);",
+                        klass.getName(),
+                        builder.getKey().getName()
+                    )
+                );
+            } else {
+                code.add(
+                    String.format(
+                        "final Node node = %s.%s(factory);",
+                        klass.getName(),
+                        builder.getKey().getName()
+                    )
+                );
+            }
+            code.addAll(
+                Arrays.asList(
+                    "if (node == DummyNode.INSTANCE) {",
+                    "    break;",
+                    "}",
+                    String.format(
+                        "result = Optional.of(new ConversionResult(node, %s));",
+                        consumed
+                    )
+                )
             );
         }
         code.addAll(
@@ -458,10 +488,10 @@ public final class TransformationGenerator extends RuleGenerator {
      * @param klass The class in which the method is created.
      * @param names Method name generator
      * @param descriptor Node descriptor
-     * @return Created method
+     * @return Created method with an indication whether to pass extracted data to it or not
      */
-    private static Method generateBuilder(final Klass klass, final NameGenerator names,
-        final ResultingSubtreeDescriptor descriptor) {
+    private static Pair<Method, Boolean> generateBuilder(final Klass klass,
+        final NameGenerator names, final ResultingSubtreeDescriptor descriptor) {
         final String name = names.nextName();
         final Method method = new Method(
             Strings.TYPE_NODE,
@@ -471,22 +501,18 @@ public final class TransformationGenerator extends RuleGenerator {
                 name.substring(1)
             ),
             String.format(
-                "Constructs a method based on the descriptor '%s'",
+                "Constructs a node based on the descriptor '%s'",
                 descriptor.toString()
             )
         );
         method.makePrivate();
         method.makeStatic();
         method.addArgument(
-            "Extracted",
-            "extracted",
-            "Extracted nodes and data"
-        );
-        method.addArgument(
             Strings.TYPE_FACTORY,
             "factory",
             "Factory for creating nodes"
         );
+        method.setReturnsDescription("Created node");
         final List<String> code = new ArrayList<>(16);
         code.addAll(
             Arrays.asList(
@@ -498,6 +524,20 @@ public final class TransformationGenerator extends RuleGenerator {
                 "do {"
             )
         );
+        boolean extracted = false;
+        if (descriptor.getData() instanceof UntypedHole) {
+            extracted = true;
+            code.addAll(
+                Arrays.asList(
+                    String.format(
+                        "if (!builder.setData(extracted.getData(%d))) {",
+                        ((UntypedHole) descriptor.getData()).getNumber()
+                    ),
+                    "    break;",
+                    "}"
+                )
+            );
+        }
         code.addAll(
             Arrays.asList(
                 "    if (!builder.isValid()) {",
@@ -508,9 +548,16 @@ public final class TransformationGenerator extends RuleGenerator {
                 "return result;"
             )
         );
+        if (extracted) {
+            method.addArgument(
+                "Extracted",
+                "extracted",
+                "Extracted nodes and data"
+            );
+        }
         method.setBody(String.join("\n", code));
         klass.addMethod(method);
-        return method;
+        return new Pair<>(method, extracted);
     }
 
     /**
