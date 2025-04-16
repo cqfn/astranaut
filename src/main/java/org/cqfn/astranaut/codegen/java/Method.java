@@ -104,6 +104,14 @@ public final class Method extends BaseMethod {
     }
 
     /**
+     * Returns name of the method.
+     * @return Name of the method
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
      * Adds a warning that needs to be suppressed.
      * @param warning Warning
      */

@@ -27,9 +27,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
+import org.cqfn.astranaut.core.utils.Pair;
 import org.cqfn.astranaut.dsl.LeftSideItem;
+import org.cqfn.astranaut.dsl.PatternMatchingMode;
 import org.cqfn.astranaut.dsl.Rule;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
 import org.cqfn.astranaut.dsl.UntypedHole;
@@ -41,6 +44,11 @@ import org.cqfn.astranaut.dsl.UntypedHole;
  */
 public final class TransformationGenerator extends RuleGenerator {
     /**
+     * Piece of code inserted to break if the pattern is not matched.
+     */
+    private static final String NOT_MATCHED = "if (!matched) {\nbreak;\n}";
+
+    /**
      * Transformation rule.
      */
     private final TransformationDescriptor rule;
@@ -51,12 +59,18 @@ public final class TransformationGenerator extends RuleGenerator {
     private final int consumed;
 
     /**
+     * The condition of the rule is complex.
+     */
+    private final boolean complex;
+
+    /**
      * Constructor.
      * @param rule The transformation rule from which the source code is generated
      */
     public TransformationGenerator(final TransformationDescriptor rule) {
         this.rule = rule;
         this.consumed = rule.getMinConsumed();
+        this.complex = rule.hasOptionalOrRepeated() && rule.getLeft().size() > 1;
     }
 
     @Override
@@ -85,6 +99,10 @@ public final class TransformationGenerator extends RuleGenerator {
             context.getPackage(),
             klass
         );
+        if (this.complex) {
+            unit.addImport("java.util.Deque");
+            unit.addImport("java.util.LinkedList");
+        }
         unit.addImport("java.util.List");
         unit.addImport("java.util.Optional");
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.ConversionResult");
@@ -130,16 +148,16 @@ public final class TransformationGenerator extends RuleGenerator {
                 "final Extracted extracted = new Extracted();"
             )
         );
-        if (!this.rule.hasOptionalOrRepeated()) {
+        if (this.rule.getLeft().size() == 1
+            && this.rule.getLeft().get(0).getMatchingMode() == PatternMatchingMode.REPEATED) {
+            this.generateConditionForRepeatedNode(context, code, matchers);
+        } else if (this.complex) {
+            final List<Pair<String, Boolean>> checkers =
+                this.generateCheckers(context, klass, matchers);
+            TransformationGenerator.generateComplexCondition(klass, code, checkers);
+        } else {
             this.generateSimpleCondition(context, code, matchers);
         }
-        code.addAll(
-            Arrays.asList(
-                "if (!matched) {",
-                "break;",
-                "}"
-            )
-        );
         if (this.rule.getRight() instanceof UntypedHole) {
             code.addAll(
                 Arrays.asList(
@@ -165,10 +183,10 @@ public final class TransformationGenerator extends RuleGenerator {
     }
 
     /**
-     * Generates code for a condition that checks whether all matchers
-     *  from the left side of the transformation rule match corresponding elements.
+     * Generates code for a simple condition, that is, when there are one or more patterns,
+     *  and each pattern is matched by one node.
      * @param context Context with available matchers
-     * @param code Output list to append generated code
+     * @param code List of source code lines where the generated condition is added
      * @param matchers Set to collect used matcher names
      */
     private void generateSimpleCondition(final Context context, final List<String> code,
@@ -195,6 +213,229 @@ public final class TransformationGenerator extends RuleGenerator {
         }
         condition.append(';');
         code.add(condition.toString());
+        code.add(TransformationGenerator.NOT_MATCHED);
+    }
+
+    /**
+     * Generates code for a degenerate condition where one pattern must have one or more nodes
+     *  matched to it.
+     * @param context Context with available matchers
+     * @param code List of source code lines where the generated condition is added
+     * @param matchers Set to collect used matcher names
+     */
+    private void generateConditionForRepeatedNode(final Context context, final List<String> code,
+        final Set<String> matchers) {
+        final LeftSideItem item = this.rule.getLeft().get(0);
+        final String matcher = context.getMatchers().get(item.toString(false)).getName();
+        matchers.add(matcher);
+        code.addAll(
+            Arrays.asList(
+                "boolean matched = false;",
+                "for (int offset = 0; index + offset < list.size(); offset = offset + 1) {",
+                "    final Node node = list.get(index + offset);",
+                String.format("    if (!%s.INSTANCE.match(node, extracted)) {", matcher),
+                "        break;",
+                "    }",
+                "    matched = true;",
+                "}",
+                TransformationGenerator.NOT_MATCHED
+            )
+        );
+    }
+
+    /**
+     * Generates checkers, that is, functions that take the next node and check it with a matcher.
+     *  A complex condition consists of consecutive calls of such checkers.
+     * @param context Context
+     * @param klass Converter class
+     * @param matchers Set to collect used matcher names
+     * @return List of generated checkers, specifying for each checker whether the checker
+     *  returns a boolean value
+     */
+    private List<Pair<String, Boolean>> generateCheckers(final Context context, final Klass klass,
+        final Set<String> matchers) {
+        final List<LeftSideItem> items = this.rule.getLeft();
+        final List<Pair<String, Boolean>> checkers = new ArrayList<>(items.size());
+        final NameGenerator names = new NameGenerator();
+        for (int index = 0; index < items.size(); index = index + 1) {
+            final LeftSideItem item = items.get(index);
+            final String name = names.nextName();
+            final PatternMatchingMode mode = item.getMatchingMode();
+            final String ret;
+            if (mode == PatternMatchingMode.NORMAL) {
+                ret = Strings.TYPE_BOOLEAN;
+            } else {
+                ret = Strings.TYPE_VOID;
+            }
+            final Method method = new Method(
+                ret,
+                String.format(
+                    "check%s%s",
+                    name.substring(0, 1).toUpperCase(Locale.ENGLISH),
+                    name.substring(1)
+                ),
+                String.format(
+                    "Matches a node with the pattern '%s'",
+                    item.toString(true)
+                )
+            );
+            checkers.add(new Pair<>(method.getName(), ret.equals(Strings.TYPE_BOOLEAN)));
+            method.makePrivate();
+            method.makeStatic();
+            method.addArgument("Deque<Node>", "queue", "Node queue");
+            method.addArgument(
+                "Extracted",
+                "extracted",
+                "Extracted nodes and data"
+            );
+            final String matcher = context.getMatchers().get(item.toString(false)).getName();
+            matchers.add(matcher);
+            if (mode == PatternMatchingMode.NORMAL) {
+                method.setReturnsDescription(
+                    "Matching result, {@code true} if the next node is matched to the pattern"
+                );
+                TransformationGenerator.generateCheckerForNormalPattern(method, matcher, index);
+            } else if (mode == PatternMatchingMode.OPTIONAL) {
+                TransformationGenerator.generateCheckerForOptionalPattern(method, matcher);
+            } else {
+                TransformationGenerator.generateCheckerForRepeatedPattern(method, matcher);
+            }
+            klass.addMethod(method);
+        }
+        return checkers;
+    }
+
+    /**
+     * Generates a checker for a “normal” pattern (not repetitive or optional).
+     * @param method Checker method
+     * @param matcher Matcher used inside the checker
+     * @param index Index of the pattern
+     */
+    private static void generateCheckerForNormalPattern(final Method method, final String matcher,
+        final int index) {
+        final List<String> code;
+        if (index == 0) {
+            code = Arrays.asList(
+                "final Node node = queue.poll();",
+                String.format("return %s.INSTANCE.match(node, extracted);", matcher)
+            );
+        } else {
+            code = Arrays.asList(
+                "boolean result = false;",
+                "if (!queue.isEmpty()) {",
+                "    final Node node = queue.poll();",
+                String.format("result = %s.INSTANCE.match(node, extracted);", matcher),
+                "}",
+                "return result;"
+            );
+        }
+        method.setBody(String.join("\n", code));
+    }
+
+    /**
+     * Generates a checker for an optional pattern.
+     * @param method Checker method
+     * @param matcher Matcher used inside the checker
+     */
+    private static void generateCheckerForOptionalPattern(final Method method,
+        final String matcher) {
+        final List<String> code = Arrays.asList(
+            "if (queue.isEmpty()) {",
+            "    return;",
+            "}",
+            "final Node node = queue.poll();",
+            String.format("final boolean matched = %s.INSTANCE.match(node, extracted);", matcher),
+            "if (!matched) {",
+            "    queue.addFirst(node);",
+            "}"
+        );
+        method.setBody(String.join("\n", code));
+    }
+
+    /**
+     * Generates a checker for a repeating pattern.
+     * @param method Checker method
+     * @param matcher Matcher used inside the checker
+     */
+    private static void generateCheckerForRepeatedPattern(final Method method,
+        final String matcher) {
+        final List<String> code = Arrays.asList(
+            "while (!queue.isEmpty()) {",
+            "    final Node node = queue.poll();",
+            String.format("final boolean matched = %s.INSTANCE.match(node, extracted);", matcher),
+            "    if (!matched) {",
+            "        queue.addFirst(node);",
+            "        break;",
+            "    }",
+            "}"
+        );
+        method.setBody(String.join("\n", code));
+    }
+
+    /**
+     * Generates code for a complex condition when there are optional and repeating rules.
+     * @param klass Converter class
+     * @param code Code lines where the generated condition is added
+     * @param checkers List of checker function names generated earlier
+     */
+    private static void generateComplexCondition(final Klass klass, final List<String> code,
+        final List<Pair<String, Boolean>> checkers) {
+        code.add("final Deque<Node> queue = new LinkedList<>(list.subList(index, list.size()));");
+        int count = 0;
+        int first = -1;
+        for (int index = 0; index < checkers.size(); index = index + 1) {
+            final Pair<String, Boolean> pair = checkers.get(index);
+            if (pair.getValue()) {
+                if (first < 0) {
+                    first = index;
+                }
+                count = count + 1;
+            }
+        }
+        int rest = count;
+        for (int index = 0; index < checkers.size(); index = index + 1) {
+            final Pair<String, Boolean> pair = checkers.get(index);
+            if (!pair.getValue()) {
+                code.add(
+                    String.format("%s.%s(queue, extracted);", klass.getName(), pair.getKey())
+                );
+                continue;
+            }
+            if (count == 1) {
+                code.addAll(
+                    Arrays.asList(
+                        String.format(
+                            "final boolean matched = %s.%s(queue, extracted);",
+                            klass.getName(),
+                            pair.getKey()
+                        ),
+                        TransformationGenerator.NOT_MATCHED
+                    )
+                );
+                continue;
+            }
+            if (index == first) {
+                code.add(
+                    String.format(
+                        "boolean matched = %s.%s(queue, extracted);",
+                        klass.getName(),
+                        pair.getKey()
+                    )
+                );
+            } else {
+                code.add(
+                    String.format(
+                        "matched = %s.%s(queue, extracted);",
+                        klass.getName(),
+                        pair.getKey()
+                    )
+                );
+            }
+            if (rest < 3) {
+                code.add(TransformationGenerator.NOT_MATCHED);
+            }
+            rest = rest - 1;
+        }
     }
 
     /**
