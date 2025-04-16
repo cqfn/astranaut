@@ -33,6 +33,7 @@ import java.util.TreeSet;
 import org.cqfn.astranaut.core.utils.Pair;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.PatternMatchingMode;
+import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.Rule;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
 import org.cqfn.astranaut.dsl.UntypedHole;
@@ -42,6 +43,7 @@ import org.cqfn.astranaut.dsl.UntypedHole;
  *  (i.e., converter and matchers).
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public final class TransformationGenerator extends RuleGenerator {
     /**
      * Piece of code inserted to break if the pattern is not matched.
@@ -110,6 +112,8 @@ public final class TransformationGenerator extends RuleGenerator {
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Extracted");
         unit.addImport("org.cqfn.astranaut.core.base.Factory");
         unit.addImport("org.cqfn.astranaut.core.base.Node");
+        unit.addImport("org.cqfn.astranaut.core.base.DummyNode");
+        unit.addImport("org.cqfn.astranaut.core.base.Builder");
         final Package mpkg = context
             .getPackage()
             .getParent()
@@ -171,6 +175,12 @@ public final class TransformationGenerator extends RuleGenerator {
                     )
                 )
             );
+        } else if (this.rule.getRight() instanceof ResultingSubtreeDescriptor) {
+            TransformationGenerator.generateBuilder(
+                klass,
+                new NameGenerator("root"),
+                (ResultingSubtreeDescriptor) this.rule.getRight()
+            );
         }
         code.addAll(
             Arrays.asList(
@@ -230,15 +240,17 @@ public final class TransformationGenerator extends RuleGenerator {
         matchers.add(matcher);
         code.addAll(
             Arrays.asList(
-                "boolean matched = false;",
+                "int consumed = 0;",
                 "for (int offset = 0; index + offset < list.size(); offset = offset + 1) {",
                 "    final Node node = list.get(index + offset);",
                 String.format("    if (!%s.INSTANCE.match(node, extracted)) {", matcher),
                 "        break;",
                 "    }",
-                "    matched = true;",
+                "    consumed = consumed + 1;",
                 "}",
-                TransformationGenerator.NOT_MATCHED
+                "if (consumed == 0) {",
+                "    break;",
+                "}"
             )
         );
     }
@@ -381,6 +393,7 @@ public final class TransformationGenerator extends RuleGenerator {
     private static void generateComplexCondition(final Klass klass, final List<String> code,
         final List<Pair<String, Boolean>> checkers) {
         code.add("final Deque<Node> queue = new LinkedList<>(list.subList(index, list.size()));");
+        code.add("final int size = queue.size();");
         int count = 0;
         int first = -1;
         for (int index = 0; index < checkers.size(); index = index + 1) {
@@ -436,6 +449,68 @@ public final class TransformationGenerator extends RuleGenerator {
             }
             rest = rest - 1;
         }
+        code.add("final int consumed = size - queue.size();");
+    }
+
+    /**
+     * Creates a function that creates a node based on its descriptor,
+     *  using the extracted nodes and data.
+     * @param klass The class in which the method is created.
+     * @param names Method name generator
+     * @param descriptor Node descriptor
+     * @return Created method
+     */
+    private static Method generateBuilder(final Klass klass, final NameGenerator names,
+        final ResultingSubtreeDescriptor descriptor) {
+        final String name = names.nextName();
+        final Method method = new Method(
+            Strings.TYPE_NODE,
+            String.format(
+                "build%s%s",
+                name.substring(0, 1).toUpperCase(Locale.ENGLISH),
+                name.substring(1)
+            ),
+            String.format(
+                "Constructs a method based on the descriptor '%s'",
+                descriptor.toString()
+            )
+        );
+        method.makePrivate();
+        method.makeStatic();
+        method.addArgument(
+            "Extracted",
+            "extracted",
+            "Extracted nodes and data"
+        );
+        method.addArgument(
+            Strings.TYPE_FACTORY,
+            "factory",
+            "Factory for creating nodes"
+        );
+        final List<String> code = new ArrayList<>(16);
+        code.addAll(
+            Arrays.asList(
+                "Node result = DummyNode.INSTANCE;",
+                String.format(
+                    "final Builder builder = factory.createBuilder(\"%s\");",
+                    descriptor.getType()
+                ),
+                "do {"
+            )
+        );
+        code.addAll(
+            Arrays.asList(
+                "    if (!builder.isValid()) {",
+                "         break;",
+                "    }",
+                "    result = builder.createNode();",
+                "} while (false);",
+                "return result;"
+            )
+        );
+        method.setBody(String.join("\n", code));
+        klass.addMethod(method);
+        return method;
     }
 
     /**
