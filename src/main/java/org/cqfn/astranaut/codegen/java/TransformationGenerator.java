@@ -47,6 +47,11 @@ import org.cqfn.astranaut.dsl.UntypedHole;
 @SuppressWarnings("PMD.TooManyMethods")
 public final class TransformationGenerator extends RuleGenerator {
     /**
+     * Piece of code inserted to break.
+     */
+    private static final String BREAK = "break;";
+
+    /**
      * Piece of code inserted to break if the pattern is not matched.
      */
     private static final String NOT_MATCHED = "if (!matched) {\nbreak;\n}";
@@ -207,7 +212,7 @@ public final class TransformationGenerator extends RuleGenerator {
             code.addAll(
                 Arrays.asList(
                     "if (node == DummyNode.INSTANCE) {",
-                    "    break;",
+                    TransformationGenerator.BREAK,
                     "}",
                     String.format(
                         "result = Optional.of(new ConversionResult(node, %s));",
@@ -294,7 +299,7 @@ public final class TransformationGenerator extends RuleGenerator {
                 "    consumed = consumed + 1;",
                 "}",
                 "if (consumed == 0) {",
-                "    break;",
+                TransformationGenerator.BREAK,
                 "}"
             )
         );
@@ -537,11 +542,6 @@ public final class TransformationGenerator extends RuleGenerator {
             "factory",
             "Factory for creating nodes"
         );
-        method.addArgument(
-            Strings.TYPE_FRAGMENT,
-            "fragment",
-            "Code fragment that is covered by the node being created"
-        );
         method.setReturnsDescription("Created node");
         final List<String> code = new ArrayList<>(16);
         code.addAll(
@@ -563,7 +563,7 @@ public final class TransformationGenerator extends RuleGenerator {
                         "if (!builder.setData(extracted.getData(%d))) {",
                         ((UntypedHole) descriptor.getData()).getNumber()
                     ),
-                    "    break;",
+                    TransformationGenerator.BREAK,
                     "}"
                 )
             );
@@ -574,17 +574,28 @@ public final class TransformationGenerator extends RuleGenerator {
                         "if (!builder.setData(%s)) {",
                         ((StaticString) descriptor.getData()).toJavaCode()
                     ),
-                    "    break;",
+                    TransformationGenerator.BREAK,
                     "}"
                 )
             );
         }
         code.addAll(
             Arrays.asList(
-                "    if (!builder.isValid()) {",
-                "         break;",
-                "    }",
-                "    builder.setFragment(fragment);",
+                "if (!builder.isValid()) {",
+                TransformationGenerator.BREAK,
+                "}"
+            )
+        );
+        if (name.equals("root")) {
+            method.addArgument(
+                Strings.TYPE_FRAGMENT,
+                "fragment",
+                "Code fragment that is covered by the node being created"
+            );
+            code.add("builder.setFragment(fragment);");
+        }
+        code.addAll(
+            Arrays.asList(
                 "    result = builder.createNode();",
                 "} while (false);",
                 "return result;"
