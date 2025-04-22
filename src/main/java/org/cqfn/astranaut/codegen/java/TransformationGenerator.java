@@ -174,7 +174,9 @@ public final class TransformationGenerator extends RuleGenerator {
                 this.generateCheckers(context, klass, matchers);
             this.generateComplexCondition(klass, code, checkers);
         } else {
-            this.generateSimpleCondition(context, code, matchers);
+            final ConditionGenerator cgen = new SimpleConditionGenerator(this.rule, context);
+            code.addAll(cgen.generate());
+            matchers.addAll(cgen.getMatchers());
         }
         final String consumed;
         if (this.rule.hasOptionalOrRepeated()) {
@@ -238,51 +240,6 @@ public final class TransformationGenerator extends RuleGenerator {
         );
         method.setBody(String.join("\n", code));
         klass.addMethod(method);
-    }
-
-    /**
-     * Generates code for a simple condition, that is, when there are one or more patterns,
-     *  and each pattern is matched by one node.
-     * @param context Context with available matchers
-     * @param code List of source code lines where the generated condition is added
-     * @param matchers Set to collect used matcher names
-     */
-    private void generateSimpleCondition(final Context context, final List<String> code,
-        final Set<String> matchers) {
-        final StringBuilder condition = new StringBuilder(128);
-        condition.append("final boolean matched = ");
-        final List<LeftSideItem> left = this.rule.getLeft();
-        for (int index = 0; index < left.size(); index = index + 1) {
-            if (index > 0) {
-                condition.append(" && ");
-            }
-            final LeftSideItem item = left.get(index);
-            final Klass matcher = context.getMatchers().get(item.toString(false));
-            final String name = matcher.getName();
-            matchers.add(name);
-            condition
-                .append(name)
-                .append(".INSTANCE.match(list.get(");
-            if (index > 0) {
-                condition.append(index).append(" + index), extracted)");
-            } else {
-                condition.append("index), extracted)");
-            }
-        }
-        condition.append(';');
-        code.add(condition.toString());
-        code.add(TransformationGenerator.NOT_MATCHED);
-        final boolean fragment = !(this.rule.getRight() instanceof UntypedHole);
-        if (fragment && left.size() < 2) {
-            code.add("final Fragment fragment = list.get(index).getFragment();");
-        } else if (fragment) {
-            code.add(
-                String.format(
-                    "final Fragment fragment = Fragment.fromNodes(list.subList(index, index + %d));",
-                    left.size()
-                )
-            );
-        }
     }
 
     /**
