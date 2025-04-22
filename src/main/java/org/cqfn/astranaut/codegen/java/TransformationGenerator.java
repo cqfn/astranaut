@@ -106,6 +106,9 @@ public final class TransformationGenerator extends RuleGenerator {
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Converter");
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Extracted");
         unit.addImport("org.cqfn.astranaut.core.base.Factory");
+        if (!(this.rule.getRight() instanceof UntypedHole)) {
+            unit.addImport("org.cqfn.astranaut.core.base.Fragment");
+        }
         unit.addImport("org.cqfn.astranaut.core.base.Node");
         if (this.rule.getRight() instanceof ResultingSubtreeDescriptor) {
             unit.addImport("org.cqfn.astranaut.core.base.DummyNode");
@@ -155,7 +158,7 @@ public final class TransformationGenerator extends RuleGenerator {
         } else if (this.complex) {
             final List<Pair<String, Boolean>> checkers =
                 this.generateCheckers(context, klass, matchers);
-            TransformationGenerator.generateComplexCondition(klass, code, checkers);
+            this.generateComplexCondition(klass, code, checkers);
         } else {
             this.generateSimpleCondition(context, code, matchers);
         }
@@ -187,7 +190,7 @@ public final class TransformationGenerator extends RuleGenerator {
             if (builder.getValue()) {
                 code.add(
                     String.format(
-                        "final Node node = %s.%s(factory, extracted);",
+                        "final Node node = %s.%s(factory, fragment, extracted);",
                         klass.getName(),
                         builder.getKey().getName()
                     )
@@ -195,7 +198,7 @@ public final class TransformationGenerator extends RuleGenerator {
             } else {
                 code.add(
                     String.format(
-                        "final Node node = %s.%s(factory);",
+                        "final Node node = %s.%s(factory, fragment);",
                         klass.getName(),
                         builder.getKey().getName()
                     )
@@ -255,6 +258,17 @@ public final class TransformationGenerator extends RuleGenerator {
         condition.append(';');
         code.add(condition.toString());
         code.add(TransformationGenerator.NOT_MATCHED);
+        final boolean fragment = !(this.rule.getRight() instanceof UntypedHole);
+        if (fragment && left.size() < 2) {
+            code.add("final Fragment fragment = list.get(index).getFragment();");
+        } else if (fragment) {
+            code.add(
+                String.format(
+                    "final Fragment fragment = Fragment.fromNodes(list.subList(index, index + %d));",
+                    left.size()
+                )
+            );
+        }
     }
 
     /**
@@ -284,6 +298,11 @@ public final class TransformationGenerator extends RuleGenerator {
                 "}"
             )
         );
+        if (!(this.rule.getRight() instanceof UntypedHole)) {
+            code.add(
+                "final Fragment fragment = Fragment.fromNodes(list.subList(index, index + consumed));"
+            );
+        }
     }
 
     /**
@@ -421,7 +440,7 @@ public final class TransformationGenerator extends RuleGenerator {
      * @param code Code lines where the generated condition is added
      * @param checkers List of checker function names generated earlier
      */
-    private static void generateComplexCondition(final Klass klass, final List<String> code,
+    private void generateComplexCondition(final Klass klass, final List<String> code,
         final List<Pair<String, Boolean>> checkers) {
         code.add("final Deque<Node> queue = new LinkedList<>(list.subList(index, list.size()));");
         code.add("final int size = queue.size();");
@@ -481,6 +500,11 @@ public final class TransformationGenerator extends RuleGenerator {
             rest = rest - 1;
         }
         code.add("final int consumed = size - queue.size();");
+        if (!(this.rule.getRight() instanceof UntypedHole)) {
+            code.add(
+                "final Fragment fragment = Fragment.fromNodes(list.subList(index, index + consumed));"
+            );
+        }
     }
 
     /**
@@ -512,6 +536,11 @@ public final class TransformationGenerator extends RuleGenerator {
             Strings.TYPE_FACTORY,
             "factory",
             "Factory for creating nodes"
+        );
+        method.addArgument(
+            Strings.TYPE_FRAGMENT,
+            "fragment",
+            "Code fragment that is covered by the node being created"
         );
         method.setReturnsDescription("Created node");
         final List<String> code = new ArrayList<>(16);
@@ -555,6 +584,7 @@ public final class TransformationGenerator extends RuleGenerator {
                 "    if (!builder.isValid()) {",
                 "         break;",
                 "    }",
+                "    builder.setFragment(fragment);",
                 "    result = builder.createNode();",
                 "} while (false);",
                 "return result;"
