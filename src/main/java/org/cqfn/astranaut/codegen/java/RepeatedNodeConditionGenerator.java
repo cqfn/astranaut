@@ -25,19 +25,18 @@ package org.cqfn.astranaut.codegen.java;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
- * Generates code for a simple condition, that is, when there are one or more patterns,
- *  and each pattern is matched by one node.
+ * Generates code for a condition that consists of a single repeating node.
  * @since 1.0.0
  */
-final class SimpleConditionGenerator implements ConditionGenerator  {
+final class RepeatedNodeConditionGenerator implements ConditionGenerator  {
     /**
      * Transformation rule.
      */
@@ -51,60 +50,43 @@ final class SimpleConditionGenerator implements ConditionGenerator  {
     /**
      * Set of matchers used in the condition.
      */
-    private final Set<String> matchers;
+    private Set<String> matchers;
 
     /**
      * Constructor.
      * @param rule Transformation rule
      * @param context Generation context
      */
-    SimpleConditionGenerator(final TransformationDescriptor rule, final Context context) {
+    RepeatedNodeConditionGenerator(final TransformationDescriptor rule, final Context context) {
         this.rule = rule;
         this.context = context;
-        this.matchers = new TreeSet<>();
+        this.matchers = Collections.emptySet();
     }
 
     @Override
     public List<String> generate() {
-        final List<String> code = new ArrayList<>(16);
-        final StringBuilder condition = new StringBuilder(128);
-        condition.append("final boolean matched = ");
-        final List<LeftSideItem> left = this.rule.getLeft();
-        for (int index = 0; index < left.size(); index = index + 1) {
-            if (index > 0) {
-                condition.append(" && ");
-            }
-            final LeftSideItem item = left.get(index);
-            final Klass matcher = this.context.getMatchers().get(item.toString(false));
-            final String name = matcher.getName();
-            this.matchers.add(name);
-            condition
-                .append(name)
-                .append(".INSTANCE.match(list.get(");
-            if (index > 0) {
-                condition.append(index).append(" + index), extracted)");
-            } else {
-                condition.append("index), extracted)");
-            }
-        }
-        condition.append(';');
+        final List<String> code = new ArrayList<>(8);
+        final LeftSideItem item = this.rule.getLeft().get(0);
+        final String matcher = this.context.getMatchers().get(item.toString(false)).getName();
+        this.matchers = Collections.singleton(matcher);
         code.addAll(
             Arrays.asList(
-                condition.toString(),
-                "if (!matched) {",
+                "int consumed = 0;",
+                "for (int offset = 0; index + offset < list.size(); offset = offset + 1) {",
+                "    final Node node = list.get(index + offset);",
+                String.format("    if (!%s.INSTANCE.match(node, extracted)) {", matcher),
+                "        break;",
+                "    }",
+                "    consumed = consumed + 1;",
+                "}",
+                "if (consumed == 0) {",
                 "    break;",
                 "}"
             )
         );
-        final boolean fragment = !(this.rule.getRight() instanceof UntypedHole);
-        if (fragment && left.size() < 2) {
-            code.add("final Fragment fragment = list.get(index).getFragment();");
-        } else if (fragment) {
+        if (!(this.rule.getRight() instanceof UntypedHole)) {
             code.add(
-                String.format(
-                    "final Fragment fragment = Fragment.fromNodes(list.subList(index, index + %d));",
-                    left.size()
-                )
+                "final Fragment fragment = Fragment.fromNodes(list.subList(index, index + consumed));"
             );
         }
         return code;
