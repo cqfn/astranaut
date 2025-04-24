@@ -27,14 +27,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
-import org.cqfn.astranaut.core.utils.Pair;
 import org.cqfn.astranaut.dsl.PatternMatchingMode;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
-import org.cqfn.astranaut.dsl.RightSideItem;
 import org.cqfn.astranaut.dsl.Rule;
-import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
@@ -60,9 +56,9 @@ public final class TransformationGenerator extends RuleGenerator {
     private final boolean complex;
 
     /**
-     * Flag indicating that 'Collection' class is needed.
+     * Various flags that are set during source code generation by the transformation rule.
      */
-    private boolean collections;
+    private final TransformationGeneratorFlags flags;
 
     /**
      * Constructor.
@@ -71,6 +67,7 @@ public final class TransformationGenerator extends RuleGenerator {
     public TransformationGenerator(final TransformationDescriptor rule) {
         this.rule = rule;
         this.complex = rule.hasOptionalOrRepeated() && rule.getLeft().size() > 1;
+        this.flags = new TransformationGeneratorFlags();
     }
 
     @Override
@@ -104,7 +101,7 @@ public final class TransformationGenerator extends RuleGenerator {
         }
         unit.addImport("java.util.List");
         unit.addImport("java.util.Optional");
-        if (this.collections) {
+        if (this.flags.isCollectionsClassNeeded()) {
             unit.addImport("java.util.Collections");
         }
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.ConversionResult");
@@ -186,17 +183,18 @@ public final class TransformationGenerator extends RuleGenerator {
                 )
             );
         } else if (this.rule.getRight() instanceof ResultingSubtreeDescriptor) {
-            final Pair<Method, Boolean> builder = this.generateBuilder(
+            final ResultingSubtreeBuilderGenerator gen = new ResultingSubtreeBuilderGenerator(
                 klass,
                 new NameGenerator("root"),
-                (ResultingSubtreeDescriptor) this.rule.getRight()
+                this.flags
             );
-            if (builder.getValue()) {
+            final Method builder = gen.generate((ResultingSubtreeDescriptor) this.rule.getRight());
+            if (gen.isExtractedParameterNeeded()) {
                 code.add(
                     String.format(
                         "final Node node = %s.%s(factory, fragment, extracted);",
                         klass.getName(),
-                        builder.getKey().getName()
+                        builder.getName()
                     )
                 );
             } else {
@@ -204,7 +202,7 @@ public final class TransformationGenerator extends RuleGenerator {
                     String.format(
                         "final Node node = %s.%s(factory, fragment);",
                         klass.getName(),
-                        builder.getKey().getName()
+                        builder.getName()
                     )
                 );
             }
@@ -229,184 +227,6 @@ public final class TransformationGenerator extends RuleGenerator {
         method.setBody(String.join("\n", code));
         klass.addMethod(method);
         return cgen.getMatchers();
-    }
-
-    /**
-     * Creates a function that creates a node based on its descriptor,
-     *  using the extracted nodes and data.
-     * @param klass The class in which the method is created.
-     * @param names Method name generator
-     * @param descriptor Node descriptor
-     * @return Created method with an indication whether to pass extracted data to it or not
-     */
-    private Pair<Method, Boolean> generateBuilder(final Klass klass,
-        final NameGenerator names, final ResultingSubtreeDescriptor descriptor) {
-        final String name = names.nextName();
-        final Method method = new Method(
-            Strings.TYPE_NODE,
-            String.format(
-                "build%s%s",
-                name.substring(0, 1).toUpperCase(Locale.ENGLISH),
-                name.substring(1)
-            ),
-            String.format(
-                "Constructs a node based on the descriptor '%s'",
-                descriptor.toString()
-            )
-        );
-        klass.addMethod(method);
-        method.makePrivate();
-        method.makeStatic();
-        method.addArgument(
-            Strings.TYPE_FACTORY,
-            "factory",
-            "Factory for creating nodes"
-        );
-        method.setReturnsDescription("Created node");
-        final List<String> code = new ArrayList<>(16);
-        code.addAll(
-            Arrays.asList(
-                "Node result = DummyNode.INSTANCE;",
-                String.format(
-                    "final Builder builder = factory.createBuilder(\"%s\");",
-                    descriptor.getType()
-                ),
-                "do {"
-            )
-        );
-        boolean extracted = false;
-        if (descriptor.getData() instanceof UntypedHole) {
-            extracted = true;
-            code.addAll(
-                Arrays.asList(
-                    String.format(
-                        "if (!builder.setData(extracted.getData(%d))) {",
-                        ((UntypedHole) descriptor.getData()).getNumber()
-                    ),
-                    TransformationGenerator.BREAK,
-                    "}"
-                )
-            );
-        } else if (descriptor.getData() instanceof StaticString) {
-            code.addAll(
-                Arrays.asList(
-                    String.format(
-                        "if (!builder.setData(%s)) {",
-                        ((StaticString) descriptor.getData()).toJavaCode()
-                    ),
-                    TransformationGenerator.BREAK,
-                    "}"
-                )
-            );
-        }
-        final Pair<String, Boolean> children =
-            this.generateChildren(klass, names, descriptor);
-        code.add(children.getKey());
-        extracted = extracted || children.getValue();
-        code.addAll(
-            Arrays.asList(
-                "if (!builder.isValid()) {",
-                TransformationGenerator.BREAK,
-                "}"
-            )
-        );
-        if (name.equals("root")) {
-            method.addArgument(
-                Strings.TYPE_FRAGMENT,
-                "fragment",
-                "Code fragment that is covered by the node being created"
-            );
-            code.add("builder.setFragment(fragment);");
-        }
-        code.addAll(
-            Arrays.asList(
-                "    result = builder.createNode();",
-                "} while (false);",
-                "return result;"
-            )
-        );
-        if (extracted) {
-            method.addArgument(
-                "Extracted",
-                "extracted",
-                "Extracted nodes and data"
-            );
-        }
-        method.setBody(String.join("\n", code));
-        return new Pair<>(method, extracted);
-    }
-
-    /**
-     * Creates a piece of code that populates the list of children of the node being created.
-     * @param klass The class in which methods are created
-     * @param names Method name generator
-     * @param descriptor Node descriptor
-     * @return Generated code lines with an indication whether to pass extracted data to it or not
-     */
-    private Pair<String, Boolean> generateChildren(final Klass klass,
-        final NameGenerator names, final ResultingSubtreeDescriptor descriptor) {
-        final List<String> code = new ArrayList<>(8);
-        boolean extracted = false;
-        if (descriptor.allChildrenAreHoles()) {
-            extracted = true;
-            final StringBuilder numbers = new StringBuilder();
-            boolean flag = false;
-            for (final RightSideItem item : descriptor.getChildren()) {
-                if (!(item instanceof UntypedHole)) {
-                    continue;
-                }
-                if (flag) {
-                    numbers.append(", ");
-                }
-                flag = true;
-                numbers.append(((UntypedHole) item).getNumber());
-            }
-            code.addAll(
-                Arrays.asList(
-                    String.format(
-                        "final List<Node> children = extracted.getNodes(%s);",
-                        numbers.toString()
-                    ),
-                    "if (!builder.setChildrenList(children)) {",
-                    TransformationGenerator.BREAK,
-                    "}"
-                )
-            );
-        } else if (descriptor.getChildren().size() == 1) {
-            this.collections = true;
-            final Pair<Method, Boolean> child = this.generateBuilder(
-                klass,
-                names,
-                (ResultingSubtreeDescriptor) descriptor.getChildren().get(0)
-            );
-            extracted = child.getValue();
-            if (child.getValue()) {
-                code.add(
-                    String.format(
-                        "final Node child = %s.%s(factory, extracted);",
-                        klass.getName(),
-                        child.getKey().getName()
-                    )
-                );
-            } else {
-                code.add(
-                    String.format(
-                        "final Node child = %s.%s(factory);",
-                        klass.getName(),
-                        child.getKey().getName()
-                    )
-                );
-            }
-            code.addAll(
-                Arrays.asList(
-                    "final List<Node> children = Collections.singletonList(child);",
-                    "if (!builder.setChildrenList(children)) {",
-                    TransformationGenerator.BREAK,
-                    "}"
-                )
-            );
-        }
-        return new Pair<>(String.join("\n", code), extracted);
     }
 
     /**
