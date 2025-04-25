@@ -310,7 +310,7 @@ final class ResultingSubtreeBuilderGenerator {
                 if (flag) {
                     builder.append(", ");
                 } else {
-                    builder.append(".merge(extracted.getNodes(");
+                    builder.append(".add(extracted.getNodes(");
                 }
                 flag = true;
                 builder.append(((UntypedHole) child).getNumber());

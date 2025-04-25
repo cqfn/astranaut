@@ -23,14 +23,15 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Arrays;
 import java.util.Locale;
 import org.cqfn.astranaut.dsl.Program;
 
 /**
- * Generates a factory provider that aggregates all generated factories.
+ * Generates a provider that aggregates all generated factories and transformers.
  * @since 1.0.0
  */
-public class FactoryProviderGenerator {
+public class ProviderGenerator {
     /**
      * Program implemented in DSL.
      */
@@ -40,7 +41,7 @@ public class FactoryProviderGenerator {
      * Constructor.
      * @param program Program implemented in DSL
      */
-    public FactoryProviderGenerator(final Program program) {
+    public ProviderGenerator(final Program program) {
         this.program = program;
     }
 
@@ -51,42 +52,59 @@ public class FactoryProviderGenerator {
      */
     public CompilationUnit createUnit(final Context context) {
         final Klass klass = new Klass(
-            "FactoryProvider",
-            "Factory provider that aggregates all factories."
+            "Provider",
+            "Provider that aggregates all factories and transformers."
         );
         klass.makePublic();
         klass.makeFinal();
         klass.setVersion(context.getVersion());
-        klass.setImplementsList("org.cqfn.astranaut.core.base.FactoryProvider");
+        klass.setImplementsList("org.cqfn.astranaut.core.base.Provider");
         final Constructor ctor = klass.createConstructor();
         ctor.makePrivate();
         final Field instance = new Field(
-            "FactoryProvider",
+            "Provider",
             "INSTANCE",
-            "The factory provider instance"
+            "The provider instance"
         );
         instance.makePublic();
         instance.makeStatic();
-        instance.makeFinal("new FactoryProvider()");
+        instance.makeFinal("new Provider()");
         klass.addField(instance);
+        ProviderGenerator.createGetFactoryMethod(klass);
         this.createMapOfFactories(context, klass);
-        final Method method = new Method("Factory", "getFactory");
-        method.makePublic();
-        method.addArgument("String", "language");
-        method.setBody(
-            "return FactoryProvider.FACTORIES.getOrDefault(language, DefaultFactory.EMPTY);"
-        );
-        klass.addMethod(method);
+        ProviderGenerator.createGetTransformerMethod(klass);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
             klass
         );
+        unit.addImport("java.util.Locale");
         unit.addImport("java.util.Map");
         unit.addImport("org.cqfn.astranaut.core.base.Factory");
         unit.addImport("org.cqfn.astranaut.core.base.DefaultFactory");
+        unit.addImport("org.cqfn.astranaut.core.base.Transformer");
         unit.addImport("org.cqfn.astranaut.core.utils.MapUtils");
         return unit;
+    }
+
+    /**
+     * Creates the 'getFactory' method.
+     * @param klass The class in which the method is created
+     */
+    private static void createGetFactoryMethod(final Klass klass) {
+        final Method method = new Method("Factory", "getFactory");
+        method.makePublic();
+        method.addArgument("String", "language");
+        method.setBody(
+            String.join(
+                "\n",
+                Arrays.asList(
+                    "final String lowercase = language.toLowerCase(Locale.ENGLISH);",
+                    "return Provider.FACTORIES.getOrDefault(lowercase, DefaultFactory.EMPTY);"
+                )
+            )
+        );
+        klass.addMethod(method);
     }
 
     /**
@@ -120,5 +138,19 @@ public class FactoryProviderGenerator {
         builder.append(".make()");
         field.makeFinal(builder.toString());
         klass.addField(field);
+    }
+
+    /**
+     * Creates the 'getTransformer' method.
+     * @param klass The class in which the method is created
+     */
+    private static void createGetTransformerMethod(final Klass klass) {
+        final Method method = new Method("Transformer", "getTransformer");
+        method.makePublic();
+        method.addArgument("String", "language");
+        method.setBody(
+            "return node -> node;"
+        );
+        klass.addMethod(method);
     }
 }

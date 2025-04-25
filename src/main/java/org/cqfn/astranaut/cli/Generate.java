@@ -37,12 +37,12 @@ import java.util.Set;
 import org.cqfn.astranaut.codegen.java.CompilationUnit;
 import org.cqfn.astranaut.codegen.java.Context;
 import org.cqfn.astranaut.codegen.java.FactoryGenerator;
-import org.cqfn.astranaut.codegen.java.FactoryProviderGenerator;
 import org.cqfn.astranaut.codegen.java.Klass;
 import org.cqfn.astranaut.codegen.java.LeftSideGenerationContext;
 import org.cqfn.astranaut.codegen.java.License;
 import org.cqfn.astranaut.codegen.java.Package;
 import org.cqfn.astranaut.codegen.java.PackageInfo;
+import org.cqfn.astranaut.codegen.java.ProviderGenerator;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.utils.FilesWriter;
 import org.cqfn.astranaut.dsl.LeftSideItem;
@@ -136,7 +136,7 @@ public final class Generate implements Action {
         cct.setPackage(this.basepkg);
         cct.setVersion(this.options.getVersion());
         final Context context = cct.createContext();
-        final CompilationUnit provider = new FactoryProviderGenerator(program).createUnit(context);
+        final CompilationUnit provider = new ProviderGenerator(program).createUnit(context);
         Generate.writeFile(
             new File(this.root.toString(), provider.getFileName()),
             provider.generateJavaCode()

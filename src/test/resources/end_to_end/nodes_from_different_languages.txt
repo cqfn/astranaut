@@ -23,20 +23,22 @@
  */
 package org.cqfn.uast.tree;
 
+import java.util.Locale;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.DefaultFactory;
 import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Transformer;
 import org.cqfn.astranaut.core.utils.MapUtils;
 
 /**
- * Factory provider that aggregates all factories.
+ * Provider that aggregates all factories and transformers.
  * @since 1.0.0
  */
-public final class FactoryProvider implements org.cqfn.astranaut.core.base.FactoryProvider {
+public final class Provider implements org.cqfn.astranaut.core.base.Provider {
     /**
-     * The factory provider instance.
+     * The provider instance.
      */
-    public static final FactoryProvider INSTANCE = new FactoryProvider();
+    public static final Provider INSTANCE = new Provider();
 
     /**
      * Collection of factories supported by this provider.
@@ -50,12 +52,18 @@ public final class FactoryProvider implements org.cqfn.astranaut.core.base.Facto
     /**
      * Constructor.
      */
-    private FactoryProvider() {
+    private Provider() {
     }
 
     @Override
     public Factory getFactory(final String language) {
-        return FactoryProvider.FACTORIES.getOrDefault(language, DefaultFactory.EMPTY);
+        final String lowercase = language.toLowerCase(Locale.ENGLISH);
+        return Provider.FACTORIES.getOrDefault(lowercase, DefaultFactory.EMPTY);
+    }
+
+    @Override
+    public Transformer getTransformer(final String language) {
+        return node -> node;
     }
 }
 
