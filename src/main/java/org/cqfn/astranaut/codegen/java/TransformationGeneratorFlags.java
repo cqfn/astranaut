@@ -29,22 +29,42 @@ package org.cqfn.astranaut.codegen.java;
  */
 final class TransformationGeneratorFlags {
     /**
-     * Flag indicating that we need to import the 'collections' class.
+     * Flag indicating that we need to import the 'Collections' class.
      */
     private boolean collections;
 
     /**
-     * Sets the flag indicating that we need to import the 'collections' class.
+     * Flag indicating that we need to import the 'ListUtils' class.
+     */
+    private boolean lutils;
+
+    /**
+     * Sets the flag indicating that we need to import the 'Collections' class.
      */
     void needCollections() {
         this.collections = true;
     }
 
     /**
-     * Returns the flag indicating that we need to import the 'collections' class.
+     * Sets the flag indicating that we need to import the 'ListUtils' class.
+     */
+    void needListUtils() {
+        this.lutils = true;
+    }
+
+    /**
+     * Returns the flag indicating that we need to import the 'Collections' class.
      * @return The flag
      */
     boolean isCollectionsClassNeeded() {
         return this.collections;
+    }
+
+    /**
+     * Returns the flag indicating that we need to import the 'ListUtils' class.
+     * @return The flag
+     */
+    boolean isListUtilsClassNeeded() {
+        return this.lutils;
     }
 }

@@ -204,33 +204,12 @@ public abstract  class BaseMethod implements Entity {
                 result.add(line);
                 continue;
             }
-            String tail = code;
-            int bias = 0;
-            int index = code.indexOf(" = ");
-            if (index > 0) {
-                result.add(new Pair<>(code.substring(0, index + 2), offset));
-                tail = code.substring(index + 3).trim();
-                bias = 1;
-            }
-            if (bias == 1 && SourceCodeBuilder.tryOn(indent + offset + 1, tail)) {
-                result.add(new Pair<>(tail, offset + 1));
-                continue;
-            }
-            index = tail.indexOf("&&");
-            boolean flag = false;
-            while (!flag && index > 0) {
-                result.add(new Pair<>(tail.substring(0, index).trim(), offset + bias));
-                tail = tail.substring(index).trim();
-                bias = 1;
-                if (SourceCodeBuilder.tryOn(indent + offset + 1, tail)) {
-                    result.add(new Pair<>(tail, offset + 1));
-                    flag = true;
-                }
-                index = tail.indexOf("&&", 2);
-            }
-            if (!flag) {
+            final LongLineBreaker breaker = new LongLineBreaker(code, indent, offset);
+            final List<Pair<String, Integer>> lines = breaker.split();
+            if (lines.isEmpty()) {
                 throw new SourceCodeBuilder.CodeLineIsTooLong(code);
             }
+            result.addAll(lines);
         }
         return result;
     }

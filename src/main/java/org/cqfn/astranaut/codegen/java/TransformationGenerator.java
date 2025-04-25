@@ -104,6 +104,9 @@ public final class TransformationGenerator extends RuleGenerator {
         if (this.flags.isCollectionsClassNeeded()) {
             unit.addImport("java.util.Collections");
         }
+        if (this.flags.isListUtilsClassNeeded()) {
+            unit.addImport("org.cqfn.astranaut.core.utils.ListUtils");
+        }
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.ConversionResult");
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Converter");
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Extracted");

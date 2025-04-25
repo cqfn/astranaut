@@ -25,6 +25,7 @@ package org.cqfn.astranaut.codegen.java;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
@@ -195,65 +196,136 @@ final class ResultingSubtreeBuilderGenerator {
      * @return Generated code lines with an indication whether to pass extracted data to it or not
      */
     private List<String> generateChildren(final ResultingSubtreeDescriptor descriptor) {
-        final List<String> code = new ArrayList<>(8);
+        final List<String> code;
         if (descriptor.allChildrenAreHoles()) {
-            this.needExtracted();
-            final StringBuilder numbers = new StringBuilder();
-            boolean flag = false;
-            for (final RightSideItem item : descriptor.getChildren()) {
-                if (!(item instanceof UntypedHole)) {
-                    continue;
-                }
+            code = this.generateChildrenFromHoles(descriptor);
+        } else if (descriptor.getChildren().size() == 1) {
+            code = this.generateChildrenFromSingleChild(descriptor);
+        } else if (descriptor.getChildren().size() > 1) {
+            code = this.generateChildrenForComplexCase(descriptor);
+        } else {
+            code = Collections.emptyList();
+        }
+        return code;
+    }
+
+    /**
+     * Generates code for populating children when all child descriptors are holes.
+     *  Extracts hole numbers and generates a call to retrieve matching nodes from extracted data.
+     * @param descriptor Node descriptor with hole-based children
+     * @return List of code lines to populate children from extracted holes
+     */
+    private List<String> generateChildrenFromHoles(final ResultingSubtreeDescriptor descriptor) {
+        this.needExtracted();
+        final StringBuilder numbers = new StringBuilder();
+        boolean flag = false;
+        for (final RightSideItem item : descriptor.getChildren()) {
+            if (item instanceof UntypedHole) {
                 if (flag) {
                     numbers.append(", ");
                 }
                 flag = true;
                 numbers.append(((UntypedHole) item).getNumber());
             }
-            code.addAll(
-                Arrays.asList(
-                    String.format(
-                        "final List<Node> children = extracted.getNodes(%s);",
-                        numbers.toString()
-                    ),
-                    "if (!builder.setChildrenList(children)) {",
-                    ResultingSubtreeBuilderGenerator.BREAK,
-                    "}"
-                )
+        }
+        return Arrays.asList(
+            String.format(
+                "final List<Node> children = extracted.getNodes(%s);",
+                numbers.toString()
+            ),
+            "if (!builder.setChildrenList(children)) {",
+            ResultingSubtreeBuilderGenerator.BREAK,
+            "}"
+        );
+    }
+
+    /**
+     * Generates code for populating children when there is exactly one child descriptor.
+     *  Builds the single child node and wraps it in a singleton list.
+     * @param descriptor Node descriptor with exactly one child
+     * @return List of code lines to populate children from a single generated node
+     */
+    private List<String> generateChildrenFromSingleChild(
+        final ResultingSubtreeDescriptor descriptor) {
+        this.flags.needCollections();
+        final ResultingSubtreeBuilderGenerator gen = this.fork();
+        final Method method = gen.generate(
+            (ResultingSubtreeDescriptor) descriptor.getChildren().get(0)
+        );
+        final String call;
+        if (gen.isExtractedParameterNeeded()) {
+            call = String.format(
+                "final Node child = %s.%s(factory, extracted);",
+                this.klass.getName(),
+                method.getName()
             );
-        } else if (descriptor.getChildren().size() == 1) {
-            this.flags.needCollections();
-            final ResultingSubtreeBuilderGenerator gen = this.fork();
-            final Method method = gen.generate(
-                (ResultingSubtreeDescriptor) descriptor.getChildren().get(0)
-            );
-            if (gen.isExtractedParameterNeeded()) {
-                code.add(
-                    String.format(
-                        "final Node child = %s.%s(factory, extracted);",
-                        this.klass.getName(),
-                        method.getName()
-                    )
-                );
-            } else {
-                code.add(
-                    String.format(
-                        "final Node child = %s.%s(factory);",
-                        this.klass.getName(),
-                        method.getName()
-                    )
-                );
-            }
-            code.addAll(
-                Arrays.asList(
-                    "final List<Node> children = Collections.singletonList(child);",
-                    "if (!builder.setChildrenList(children)) {",
-                    ResultingSubtreeBuilderGenerator.BREAK,
-                    "}"
-                )
+        } else {
+            call =
+            String.format(
+                "final Node child = %s.%s(factory);",
+                this.klass.getName(),
+                method.getName()
             );
         }
-        return code;
+        return Arrays.asList(
+            call,
+            "final List<Node> children = Collections.singletonList(child);",
+            "if (!builder.setChildrenList(children)) {",
+            ResultingSubtreeBuilderGenerator.BREAK,
+            "}"
+        );
+    }
+
+    /**
+     * Generates code for populating children in a complex case where the descriptor
+     *  contains a mix of subtree descriptors and holes.
+     *  Builds the list dynamically using utility methods and merges nodes extracted from holes.
+     * @param descriptor Node descriptor with mixed children
+     * @return List of code lines to populate children from multiple sources
+     */
+    private List<String> generateChildrenForComplexCase(
+        final ResultingSubtreeDescriptor descriptor) {
+        this.flags.needListUtils();
+        final StringBuilder builder = new StringBuilder(64);
+        builder.append("final List<Node> children = new ListUtils<Node>()");
+        boolean flag = false;
+        for (final RightSideItem child : descriptor.getChildren()) {
+            if (child instanceof ResultingSubtreeDescriptor) {
+                if (flag) {
+                    builder.append("))");
+                }
+                flag = false;
+                final ResultingSubtreeBuilderGenerator gen = this.fork();
+                final Method method = gen.generate(
+                    (ResultingSubtreeDescriptor) child
+                );
+                builder.append(".add(").append(this.klass.getName()).append('.')
+                    .append(method.getName()).append("(factory");
+                if (gen.isExtractedParameterNeeded()) {
+                    builder.append(", extracted");
+                }
+                builder.append("))");
+            } else if (child instanceof UntypedHole) {
+                this.needExtracted();
+                if (flag) {
+                    builder.append(", ");
+                } else {
+                    builder.append(".merge(extracted.getNodes(");
+                }
+                flag = true;
+                builder.append(((UntypedHole) child).getNumber());
+            }
+        }
+        if (flag) {
+            builder.append("))");
+        }
+        builder.append(".make();");
+        return Arrays.asList(
+            builder.toString(),
+            "if (!builder.setChildrenList(children)) {",
+            ResultingSubtreeBuilderGenerator.BREAK,
+            "}"
+        );
     }
 
     /**
