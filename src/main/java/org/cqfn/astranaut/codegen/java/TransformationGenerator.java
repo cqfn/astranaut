@@ -88,6 +88,13 @@ public final class TransformationGenerator extends RuleGenerator {
         klass.makeFinal();
         klass.setVersion(context.getVersion());
         klass.setImplementsList("Converter");
+        final Field instance = new Field("Converter", "INSTANCE", "The instance");
+        instance.makePublic();
+        instance.makeStatic();
+        instance.makeFinal(String.format("new %s()", klass.getName()));
+        klass.addField(instance);
+        final Constructor ctor = klass.createConstructor();
+        ctor.makePrivate();
         final Set<String> matchers = this.createConvertMethod(context, klass);
         this.createGetMinConsumedMethod(klass);
         final CompilationUnit unit = new CompilationUnit(
