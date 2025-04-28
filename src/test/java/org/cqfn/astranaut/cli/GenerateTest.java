@@ -274,6 +274,13 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void dataExtraction(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("data_extraction.txt");
+        final String actual = this.run("data_extraction.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.
