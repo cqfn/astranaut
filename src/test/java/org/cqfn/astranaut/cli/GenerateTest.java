@@ -225,6 +225,27 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void matcherReuse(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("matcher_reuse.txt");
+        final String actual = this.run("matcher_reuse.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void conversionWithOptionalNode(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("conversion_with_optional_node.txt");
+        final String actual = this.run("conversion_with_optional_node.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void conversionToListNode(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("conversion_to_list_node.txt");
+        final String actual = this.run("conversion_to_list_node.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.
