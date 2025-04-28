@@ -36,7 +36,7 @@ import org.cqfn.astranaut.dsl.Program;
  * Generates factories for nodes.
  * @since 1.0.0
  */
-public class FactoryGenerator {
+public final class FactoryGenerator {
     /**
      * Program implemented in DSL.
      */

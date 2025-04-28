@@ -31,7 +31,7 @@ import java.util.TreeMap;
  * Generates fields containing constant (final) strings.
  * @since 1.0.0
  */
-public class ConstantStrings {
+public final class ConstantStrings {
     /**
      * The maximum length of the field name.
      */

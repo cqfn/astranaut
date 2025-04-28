@@ -44,6 +44,7 @@ import org.cqfn.astranaut.codegen.java.Package;
 import org.cqfn.astranaut.codegen.java.PackageInfo;
 import org.cqfn.astranaut.codegen.java.ProviderGenerator;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
+import org.cqfn.astranaut.codegen.java.TransformerGenerator;
 import org.cqfn.astranaut.core.utils.FilesWriter;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
@@ -290,6 +291,12 @@ public final class Generate implements Action {
         cct.setVersion(this.options.getVersion());
         cct.setMatchers(matchers);
         final Context context = cct.createContext();
+        final CompilationUnit transformer =
+            TransformerGenerator.INSTANCE.createUnit(language, context);
+        Generate.writeFile(
+            new File(folder, transformer.getFileName()),
+            transformer.generateJavaCode()
+        );
         for (final TransformationDescriptor rule : rules) {
             final RuleGenerator generator = rule.createGenerator();
             final Set<CompilationUnit> units = generator.createUnits(context);
