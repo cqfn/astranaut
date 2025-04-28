@@ -246,6 +246,27 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void extractNodeFromComplexCase(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("extract_node_from_complex_case.txt");
+        final String actual = this.run("extract_node_from_complex_case.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void complexCaseConversion(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("complex_case_conversion.txt");
+        final String actual = this.run("complex_case_conversion.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void untypedHoles(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("untyped_holes.txt");
+        final String actual = this.run("untyped_holes.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.

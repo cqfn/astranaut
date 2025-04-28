@@ -49,7 +49,7 @@ public final class TypedHoleMatcherGenerator extends LeftSideItemGenerator {
     public Klass generate(final LeftSideGenerationContext context) {
         final String brief = String.format(
             "Matches a node with the pattern '%s' and extracts it if matched",
-            this.item.toString()
+            this.item.toString(false)
         );
         final Klass klass = new Klass(context.generateClassName(), brief);
         LeftSideItemGenerator.generateInstanceAndConstructor(klass);

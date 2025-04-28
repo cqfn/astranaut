@@ -110,7 +110,7 @@ import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
 import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Matches a node with the pattern 'AAA#1' and extracts it if matched.
+ * Matches a node with the pattern 'AAA'.
  * @since 1.0.0
  */
 public final class Matcher0 implements Matcher {
@@ -127,11 +127,262 @@ public final class Matcher0 implements Matcher {
 
     @Override
     public boolean match(final Node node, final Extracted extracted) {
-        final boolean matches = node.belongsToGroup("AAA");
-        if (matches) {
-            extracted.addNode(1, node);
-        }
-        return matches;
+        return node.belongsToGroup("AAA") && node.getChildCount() == 0;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'BBB'.
+ * @since 1.0.0
+ */
+public final class Matcher1 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher1();
+
+    /**
+     * Constructor.
+     */
+    private Matcher1() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        return node.belongsToGroup("BBB") && node.getChildCount() == 0;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'CCC'.
+ * @since 1.0.0
+ */
+public final class Matcher2 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher2();
+
+    /**
+     * Constructor.
+     */
+    private Matcher2() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        return node.belongsToGroup("CCC") && node.getChildCount() == 0;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'DDD'.
+ * @since 1.0.0
+ */
+public final class Matcher3 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher3();
+
+    /**
+     * Constructor.
+     */
+    private Matcher3() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        return node.belongsToGroup("DDD") && node.getChildCount() == 0;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'EEE'.
+ * @since 1.0.0
+ */
+public final class Matcher4 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher4();
+
+    /**
+     * Constructor.
+     */
+    private Matcher4() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        return node.belongsToGroup("EEE") && node.getChildCount() == 0;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'FFF'.
+ * @since 1.0.0
+ */
+public final class Matcher5 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher5();
+
+    /**
+     * Constructor.
+     */
+    private Matcher5() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        return node.belongsToGroup("FFF") && node.getChildCount() == 0;
     }
 }
 
@@ -217,211 +468,13 @@ public final class CommonFactory extends DefaultFactory {
      * Collection of types supported by this factory.
      */
     private static final Map<String, Type> TYPES =
-        new MapUtils<String, Type>()
-            .put(FakeList.NAME, FakeList.TYPE)
-            .put(FakeNode.NAME, FakeNode.TYPE)
-            .make();
+        new MapUtils<String, Type>().put(FakeNode.NAME, FakeNode.TYPE).make();
 
     /**
      * Constructor.
      */
     private CommonFactory() {
         super(CommonFactory.TYPES);
-    }
-}
-
-/*
- * The MIT License (MIT)
- *
- * Copyright (c) 2025 Ivan Kniazkov
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-package org.cqfn.uast.tree.common.nodes;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import org.cqfn.astranaut.core.base.Builder;
-import org.cqfn.astranaut.core.base.EmptyFragment;
-import org.cqfn.astranaut.core.base.Fragment;
-import org.cqfn.astranaut.core.base.Node;
-import org.cqfn.astranaut.core.base.Type;
-
-/**
- * Node of the 'FakeList' type.
- * @since 1.0.0
- */
-public final class FakeList implements Node {
-    /**
-     * Name of the type.
-     */
-    public static final String NAME = "FakeList";
-
-    /**
-     * Type of the node.
-     */
-    public static final Type TYPE = new FakeListType();
-
-    /**
-     * Fragment of source code that is associated with the node.
-     */
-    private Fragment fragment;
-
-    /**
-     * List of child nodes.
-     */
-    private List<FakeNode> children;
-
-    /**
-     * Constructor.
-     */
-    private FakeList() {
-    }
-
-    @Override
-    public Fragment getFragment() {
-        return this.fragment;
-    }
-
-    @Override
-    public Type getType() {
-        return FakeList.TYPE;
-    }
-
-    @Override
-    public String getData() {
-        return "";
-    }
-
-    @Override
-    public int getChildCount() {
-        return this.children.size();
-    }
-
-    @Override
-    public Node getChild(final int index) {
-        return this.children.get(index);
-    }
-
-    /**
-     * Returns child node by its index.
-     * @param index Child index
-     * @return Child node
-     */
-    public FakeNode getFakeNode(final int index) {
-        return this.children.get(index);
-    }
-
-    /**
-     * Type implementation describing 'FakeList' nodes.
-     * @since 1.0.0
-     */
-    private static final class FakeListType implements Type {
-        /**
-         * Node hierarchy.
-         */
-        private static final List<String> HIERARCHY = Collections.singletonList(FakeList.NAME);
-
-        @Override
-        public String getName() {
-            return FakeList.NAME;
-        }
-
-        @Override
-        public List<String> getHierarchy() {
-            return FakeListType.HIERARCHY;
-        }
-
-        @Override
-        public Map<String, String> getProperties() {
-            return CommonFactory.PROPERTIES;
-        }
-
-        @Override
-        public Builder createBuilder() {
-            return new FakeList.Constructor();
-        }
-    }
-
-    /**
-     * Constructor (builder) that creates nodes of the 'FakeList' type.
-     * @since 1.0.0
-     */
-    public static final class Constructor implements Builder {
-        /**
-         * Fragment of source code that is associated with the node.
-         */
-        private Fragment fragment;
-
-        /**
-         * List of child nodes.
-         */
-        private List<FakeNode> children;
-
-        /**
-         * Constructor.
-         */
-        public Constructor() {
-            this.fragment = EmptyFragment.INSTANCE;
-            this.children = Collections.emptyList();
-        }
-
-        @Override
-        public void setFragment(final Fragment object) {
-            this.fragment = object;
-        }
-
-        @Override
-        public boolean setData(final String value) {
-            return value.isEmpty();
-        }
-
-        @Override
-        public boolean setChildrenList(final List<Node> list) {
-            final List<FakeNode> temp = new ArrayList<>(list.size());
-            boolean result = true;
-            for (final Node node: list) {
-                if (node instanceof FakeNode) {
-                    temp.add((FakeNode) node);
-                } else {
-                    result = false;
-                    break;
-                }
-            }
-            this.children = temp;
-            return result;
-        }
-
-        @Override
-        public boolean isValid() {
-            return true;
-        }
-
-        @Override
-        public Node createNode() {
-            final FakeList node = new FakeList();
-            node.fragment = this.fragment;
-            node.children = Collections.unmodifiableList(this.children);
-            return node;
-        }
     }
 }
 
@@ -707,6 +760,8 @@ public final class CommonTransformer extends DefaultTransformer {
  */
 package org.cqfn.uast.tree.common.rules;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import org.cqfn.astranaut.core.algorithms.conversion.ConversionResult;
@@ -718,9 +773,14 @@ import org.cqfn.astranaut.core.base.Factory;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.uast.tree.common.matchers.Matcher0;
+import org.cqfn.uast.tree.common.matchers.Matcher1;
+import org.cqfn.uast.tree.common.matchers.Matcher2;
+import org.cqfn.uast.tree.common.matchers.Matcher3;
+import org.cqfn.uast.tree.common.matchers.Matcher4;
+import org.cqfn.uast.tree.common.matchers.Matcher5;
 
 /**
- * Converter implementing the rule '{AAA#1} -> FakeList(#1)'.
+ * Converter implementing the rule 'AAA, [BBB], {CCC}, DDD, EEE, FFF -> FakeNode'.
  * @since 1.0.0
  */
 public final class Converter0 implements Converter {
@@ -740,23 +800,27 @@ public final class Converter0 implements Converter {
         final Factory factory) {
         Optional<ConversionResult> result = Optional.empty();
         do {
-            if (index + 1 > list.size()) {
+            if (index + 4 > list.size()) {
                 break;
             }
             final Extracted extracted = new Extracted();
-            int consumed = 0;
-            for (int offset = 0; index + offset < list.size(); offset = offset + 1) {
-                final Node node = list.get(index + offset);
-                if (!Matcher0.INSTANCE.match(node, extracted)) {
-                    break;
-                }
-                consumed = consumed + 1;
-            }
-            if (consumed == 0) {
+            final Deque<Node> queue = new LinkedList<>(list.subList(index, list.size()));
+            final int size = queue.size();
+            boolean matched = Converter0.checkFirst(queue, extracted);
+            Converter0.checkSecond(queue, extracted);
+            Converter0.checkThird(queue, extracted);
+            matched = Converter0.checkFourth(queue, extracted);
+            matched = Converter0.checkFifth(queue, extracted);
+            if (!matched) {
                 break;
             }
+            matched = Converter0.checkSixth(queue, extracted);
+            if (!matched) {
+                break;
+            }
+            final int consumed = size - queue.size();
             final Fragment fragment = Fragment.fromNodes(list.subList(index, index + consumed));
-            final Node node = Converter0.buildRoot(factory, fragment, extracted);
+            final Node node = Converter0.buildRoot(factory, fragment);
             if (node == DummyNode.INSTANCE) {
                 break;
             }
@@ -767,25 +831,107 @@ public final class Converter0 implements Converter {
 
     @Override
     public int getMinConsumed() {
-        return 1;
+        return 4;
     }
 
     /**
-     * Constructs a node based on the descriptor 'FakeList(#1)'.
-     * @param factory Factory for creating nodes
-     * @param fragment Code fragment that is covered by the node being created
+     * Matches a node with the pattern 'AAA'.
+     * @param queue Node queue
      * @param extracted Extracted nodes and data
-     * @return Created node
+     * @return Matching result, {@code true} if the next node is matched to the pattern
      */
-    private static Node buildRoot(final Factory factory, final Fragment fragment,
-        final Extracted extracted) {
-        Node result = DummyNode.INSTANCE;
-        final Builder builder = factory.createBuilder("FakeList");
-        do {
-            final List<Node> children = extracted.getNodes(1);
-            if (!builder.setChildrenList(children)) {
+    private static boolean checkFirst(final Deque<Node> queue, final Extracted extracted) {
+        final Node node = queue.poll();
+        return Matcher0.INSTANCE.match(node, extracted);
+    }
+
+    /**
+     * Matches a node with the pattern '[BBB]'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     */
+    private static void checkSecond(final Deque<Node> queue, final Extracted extracted) {
+        if (queue.isEmpty()) {
+            return;
+        }
+        final Node node = queue.poll();
+        final boolean matched = Matcher1.INSTANCE.match(node, extracted);
+        if (!matched) {
+            queue.addFirst(node);
+        }
+    }
+
+    /**
+     * Matches a node with the pattern '{CCC}'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     */
+    private static void checkThird(final Deque<Node> queue, final Extracted extracted) {
+        while (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            final boolean matched = Matcher2.INSTANCE.match(node, extracted);
+            if (!matched) {
+                queue.addFirst(node);
                 break;
             }
+        }
+    }
+
+    /**
+     * Matches a node with the pattern 'DDD'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the next node is matched to the pattern
+     */
+    private static boolean checkFourth(final Deque<Node> queue, final Extracted extracted) {
+        boolean result = false;
+        if (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            result = Matcher3.INSTANCE.match(node, extracted);
+        }
+        return result;
+    }
+
+    /**
+     * Matches a node with the pattern 'EEE'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the next node is matched to the pattern
+     */
+    private static boolean checkFifth(final Deque<Node> queue, final Extracted extracted) {
+        boolean result = false;
+        if (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            result = Matcher4.INSTANCE.match(node, extracted);
+        }
+        return result;
+    }
+
+    /**
+     * Matches a node with the pattern 'FFF'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the next node is matched to the pattern
+     */
+    private static boolean checkSixth(final Deque<Node> queue, final Extracted extracted) {
+        boolean result = false;
+        if (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            result = Matcher5.INSTANCE.match(node, extracted);
+        }
+        return result;
+    }
+
+    /**
+     * Constructs a node based on the descriptor 'FakeNode'.
+     * @param factory Factory for creating nodes
+     * @param fragment Code fragment that is covered by the node being created
+     * @return Created node
+     */
+    private static Node buildRoot(final Factory factory, final Fragment fragment) {
+        Node result = DummyNode.INSTANCE;
+        final Builder builder = factory.createBuilder("FakeNode");
+        do {
             if (!builder.isValid()) {
                 break;
             }
