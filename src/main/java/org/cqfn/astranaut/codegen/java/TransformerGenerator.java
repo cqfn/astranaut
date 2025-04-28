@@ -23,9 +23,11 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import org.cqfn.astranaut.dsl.Program;
 
 /**
  * Generates transformers for languages.
@@ -33,14 +35,16 @@ import java.util.Locale;
  */
 public final class TransformerGenerator {
     /**
-     * The instance.
+     * Program implemented in DSL.
      */
-    public static final TransformerGenerator INSTANCE = new TransformerGenerator();
+    private final Program program;
 
     /**
-     * Private constructor.
+     * Constructor.
+     * @param program Program implemented in DSL
      */
-    private TransformerGenerator() {
+    public TransformerGenerator(final Program program) {
+        this.program = program;
     }
 
     /**
@@ -90,9 +94,8 @@ public final class TransformerGenerator {
         instance.makeFinal(String.format("new %s()", classname));
         klass.addField(instance);
         final Package pkg = context.getPackage();
-        klass.addMethod(
-            TransformerGenerator.createMethodThatCollectConverters(target, pkg)
-        );
+        this.createMethodThatCollectConverters(target, pkg, klass);
+        klass.addMethod(TransformerGenerator.createMethodThatCollectConverters());
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             pkg,
@@ -118,10 +121,10 @@ public final class TransformerGenerator {
      * Creates a method that collect converters from specified packages.
      * @param target Target language
      * @param pkg Package
-     * @return A method
+     * @param klass The class in which the method is created
      */
-    private static Method createMethodThatCollectConverters(final String target,
-        final Package pkg) {
+    private void createMethodThatCollectConverters(final String target,
+        final Package pkg, final Klass klass) {
         final Method method = new Method(
             "List<Converter>",
             "collectConverters",
@@ -130,12 +133,50 @@ public final class TransformerGenerator {
         method.makePrivate();
         method.makeStatic();
         method.setReturnsDescription("List of converter objects");
-        final List<String> code = Arrays.asList(
-            "final List<Converter> list = new LinkedList<>();",
+        final List<String> code = new ArrayList<>(4);
+        code.add("final List<Converter> list = new LinkedList<>();");
+        if (!target.equals("common cases")
+            && !this.program.getTransformationDescriptorsByLanguage("common").isEmpty()) {
+            code.add(
+                String.format(
+                    "%s.collectConverters(\"%s\", list);",
+                    klass.getName(),
+                    pkg.getParent().getParent().getSubpackage("common", "rules").toString()
+                )
+            );
+        }
+        code.add(
             String.format(
-                "final String prefix = \"%s.Converter\";",
+                "%s.collectConverters(\"%s\", list);",
+                klass.getName(),
                 pkg.toString()
-            ),
+            )
+        );
+        code.add("return list;");
+        method.setBody(String.join("\n", code));
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates a method that collect converters from specified packages.
+     * @return A method
+     */
+    private static Method createMethodThatCollectConverters() {
+        final Method method = new Method(
+            Strings.TYPE_VOID,
+            "collectConverters",
+            "Collects converter objects from the specified package"
+        );
+        method.makePrivate();
+        method.makeStatic();
+        method.addArgument(Strings.TYPE_STRING, "pkg", "Package name");
+        method.addArgument(
+            "List<Converter>",
+            "list",
+            "Resulting list of converters"
+        );
+        final List<String> code = Arrays.asList(
+            "final String prefix = String.format(\"%s.Converter\", pkg);",
             "final ObjectsLoader loader = new ObjectsLoader(prefix);",
             "int index = 0;",
             "while (true) {",
@@ -145,8 +186,7 @@ public final class TransformerGenerator {
             "    }",
             "    list.add((Converter) object);",
             "    index = index + 1;",
-            "}",
-            "return list;"
+            "}"
         );
         method.setBody(String.join("\n", code));
         return method;

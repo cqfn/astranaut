@@ -83,6 +83,11 @@ public final class Generate implements Action {
     private FactoryGenerator factories;
 
     /**
+     * Generates transformations for languages.
+     */
+    private TransformerGenerator transformers;
+
+    /**
      * Constructor.
      */
     public Generate() {
@@ -118,6 +123,7 @@ public final class Generate implements Action {
         }
         final Map<String, Klass> matchers = this.generateMatchersIfAny(program);
         this.factories = new FactoryGenerator(program);
+        this.transformers = new TransformerGenerator(program);
         for (final String language : program.getAllLanguages()) {
             this.generateNodes(program, language);
             this.generateTransformationsIfAny(program, language, matchers);
@@ -291,8 +297,7 @@ public final class Generate implements Action {
         cct.setVersion(this.options.getVersion());
         cct.setMatchers(matchers);
         final Context context = cct.createContext();
-        final CompilationUnit transformer =
-            TransformerGenerator.INSTANCE.createUnit(language, context);
+        final CompilationUnit transformer = this.transformers.createUnit(language, context);
         Generate.writeFile(
             new File(folder, transformer.getFileName()),
             transformer.generateJavaCode()
