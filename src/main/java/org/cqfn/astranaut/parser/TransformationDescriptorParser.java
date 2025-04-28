@@ -60,6 +60,7 @@ public class TransformationDescriptorParser {
      * @return A node descriptor
      * @throws ParsingException If the parse fails
      */
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public TransformationDescriptor parseDescriptor() throws ParsingException {
         final String[] parts = this.stmt.getCode().split("->");
         if (parts.length < 2) {
@@ -78,7 +79,7 @@ public class TransformationDescriptorParser {
             final TransformationDescriptor result = new TransformationDescriptor(left, right);
             result.setLanguage(this.language);
             return result;
-        } catch (IllegalArgumentException exception) {
+        } catch (final IllegalArgumentException exception) {
             throw new CommonParsingException(
                 this.stmt.getLocation(),
                 exception.getMessage()
