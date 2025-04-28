@@ -164,7 +164,9 @@ public final class TransformationDescriptor implements Rule {
      */
     private static List<LeftSideItem> checkLeftSide(final List<LeftSideItem> left) {
         if (TransformationDescriptor.calcMinConsumed(left) < 1) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                "At least one node on the left must be guaranteed to be consumed"
+            );
         }
         return Collections.unmodifiableList(left);
     }

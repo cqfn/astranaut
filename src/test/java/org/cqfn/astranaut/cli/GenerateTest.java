@@ -302,6 +302,19 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void oneOptionalNodeOnLeft(final @TempDir Path temp) {
+        final String message = this.runAndReadErrorMessage(
+            "one_optional_on_left.dsl",
+            temp,
+            GenerateTest.PARSER_EXCERT
+        );
+        Assertions.assertEquals(
+            "one_optional_on_left.dsl, 26: At least one node on the left must be guaranteed to be consumed",
+            message
+        );
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.

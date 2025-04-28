@@ -74,9 +74,16 @@ public class TransformationDescriptorParser {
         final HoleCounter holes = new HoleCounter();
         final List<LeftSideItem> left = this.parseLeftSide(parts[0], holes);
         final RightSideItem right = this.parseRightSide(parts[1], holes);
-        final TransformationDescriptor result = new TransformationDescriptor(left, right);
-        result.setLanguage(this.language);
-        return result;
+        try {
+            final TransformationDescriptor result = new TransformationDescriptor(left, right);
+            result.setLanguage(this.language);
+            return result;
+        } catch (IllegalArgumentException exception) {
+            throw new CommonParsingException(
+                this.stmt.getLocation(),
+                exception.getMessage()
+            );
+        }
     }
 
     /**
