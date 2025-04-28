@@ -49,6 +49,11 @@ public final class Provider implements org.cqfn.astranaut.core.base.Provider {
             .make();
 
     /**
+     * Default transformer that doesn't transform anything.
+     */
+    private static final Transformer DEF_TRANS = node -> node;
+
+    /**
      * Constructor.
      */
     private Provider() {
@@ -62,7 +67,7 @@ public final class Provider implements org.cqfn.astranaut.core.base.Provider {
 
     @Override
     public Transformer getTransformer(final String language) {
-        return node -> node;
+        return Provider.DEF_TRANS;
     }
 }
 

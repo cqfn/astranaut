@@ -61,6 +61,29 @@ public class ProviderGenerator {
         klass.setImplementsList("org.cqfn.astranaut.core.base.Provider");
         final Constructor ctor = klass.createConstructor();
         ctor.makePrivate();
+        ProviderGenerator.createGetFactoryMethod(klass);
+        this.createMapOfFactories(context, klass);
+        this.createGetTransformerMethod(context, klass);
+        final CompilationUnit unit = new CompilationUnit(
+            context.getLicense(),
+            context.getPackage(),
+            klass
+        );
+        ProviderGenerator.createOtherStaticFields(klass);
+        unit.addImport("java.util.Locale");
+        unit.addImport("java.util.Map");
+        unit.addImport("org.cqfn.astranaut.core.base.Factory");
+        unit.addImport("org.cqfn.astranaut.core.base.DefaultFactory");
+        unit.addImport("org.cqfn.astranaut.core.base.Transformer");
+        unit.addImport("org.cqfn.astranaut.core.utils.MapUtils");
+        return unit;
+    }
+
+    /**
+     * Creates different static fields.
+     * @param klass The class in which the fields are created
+     */
+    private static void createOtherStaticFields(final Klass klass) {
         final Field instance = new Field(
             "Provider",
             "INSTANCE",
@@ -70,21 +93,15 @@ public class ProviderGenerator {
         instance.makeStatic();
         instance.makeFinal("new Provider()");
         klass.addField(instance);
-        ProviderGenerator.createGetFactoryMethod(klass);
-        this.createMapOfFactories(context, klass);
-        ProviderGenerator.createGetTransformerMethod(klass);
-        final CompilationUnit unit = new CompilationUnit(
-            context.getLicense(),
-            context.getPackage(),
-            klass
+        final Field deftrans = new Field(
+            "Transformer",
+            "DEF_TRANS",
+            "Default transformer that doesn't transform anything"
         );
-        unit.addImport("java.util.Locale");
-        unit.addImport("java.util.Map");
-        unit.addImport("org.cqfn.astranaut.core.base.Factory");
-        unit.addImport("org.cqfn.astranaut.core.base.DefaultFactory");
-        unit.addImport("org.cqfn.astranaut.core.base.Transformer");
-        unit.addImport("org.cqfn.astranaut.core.utils.MapUtils");
-        return unit;
+        deftrans.makePrivate();
+        deftrans.makeStatic();
+        deftrans.makeFinal("node -> node");
+        klass.addField(deftrans);
     }
 
     /**
@@ -142,15 +159,55 @@ public class ProviderGenerator {
 
     /**
      * Creates the 'getTransformer' method.
+     * @param context Data required to generate Java source code
      * @param klass The class in which the method is created
      */
-    private static void createGetTransformerMethod(final Klass klass) {
+    private void createGetTransformerMethod(final Context context, final Klass klass) {
         final Method method = new Method("Transformer", "getTransformer");
         method.makePublic();
         method.addArgument("String", "language");
-        method.setBody(
-            "return node -> node;"
-        );
+        if (this.program.getAllTransformationDescriptors().isEmpty()) {
+            method.setBody(
+                "return Provider.DEF_TRANS;"
+            );
+        } else {
+            final Field field = new Field(
+                "Map<String, Transformer>",
+                "TRANSFORMERS",
+                "Collection of transformers supported by this provider"
+            );
+            field.makePrivate();
+            field.makeStatic();
+            final Package root = context.getPackage();
+            final StringBuilder builder = new StringBuilder(128);
+            builder.append("new MapUtils<String, Transformer>()");
+            for (final String language : this.program.getAllLanguages()) {
+                if (!this.program.getTransformationDescriptorsByLanguage(language).isEmpty()) {
+                    final Package pkg = root.getSubpackage(language, "rules");
+                    builder
+                        .append(".put(\"")
+                        .append(language)
+                        .append("\", ")
+                        .append(pkg.toString())
+                        .append('.')
+                        .append(language.substring(0, 1).toUpperCase(Locale.ENGLISH))
+                        .append(language.substring(1))
+                        .append("Transformer.INSTANCE)");
+                }
+            }
+            builder.append(".make()");
+            field.makeFinal(builder.toString());
+            klass.addField(field);
+            method.setBody(
+                String.join(
+                    "\n",
+                    Arrays.asList(
+                        "final String lowercase = language.toLowerCase(Locale.ENGLISH);",
+                        "return Provider.TRANSFORMERS.getOrDefault(lowercase, Provider.DEF_TRANS);"
+                    )
+                )
+            );
+        }
         klass.addMethod(method);
     }
 }
