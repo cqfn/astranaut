@@ -24,7 +24,6 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import org.cqfn.astranaut.dsl.Program;
@@ -95,7 +94,6 @@ public final class TransformerGenerator {
         klass.addField(instance);
         final Package pkg = context.getPackage();
         this.createMethodThatCollectConverters(target, pkg, klass);
-        klass.addMethod(TransformerGenerator.createMethodThatCollectConverters());
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             pkg,
@@ -106,7 +104,6 @@ public final class TransformerGenerator {
         unit.addImport("org.cqfn.astranaut.core.base.Transformer");
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Converter");
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.DefaultTransformer");
-        unit.addImport("org.cqfn.astranaut.core.utils.ObjectsLoader");
         unit.addImport(
             String.format(
                 "%s.%sFactory",
@@ -139,56 +136,19 @@ public final class TransformerGenerator {
             && !this.program.getTransformationDescriptorsByLanguage("common").isEmpty()) {
             code.add(
                 String.format(
-                    "%s.collectConverters(\"%s\", list);",
-                    klass.getName(),
+                    "Converter.collectConverters(\"%s\", list);",
                     pkg.getParent().getParent().getSubpackage("common", "rules").toString()
                 )
             );
         }
         code.add(
             String.format(
-                "%s.collectConverters(\"%s\", list);",
-                klass.getName(),
+                "Converter.collectConverters(\"%s\", list);",
                 pkg.toString()
             )
         );
         code.add("return list;");
         method.setBody(String.join("\n", code));
         klass.addMethod(method);
-    }
-
-    /**
-     * Creates a method that collect converters from specified packages.
-     * @return A method
-     */
-    private static Method createMethodThatCollectConverters() {
-        final Method method = new Method(
-            Strings.TYPE_VOID,
-            "collectConverters",
-            "Collects converter objects from the specified package"
-        );
-        method.makePrivate();
-        method.makeStatic();
-        method.addArgument(Strings.TYPE_STRING, "pkg", "Package name");
-        method.addArgument(
-            "List<Converter>",
-            "list",
-            "Resulting list of converters"
-        );
-        final List<String> code = Arrays.asList(
-            "final String prefix = String.format(\"%s.Converter\", pkg);",
-            "final ObjectsLoader loader = new ObjectsLoader(prefix);",
-            "int index = 0;",
-            "while (true) {",
-            "    final Object object = loader.loadSingleton(index);",
-            "    if (!(object instanceof Converter)) {",
-            "        break;",
-            "    }",
-            "    list.add((Converter) object);",
-            "    index = index + 1;",
-            "}"
-        );
-        method.setBody(String.join("\n", code));
-        return method;
     }
 }
