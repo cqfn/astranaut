@@ -211,6 +211,13 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void simpleConversionRule(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("simple_conversion_rule.txt");
+        final String actual = this.run("simple_conversion_rule.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.
