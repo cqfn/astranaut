@@ -21,46 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
+package org.cqfn.astranaut.parser;
 
-import org.cqfn.astranaut.parser.StringToken;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
- * Entity that represents a static string.
+ * Tests covering {@link SymbolRangeToken} class.
  * @since 1.0.0
  */
-public final class StaticString implements LeftDataDescriptor, RightDataDescriptor {
-    /**
-     * Token from which this descriptor is generated.
-     */
-    private final StringToken token;
-
-    /**
-     * Constructor to initialize the StaticString with the provided value.
-     * @param token Token from which this descriptor is generated
-     */
-    public StaticString(final StringToken token) {
-        this.token = token;
+class SymbolRangeTokenTest {
+    @Test
+    void simpleToken() {
+        final SymbolRangeToken token = new SymbolRangeToken('a', 'z');
+        Assertions.assertEquals("'a..z'", token.toString());
+        Assertions.assertEquals('a', token.getFirstSymbol());
+        Assertions.assertEquals('z', token.getLastSymbol());
     }
 
-    /**
-     * Gets the value of the static string.
-     * @return The string value
-     */
-    public String getValue() {
-        return this.token.getValue();
-    }
-
-    @Override
-    public String toString() {
-        return this.token.toString();
-    }
-
-    /**
-     * Converts the entity into a Java-compatible string literal.
-     * @return The Java string literal representation of the token
-     */
-    public String toJavaCode() {
-        return this.token.toQuotedString('"');
+    @Test
+    void mixedCharacterOrder() {
+        final SymbolRangeToken token = new SymbolRangeToken('z', 'a');
+        Assertions.assertEquals("'a..z'", token.toString());
+        Assertions.assertEquals('a', token.getFirstSymbol());
+        Assertions.assertEquals('z', token.getLastSymbol());
     }
 }

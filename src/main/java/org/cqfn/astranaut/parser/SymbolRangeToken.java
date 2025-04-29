@@ -24,57 +24,47 @@
 package org.cqfn.astranaut.parser;
 
 /**
- * Token representing a string in single or double quotes.
+ * Token representing some range of symbols.
  * @since 1.0.0
  */
-public final class StringToken extends CharSequenceToken {
+public final class SymbolRangeToken extends SymbolicToken {
     /**
-     * Quotation mark that opens and closes a string.
+     * First symbol of the range
      */
-    private final char quote;
+    private final char first;
 
     /**
-     * Value of the token.
+     * Last symbol of the range.
      */
-    private final String value;
+    private final char last;
 
     /**
      * Constructor.
-     * @param quote Quotation mark that opens and closes a string
-     * @param value Value of the token
+     * @param first First symbol of the range
+     * @param last Last symbol of the range
      */
-    public StringToken(final char quote, final String value) {
-        this.quote = StringToken.checkQuote(quote);
-        this.value = value;
+    public SymbolRangeToken(final char first, final char last) {
+        this.first = (char) Math.min(first, last);
+        this.last = (char) Math.max(first, last);
     }
 
-    /**
-     * Returns value of the token.
-     * @return String value of the token
-     */
-    public String getValue() {
-        return this.value;
+    @Override
+    public char getFirstSymbol() {
+        return this.first;
+    }
+
+    @Override
+    public char getLastSymbol() {
+        return this.last;
     }
 
     @Override
     public String getValueAsString() {
-        return this.value;
+        return String.format("%c..%c", this.first, this.last);
     }
 
     @Override
     public String toString() {
-        return this.toQuotedString(this.quote);
-    }
-
-    /**
-     * Checks the “quote” parameter to see if it is valid.
-     * @param quote Quote parameter
-     * @return The same quote
-     */
-    private static char checkQuote(final char quote) {
-        if (quote != '\'' && quote != '\"') {
-            throw new IllegalArgumentException();
-        }
-        return quote;
+        return this.toQuotedString('\'');
     }
 }

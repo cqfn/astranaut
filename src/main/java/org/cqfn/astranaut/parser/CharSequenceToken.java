@@ -39,7 +39,7 @@ public abstract class CharSequenceToken extends Token {
      * @param quotes The character to use as a quote (either single {@code '} or double {@code "})
      * @return The quoted string with escaped special characters
      */
-    public String toQuitedString(final char quotes) {
+    public String toQuotedString(final char quotes) {
         final StringBuilder builder = new StringBuilder();
         final String value = this.getValueAsString();
         builder.append(quotes);

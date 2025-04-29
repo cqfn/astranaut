@@ -27,7 +27,7 @@ package org.cqfn.astranaut.parser;
  * Token representing a single character in single quotes.
  * @since 1.0.0
  */
-public final class SymbolToken extends CharSequenceToken {
+public final class SymbolToken extends SymbolicToken {
     /**
      * The symbol itself.
      */
@@ -35,7 +35,7 @@ public final class SymbolToken extends CharSequenceToken {
 
     /**
      * Constructor.
-     * @param symbol The symbol itself.
+     * @param symbol The symbol itself
      */
     public SymbolToken(final char symbol) {
         this.symbol = symbol;
@@ -50,12 +50,22 @@ public final class SymbolToken extends CharSequenceToken {
     }
 
     @Override
+    public char getFirstSymbol() {
+        return this.symbol;
+    }
+
+    @Override
+    public char getLastSymbol() {
+        return this.symbol;
+    }
+
+    @Override
     public String getValueAsString() {
         return String.valueOf(this.symbol);
     }
 
     @Override
     public String toString() {
-        return this.toQuitedString('\'');
+        return this.toQuotedString('\'');
     }
 }
