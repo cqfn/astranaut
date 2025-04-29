@@ -192,7 +192,7 @@ public final class TransformationGenerator extends RuleGenerator {
                     )
                 )
             );
-        } else if (this.rule.getRight() instanceof ResultingSubtreeDescriptor) {
+        } else {
             final ResultingSubtreeBuilderGenerator gen = new ResultingSubtreeBuilderGenerator(
                 klass,
                 new NameGenerator("root"),
