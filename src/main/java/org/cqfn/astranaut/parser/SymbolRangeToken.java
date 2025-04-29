@@ -29,7 +29,7 @@ package org.cqfn.astranaut.parser;
  */
 public final class SymbolRangeToken extends SymbolicToken {
     /**
-     * First symbol of the range
+     * First symbol of the range.
      */
     private final char first;
 
