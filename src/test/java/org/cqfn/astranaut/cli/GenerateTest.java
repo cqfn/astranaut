@@ -26,7 +26,14 @@ package org.cqfn.astranaut.cli;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclEntryPermission;
+import java.nio.file.attribute.AclEntryType;
+import java.nio.file.attribute.AclFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import org.cqfn.astranaut.core.utils.FilesWriter;
@@ -205,9 +212,204 @@ class GenerateTest extends EndToEndTest {
     }
 
     @Test
+    void writeToProtectedFolder(final @TempDir Path temp) {
+        boolean oops = false;
+        try {
+            final Path dir = temp.resolve("output");
+            Files.createDirectories(dir);
+            if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("win")) {
+                final AclFileAttributeView view = Files.getFileAttributeView(
+                    dir,
+                    AclFileAttributeView.class
+                );
+                final AclEntry denied = AclEntry.newBuilder()
+                    .setType(AclEntryType.DENY)
+                    .setPrincipal(view.getOwner())
+                    .setPermissions(AclEntryPermission.WRITE_DATA, AclEntryPermission.APPEND_DATA)
+                    .build();
+                final List<AclEntry> acl = new ArrayList<>(view.getAcl());
+                acl.add(0, denied);
+                view.setAcl(acl);
+            } else {
+                final Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(dir);
+                permissions.remove(PosixFilePermission.OWNER_WRITE);
+                permissions.remove(PosixFilePermission.GROUP_WRITE);
+                permissions.remove(PosixFilePermission.OTHERS_WRITE);
+                Files.setPosixFilePermissions(dir, permissions);
+            }
+            String message = "";
+            final String[] args = {
+                "generate",
+                "src/test/resources/dsl/node_without_children.dsl",
+                "--output",
+                dir.toFile().getAbsolutePath(),
+                "--package",
+                "org.cqfn.uast.tree",
+                "--license",
+                "LICENSE.txt",
+                "--version",
+                "1.0.0",
+            };
+            boolean wow = false;
+            try {
+                Main.run(args);
+            } catch (final BaseException exception) {
+                wow = true;
+                message = exception.getErrorMessage();
+            }
+            if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("win")) {
+                final AclFileAttributeView view = Files.getFileAttributeView(
+                    dir,
+                    AclFileAttributeView.class
+                );
+                final List<AclEntry> acl = new ArrayList<>(view.getAcl());
+                acl.removeIf(entry -> entry.type() == AclEntryType.DENY);
+                view.setAcl(acl);
+            } else {
+                Files.setPosixFilePermissions(
+                    dir,
+                    PosixFilePermissions.fromString("rwxr-xr-x")
+                );
+            }
+            Assertions.assertTrue(wow);
+            Assertions.assertTrue(message.startsWith("Cannot create destination folder"));
+        } catch (final IOException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
     void differentLevelsOfInheritance(final @TempDir Path temp) {
         final String expected = this.loadStringResource("different_levels_of_inheritance.txt");
         final String actual = this.run("different_levels_of_inheritance.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void simpleConversionRule(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("simple_conversion_rule.txt");
+        final String actual = this.run("simple_conversion_rule.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void conversionWithStaticStrings(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("conversion_with_static_strings.txt");
+        final String actual = this.run("conversion_with_static_strings.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void matcherReuse(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("matcher_reuse.txt");
+        final String actual = this.run("matcher_reuse.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void conversionWithOptionalNode(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("conversion_with_optional_node.txt");
+        final String actual = this.run("conversion_with_optional_node.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void conversionToListNode(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("conversion_to_list_node.txt");
+        final String actual = this.run("conversion_to_list_node.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void extractNodeFromComplexCase(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("extract_node_from_complex_case.txt");
+        final String actual = this.run("extract_node_from_complex_case.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void extractNodeFromSimpleCase(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("extract_node_from_simple_case.txt");
+        final String actual = this.run("extract_node_from_simple_case.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void complexCaseConversion(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("complex_case_conversion.txt");
+        final String actual = this.run("complex_case_conversion.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void untypedHoles(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("untyped_holes.txt");
+        final String actual = this.run("untyped_holes.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void complexResultingNode(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("complex_resulting_node.txt");
+        final String actual = this.run("complex_resulting_node.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void dataExtraction(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("data_extraction.txt");
+        final String actual = this.run("data_extraction.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void conversionsWithCommonRules(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("conversions_with_common_rules.txt");
+        final String actual = this.run("conversions_with_common_rules.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void conversionsWithoutCommonRules(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("conversions_without_common_rules.txt");
+        final String actual = this.run("conversions_without_common_rules.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void matchOptionalAndRepeated(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("match_optional_and_repeated.txt");
+        final String actual = this.run("match_optional_and_repeated.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void matchOptionalAndRepeatedWithData(final @TempDir Path temp) {
+        final String expected = this.loadStringResource(
+            "match_optional_and_repeated_with_data.txt"
+        );
+        final String actual = this.run("match_optional_and_repeated_with_data.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void oneOptionalNodeOnLeft(final @TempDir Path temp) {
+        final String message = this.runAndReadErrorMessage(
+            "one_optional_on_left.dsl",
+            temp,
+            GenerateTest.PARSER_EXCERT
+        );
+        Assertions.assertEquals(
+            "one_optional_on_left.dsl, 26: At least one node on the left must be guaranteed to be consumed",
+            message
+        );
+    }
+
+    @Test
+    void extractFirstNodeFromList(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("extract_first_node_from_list.txt");
+        final String actual = this.run("extract_first_node_from_list.dsl", temp);
         Assertions.assertEquals(expected, actual);
     }
 

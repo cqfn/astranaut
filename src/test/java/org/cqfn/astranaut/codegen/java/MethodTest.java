@@ -292,6 +292,34 @@ class MethodTest {
         Assertions.assertThrows(BaseException.class, () -> method.build(0, builder));
     }
 
+    @Test
+    void methodWithDoWhileStatement() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Method with do..while statement.",
+                " */",
+                "public void doSomething() {",
+                "    do {",
+                "        System.out.println(\"it works!\");",
+                "    } while (false);",
+                "    return;",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method(
+            "void",
+            "doSomething",
+            "Method with do..while statement"
+        );
+        method.makePublic();
+        method.setBody("   do { System.out.println(\"it works!\"); } while (false); \n return; ");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
     /**
      * Tests the source code generation from an object describing a method.
      * @param method Object describing a method

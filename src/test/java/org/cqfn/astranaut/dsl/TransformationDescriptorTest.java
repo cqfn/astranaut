@@ -51,6 +51,6 @@ class TransformationDescriptorTest {
         final NodeDescriptor node = new RegularNodeDescriptor("BBB", Collections.emptyList());
         transform.addDependency(node);
         Assertions.assertEquals(1, transform.getDependencies().size());
-        Assertions.assertNull(transform.createGenerator());
+        Assertions.assertNotNull(transform.createGenerator());
     }
 }

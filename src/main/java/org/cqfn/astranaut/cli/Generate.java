@@ -24,22 +24,32 @@
 package org.cqfn.astranaut.cli;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import org.cqfn.astranaut.codegen.java.CompilationUnit;
 import org.cqfn.astranaut.codegen.java.Context;
 import org.cqfn.astranaut.codegen.java.FactoryGenerator;
-import org.cqfn.astranaut.codegen.java.FactoryProviderGenerator;
+import org.cqfn.astranaut.codegen.java.Klass;
+import org.cqfn.astranaut.codegen.java.LeftSideGenerationContext;
 import org.cqfn.astranaut.codegen.java.License;
 import org.cqfn.astranaut.codegen.java.Package;
 import org.cqfn.astranaut.codegen.java.PackageInfo;
+import org.cqfn.astranaut.codegen.java.ProviderGenerator;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
+import org.cqfn.astranaut.codegen.java.TransformerGenerator;
 import org.cqfn.astranaut.core.utils.FilesWriter;
+import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.Program;
+import org.cqfn.astranaut.dsl.TransformationDescriptor;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -73,12 +83,18 @@ public final class Generate implements Action {
     private FactoryGenerator factories;
 
     /**
+     * Generates transformations for languages.
+     */
+    private TransformerGenerator transformers;
+
+    /**
      * Constructor.
      */
     public Generate() {
         this.options = new ArgumentParser();
     }
 
+    @SuppressWarnings("PMD.PreserveStackTrace")
     @Override
     public void perform(final Program program, final List<String> args) throws BaseException {
         this.options.parse(args);
@@ -88,9 +104,29 @@ public final class Generate implements Action {
             this.options.getOutput(),
             this.options.getPackage().replace('.', '/')
         );
+        try {
+            if (Files.exists(this.root)) {
+                Files.walk(this.root)
+                    .sorted(Comparator.reverseOrder())
+                    .filter(p -> Files.isWritable(p))
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+            }
+            Files.createDirectories(this.root);
+        } catch (final IOException exception) {
+            throw new CommonCliException(
+                String.format(
+                    "Cannot create destination folder '%s'",
+                    this.root.toAbsolutePath()
+                )
+            );
+        }
+        final Map<String, Klass> matchers = this.generateMatchersIfAny(program);
         this.factories = new FactoryGenerator(program);
+        this.transformers = new TransformerGenerator(program);
         for (final String language : program.getAllLanguages()) {
             this.generateNodes(program, language);
+            this.generateTransformationsIfAny(program, language, matchers);
         }
         final PackageInfo info = new PackageInfo(
             this.license,
@@ -107,7 +143,7 @@ public final class Generate implements Action {
         cct.setPackage(this.basepkg);
         cct.setVersion(this.options.getVersion());
         final Context context = cct.createContext();
-        final CompilationUnit provider = new FactoryProviderGenerator(program).createUnit(context);
+        final CompilationUnit provider = new ProviderGenerator(program).createUnit(context);
         Generate.writeFile(
             new File(this.root.toString(), provider.getFileName()),
             provider.generateJavaCode()
@@ -145,6 +181,128 @@ public final class Generate implements Action {
         final CompilationUnit factory = this.factories.createUnit(language, context);
         Generate.writeFile(new File(folder, factory.getFileName()), factory.generateJavaCode());
         for (final NodeDescriptor rule : program.getNodeDescriptorsByLanguage(language).values()) {
+            final RuleGenerator generator = rule.createGenerator();
+            final Set<CompilationUnit> units = generator.createUnits(context);
+            for (final CompilationUnit unit : units) {
+                Generate.writeFile(new File(folder, unit.getFileName()), unit.generateJavaCode());
+            }
+        }
+    }
+
+    /**
+     * Generates matchers if there are transformation descriptors in the given program.
+     *  This method retrieves all transformation descriptors from the program and,
+     *  if any exist, invokes {@link #generateMatchers(List)} to generate the matchers.
+     *  If no transformation descriptors are found, an empty map is returned.
+     * @param program The program containing transformation descriptors
+     * @return A map of matcher classes mapped to their textual representations.
+     *  If no matchers are generated, returns an empty map
+     * @throws BaseException If an error occurs during matcher generation
+     */
+    private Map<String, Klass> generateMatchersIfAny(final Program program) throws BaseException {
+        final List<TransformationDescriptor> rules = program.getAllTransformationDescriptors();
+        final Map<String, Klass> matchers;
+        if (rules.isEmpty()) {
+            matchers = Collections.emptyMap();
+        } else {
+            matchers = Collections.unmodifiableMap(this.generateMatchers(rules));
+        }
+        return matchers;
+    }
+
+    /**
+     * Generates matcher classes based on the given transformation descriptors.
+     * @param rules The list of transformation descriptors for which matchers are generated
+     * @return A map of matcher classes mapped to their textual representations
+     * @throws BaseException If an error occurs during file writing or matcher generation
+     */
+    private Map<String, Klass> generateMatchers(final List<TransformationDescriptor> rules)
+        throws BaseException {
+        final Package pkg = this.basepkg.getSubpackage("common.matchers");
+        final File folder = this.root.resolve("common/matchers").toFile();
+        folder.mkdirs();
+        final PackageInfo info = new PackageInfo(
+            this.license,
+            "This package contains matchers that map subtrees to some pattern and extract nodes and data when matched",
+            pkg
+        );
+        info.setVersion(this.options.getVersion());
+        Generate.writeFile(new File(folder, "package-info.java"), info.generateJavaCode());
+        final LeftSideGenerationContext context = new LeftSideGenerationContext();
+        for (final TransformationDescriptor rule : rules) {
+            for (final LeftSideItem item : rule.getLeft()) {
+                item.generateMatcher(context);
+            }
+        }
+        final Map<String, Klass> matchers = context.getMatchers();
+        for (final Klass klass : matchers.values()) {
+            klass.setVersion(this.options.getVersion());
+            klass.makePublic();
+            klass.makeFinal();
+            klass.setImplementsList("Matcher");
+            final CompilationUnit unit = new CompilationUnit(this.license, pkg, klass);
+            unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Extracted");
+            unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Matcher");
+            unit.addImport("org.cqfn.astranaut.core.base.Node");
+            Generate.writeFile(new File(folder, unit.getFileName()), unit.generateJavaCode());
+        }
+        return matchers;
+    }
+
+    /**
+     * Generates transformations for the specified programming language, if any.
+     * @param program Program implemented in DSL
+     * @param language Language name
+     * @param matchers Map of matcher classes mapped to their textual representations
+     * @throws BaseException If files cannot be generated
+     */
+    private void generateTransformationsIfAny(final Program program, final String language,
+        final Map<String, Klass> matchers) throws BaseException {
+        final List<TransformationDescriptor> rules =
+            program.getTransformationDescriptorsByLanguage(language);
+        if (!rules.isEmpty()) {
+            this.generateTransformations(rules, language, matchers);
+        }
+    }
+
+    /**
+     * Generates transformations for the specified programming language.
+     * @param rules List of transformation rules
+     * @param language Language name
+     * @param matchers Map of matcher classes mapped to their textual representations
+     * @throws BaseException If files cannot be generated
+     */
+    private void generateTransformations(
+        final List<TransformationDescriptor> rules, final String language,
+        final Map<String, Klass> matchers) throws BaseException {
+        final Package pkg = this.basepkg.getSubpackage(language, "rules");
+        final File folder = this.root.resolve(String.format("%s/rules", language)).toFile();
+        folder.mkdirs();
+        final String brief;
+        if (language.equals("common")) {
+            brief = "This package contains transformation rules for common ('green') nodes";
+        } else {
+            brief = String.format(
+                "This package contains transformation rules for %s%s language",
+                language.substring(0, 1).toUpperCase(Locale.ENGLISH),
+                language.substring(1)
+            );
+        }
+        final PackageInfo info = new PackageInfo(this.license, brief, pkg);
+        info.setVersion(this.options.getVersion());
+        Generate.writeFile(new File(folder, "package-info.java"), info.generateJavaCode());
+        final Context.Constructor cct = new Context.Constructor();
+        cct.setLicense(this.license);
+        cct.setPackage(pkg);
+        cct.setVersion(this.options.getVersion());
+        cct.setMatchers(matchers);
+        final Context context = cct.createContext();
+        final CompilationUnit transformer = this.transformers.createUnit(language, context);
+        Generate.writeFile(
+            new File(folder, transformer.getFileName()),
+            transformer.generateJavaCode()
+        );
+        for (final TransformationDescriptor rule : rules) {
             final RuleGenerator generator = rule.createGenerator();
             final Set<CompilationUnit> units = generator.createUnits(context);
             for (final CompilationUnit unit : units) {

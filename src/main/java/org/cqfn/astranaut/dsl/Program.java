@@ -52,12 +52,18 @@ public final class Program {
     private final Map<String, Map<String, NodeDescriptor>> nodes;
 
     /**
+     * Cached result for getTransformationDescriptorsByLanguage().
+     */
+    private final Map<String, List<TransformationDescriptor>> converters;
+
+    /**
      * Constructor.
      * @param all List of all rules
      */
     public Program(final List<Rule> all) {
         this.all = Collections.unmodifiableList(new ArrayList<>(all));
         this.nodes = new TreeMap<>();
+        this.converters = new TreeMap<>();
     }
 
     /**
@@ -122,5 +128,45 @@ public final class Program {
             descriptor = this.getNodeDescriptorsByLanguage("common").get(name);
         }
         return descriptor;
+    }
+
+    /**
+     * Returns an immutable list of all transformation descriptors, regardless of language.
+     * @return An immutable list of all transformation descriptors.
+     */
+    public List<TransformationDescriptor> getAllTransformationDescriptors() {
+        final List<TransformationDescriptor> descriptors = new ArrayList<>(0);
+        for (final Rule rule : this.all) {
+            if (rule instanceof TransformationDescriptor) {
+                descriptors.add((TransformationDescriptor) rule);
+            }
+        }
+        return Collections.unmodifiableList(descriptors);
+    }
+
+    /**
+     * Returns an immutable list of transformation descriptors for the specified language.
+     * The map is cached for performance.
+     * @param language The language to get the transformation descriptors for
+     * @return An immutable list of transformation descriptors
+     */
+    public List<TransformationDescriptor> getTransformationDescriptorsByLanguage(
+        final String language) {
+        final List<TransformationDescriptor> result;
+        if (this.converters.containsKey(language)) {
+            result = this.converters.get(language);
+        } else {
+            final List<TransformationDescriptor> descriptors = new ArrayList<>(0);
+            for (final Rule rule : this.all) {
+                if (rule instanceof TransformationDescriptor
+                    && rule.getLanguage().equals(language)) {
+                    final TransformationDescriptor descriptor = (TransformationDescriptor) rule;
+                    descriptors.add(descriptor);
+                }
+            }
+            result = Collections.unmodifiableList(descriptors);
+            this.converters.put(language, result);
+        }
+        return result;
     }
 }

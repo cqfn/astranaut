@@ -31,12 +31,11 @@ import java.util.List;
  *  when the variable name is not known.
  * @since 1.0.0
  */
-public class NameGenerator {
+public final class NameGenerator {
     /**
      * List of names.
      */
     private static final List<String> NAMES = Arrays.asList(
-        "first",
         "second",
         "third",
         "fourth",
@@ -59,9 +58,29 @@ public class NameGenerator {
     );
 
     /**
+     * First name.
+     */
+    private final String first;
+
+    /**
      * Current index.
      */
     private int current;
+
+    /**
+     * Constructor.
+     * @param first First name
+     */
+    public NameGenerator(final String first) {
+        this.first = first;
+    }
+
+    /**
+     * Another constructor.
+     */
+    public NameGenerator() {
+        this("first");
+    }
 
     /**
      * Returns the next name.
@@ -69,12 +88,14 @@ public class NameGenerator {
      */
     public String nextName() {
         final String name;
-        if (this.current < NameGenerator.NAMES.size()) {
-            name = NameGenerator.NAMES.get(this.current);
-            this.current = this.current + 1;
+        if (this.current == 0) {
+            name = this.first;
+        } else if (this.current - 1 < NameGenerator.NAMES.size()) {
+            name = NameGenerator.NAMES.get(this.current - 1);
         } else {
             throw new IllegalStateException("No more names available.");
         }
+        this.current = this.current + 1;
         return name;
     }
 }

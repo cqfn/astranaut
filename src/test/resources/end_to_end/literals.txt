@@ -23,20 +23,22 @@
  */
 package org.cqfn.uast.tree;
 
+import java.util.Locale;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.DefaultFactory;
 import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Transformer;
 import org.cqfn.astranaut.core.utils.MapUtils;
 
 /**
- * Factory provider that aggregates all factories.
+ * Provider that aggregates all factories and transformers.
  * @since 1.0.0
  */
-public final class FactoryProvider implements org.cqfn.astranaut.core.base.FactoryProvider {
+public final class Provider implements org.cqfn.astranaut.core.base.Provider {
     /**
-     * The factory provider instance.
+     * The provider instance.
      */
-    public static final FactoryProvider INSTANCE = new FactoryProvider();
+    public static final Provider INSTANCE = new Provider();
 
     /**
      * Collection of factories supported by this provider.
@@ -47,14 +49,25 @@ public final class FactoryProvider implements org.cqfn.astranaut.core.base.Facto
             .make();
 
     /**
+     * Default transformer that doesn't transform anything.
+     */
+    private static final Transformer DEF_TRANS = node -> node;
+
+    /**
      * Constructor.
      */
-    private FactoryProvider() {
+    private Provider() {
     }
 
     @Override
     public Factory getFactory(final String language) {
-        return FactoryProvider.FACTORIES.getOrDefault(language, DefaultFactory.EMPTY);
+        final String lowercase = language.toLowerCase(Locale.ENGLISH);
+        return Provider.FACTORIES.getOrDefault(lowercase, DefaultFactory.EMPTY);
+    }
+
+    @Override
+    public Transformer getTransformer(final String language) {
+        return Provider.DEF_TRANS;
     }
 }
 
@@ -88,6 +101,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -116,6 +130,12 @@ public final class BooleanLiteral implements Literals {
      * Value of the node.
      */
     private boolean data;
+
+    /**
+     * Constructor.
+     */
+    private BooleanLiteral() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -208,9 +228,24 @@ public final class BooleanLiteral implements Literals {
          */
         private boolean data;
 
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
+        }
+
+        /**
+         * Sets the value of the node to be created.
+         * @param value Value of the node
+         */
+        public void setValue(final boolean value) {
+            this.data = value;
         }
 
         @Override
@@ -335,6 +370,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -363,6 +399,12 @@ public final class IntegerLiteral implements Literals {
      * Value of the node.
      */
     private int data;
+
+    /**
+     * Constructor.
+     */
+    private IntegerLiteral() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -454,9 +496,24 @@ public final class IntegerLiteral implements Literals {
          */
         private int data;
 
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
+        }
+
+        /**
+         * Sets the value of the node to be created.
+         * @param value Value of the node
+         */
+        public void setValue(final int value) {
+            this.data = value;
         }
 
         @Override
@@ -520,6 +577,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -548,6 +606,12 @@ public final class JsonLiteral implements Literals {
      * Value of the node.
      */
     private com.kniazkov.json.JsonElement data;
+
+    /**
+     * Constructor.
+     */
+    private JsonLiteral() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -642,13 +706,22 @@ public final class JsonLiteral implements Literals {
         /**
          * Constructor.
          */
-        Constructor() {
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
             this.data = com.kniazkov.json.JsonNull.INSTANCE;
         }
 
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
+        }
+
+        /**
+         * Sets the value of the node to be created.
+         * @param value Value of the node
+         */
+        public void setValue(final com.kniazkov.json.JsonElement value) {
+            this.data = value;
         }
 
         @Override
@@ -746,6 +819,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -774,6 +848,12 @@ public final class StringLiteral implements Literals {
      * Value of the node.
      */
     private String data;
+
+    /**
+     * Constructor.
+     */
+    private StringLiteral() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -868,13 +948,22 @@ public final class StringLiteral implements Literals {
         /**
          * Constructor.
          */
-        Constructor() {
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
             this.data = "";
         }
 
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
+        }
+
+        /**
+         * Sets the value of the node to be created.
+         * @param value Value of the node
+         */
+        public void setValue(final String value) {
+            this.data = value;
         }
 
         @Override

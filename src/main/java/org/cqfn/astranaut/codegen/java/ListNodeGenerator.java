@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.codegen.java;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.cqfn.astranaut.dsl.ListNodeDescriptor;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
@@ -113,7 +114,15 @@ public final class ListNodeGenerator extends NonAbstractNodeGenerator {
         klass.addField(children);
         final Constructor ctor = klass.createConstructor();
         ctor.makePublic();
-        ctor.setBody("this.children = Collections.emptyList();");
+        ctor.setBody(
+            String.join(
+                "\n",
+                Arrays.asList(
+                    "this.fragment = EmptyFragment.INSTANCE;",
+                    "this.children = Collections.emptyList();"
+                )
+            )
+        );
     }
 
     @Override

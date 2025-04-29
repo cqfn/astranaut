@@ -58,8 +58,17 @@ public final class StringToken extends Token {
 
     @Override
     public String toString() {
+        return this.toQuitedString(this.quote);
+    }
+
+    /**
+     * Converts the stored string into a quoted string with escaped special characters.
+     * @param quotes The character to use as a quote (either single {@code '} or double {@code "})
+     * @return The quoted string with escaped special characters
+     */
+    public String toQuitedString(final char quotes) {
         final StringBuilder builder = new StringBuilder();
-        builder.append(this.quote);
+        builder.append(quotes);
         for (int index = 0; index < this.value.length(); index = index + 1) {
             final char chr = this.value.charAt(index);
             switch (chr) {
@@ -76,14 +85,14 @@ public final class StringToken extends Token {
                     builder.append("\\t");
                     break;
                 case '\'':
-                    if (this.quote == '\'') {
+                    if (quotes == '\'') {
                         builder.append("\\'");
                     } else {
                         builder.append('\'');
                     }
                     break;
                 case '\"':
-                    if (this.quote == '\"') {
+                    if (quotes == '\"') {
                         builder.append("\\\"");
                     } else {
                         builder.append('"');
@@ -94,7 +103,7 @@ public final class StringToken extends Token {
                     break;
             }
         }
-        builder.append(this.quote);
+        builder.append(quotes);
         return builder.toString();
     }
 

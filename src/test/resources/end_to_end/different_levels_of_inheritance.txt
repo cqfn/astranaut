@@ -23,20 +23,22 @@
  */
 package org.cqfn.uast.tree;
 
+import java.util.Locale;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.DefaultFactory;
 import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Transformer;
 import org.cqfn.astranaut.core.utils.MapUtils;
 
 /**
- * Factory provider that aggregates all factories.
+ * Provider that aggregates all factories and transformers.
  * @since 1.0.0
  */
-public final class FactoryProvider implements org.cqfn.astranaut.core.base.FactoryProvider {
+public final class Provider implements org.cqfn.astranaut.core.base.Provider {
     /**
-     * The factory provider instance.
+     * The provider instance.
      */
-    public static final FactoryProvider INSTANCE = new FactoryProvider();
+    public static final Provider INSTANCE = new Provider();
 
     /**
      * Collection of factories supported by this provider.
@@ -47,14 +49,25 @@ public final class FactoryProvider implements org.cqfn.astranaut.core.base.Facto
             .make();
 
     /**
+     * Default transformer that doesn't transform anything.
+     */
+    private static final Transformer DEF_TRANS = node -> node;
+
+    /**
      * Constructor.
      */
-    private FactoryProvider() {
+    private Provider() {
     }
 
     @Override
     public Factory getFactory(final String language) {
-        return FactoryProvider.FACTORIES.getOrDefault(language, DefaultFactory.EMPTY);
+        final String lowercase = language.toLowerCase(Locale.ENGLISH);
+        return Provider.FACTORIES.getOrDefault(lowercase, DefaultFactory.EMPTY);
+    }
+
+    @Override
+    public Transformer getTransformer(final String language) {
+        return Provider.DEF_TRANS;
     }
 }
 
@@ -89,6 +102,7 @@ import java.util.Map;
 import org.cqfn.astranaut.core.algorithms.NodeAllocator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -129,6 +143,12 @@ public final class Addition implements BinaryExpression {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private Addition() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -250,6 +270,13 @@ public final class Addition implements BinaryExpression {
          */
         private Expression right;
 
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
@@ -343,6 +370,7 @@ import java.util.Map;
 import org.cqfn.astranaut.core.algorithms.NodeAllocator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -383,6 +411,12 @@ public final class Assignment implements BinaryExpression {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private Assignment() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -508,6 +542,13 @@ public final class Assignment implements BinaryExpression {
          * Child node with 'right' tag.
          */
         private Expression right;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
 
         @Override
         public void setFragment(final Fragment object) {
@@ -790,6 +831,7 @@ import java.util.Map;
 import org.cqfn.astranaut.core.algorithms.NodeAllocator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -830,6 +872,12 @@ public final class FieldAccess implements NamedExpression {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private FieldAccess() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -965,6 +1013,13 @@ public final class FieldAccess implements NamedExpression {
          */
         private Identifier name;
 
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
@@ -1056,6 +1111,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -1084,6 +1140,12 @@ public final class Identifier implements Node {
      * Value of the node.
      */
     private String data;
+
+    /**
+     * Constructor.
+     */
+    private Identifier() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -1172,13 +1234,22 @@ public final class Identifier implements Node {
         /**
          * Constructor.
          */
-        Constructor() {
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
             this.data = "";
         }
 
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
+        }
+
+        /**
+         * Sets the value of the node to be created.
+         * @param value Value of the node
+         */
+        public void setValue(final String value) {
+            this.data = value;
         }
 
         @Override
@@ -1238,6 +1309,7 @@ import java.util.Map;
 import org.cqfn.astranaut.core.algorithms.NodeAllocator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -1283,6 +1355,12 @@ public final class If implements Statement {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private If() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -1420,6 +1498,13 @@ public final class If implements Statement {
          */
         private Statement negative;
 
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
@@ -1523,6 +1608,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -1551,6 +1637,12 @@ public final class IntegerLiteral implements Expression {
      * Value of the node.
      */
     private int data;
+
+    /**
+     * Constructor.
+     */
+    private IntegerLiteral() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -1642,9 +1734,24 @@ public final class IntegerLiteral implements Expression {
          */
         private int data;
 
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
+        }
+
+        /**
+         * Sets the value of the node to be created.
+         * @param value Value of the node
+         */
+        public void setValue(final int value) {
+            this.data = value;
         }
 
         @Override
@@ -1778,6 +1885,7 @@ import java.util.Map;
 import org.cqfn.astranaut.core.algorithms.NodeAllocator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -1812,6 +1920,12 @@ public final class Return implements Decorator, Statement {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private Return() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -1920,6 +2034,13 @@ public final class Return implements Decorator, Statement {
          * Child node with 'expression' tag.
          */
         private Expression expression;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
 
         @Override
         public void setFragment(final Fragment object) {
@@ -2031,6 +2152,7 @@ import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -2064,6 +2186,12 @@ public final class StatementExpression implements Decorator, Statement {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private StatementExpression() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -2177,6 +2305,13 @@ public final class StatementExpression implements Decorator, Statement {
          */
         private Expression expression;
 
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
@@ -2257,6 +2392,7 @@ import java.util.Map;
 import org.cqfn.astranaut.core.algorithms.NodeAllocator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -2297,6 +2433,12 @@ public final class Subtraction implements BinaryExpression {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private Subtraction() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -2418,6 +2560,13 @@ public final class Subtraction implements BinaryExpression {
          */
         private Expression right;
 
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
         @Override
         public void setFragment(final Fragment object) {
             this.fragment = object;
@@ -2511,6 +2660,7 @@ import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -2544,6 +2694,12 @@ public final class Variable implements NamedExpression {
      * List of child nodes.
      */
     private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private Variable() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -2662,6 +2818,13 @@ public final class Variable implements NamedExpression {
          * Child node with 'name' tag.
          */
         private Identifier name;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
 
         @Override
         public void setFragment(final Fragment object) {

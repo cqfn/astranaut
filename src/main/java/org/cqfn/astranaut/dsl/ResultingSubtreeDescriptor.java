@@ -109,4 +109,23 @@ public final class ResultingSubtreeDescriptor implements RightSideItem {
         }
         return builder.toString();
     }
+
+    /**
+     * Checks whether all children are untyped holes.
+     * @return Checking result, {@code true} if all children are holes
+     */
+    public boolean allChildrenAreHoles() {
+        boolean result = true;
+        if (this.children.isEmpty()) {
+            result = false;
+        } else {
+            for (final RightSideItem item : this.children) {
+                if (!(item instanceof UntypedHole)) {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
 }

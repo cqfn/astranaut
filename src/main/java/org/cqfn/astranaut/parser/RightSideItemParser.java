@@ -134,7 +134,7 @@ public class RightSideItemParser {
             throw new BadHole(this.scanner.getLocation());
         }
         final int value = ((Number) token).getValue();
-        if (!this.holes.hasNodeHole(value)) {
+        if (!this.holes.hasDataHole(value)) {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
                 String.format(

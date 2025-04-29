@@ -23,6 +23,9 @@
  */
 package org.cqfn.astranaut.dsl;
 
+import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
+import org.cqfn.astranaut.codegen.java.TypedHoleMatcherGenerator;
+
 /**
  * A typed hole, identified by its type and number.
  *  This hole matches only if the node type corresponds to the specified type.
@@ -54,6 +57,7 @@ public final class TypedHole implements Hole, LeftSideItem {
     public TypedHole(final String type, final int number) {
         this.type = type;
         this.number = number;
+        this.mode = PatternMatchingMode.NORMAL;
     }
 
     /**
@@ -77,6 +81,22 @@ public final class TypedHole implements Hole, LeftSideItem {
     @Override
     public PatternMatchingMode getMatchingMode() {
         return this.mode;
+    }
+
+    @Override
+    public LeftSideItemGenerator createGenerator() {
+        return new TypedHoleMatcherGenerator(this);
+    }
+
+    @Override
+    public String toString(final boolean full) {
+        final String result;
+        if (full) {
+            result = this.toString();
+        } else {
+            result = String.format("%s#%d", this.type, this.number);
+        }
+        return result;
     }
 
     @Override

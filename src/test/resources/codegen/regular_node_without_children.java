@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.core.base.Type;
@@ -30,6 +31,12 @@ public final class This implements Node {
      * Fragment of source code that is associated with the node.
      */
     private Fragment fragment;
+
+    /**
+     * Constructor.
+     */
+    private This() {
+    }
 
     @Override
     public Fragment getFragment() {
@@ -101,6 +108,13 @@ public final class This implements Node {
          * Fragment of source code that is associated with the node.
          */
         private Fragment fragment;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
 
         @Override
         public void setFragment(final Fragment object) {

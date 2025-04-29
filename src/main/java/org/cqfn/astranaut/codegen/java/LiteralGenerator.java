@@ -113,11 +113,14 @@ public final class LiteralGenerator extends NonAbstractNodeGenerator {
 
     @Override
     public void createSpecificEntitiesInBuilderClass(final Klass klass) {
+        String body = "this.fragment = EmptyFragment.INSTANCE;";
         final String initial = this.rule.getInitial();
         if (!initial.isEmpty()) {
-            final Constructor ctor = klass.createConstructor();
-            ctor.setBody(String.format("this.data = %s;", initial));
+            body = String.format("%s\nthis.data = %s;", body, initial);
         }
+        final Constructor ctor = klass.createConstructor();
+        ctor.makePublic();
+        ctor.setBody(body);
         final Field value = new Field(
             this.rule.getDataType(),
             "data",
@@ -125,6 +128,15 @@ public final class LiteralGenerator extends NonAbstractNodeGenerator {
         );
         value.makePrivate();
         klass.addField(value);
+        final Method setter = new Method(
+            "void",
+            "setValue",
+            "Sets the value of the node to be created."
+        );
+        setter.makePublic();
+        setter.addArgument(this.rule.getDataType(), "value", "Value of the node");
+        setter.setBody("this.data = value;");
+        klass.addMethod(setter);
     }
 
     @Override

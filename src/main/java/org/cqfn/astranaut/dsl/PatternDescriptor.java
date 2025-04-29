@@ -25,6 +25,8 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.Collections;
 import java.util.List;
+import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
+import org.cqfn.astranaut.codegen.java.PatternMatcherGenerator;
 
 /**
  * Descriptor representing a pattern in the transformation rule.
@@ -99,6 +101,22 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
         return this.children;
     }
 
+    /**
+     * Checks if there are optional or repeated child descriptors.
+     * @return Check result, {@code true} if any
+     */
+    public boolean hasOptionalOrRepeated() {
+        boolean found = false;
+        for (final PatternItem item : this.children) {
+            if (item instanceof LeftSideItem
+                && ((LeftSideItem) item).getMatchingMode() != PatternMatchingMode.NORMAL) {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
     @Override
     public void setMatchingMode(final PatternMatchingMode value) {
         this.mode = value;
@@ -110,13 +128,32 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
     }
 
     @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        if (this.mode == PatternMatchingMode.OPTIONAL) {
-            builder.append('[');
-        } else if (this.mode == PatternMatchingMode.REPEATED) {
-            builder.append('{');
+    public LeftSideItemGenerator createGenerator() {
+        return new PatternMatcherGenerator(this);
+    }
+
+    @Override
+    public String toString(final boolean full) {
+        final String result;
+        if (full) {
+            result = this.toFullString();
+        } else {
+            result = this.toShortString();
         }
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return this.toFullString();
+    }
+
+    /**
+     * Represents the descriptor as a string in short form, without matching mode.
+     * @return Short pattern descriptor as a string
+     */
+    private String toShortString() {
+        final StringBuilder builder = new StringBuilder();
         builder.append(this.type);
         if (this.data != null) {
             builder.append('<').append(this.data.toString()).append('>');
@@ -133,6 +170,21 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
             }
             builder.append(')');
         }
+        return builder.toString();
+    }
+
+    /**
+     * Represents the descriptor as a string in full form, with matching mode.
+     * @return Full pattern descriptor as a string
+     */
+    private String toFullString() {
+        final StringBuilder builder = new StringBuilder();
+        if (this.mode == PatternMatchingMode.OPTIONAL) {
+            builder.append('[');
+        } else if (this.mode == PatternMatchingMode.REPEATED) {
+            builder.append('{');
+        }
+        builder.append(this.toShortString());
         if (this.mode == PatternMatchingMode.OPTIONAL) {
             builder.append(']');
         } else if (this.mode == PatternMatchingMode.REPEATED) {

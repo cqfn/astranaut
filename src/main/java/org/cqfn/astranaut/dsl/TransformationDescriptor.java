@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
+import org.cqfn.astranaut.codegen.java.TransformationGenerator;
 
 /**
  * Transformation descriptor describing the transformation of one or more subtrees into a single
@@ -101,6 +102,31 @@ public final class TransformationDescriptor implements Rule {
         this.language = value.toLowerCase(Locale.ENGLISH);
     }
 
+    /**
+     * Returns the minimum number of elements consumed by the left side
+     *  of this transformation rule.
+     * @return Minimum number of consumed elements
+     */
+    public int getMinConsumed() {
+        return TransformationDescriptor.calcMinConsumed(this.left);
+    }
+
+    /**
+     * Checks if the left side of this transformation rule contains
+     *  optional or repeated descriptors.
+     * @return Check result, {@code true} if any
+     */
+    public boolean hasOptionalOrRepeated() {
+        boolean found = false;
+        for (final LeftSideItem item : this.left) {
+            if (item.getMatchingMode() != PatternMatchingMode.NORMAL) {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
     @Override
     public void addDependency(final NodeDescriptor descriptor) {
         this.dependencies.add(descriptor);
@@ -113,7 +139,7 @@ public final class TransformationDescriptor implements Rule {
 
     @Override
     public RuleGenerator createGenerator() {
-        return null;
+        return new TransformationGenerator(this);
     }
 
     @Override
@@ -137,9 +163,31 @@ public final class TransformationDescriptor implements Rule {
      * @return Unmodifiable list of left items
      */
     private static List<LeftSideItem> checkLeftSide(final List<LeftSideItem> left) {
-        if (left.isEmpty()) {
-            throw new IllegalArgumentException();
+        if (TransformationDescriptor.calcMinConsumed(left) < 1) {
+            throw new IllegalArgumentException(
+                "At least one node on the left must be guaranteed to be consumed"
+            );
         }
         return Collections.unmodifiableList(left);
+    }
+
+    /**
+     * Calculates the minimum number of elements consumed by this transformation rule,
+     *  based on the matching mode of each item.
+     * @param list List of left side elements
+     * @return Minimum number of consumed elements
+     */
+    private static int calcMinConsumed(final List<LeftSideItem> list) {
+        int consumed = 0;
+        for (final LeftSideItem item : list) {
+            if (item.getMatchingMode() == PatternMatchingMode.NORMAL) {
+                consumed = consumed + 1;
+            }
+        }
+        if (consumed == 0 && list.size() == 1
+            && list.get(0).getMatchingMode() == PatternMatchingMode.REPEATED) {
+            consumed = 1;
+        }
+        return consumed;
     }
 }

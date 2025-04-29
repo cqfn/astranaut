@@ -104,6 +104,14 @@ public final class Method extends BaseMethod {
     }
 
     /**
+     * Returns name of the method.
+     * @return Name of the method
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
      * Adds a warning that needs to be suppressed.
      * @param warning Warning
      */
@@ -189,7 +197,7 @@ public final class Method extends BaseMethod {
         if (this.over) {
             code.add(indent, "@Override");
         }
-        code.add(indent, this.composeHeader());
+        this.composeHeader(indent, code);
         this.buildBody(indent + 1, code);
         code.add(indent, "}");
     }
@@ -201,33 +209,45 @@ public final class Method extends BaseMethod {
 
     /**
      * Composes the header (signature) of the method.
-     * @return Method header
+     * @param indent Code indentation
+     * @param code Source code builder
+     * @throws BaseException If there are any problems during code generation
      */
-    private String composeHeader() {
-        final StringBuilder header = new StringBuilder(128);
+    private void composeHeader(final int indent, final SourceCodeBuilder code)
+        throws BaseException {
+        final StringBuilder builder = new StringBuilder(128);
         if (this.isPublic()) {
-            header.append("public ");
+            builder.append("public ");
         } else if (this.isProtected()) {
-            header.append("protected ");
+            builder.append("protected ");
         } else if (this.isPrivate()) {
-            header.append("private ");
+            builder.append("private ");
         }
         if (this.stat) {
-            header.append("static ");
+            builder.append("static ");
         }
         if (this.fin) {
-            header.append("final ");
+            builder.append("final ");
         }
-        header.append(this.ret).append(' ').append(this.name).append('(');
+        builder.append(this.ret).append(' ').append(this.name).append('(');
         boolean flag = false;
+        int offset = 0;
+        String header = builder.toString();
         for (final Pair<String, String> arg : this.args) {
             if (flag) {
-                header.append(", ");
+                header = header.concat(", ");
             }
             flag = true;
-            header.append("final ").append(arg.getKey()).append(' ').append(arg.getValue());
+            final String argstr = String.format("final %s %s", arg.getKey(), arg.getValue());
+            final String bigger = header.concat(argstr);
+            if (SourceCodeBuilder.tryOn(indent + offset, bigger)) {
+                header = bigger;
+            } else {
+                code.add(indent + offset, header.trim());
+                header = argstr;
+                offset = 1;
+            }
         }
-        header.append(") {");
-        return header.toString();
+        code.add(indent + offset, header.concat(") {"));
     }
 }

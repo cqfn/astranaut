@@ -129,43 +129,62 @@ public abstract  class BaseMethod implements Entity {
         final List<Pair<String, Integer>> list = new ArrayList<>(0);
         int offset = 0;
         for (final String line : this.getBody().split("\n")) {
-            String tail = line.trim();
-            while (!tail.isEmpty()) {
-                int extra = 0;
-                if (tail.charAt(0) == '.') {
-                    extra = 1;
-                }
-                int index = tail.indexOf('{');
-                if (index > 0 && tail.charAt(0) == '}') {
-                    offset = offset - 1;
-                }
-                if (index >= 0) {
-                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), offset + extra));
-                    offset = offset + 1;
-                    tail = tail.substring(index + 1).trim();
-                    continue;
-                }
-                index = tail.indexOf(';');
-                if (index >= 0) {
-                    list.add(new Pair<>(tail.substring(0, index + 1).trim(), offset + extra));
-                    tail = tail.substring(index + 1).trim();
-                    continue;
-                }
-                index = tail.indexOf('}');
-                if (index > 0) {
-                    throw new SyntaxErrorInSourceCode(tail);
-                }
-                if (index == 0) {
-                    offset = offset - 1;
-                    list.add(new Pair<>("}", offset));
-                    tail = tail.substring(index + 1).trim();
-                    continue;
-                }
-                list.add(new Pair<>(tail, offset + extra));
-                tail = "";
-            }
+            offset = BaseMethod.splitLine(line, list, offset);
         }
         return BaseMethod.fixLinesThatAreTooLong(list, indent);
+    }
+
+    /**
+     * Splits a single line of code into parts and appends them with calculated indentation.
+     * @param line Source code line
+     * @param list Output list to append indented parts
+     * @param bias Starting indentation offset
+     * @return Final indentation offset after processing the line
+     * @throws BaseException If syntax is incorrect
+     */
+    private static int splitLine(final String line, final List<Pair<String, Integer>> list,
+        final int bias) throws BaseException {
+        int offset = bias;
+        String tail = line.trim();
+        while (!tail.isEmpty()) {
+            int extra = 0;
+            if (tail.charAt(0) == '.') {
+                extra = 1;
+            }
+            int index = tail.indexOf('{');
+            if (index > 0 && tail.charAt(0) == '}') {
+                offset = offset - 1;
+            }
+            if (index >= 0) {
+                list.add(new Pair<>(tail.substring(0, index + 1).trim(), offset + extra));
+                offset = offset + 1;
+                tail = tail.substring(index + 1).trim();
+                continue;
+            }
+            index = tail.indexOf("} while");
+            if (index == 0) {
+                offset = offset - 1;
+            }
+            index = tail.indexOf(';');
+            if (index >= 0) {
+                list.add(new Pair<>(tail.substring(0, index + 1).trim(), offset + extra));
+                tail = tail.substring(index + 1).trim();
+                continue;
+            }
+            index = tail.indexOf('}');
+            if (index > 0) {
+                throw new SyntaxErrorInSourceCode(tail);
+            }
+            if (index == 0) {
+                offset = offset - 1;
+                list.add(new Pair<>("}", offset));
+                tail = tail.substring(index + 1).trim();
+                continue;
+            }
+            list.add(new Pair<>(tail, offset + extra));
+            tail = "";
+        }
+        return offset;
     }
 
     /**
@@ -177,8 +196,7 @@ public abstract  class BaseMethod implements Entity {
      */
     private static List<Pair<String, Integer>> fixLinesThatAreTooLong(
         final List<Pair<String, Integer>> list, final int indent) throws BaseException {
-        List<Pair<String, Integer>> result = new ArrayList<>(list.size());
-        boolean flag = false;
+        final List<Pair<String, Integer>> result = new ArrayList<>(list.size());
         for (final Pair<String, Integer> line : list) {
             final String code = line.getKey();
             final int offset = line.getValue();
@@ -186,17 +204,12 @@ public abstract  class BaseMethod implements Entity {
                 result.add(line);
                 continue;
             }
-            final int index = code.indexOf('=');
-            if (index > 0) {
-                result.add(new Pair<>(code.substring(0, index + 1), offset));
-                result.add(new Pair<>(code.substring(index + 1).trim(), offset + 1));
-                flag = true;
-                continue;
+            final LongLineBreaker breaker = new LongLineBreaker(code, indent, offset);
+            final List<Pair<String, Integer>> lines = breaker.split();
+            if (lines.isEmpty()) {
+                throw new SourceCodeBuilder.CodeLineIsTooLong(code);
             }
-            throw new SourceCodeBuilder.CodeLineIsTooLong(code);
-        }
-        if (flag) {
-            result = BaseMethod.fixLinesThatAreTooLong(result, indent);
+            result.addAll(lines);
         }
         return result;
     }

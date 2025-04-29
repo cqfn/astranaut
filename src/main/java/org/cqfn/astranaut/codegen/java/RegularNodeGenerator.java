@@ -144,6 +144,9 @@ public final class RegularNodeGenerator extends NonAbstractNodeGenerator {
 
     @Override
     public void createSpecificEntitiesInBuilderClass(final Klass klass) {
+        final Constructor ctor = klass.createConstructor();
+        ctor.makePublic();
+        ctor.setBody("this.fragment = EmptyFragment.INSTANCE;");
         if (this.names.length > 0) {
             this.createFieldsWithSettersForTaggedChildren(klass);
         }

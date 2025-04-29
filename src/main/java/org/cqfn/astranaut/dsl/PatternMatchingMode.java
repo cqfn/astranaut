@@ -39,7 +39,9 @@ public enum PatternMatchingMode {
     OPTIONAL,
 
     /**
-     * The descriptor must match the pattern one or more times.
+     * The descriptor may match the pattern zero or more times.
+     * However, if this pattern is the only one in the transformation descriptor,
+     * it must match at least once.
      */
     REPEATED;
 }

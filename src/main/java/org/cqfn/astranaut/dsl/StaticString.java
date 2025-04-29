@@ -55,4 +55,12 @@ public final class StaticString implements LeftDataDescriptor, RightDataDescript
     public String toString() {
         return this.token.toString();
     }
+
+    /**
+     * Converts the entity into a Java-compatible string literal.
+     * @return The Java string literal representation of the token
+     */
+    public String toJavaCode() {
+        return this.token.toQuitedString('"');
+    }
 }

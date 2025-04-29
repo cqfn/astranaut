@@ -1,0 +1,2792 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree;
+
+import java.util.Locale;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.DefaultFactory;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Transformer;
+import org.cqfn.astranaut.core.utils.MapUtils;
+
+/**
+ * Provider that aggregates all factories and transformers.
+ * @since 1.0.0
+ */
+public final class Provider implements org.cqfn.astranaut.core.base.Provider {
+    /**
+     * The provider instance.
+     */
+    public static final Provider INSTANCE = new Provider();
+
+    /**
+     * Collection of factories supported by this provider.
+     */
+    private static final Map<String, Factory> FACTORIES =
+        new MapUtils<String, Factory>()
+            .put("common", org.cqfn.uast.tree.common.nodes.CommonFactory.INSTANCE)
+            .make();
+
+    /**
+     * Collection of transformers supported by this provider.
+     */
+    private static final Map<String, Transformer> TRANSFORMERS =
+        new MapUtils<String, Transformer>()
+            .put("common", org.cqfn.uast.tree.common.rules.CommonTransformer.INSTANCE)
+            .make();
+
+    /**
+     * Default transformer that doesn't transform anything.
+     */
+    private static final Transformer DEF_TRANS = node -> node;
+
+    /**
+     * Constructor.
+     */
+    private Provider() {
+    }
+
+    @Override
+    public Factory getFactory(final String language) {
+        final String lowercase = language.toLowerCase(Locale.ENGLISH);
+        return Provider.FACTORIES.getOrDefault(lowercase, DefaultFactory.EMPTY);
+    }
+
+    @Override
+    public Transformer getTransformer(final String language) {
+        final String lowercase = language.toLowerCase(Locale.ENGLISH);
+        return Provider.TRANSFORMERS.getOrDefault(lowercase, Provider.DEF_TRANS);
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'First#1' and extracts it if matched.
+ * @since 1.0.0
+ */
+public final class Matcher0 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher0();
+
+    /**
+     * Constructor.
+     */
+    private Matcher0() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        final boolean matches = node.belongsToGroup("First");
+        if (matches) {
+            extracted.addNode(1, node);
+        }
+        return matches;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'Second#2' and extracts it if matched.
+ * @since 1.0.0
+ */
+public final class Matcher1 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher1();
+
+    /**
+     * Constructor.
+     */
+    private Matcher1() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        final boolean matches = node.belongsToGroup("Second");
+        if (matches) {
+            extracted.addNode(2, node);
+        }
+        return matches;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'Seventh'.
+ * @since 1.0.0
+ */
+public final class Matcher2 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher2();
+
+    /**
+     * Constructor.
+     */
+    private Matcher2() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        return node.belongsToGroup("Seventh") && node.getChildCount() == 0;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'Fourth#3' and extracts it if matched.
+ * @since 1.0.0
+ */
+public final class Matcher3 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher3();
+
+    /**
+     * Constructor.
+     */
+    private Matcher3() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        final boolean matches = node.belongsToGroup("Fourth");
+        if (matches) {
+            extracted.addNode(3, node);
+        }
+        return matches;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'Fifth#4' and extracts it if matched.
+ * @since 1.0.0
+ */
+public final class Matcher4 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher4();
+
+    /**
+     * Constructor.
+     */
+    private Matcher4() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        final boolean matches = node.belongsToGroup("Fifth");
+        if (matches) {
+            extracted.addNode(4, node);
+        }
+        return matches;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'Sixth#5' and extracts it if matched.
+ * @since 1.0.0
+ */
+public final class Matcher5 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher5();
+
+    /**
+     * Constructor.
+     */
+    private Matcher5() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        final boolean matches = node.belongsToGroup("Sixth");
+        if (matches) {
+            extracted.addNode(5, node);
+        }
+        return matches;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * This package contains matchers that map subtrees to some pattern and extract nodes and data
+ *  when matched.
+ * @since 1.0.0
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Map;
+import org.cqfn.astranaut.core.base.DefaultFactory;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.astranaut.core.utils.MapUtils;
+
+/**
+ * Factory that creates nodes for the 'Common' language.
+ * @since 1.0.0
+ */
+public final class CommonFactory extends DefaultFactory {
+    /**
+     * The factory instance.
+     */
+    public static final Factory INSTANCE = new CommonFactory();
+
+    /**
+     * Default properties of nodes describing the language.
+     */
+    public static final Map<String, String> PROPERTIES =
+        new MapUtils<String, String>().put("language", "common").put("color", "green").make();
+
+    /**
+     * Collection of types supported by this factory.
+     */
+    private static final Map<String, Type> TYPES =
+        new MapUtils<String, Type>()
+            .put(Eighth.NAME, Eighth.TYPE)
+            .put(External.NAME, External.TYPE)
+            .put(Fifth.NAME, Fifth.TYPE)
+            .put(First.NAME, First.TYPE)
+            .put(Fourth.NAME, Fourth.TYPE)
+            .put(Ninth.NAME, Ninth.TYPE)
+            .put(Second.NAME, Second.TYPE)
+            .put(Seventh.NAME, Seventh.TYPE)
+            .put(Sixth.NAME, Sixth.TYPE)
+            .put(Third.NAME, Third.TYPE)
+            .make();
+
+    /**
+     * Constructor.
+     */
+    private CommonFactory() {
+        super(CommonFactory.TYPES);
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'Eighth' type.
+ * @since 1.0.0
+ */
+public final class Eighth implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "Eighth";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new EighthType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * List of child nodes.
+     */
+    private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private Eighth() {
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return Eighth.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return this.children.size();
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return this.children;
+    }
+
+    /**
+     * Type implementation describing 'Eighth' nodes.
+     * @since 1.0.0
+     */
+    private static final class EighthType implements Type {
+        /**
+         * The 'Ninth' type name.
+         */
+        private static final String TYPE_NINTH = "Ninth";
+
+        /**
+         * List of child node descriptors.
+         */
+        private static final List<ChildDescriptor> CHILD_TYPES =
+            ChildDescriptor.create().required(EighthType.TYPE_NINTH).build();
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(Eighth.NAME);
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return EighthType.CHILD_TYPES;
+        }
+
+        @Override
+        public String getName() {
+            return Eighth.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return EighthType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Eighth.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'Eighth' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Child node.
+         */
+        private Ninth child;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            boolean result = false;
+            if (list.size() == 1 && list.get(0) instanceof Ninth) {
+                this.child = (Ninth) list.get(0);
+                result = true;
+            }
+            return result;
+        }
+
+        @Override
+        public boolean isValid() {
+            return this.child != null;
+        }
+
+        @Override
+        public Node createNode() {
+            if (!this.isValid()) {
+                throw new IllegalStateException();
+            }
+            final Eighth node = new Eighth();
+            node.fragment = this.fragment;
+            node.children = Collections.singletonList(this.child);
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.algorithms.NodeAllocator;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.astranaut.core.utils.ListUtils;
+
+/**
+ * Node of the 'External' type.
+ * @since 1.0.0
+ */
+public final class External implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "External";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new ExternalType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * List of child nodes.
+     */
+    private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private External() {
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return External.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return this.children.size();
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return this.children;
+    }
+
+    /**
+     * Type implementation describing 'External' nodes.
+     * @since 1.0.0
+     */
+    private static final class ExternalType implements Type {
+        /**
+         * The 'First' type name.
+         */
+        private static final String TYPE_FIRST = "First";
+
+        /**
+         * The 'Second' type name.
+         */
+        private static final String TYPE_SECOND = "Second";
+
+        /**
+         * The 'Third' type name.
+         */
+        private static final String TYPE_THIRD = "Third";
+
+        /**
+         * The 'Fourth' type name.
+         */
+        private static final String TYPE_FOURTH = "Fourth";
+
+        /**
+         * The 'Fifth' type name.
+         */
+        private static final String TYPE_FIFTH = "Fifth";
+
+        /**
+         * The 'Sixth' type name.
+         */
+        private static final String TYPE_SIXTH = "Sixth";
+
+        /**
+         * List of child node descriptors.
+         */
+        private static final List<ChildDescriptor> CHILD_TYPES =
+            ChildDescriptor.create()
+                .required(ExternalType.TYPE_FIRST)
+                .required(ExternalType.TYPE_SECOND)
+                .required(ExternalType.TYPE_THIRD)
+                .required(ExternalType.TYPE_FOURTH)
+                .required(ExternalType.TYPE_FIFTH)
+                .required(ExternalType.TYPE_SIXTH)
+                .build();
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(External.NAME);
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return ExternalType.CHILD_TYPES;
+        }
+
+        @Override
+        public String getName() {
+            return External.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return ExternalType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new External.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'External' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * First node.
+         */
+        private First first;
+
+        /**
+         * Second node.
+         */
+        private Second second;
+
+        /**
+         * Third node.
+         */
+        private Third third;
+
+        /**
+         * Fourth node.
+         */
+        private Fourth fourth;
+
+        /**
+         * Fifth node.
+         */
+        private Fifth fifth;
+
+        /**
+         * Sixth node.
+         */
+        private Sixth sixth;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            final NodeAllocator allocator = new NodeAllocator(ExternalType.CHILD_TYPES);
+            final Node[] nodes = new Node[6];
+            final boolean result = allocator.allocate(nodes, list);
+            if (result) {
+                this.first = (First) nodes[0];
+                this.second = (Second) nodes[1];
+                this.third = (Third) nodes[2];
+                this.fourth = (Fourth) nodes[3];
+                this.fifth = (Fifth) nodes[4];
+                this.sixth = (Sixth) nodes[5];
+            }
+            return result;
+        }
+
+        @Override
+        public boolean isValid() {
+            return this.first != null
+                && this.second != null
+                && this.third != null
+                && this.fourth != null && this.fifth != null && this.sixth != null;
+        }
+
+        @Override
+        public Node createNode() {
+            if (!this.isValid()) {
+                throw new IllegalStateException();
+            }
+            final External node = new External();
+            node.fragment = this.fragment;
+            node.children =
+                new ListUtils<Node>()
+                .add(this.first, this.second, this.third, this.fourth, this.fifth, this.sixth)
+                .make();
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'Fifth' type.
+ * @since 1.0.0
+ */
+public final class Fifth implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "Fifth";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new FifthType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Constructor.
+     */
+    private Fifth() {
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return Fifth.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Type implementation describing 'Fifth' nodes.
+     * @since 1.0.0
+     */
+    private static final class FifthType implements Type {
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(Fifth.NAME);
+
+        @Override
+        public String getName() {
+            return Fifth.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return FifthType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Fifth.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'Fifth' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final Fifth node = new Fifth();
+            node.fragment = this.fragment;
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'First' type.
+ * @since 1.0.0
+ */
+public final class First implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "First";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new FirstType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Constructor.
+     */
+    private First() {
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return First.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Type implementation describing 'First' nodes.
+     * @since 1.0.0
+     */
+    private static final class FirstType implements Type {
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(First.NAME);
+
+        @Override
+        public String getName() {
+            return First.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return FirstType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new First.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'First' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final First node = new First();
+            node.fragment = this.fragment;
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'Fourth' type.
+ * @since 1.0.0
+ */
+public final class Fourth implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "Fourth";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new FourthType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Constructor.
+     */
+    private Fourth() {
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return Fourth.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Type implementation describing 'Fourth' nodes.
+     * @since 1.0.0
+     */
+    private static final class FourthType implements Type {
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(Fourth.NAME);
+
+        @Override
+        public String getName() {
+            return Fourth.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return FourthType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Fourth.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'Fourth' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final Fourth node = new Fourth();
+            node.fragment = this.fragment;
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'Ninth' type.
+ * @since 1.0.0
+ */
+public final class Ninth implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "Ninth";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new NinthType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Constructor.
+     */
+    private Ninth() {
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return Ninth.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Type implementation describing 'Ninth' nodes.
+     * @since 1.0.0
+     */
+    private static final class NinthType implements Type {
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(Ninth.NAME);
+
+        @Override
+        public String getName() {
+            return Ninth.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return NinthType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Ninth.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'Ninth' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final Ninth node = new Ninth();
+            node.fragment = this.fragment;
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'Second' type.
+ * @since 1.0.0
+ */
+public final class Second implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "Second";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new SecondType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Constructor.
+     */
+    private Second() {
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return Second.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Type implementation describing 'Second' nodes.
+     * @since 1.0.0
+     */
+    private static final class SecondType implements Type {
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(Second.NAME);
+
+        @Override
+        public String getName() {
+            return Second.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return SecondType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Second.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'Second' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final Second node = new Second();
+            node.fragment = this.fragment;
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'Seventh' type.
+ * @since 1.0.0
+ */
+public final class Seventh implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "Seventh";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new SeventhType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Constructor.
+     */
+    private Seventh() {
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return Seventh.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Type implementation describing 'Seventh' nodes.
+     * @since 1.0.0
+     */
+    private static final class SeventhType implements Type {
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(Seventh.NAME);
+
+        @Override
+        public String getName() {
+            return Seventh.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return SeventhType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Seventh.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'Seventh' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final Seventh node = new Seventh();
+            node.fragment = this.fragment;
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'Sixth' type.
+ * @since 1.0.0
+ */
+public final class Sixth implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "Sixth";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new SixthType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Constructor.
+     */
+    private Sixth() {
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return Sixth.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Type implementation describing 'Sixth' nodes.
+     * @since 1.0.0
+     */
+    private static final class SixthType implements Type {
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(Sixth.NAME);
+
+        @Override
+        public String getName() {
+            return Sixth.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return SixthType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Sixth.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'Sixth' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final Sixth node = new Sixth();
+            node.fragment = this.fragment;
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.ChildDescriptor;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'Third' type.
+ * @since 1.0.0
+ */
+public final class Third implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "Third";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new ThirdType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * List of child nodes.
+     */
+    private List<Node> children;
+
+    /**
+     * Constructor.
+     */
+    private Third() {
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return Third.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return "";
+    }
+
+    @Override
+    public int getChildCount() {
+        return this.children.size();
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        return this.children.get(index);
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return this.children;
+    }
+
+    /**
+     * Type implementation describing 'Third' nodes.
+     * @since 1.0.0
+     */
+    private static final class ThirdType implements Type {
+        /**
+         * The 'Eighth' type name.
+         */
+        private static final String TYPE_EIGHTH = "Eighth";
+
+        /**
+         * List of child node descriptors.
+         */
+        private static final List<ChildDescriptor> CHILD_TYPES =
+            ChildDescriptor.create().required(ThirdType.TYPE_EIGHTH).build();
+
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(Third.NAME);
+
+        @Override
+        public List<ChildDescriptor> getChildTypes() {
+            return ThirdType.CHILD_TYPES;
+        }
+
+        @Override
+        public String getName() {
+            return Third.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return ThirdType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new Third.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'Third' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Child node.
+         */
+        private Eighth child;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            boolean result = false;
+            if (list.size() == 1 && list.get(0) instanceof Eighth) {
+                this.child = (Eighth) list.get(0);
+                result = true;
+            }
+            return result;
+        }
+
+        @Override
+        public boolean isValid() {
+            return this.child != null;
+        }
+
+        @Override
+        public Node createNode() {
+            if (!this.isValid()) {
+                throw new IllegalStateException();
+            }
+            final Third node = new Third();
+            node.fragment = this.fragment;
+            node.children = Collections.singletonList(this.child);
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * This package contains common ('green') nodes.
+ * @since 1.0.0
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.rules;
+
+import java.util.LinkedList;
+import java.util.List;
+import org.cqfn.astranaut.core.algorithms.conversion.Converter;
+import org.cqfn.astranaut.core.algorithms.conversion.DefaultTransformer;
+import org.cqfn.astranaut.core.base.Transformer;
+import org.cqfn.uast.tree.common.nodes.CommonFactory;
+
+/**
+ * Transformer that performs transformations for common cases.
+ * @since 1.0.0
+ */
+public final class CommonTransformer extends DefaultTransformer {
+    /**
+     * The transformer instance.
+     */
+    public static final Transformer INSTANCE = new CommonTransformer();
+
+    /**
+     * Constructor.
+     */
+    private CommonTransformer() {
+        super(CommonTransformer.collectConverters(), CommonFactory.INSTANCE);
+    }
+
+    /**
+     * Collects converter objects for common cases.
+     * @return List of converter objects
+     */
+    private static List<Converter> collectConverters() {
+        final List<Converter> list = new LinkedList<>();
+        Converter.collectConverters("org.cqfn.uast.tree.common.rules", list);
+        return list;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.rules;
+
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import org.cqfn.astranaut.core.algorithms.conversion.ConversionResult;
+import org.cqfn.astranaut.core.algorithms.conversion.Converter;
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.DummyNode;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.utils.ListUtils;
+import org.cqfn.uast.tree.common.matchers.Matcher0;
+import org.cqfn.uast.tree.common.matchers.Matcher1;
+import org.cqfn.uast.tree.common.matchers.Matcher2;
+import org.cqfn.uast.tree.common.matchers.Matcher3;
+import org.cqfn.uast.tree.common.matchers.Matcher4;
+import org.cqfn.uast.tree.common.matchers.Matcher5;
+
+/**
+ * Converter implementing the rule 'First#1, [Second#2], {Seventh}, Fourth#3, Fifth#4, Sixth#5 ->
+ *  External(#1, #2, Third(Eighth(Ninth)), #3, #4, #5)'.
+ * @since 1.0.0
+ */
+public final class Converter0 implements Converter {
+    /**
+     * The instance.
+     */
+    public static final Converter INSTANCE = new Converter0();
+
+    /**
+     * Constructor.
+     */
+    private Converter0() {
+    }
+
+    @Override
+    public Optional<ConversionResult> convert(final List<Node> list, final int index,
+        final Factory factory) {
+        Optional<ConversionResult> result = Optional.empty();
+        do {
+            if (index + 4 > list.size()) {
+                break;
+            }
+            final Extracted extracted = new Extracted();
+            final Deque<Node> queue = new LinkedList<>(list.subList(index, list.size()));
+            final int size = queue.size();
+            boolean matched = Converter0.checkFirst(queue, extracted);
+            Converter0.checkSecond(queue, extracted);
+            Converter0.checkThird(queue, extracted);
+            matched = Converter0.checkFourth(queue, extracted);
+            matched = Converter0.checkFifth(queue, extracted);
+            if (!matched) {
+                break;
+            }
+            matched = Converter0.checkSixth(queue, extracted);
+            if (!matched) {
+                break;
+            }
+            final int consumed = size - queue.size();
+            final Fragment fragment = Fragment.fromNodes(list.subList(index, index + consumed));
+            final Node node = Converter0.buildRoot(factory, fragment, extracted);
+            if (node == DummyNode.INSTANCE) {
+                break;
+            }
+            result = Optional.of(new ConversionResult(node, consumed));
+        } while (false);
+        return result;
+    }
+
+    @Override
+    public int getMinConsumed() {
+        return 4;
+    }
+
+    /**
+     * Matches a node with the pattern 'First#1'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the next node is matched to the pattern
+     */
+    private static boolean checkFirst(final Deque<Node> queue, final Extracted extracted) {
+        final Node node = queue.poll();
+        return Matcher0.INSTANCE.match(node, extracted);
+    }
+
+    /**
+     * Matches a node with the pattern '[Second#2]'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     */
+    private static void checkSecond(final Deque<Node> queue, final Extracted extracted) {
+        if (queue.isEmpty()) {
+            return;
+        }
+        final Node node = queue.poll();
+        final boolean matched = Matcher1.INSTANCE.match(node, extracted);
+        if (!matched) {
+            queue.addFirst(node);
+        }
+    }
+
+    /**
+     * Matches a node with the pattern '{Seventh}'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     */
+    private static void checkThird(final Deque<Node> queue, final Extracted extracted) {
+        while (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            final boolean matched = Matcher2.INSTANCE.match(node, extracted);
+            if (!matched) {
+                queue.addFirst(node);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Matches a node with the pattern 'Fourth#3'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the next node is matched to the pattern
+     */
+    private static boolean checkFourth(final Deque<Node> queue, final Extracted extracted) {
+        boolean result = false;
+        if (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            result = Matcher3.INSTANCE.match(node, extracted);
+        }
+        return result;
+    }
+
+    /**
+     * Matches a node with the pattern 'Fifth#4'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the next node is matched to the pattern
+     */
+    private static boolean checkFifth(final Deque<Node> queue, final Extracted extracted) {
+        boolean result = false;
+        if (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            result = Matcher4.INSTANCE.match(node, extracted);
+        }
+        return result;
+    }
+
+    /**
+     * Matches a node with the pattern 'Sixth#5'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the next node is matched to the pattern
+     */
+    private static boolean checkSixth(final Deque<Node> queue, final Extracted extracted) {
+        boolean result = false;
+        if (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            result = Matcher5.INSTANCE.match(node, extracted);
+        }
+        return result;
+    }
+
+    /**
+     * Constructs a node based on the descriptor 'External(#1, #2, Third(Eighth(Ninth)), #3, #4,
+     *  #5)'.
+     * @param factory Factory for creating nodes
+     * @param fragment Code fragment that is covered by the node being created
+     * @param extracted Extracted nodes and data
+     * @return Created node
+     */
+    private static Node buildRoot(final Factory factory, final Fragment fragment,
+        final Extracted extracted) {
+        Node result = DummyNode.INSTANCE;
+        final Builder builder = factory.createBuilder("External");
+        do {
+            final List<Node> children =
+                new ListUtils<Node>()
+                .add(extracted.getNodes(1, 2))
+                .add(Converter0.buildSecond(factory)).add(extracted.getNodes(3, 4, 5)).make();
+            if (!builder.setChildrenList(children)) {
+                break;
+            }
+            if (!builder.isValid()) {
+                break;
+            }
+            builder.setFragment(fragment);
+            result = builder.createNode();
+        } while (false);
+        return result;
+    }
+
+    /**
+     * Constructs a node based on the descriptor 'Third(Eighth(Ninth))'.
+     * @param factory Factory for creating nodes
+     * @return Created node
+     */
+    private static Node buildSecond(final Factory factory) {
+        Node result = DummyNode.INSTANCE;
+        final Builder builder = factory.createBuilder("Third");
+        do {
+            final Node child = Converter0.buildThird(factory);
+            final List<Node> children = Collections.singletonList(child);
+            if (!builder.setChildrenList(children)) {
+                break;
+            }
+            if (!builder.isValid()) {
+                break;
+            }
+            result = builder.createNode();
+        } while (false);
+        return result;
+    }
+
+    /**
+     * Constructs a node based on the descriptor 'Eighth(Ninth)'.
+     * @param factory Factory for creating nodes
+     * @return Created node
+     */
+    private static Node buildThird(final Factory factory) {
+        Node result = DummyNode.INSTANCE;
+        final Builder builder = factory.createBuilder("Eighth");
+        do {
+            final Node child = Converter0.buildFourth(factory);
+            final List<Node> children = Collections.singletonList(child);
+            if (!builder.setChildrenList(children)) {
+                break;
+            }
+            if (!builder.isValid()) {
+                break;
+            }
+            result = builder.createNode();
+        } while (false);
+        return result;
+    }
+
+    /**
+     * Constructs a node based on the descriptor 'Ninth'.
+     * @param factory Factory for creating nodes
+     * @return Created node
+     */
+    private static Node buildFourth(final Factory factory) {
+        Node result = DummyNode.INSTANCE;
+        final Builder builder = factory.createBuilder("Ninth");
+        do {
+            if (!builder.isValid()) {
+                break;
+            }
+            result = builder.createNode();
+        } while (false);
+        return result;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * This package contains transformation rules for common ('green') nodes.
+ * @since 1.0.0
+ */
+package org.cqfn.uast.tree.common.rules;
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * Nodes describing syntax trees, and algorithms to process them, generated from the description
+ *  in the DSL language.
+ * @since 1.0.0
+ */
+package org.cqfn.uast.tree;
+

@@ -31,6 +31,7 @@ import java.util.Map;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.Program;
 import org.cqfn.astranaut.dsl.Rule;
+import org.cqfn.astranaut.dsl.TransformationDescriptor;
 import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
@@ -75,6 +76,12 @@ public class ProgramParser {
             if (code.contains("<-")) {
                 final NodeDescriptorParser parser = new NodeDescriptorParser(this.language, stmt);
                 final NodeDescriptor descr = parser.parseDescriptor();
+                list.add(descr);
+                this.locations.put(descr, stmt.getLocation());
+            } else if (code.contains("->")) {
+                final TransformationDescriptorParser parser =
+                    new TransformationDescriptorParser(this.language, stmt);
+                final TransformationDescriptor descr = parser.parseDescriptor();
                 list.add(descr);
                 this.locations.put(descr, stmt.getLocation());
             } else {

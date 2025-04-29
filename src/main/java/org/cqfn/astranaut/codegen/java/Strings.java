@@ -84,9 +84,19 @@ final class Strings {
     public static final String TYPE_FRAGMENT = "Fragment";
 
     /**
+     * The 'EmptyFragment' type.
+     */
+    public static final String TYPE_EMPTY_FRAG = "EmptyFragment";
+
+    /**
      * The 'ChildDescriptor' type.
      */
     public static final String TYPE_CHLD_DESCR = "ChildDescriptor";
+
+    /**
+     * The 'Factory' type.
+     */
+    public static final String TYPE_FACTORY = "Factory";
 
     /**
      * Private constructor.
