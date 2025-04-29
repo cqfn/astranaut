@@ -24,10 +24,26 @@
 
 First <- 0;
 Second <- 0;
-Third <- 0;
+Third <- Eighth;
 Fourth <- 0;
 Fifth <- 0;
 Sixth <- 0;
 Seventh <- 0;
+Eighth <- Ninth;
+Ninth <- 0;
 External <- First, Second, Third, Fourth, Fifth, Sixth;
-First#1, [Second#2], {Seventh}, Fourth#3, Fifth#4, Sixth#5 -> External(#1, #2, Third, #3, #4, #5);
+
+First#1, [Second#2], {Seventh}, Fourth#3, Fifth#4, Sixth#5
+->
+External(
+  #1,
+  #2,
+  Third(
+    Eighth(
+      Ninth
+    )
+  ),
+  #3,
+  #4,
+  #5
+);
