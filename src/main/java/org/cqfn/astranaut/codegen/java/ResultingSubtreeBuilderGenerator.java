@@ -220,13 +220,12 @@ final class ResultingSubtreeBuilderGenerator {
         final StringBuilder numbers = new StringBuilder();
         boolean flag = false;
         for (final RightSideItem item : descriptor.getChildren()) {
-            if (item instanceof UntypedHole) {
-                if (flag) {
-                    numbers.append(", ");
-                }
-                flag = true;
-                numbers.append(((UntypedHole) item).getNumber());
+            if (flag) {
+                numbers.append(", ");
             }
+            flag = true;
+            final UntypedHole hole = (UntypedHole) item;
+            numbers.append(hole.getNumber());
         }
         return Arrays.asList(
             String.format(
@@ -305,7 +304,7 @@ final class ResultingSubtreeBuilderGenerator {
                     builder.append(", extracted");
                 }
                 builder.append("))");
-            } else if (child instanceof UntypedHole) {
+            } else {
                 this.needExtracted();
                 if (flag) {
                     builder.append(", ");

@@ -381,7 +381,7 @@ import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
 import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Matches a node with the pattern 'Sixth'.
+ * Matches a node with the pattern 'Sixth#5' and extracts it if matched.
  * @since 1.0.0
  */
 public final class Matcher5 implements Matcher {
@@ -398,7 +398,11 @@ public final class Matcher5 implements Matcher {
 
     @Override
     public boolean match(final Node node, final Extracted extracted) {
-        return node.belongsToGroup("Sixth") && node.getChildCount() == 0;
+        final boolean matches = node.belongsToGroup("Sixth");
+        if (matches) {
+            extracted.addNode(5, node);
+        }
+        return matches;
     }
 }
 
@@ -2082,8 +2086,8 @@ import org.cqfn.uast.tree.common.matchers.Matcher4;
 import org.cqfn.uast.tree.common.matchers.Matcher5;
 
 /**
- * Converter implementing the rule 'First#1, [Second#2], {Seventh}, Fourth#3, Fifth#4, Sixth ->
- *  External(#1, #2, Third, #3, #4, Sixth)'.
+ * Converter implementing the rule 'First#1, [Second#2], {Seventh}, Fourth#3, Fifth#4, Sixth#5 ->
+ *  External(#1, #2, Third, #3, #4, #5)'.
  * @since 1.0.0
  */
 public final class Converter0 implements Converter {
@@ -2211,7 +2215,7 @@ public final class Converter0 implements Converter {
     }
 
     /**
-     * Matches a node with the pattern 'Sixth'.
+     * Matches a node with the pattern 'Sixth#5'.
      * @param queue Node queue
      * @param extracted Extracted nodes and data
      * @return Matching result, {@code true} if the next node is matched to the pattern
@@ -2226,7 +2230,7 @@ public final class Converter0 implements Converter {
     }
 
     /**
-     * Constructs a node based on the descriptor 'External(#1, #2, Third, #3, #4, Sixth)'.
+     * Constructs a node based on the descriptor 'External(#1, #2, Third, #3, #4, #5)'.
      * @param factory Factory for creating nodes
      * @param fragment Code fragment that is covered by the node being created
      * @param extracted Extracted nodes and data
@@ -2240,8 +2244,7 @@ public final class Converter0 implements Converter {
             final List<Node> children =
                 new ListUtils<Node>()
                 .add(extracted.getNodes(1, 2))
-                .add(Converter0.buildSecond(factory))
-                .add(extracted.getNodes(3, 4)).add(Converter0.buildThird(factory)).make();
+                .add(Converter0.buildSecond(factory)).add(extracted.getNodes(3, 4, 5)).make();
             if (!builder.setChildrenList(children)) {
                 break;
             }
@@ -2262,23 +2265,6 @@ public final class Converter0 implements Converter {
     private static Node buildSecond(final Factory factory) {
         Node result = DummyNode.INSTANCE;
         final Builder builder = factory.createBuilder("Third");
-        do {
-            if (!builder.isValid()) {
-                break;
-            }
-            result = builder.createNode();
-        } while (false);
-        return result;
-    }
-
-    /**
-     * Constructs a node based on the descriptor 'Sixth'.
-     * @param factory Factory for creating nodes
-     * @return Created node
-     */
-    private static Node buildThird(final Factory factory) {
-        Node result = DummyNode.INSTANCE;
-        final Builder builder = factory.createBuilder("Sixth");
         do {
             if (!builder.isValid()) {
                 break;

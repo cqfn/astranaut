@@ -329,6 +329,13 @@ class GenerateTest extends EndToEndTest {
     }
 
     @Test
+    void extractNodeFromSimpleCase(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("extract_node_from_simple_case.txt");
+        final String actual = this.run("extract_node_from_simple_case.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
     void complexCaseConversion(final @TempDir Path temp) {
         final String expected = this.loadStringResource("complex_case_conversion.txt");
         final String actual = this.run("complex_case_conversion.dsl", temp);
