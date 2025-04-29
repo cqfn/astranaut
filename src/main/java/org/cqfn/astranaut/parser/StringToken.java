@@ -27,7 +27,7 @@ package org.cqfn.astranaut.parser;
  * Token representing a string in single or double quotes.
  * @since 1.0.0
  */
-public final class StringToken extends Token {
+public final class StringToken extends CharSequenceToken {
     /**
      * Quotation mark that opens and closes a string.
      */
@@ -57,54 +57,13 @@ public final class StringToken extends Token {
     }
 
     @Override
-    public String toString() {
-        return this.toQuitedString(this.quote);
+    public String getValueAsString() {
+        return this.value;
     }
 
-    /**
-     * Converts the stored string into a quoted string with escaped special characters.
-     * @param quotes The character to use as a quote (either single {@code '} or double {@code "})
-     * @return The quoted string with escaped special characters
-     */
-    public String toQuitedString(final char quotes) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(quotes);
-        for (int index = 0; index < this.value.length(); index = index + 1) {
-            final char chr = this.value.charAt(index);
-            switch (chr) {
-                case '\\':
-                    builder.append("\\\\");
-                    break;
-                case '\r':
-                    builder.append("\\r");
-                    break;
-                case '\n':
-                    builder.append("\\n");
-                    break;
-                case '\t':
-                    builder.append("\\t");
-                    break;
-                case '\'':
-                    if (quotes == '\'') {
-                        builder.append("\\'");
-                    } else {
-                        builder.append('\'');
-                    }
-                    break;
-                case '\"':
-                    if (quotes == '\"') {
-                        builder.append("\\\"");
-                    } else {
-                        builder.append('"');
-                    }
-                    break;
-                default:
-                    builder.append(chr);
-                    break;
-            }
-        }
-        builder.append(quotes);
-        return builder.toString();
+    @Override
+    public String toString() {
+        return this.toQuitedString(this.quote);
     }
 
     /**
