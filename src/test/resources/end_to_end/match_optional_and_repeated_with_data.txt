@@ -110,7 +110,8 @@ import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
 import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Matches a node with the pattern 'AAA([BBB], {CCC})' and extracts nested nodes if matched.
+ * Matches a node with the pattern 'AAA<#1>([BBB], {CCC})' and extracts nested nodes and data if
+ *  matched.
  * @since 1.0.0
  */
 public final class Matcher0 implements Matcher {
@@ -129,6 +130,9 @@ public final class Matcher0 implements Matcher {
     public boolean match(final Node node, final Extracted extracted) {
         final boolean matches = false;
         // stub
+        if (matches) {
+            extracted.addData(Matcher0.HOLE_NUMBER, node.getData());
+        }
         return matches;
     }
 }
@@ -520,7 +524,7 @@ import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.uast.tree.common.matchers.Matcher0;
 
 /**
- * Converter implementing the rule 'AAA([BBB], {CCC}) -> FakeNode'.
+ * Converter implementing the rule 'AAA<#1>([BBB], {CCC}) -> FakeNode'.
  * @since 1.0.0
  */
 public final class Converter0 implements Converter {

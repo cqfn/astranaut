@@ -200,6 +200,7 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
      */
     private String generateBodyWithComplexCondition(final Klass klass) {
         final List<String> code = new ArrayList<>(2);
+        code.add("final boolean matches = false; // stub");
         if (this.item.getData() instanceof UntypedHole) {
             code.addAll(
                 Arrays.asList(

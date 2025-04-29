@@ -378,6 +378,15 @@ class GenerateTest extends EndToEndTest {
     }
 
     @Test
+    void matchOptionalAndRepeatedWithData(final @TempDir Path temp) {
+        final String expected = this.loadStringResource(
+            "match_optional_and_repeated_with_data.txt"
+        );
+        final String actual = this.run("match_optional_and_repeated_with_data.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
     void oneOptionalNodeOnLeft(final @TempDir Path temp) {
         final String message = this.runAndReadErrorMessage(
             "one_optional_on_left.dsl",
