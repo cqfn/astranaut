@@ -399,6 +399,13 @@ class GenerateTest extends EndToEndTest {
         );
     }
 
+    @Test
+    void extractFirstNodeFromList(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("extract_first_node_from_list.txt");
+        final String actual = this.run("extract_first_node_from_list.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.

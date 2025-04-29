@@ -22,12 +22,4 @@
  * SOFTWARE.
  */
 
-First <- 0;
-Second <- 0;
-Third <- 0;
-Fourth <- 0;
-Fifth <- 0;
-Sixth <- 0;
-Seventh <- 0;
-External <- First, Second, Third, Fourth, Fifth, Sixth;
-First#1, [Second#2], {Seventh}, Fourth#3, Fifth#4, Sixth -> External(#1, #2, Third, #3, #4, Sixth);
+{AAA#1} -> #1;
