@@ -262,8 +262,8 @@ public class LeftSideParser {
         final Token first = this.scanner.getToken();
         if (first instanceof HashSymbol) {
             data = this.parseUntypedDataHole();
-        } else if (first instanceof StringToken) {
-            data = new StaticString((StringToken) first);
+        } else if (first instanceof CharSequenceToken) {
+            data = new StaticString((CharSequenceToken) first);
         } else {
             throw new CommonParsingException(
                 this.scanner.getLocation(),

@@ -23,7 +23,7 @@
  */
 package org.cqfn.astranaut.dsl;
 
-import org.cqfn.astranaut.parser.StringToken;
+import org.cqfn.astranaut.parser.CharSequenceToken;
 
 /**
  * Entity that represents a static string.
@@ -33,13 +33,13 @@ public final class StaticString implements LeftDataDescriptor, RightDataDescript
     /**
      * Token from which this descriptor is generated.
      */
-    private final StringToken token;
+    private final CharSequenceToken token;
 
     /**
      * Constructor to initialize the StaticString with the provided value.
      * @param token Token from which this descriptor is generated
      */
-    public StaticString(final StringToken token) {
+    public StaticString(final CharSequenceToken token) {
         this.token = token;
     }
 
@@ -48,7 +48,7 @@ public final class StaticString implements LeftDataDescriptor, RightDataDescript
      * @return The string value
      */
     public String getValue() {
-        return this.token.getValue();
+        return this.token.getValueAsString();
     }
 
     @Override

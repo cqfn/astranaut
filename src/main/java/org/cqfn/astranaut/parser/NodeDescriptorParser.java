@@ -81,8 +81,8 @@ public class NodeDescriptorParser {
             result = this.parseNodeWithoutChildren(name, scanner);
         } else if (first instanceof OpeningCurlyBracket) {
             result = this.parseListNode(name, scanner);
-        } else if (first instanceof StringToken) {
-            result = this.parseLiteral(name, scanner, (StringToken) first);
+        } else if (first instanceof CharSequenceToken) {
+            result = this.parseLiteral(name, scanner, (CharSequenceToken) first);
         } else if (first instanceof Identifier || first instanceof SquareBracket) {
             result = this.parseRegularOrAbstractNode(name, scanner, first);
         } else {
@@ -173,8 +173,8 @@ public class NodeDescriptorParser {
      * @throws ParsingException If there are any errors on the right side of the descriptor
      */
     private LiteralDescriptor parseLiteral(final String name, final Scanner scanner,
-        final StringToken first) throws ParsingException {
-        final String type = first.getValue();
+        final CharSequenceToken first) throws ParsingException {
+        final String type = first.getValueAsString();
         if (type.isEmpty()) {
             throw new CommonParsingException(this.stmt.getLocation(), "Data type cannot be empty");
         }
@@ -287,13 +287,13 @@ public class NodeDescriptorParser {
                 );
             }
             final Token second = scanner.getToken();
-            if (!(second instanceof StringToken)) {
+            if (!(second instanceof CharSequenceToken)) {
                 throw new CommonParsingException(
                     this.stmt.getLocation(),
                     "A string literal is expected after ','"
                 );
             }
-            value = ((StringToken) second).getValue();
+            value = ((CharSequenceToken) second).getValueAsString();
         }
         return value;
     }
