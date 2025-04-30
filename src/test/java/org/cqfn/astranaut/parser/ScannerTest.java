@@ -283,6 +283,8 @@ class ScannerTest {
             final Token token = scanner.getToken();
             Assertions.assertTrue(token instanceof SymbolToken);
             Assertions.assertEquals('x', ((SymbolToken) token).getSymbol());
+            Assertions.assertEquals('x', ((SymbolToken) token).getFirstSymbol());
+            Assertions.assertEquals('x', ((SymbolToken) token).getLastSymbol());
             Assertions.assertEquals(code, token.toString());
         } catch (final BaseException ignored) {
             oops = true;
@@ -388,5 +390,28 @@ class ScannerTest {
             );
         }
         Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void stringLooksLikeRangeButNotIt() {
+        String code = "'a.,b'";
+        Scanner scanner = new Scanner(ScannerTest.LOCATION, code);
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof StringToken);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        code = "'a,.b'";
+        scanner = new Scanner(ScannerTest.LOCATION, code);
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof StringToken);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }
