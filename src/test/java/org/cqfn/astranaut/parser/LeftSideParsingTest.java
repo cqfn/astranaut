@@ -651,6 +651,12 @@ class LeftSideParsingTest {
         Assertions.assertFalse(oops);
     }
 
+    @Test
+    void badHoleInSymbolicDescriptor() {
+        final LeftSideParser parser = this.createParser("'#1'<?>");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
     /**
      * Creates a parser that parses an item that is part of the left side of
      *  a transformation rule.
