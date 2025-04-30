@@ -38,7 +38,7 @@ import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
  * @since 1.0.0
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class NodeDescriptorParser {
+public final class NodeDescriptorParser {
     /**
      * Name of the programming language whose entity this node descriptor covers.
      */

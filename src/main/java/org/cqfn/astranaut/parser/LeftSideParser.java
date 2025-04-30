@@ -32,6 +32,7 @@ import org.cqfn.astranaut.dsl.PatternDescriptor;
 import org.cqfn.astranaut.dsl.PatternItem;
 import org.cqfn.astranaut.dsl.PatternMatchingMode;
 import org.cqfn.astranaut.dsl.StaticString;
+import org.cqfn.astranaut.dsl.SymbolDescriptor;
 import org.cqfn.astranaut.dsl.TypedHole;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
@@ -40,7 +41,7 @@ import org.cqfn.astranaut.dsl.UntypedHole;
  * @since 1.0.0
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class LeftSideParser {
+public final class LeftSideParser {
     /**
      * Scanner that produces a sequence of tokens.
      */
@@ -89,6 +90,8 @@ public class LeftSideParser {
             item = this.parseOptionalItem();
         } else if (first instanceof OpeningCurlyBracket) {
             item = this.parseRepeatedItem();
+        } else if (first instanceof SymbolicToken) {
+            item = this.parseSymbolDescriptor((SymbolicToken) first);
         } else if (first == null) {
             item = null;
         } else if (first instanceof HashSymbol) {
@@ -117,6 +120,8 @@ public class LeftSideParser {
             item = (PatternItem) this.parseOptionalItem();
         } else if (first instanceof OpeningCurlyBracket) {
             item = (PatternItem) this.parseRepeatedItem();
+        } else if (first instanceof SymbolicToken) {
+            item = (PatternItem) this.parseSymbolDescriptor((SymbolicToken) first);
         } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
             item = null;
         } else if (first instanceof HashSymbol) {
@@ -371,5 +376,33 @@ public class LeftSideParser {
             );
         }
         return item;
+    }
+
+    /**
+     * Parses a sequence of tokens as a symbolic descriptor.
+     * @param first Symbolic token
+     * @return Symbolic descriptor
+     * @throws ParsingException If the parse fails
+     */
+    private LeftSideItem parseSymbolDescriptor(final SymbolicToken first)
+        throws ParsingException {
+        UntypedHole data = null;
+        Token next = this.scanner.getToken();
+        do {
+            if (!(next instanceof OpeningAngleBracket)) {
+                this.last = next;
+                break;
+            }
+            next = this.scanner.getToken();
+            if (next instanceof HashSymbol) {
+                data = this.parseUntypedDataHole();
+            } else {
+                throw new CommonParsingException(
+                    this.scanner.getLocation(),
+                    "Data inside symbolic descriptors can only be holes"
+                );
+            }
+        } while (false);
+        return new SymbolDescriptor(first, data);
     }
 }

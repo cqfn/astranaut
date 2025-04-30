@@ -37,7 +37,7 @@ import org.cqfn.astranaut.dsl.UntypedHole;
  *  of a transformation rule.
  * @since 1.0.0
  */
-public class RightSideItemParser {
+public final class RightSideItemParser {
     /**
      * Scanner that produces a sequence of tokens.
      */
