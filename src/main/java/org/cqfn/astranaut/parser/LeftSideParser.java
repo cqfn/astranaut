@@ -172,12 +172,6 @@ public final class LeftSideParser {
             throw new BadHole(this.scanner.getLocation());
         }
         final int value = ((Number) token).getValue();
-        if (this.holes.hasDataHole(value)) {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                String.format("Hole with number #%d replacing data has already been used", value)
-            );
-        }
         this.holes.addDataHole(value);
         return UntypedHole.getInstance(value);
     }
