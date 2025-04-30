@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.dsl;
 
 import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
+import org.cqfn.astranaut.codegen.java.SymbolMatcherGenerator;
 import org.cqfn.astranaut.parser.SymbolicToken;
 
 /**
@@ -59,19 +60,11 @@ public final class SymbolDescriptor implements PatternItem, LeftSideItem {
     }
 
     /**
-     * Returns the first character in the range.
-     * @return Symbol
+     * Returns token describing a character or range of characters.
+     * @return Token
      */
-    public char getFirstSymbol() {
-        return this.token.getFirstSymbol();
-    }
-
-    /**
-     * Returns the last character in the range.
-     * @return Symbol
-     */
-    public char getLastSymbol() {
-        return this.token.getLastSymbol();
+    public SymbolicToken getToken() {
+        return this.token;
     }
 
     /**
@@ -94,7 +87,7 @@ public final class SymbolDescriptor implements PatternItem, LeftSideItem {
 
     @Override
     public LeftSideItemGenerator createGenerator() {
-        return null;
+        return new SymbolMatcherGenerator(this);
     }
 
     @Override

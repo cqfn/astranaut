@@ -40,8 +40,17 @@ public abstract class CharSequenceToken extends Token {
      * @return The quoted string with escaped special characters
      */
     public String toQuotedString(final char quotes) {
+        return SymbolicToken.toQuotedString(quotes, this.getValueAsString());
+    }
+
+    /**
+     * Converts the string into a quoted string with escaped special characters.
+     * @param quotes The character to use as a quote (either single {@code '} or double {@code "})
+     * @param value String value
+     * @return The quoted string with escaped special characters
+     */
+    protected static String toQuotedString(final char quotes, final String value) {
         final StringBuilder builder = new StringBuilder();
-        final String value = this.getValueAsString();
         builder.append(quotes);
         for (int index = 0; index < value.length(); index = index + 1) {
             final char chr = value.charAt(index);

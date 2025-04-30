@@ -35,8 +35,24 @@ public abstract class SymbolicToken extends CharSequenceToken {
     public abstract char getFirstSymbol();
 
     /**
+     * Returns the first symbol as a Java-compatible character literal.
+     * @return A quoted and escaped string representing the first symbol, suitable for Java code.
+     */
+    public String getFirstSymbolAsQuotedString() {
+        return CharSequenceToken.toQuotedString('\'', String.valueOf(this.getFirstSymbol()));
+    }
+
+    /**
      * Returns the last character in the range.
      * @return Symbol
      */
     public abstract char getLastSymbol();
+
+    /**
+     * Returns the last symbol as a Java-compatible character literal.
+     * @return A quoted and escaped string representing the last symbol, suitable for Java code.
+     */
+    public String getLastSymbolAsQuotedString() {
+        return CharSequenceToken.toQuotedString('\'', String.valueOf(this.getLastSymbol()));
+    }
 }

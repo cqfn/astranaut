@@ -592,8 +592,8 @@ class LeftSideParsingTest {
             final PatternItem item = parser.parsePatternItem();
             Assertions.assertTrue(item instanceof SymbolDescriptor);
             final SymbolDescriptor descr = (SymbolDescriptor) item;
-            Assertions.assertEquals('x', descr.getFirstSymbol());
-            Assertions.assertEquals('x', descr.getLastSymbol());
+            Assertions.assertEquals('x', descr.getToken().getFirstSymbol());
+            Assertions.assertEquals('x', descr.getToken().getLastSymbol());
             Assertions.assertNull(descr.getData());
             Assertions.assertEquals(code, descr.toString());
         } catch (final ParsingException ignored) {
@@ -620,8 +620,8 @@ class LeftSideParsingTest {
             final PatternItem item = parser.parsePatternItem();
             Assertions.assertTrue(item instanceof SymbolDescriptor);
             final SymbolDescriptor descr = (SymbolDescriptor) item;
-            Assertions.assertEquals('a', descr.getFirstSymbol());
-            Assertions.assertEquals('z', descr.getLastSymbol());
+            Assertions.assertEquals('a', descr.getToken().getFirstSymbol());
+            Assertions.assertEquals('z', descr.getToken().getLastSymbol());
             Assertions.assertNull(descr.getData());
             Assertions.assertEquals(code, descr.toString());
         } catch (final ParsingException ignored) {
@@ -639,8 +639,8 @@ class LeftSideParsingTest {
             final PatternItem item = parser.parsePatternItem();
             Assertions.assertTrue(item instanceof SymbolDescriptor);
             final SymbolDescriptor descr = (SymbolDescriptor) item;
-            Assertions.assertEquals('x', descr.getFirstSymbol());
-            Assertions.assertEquals('x', descr.getLastSymbol());
+            Assertions.assertEquals('x', descr.getToken().getFirstSymbol());
+            Assertions.assertEquals('x', descr.getToken().getLastSymbol());
             final UntypedHole hole = descr.getData();
             Assertions.assertNotNull(hole);
             Assertions.assertEquals(1, hole.getNumber());
@@ -653,7 +653,13 @@ class LeftSideParsingTest {
 
     @Test
     void badHoleInSymbolicDescriptor() {
-        final LeftSideParser parser = this.createParser("'#1'<?>");
+        final LeftSideParser parser = this.createParser("'x'<?>");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void badUnclosedDataInSymbolicDescriptor() {
+        final LeftSideParser parser = this.createParser("'x'<#1 ");
         Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
     }
 

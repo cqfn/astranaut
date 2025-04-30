@@ -402,6 +402,13 @@ public final class LeftSideParser {
                     "Data inside symbolic descriptors can only be holes"
                 );
             }
+            next = this.scanner.getToken();
+            if (!(next instanceof ClosingAngleBracket)) {
+                throw new CommonParsingException(
+                    this.scanner.getLocation(),
+                    "Closing angle bracket '>' expected for data descriptor"
+                );
+            }
         } while (false);
         return new SymbolDescriptor(first, data);
     }
