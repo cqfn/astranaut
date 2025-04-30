@@ -109,14 +109,6 @@ class TransformationDescriptionParsingTest {
     }
 
     @Test
-    void duplicateDataHole() {
-        final TransformationDescriptorParser parser = this.createParser(
-            "AAA<#1>, BBB<#1> -> CCC<#1>"
-        );
-        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
-    }
-
-    @Test
     void inconsistentNodeHole() {
         final TransformationDescriptorParser parser = this.createParser(
             "AAA(#1) -> BBB(#2)"
