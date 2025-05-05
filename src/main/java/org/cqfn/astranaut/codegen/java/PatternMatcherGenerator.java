@@ -112,7 +112,7 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
         method.addArgument("Extracted", "extracted");
         do {
             if (this.item.hasOptionalOrRepeated()) {
-                method.setBody(this.generateBodyWithComplexCondition(klass));
+                method.setBody(this.generateBodyWithComplexCondition(klass, context));
                 break;
             }
             final List<Pair<Integer, Integer>> holes = this.getNumbersOfUntypedHoles();
@@ -196,11 +196,17 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
      *  Such a condition, for example, can be if a descriptor contains optional or repeating
      *  child descriptors.
      * @param klass The class to which the {@code match} method will be added
+     * @param context Generation context
      * @return Body content as a string
      */
-    private String generateBodyWithComplexCondition(final Klass klass) {
-        final List<String> code = new ArrayList<>(2);
-        code.add("final boolean matches = false; // stub");
+    private String generateBodyWithComplexCondition(final Klass klass,
+        final LeftSideGenerationContext context) {
+        context.addImport(klass, "java.util.Deque");
+        context.addImport(klass, "java.util.LinkedList");
+        final List<String> code = new ArrayList<>(8);
+        code.add("final boolean matches = false;");
+        code.add("final Deque<Node> queue = new LinkedList<>(node.getChildrenList());");
+        code.add("final int size = queue.size();");
         if (this.item.getData() instanceof UntypedHole) {
             code.addAll(
                 Arrays.asList(

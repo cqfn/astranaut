@@ -244,6 +244,9 @@ public final class Generate implements Action {
             unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Extracted");
             unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Matcher");
             unit.addImport("org.cqfn.astranaut.core.base.Node");
+            for (final String name : context.getImports(klass)) {
+                unit.addImport(name);
+            }
             Generate.writeFile(new File(folder, unit.getFileName()), unit.generateJavaCode());
         }
         return matchers;

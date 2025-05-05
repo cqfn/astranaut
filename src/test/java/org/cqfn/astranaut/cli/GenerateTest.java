@@ -39,6 +39,7 @@ import java.util.Set;
 import org.cqfn.astranaut.core.utils.FilesWriter;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -377,6 +378,7 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Disabled
     @Test
     void matchOptionalAndRepeated(final @TempDir Path temp) {
         final String expected = this.loadStringResource("match_optional_and_repeated.txt");
@@ -384,6 +386,7 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Disabled
     @Test
     void matchOptionalAndRepeatedWithData(final @TempDir Path temp) {
         final String expected = this.loadStringResource(

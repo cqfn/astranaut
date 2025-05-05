@@ -23,8 +23,12 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * All that is needed to generate a set of matchers from a set of rules.
@@ -42,11 +46,17 @@ public final class LeftSideGenerationContext {
     private final NumberedLabelGenerator labels;
 
     /**
+     * List of additional imported libraries for each generated class.
+     */
+    private final Map<Klass, Set<String>> imports;
+
+    /**
      * Constructor.
      */
     public LeftSideGenerationContext() {
         this.matchers = new TreeMap<>();
         this.labels = new NumberedLabelGenerator("Matcher");
+        this.imports = new HashMap<>();
     }
 
     /**
@@ -63,5 +73,24 @@ public final class LeftSideGenerationContext {
      */
     public String generateClassName() {
         return this.labels.getLabel();
+    }
+
+    /**
+     * Adds the imported library to the class.
+     * @param klass Class
+     * @param name Full library name (with package)
+     */
+    public void addImport(final Klass klass, final String name) {
+        final Set<String> set = this.imports.computeIfAbsent(klass, x -> new TreeSet<>());
+        set.add(name);
+    }
+
+    /**
+     * Returns set of imported names for generated class.
+     * @param klass Class
+     * @return Set of names (can be empty)
+     */
+    public Set<String> getImports(final Klass klass) {
+        return this.imports.getOrDefault(klass, Collections.emptySet());
     }
 }
