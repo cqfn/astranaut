@@ -338,7 +338,9 @@ public final class CommonFactory extends DefaultFactory {
     private static Map<String, Type> createMapOfTypes() {
         return new MapUtils<String, Type>()
             .put(FirstNode.NAME, FirstNode.TYPE)
-            .put(SecondNode.NAME, SecondNode.TYPE).put(ThirdNode.NAME, ThirdNode.TYPE).make();
+            .put(SecondNode.NAME, SecondNode.TYPE)
+            .put(ThirdNode.NAME, ThirdNode.TYPE)
+            .make();
     }
 }
 
@@ -1151,7 +1153,8 @@ public final class Converter0 implements Converter {
             final List<Node> children =
                 new ListUtils<Node>()
                 .add(Converter0.buildSecond(factory, extracted))
-                .add(Converter0.buildThird(factory, extracted)).make();
+                .add(Converter0.buildThird(factory, extracted))
+                .make();
             if (!builder.setChildrenList(children)) {
                 break;
             }

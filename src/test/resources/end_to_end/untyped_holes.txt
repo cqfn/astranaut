@@ -552,7 +552,8 @@ public final class CommonFactory extends DefaultFactory {
         return new MapUtils<String, Type>()
             .put(Assignment.NAME, Assignment.TYPE)
             .put(Expression.NAME, Expression.TYPE)
-            .put(IntegerLiteral.NAME, IntegerLiteral.TYPE).make();
+            .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
+            .make();
     }
 }
 

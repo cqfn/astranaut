@@ -505,7 +505,9 @@ public final class CommonFactory extends DefaultFactory {
             .put(Ninth.NAME, Ninth.TYPE)
             .put(Second.NAME, Second.TYPE)
             .put(Seventh.NAME, Seventh.TYPE)
-            .put(Sixth.NAME, Sixth.TYPE).put(Third.NAME, Third.TYPE).make();
+            .put(Sixth.NAME, Sixth.TYPE)
+            .put(Third.NAME, Third.TYPE)
+            .make();
     }
 }
 
@@ -2654,7 +2656,9 @@ public final class Converter0 implements Converter {
             final List<Node> children =
                 new ListUtils<Node>()
                 .add(extracted.getNodes(1, 2))
-                .add(Converter0.buildSecond(factory)).add(extracted.getNodes(3, 4, 5)).make();
+                .add(Converter0.buildSecond(factory))
+                .add(extracted.getNodes(3, 4, 5))
+                .make();
             if (!builder.setChildrenList(children)) {
                 break;
             }

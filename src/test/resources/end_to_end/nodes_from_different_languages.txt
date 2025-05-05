@@ -135,7 +135,8 @@ public final class CommonFactory extends DefaultFactory {
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(Return.NAME, Return.TYPE)
             .put(StrangeButValidStatement.NAME, StrangeButValidStatement.TYPE)
-            .put(StringLiteral.NAME, StringLiteral.TYPE).make();
+            .put(StringLiteral.NAME, StringLiteral.TYPE)
+            .make();
     }
 }
 
@@ -1130,7 +1131,8 @@ public final class JavaFactory extends DefaultFactory {
             .put(Return.NAME, Return.TYPE)
             .put(StrangeButValidStatement.NAME, StrangeButValidStatement.TYPE)
             .put(StringLiteral.NAME, StringLiteral.TYPE)
-            .put(Synchronized.NAME, Synchronized.TYPE).make();
+            .put(Synchronized.NAME, Synchronized.TYPE)
+            .make();
     }
 }
 

@@ -337,7 +337,8 @@ public final class CommonFactory extends DefaultFactory {
             .put(BooleanLiteral.NAME, BooleanLiteral.TYPE)
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(JsonLiteral.NAME, JsonLiteral.TYPE)
-            .put(StringLiteral.NAME, StringLiteral.TYPE).make();
+            .put(StringLiteral.NAME, StringLiteral.TYPE)
+            .make();
     }
 }
 

@@ -726,7 +726,9 @@ public final class CommonFactory extends DefaultFactory {
             .put(CapitalLetter.NAME, CapitalLetter.TYPE)
             .put(Digit.NAME, Digit.TYPE)
             .put(Identifier.NAME, Identifier.TYPE)
-            .put(SmallLetter.NAME, SmallLetter.TYPE).put(Underscore.NAME, Underscore.TYPE).make();
+            .put(SmallLetter.NAME, SmallLetter.TYPE)
+            .put(Underscore.NAME, Underscore.TYPE)
+            .make();
     }
 }
 

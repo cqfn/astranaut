@@ -134,7 +134,8 @@ public final class CommonFactory extends DefaultFactory {
             .put(Identifier.NAME, Identifier.TYPE)
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(StringLiteral.NAME, StringLiteral.TYPE)
-            .put(VariableDeclaration.NAME, VariableDeclaration.TYPE).make();
+            .put(VariableDeclaration.NAME, VariableDeclaration.TYPE)
+            .make();
     }
 }
 

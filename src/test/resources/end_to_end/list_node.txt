@@ -131,7 +131,9 @@ public final class CommonFactory extends DefaultFactory {
      */
     private static Map<String, Type> createMapOfTypes() {
         return new MapUtils<String, Type>()
-            .put(Entities.NAME, Entities.TYPE).put(Entity.NAME, Entity.TYPE).make();
+            .put(Entities.NAME, Entities.TYPE)
+            .put(Entity.NAME, Entity.TYPE)
+            .make();
     }
 }
 

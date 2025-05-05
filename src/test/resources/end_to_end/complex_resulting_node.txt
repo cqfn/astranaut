@@ -435,7 +435,8 @@ public final class CommonFactory extends DefaultFactory {
             .put(FirstFakeNode.NAME, FirstFakeNode.TYPE)
             .put(FourthFakeNode.NAME, FourthFakeNode.TYPE)
             .put(SecondFakeNode.NAME, SecondFakeNode.TYPE)
-            .put(ThirdFakeNode.NAME, ThirdFakeNode.TYPE).make();
+            .put(ThirdFakeNode.NAME, ThirdFakeNode.TYPE)
+            .make();
     }
 }
 
@@ -694,7 +695,8 @@ public final class ComplexFakeNode implements Node {
             node.fragment = this.fragment;
             node.children =
                 new ListUtils<Node>()
-                .add(this.first, this.second, this.third, this.fourth, this.fifth).make();
+                .add(this.first, this.second, this.third, this.fourth, this.fifth)
+                .make();
             return node;
         }
     }
@@ -1740,7 +1742,9 @@ public final class Converter0 implements Converter {
                 .add(Converter0.buildSecond(factory))
                 .add(Converter0.buildThird(factory, extracted))
                 .add(Converter0.buildFourth(factory))
-                .add(Converter0.buildFifth(factory)).add(Converter0.buildSixth(factory)).make();
+                .add(Converter0.buildFifth(factory))
+                .add(Converter0.buildSixth(factory))
+                .make();
             if (!builder.setChildrenList(children)) {
                 break;
             }
