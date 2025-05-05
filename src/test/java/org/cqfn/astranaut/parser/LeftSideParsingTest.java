@@ -653,7 +653,7 @@ class LeftSideParsingTest {
 
     @Test
     void badHoleInSymbolicDescriptor() {
-        final LeftSideParser parser = this.createParser("'x'<?>");
+        final LeftSideParser parser = this.createParser("'x'<'test'>");
         Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
     }
 

@@ -321,10 +321,10 @@ public final class LeftSideParser {
      */
     private LeftSideItem parseOptionalItem() throws ParsingException {
         final Token first = this.scanner.getToken();
-        if (!(first instanceof Identifier)) {
+        if (!(first instanceof Identifier) && !(first instanceof  SymbolicToken)) {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
-                "An identifier after '[' is expected. Only patterns or typed holes can be optional"
+                "An identifier or symbol is expected after '['. Only patterns or typed holes can be optional"
             );
         }
         final LeftSideParser parser = new LeftSideParser(this.scanner, 0, this.holes);
@@ -350,10 +350,10 @@ public final class LeftSideParser {
      */
     private LeftSideItem parseRepeatedItem() throws ParsingException {
         final Token first = this.scanner.getToken();
-        if (!(first instanceof Identifier)) {
+        if (!(first instanceof Identifier) && !(first instanceof  SymbolicToken)) {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
-                "An identifier after '{' is expected. Only patterns or typed holes can be repeated"
+                "An identifier or symbol is expected after '{'. Only patterns or typed holes can be repeated"
             );
         }
         final LeftSideParser parser = new LeftSideParser(this.scanner, 0, this.holes);

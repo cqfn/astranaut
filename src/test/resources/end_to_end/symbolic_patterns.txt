@@ -1,0 +1,830 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree;
+
+import java.util.Locale;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.DefaultFactory;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Transformer;
+import org.cqfn.astranaut.core.utils.MapUtils;
+
+/**
+ * Provider that aggregates all factories and transformers.
+ * @since 1.0.0
+ */
+public final class Provider implements org.cqfn.astranaut.core.base.Provider {
+    /**
+     * The provider instance.
+     */
+    public static final Provider INSTANCE = new Provider();
+
+    /**
+     * Collection of factories supported by this provider.
+     */
+    private static final Map<String, Factory> FACTORIES =
+        new MapUtils<String, Factory>()
+            .put("common", org.cqfn.uast.tree.common.nodes.CommonFactory.INSTANCE)
+            .make();
+
+    /**
+     * Collection of transformers supported by this provider.
+     */
+    private static final Map<String, Transformer> TRANSFORMERS =
+        new MapUtils<String, Transformer>()
+            .put("common", org.cqfn.uast.tree.common.rules.CommonTransformer.INSTANCE)
+            .make();
+
+    /**
+     * Default transformer that doesn't transform anything.
+     */
+    private static final Transformer DEF_TRANS = node -> node;
+
+    /**
+     * Constructor.
+     */
+    private Provider() {
+    }
+
+    @Override
+    public Factory getFactory(final String language) {
+        final String lowercase = language.toLowerCase(Locale.ENGLISH);
+        return Provider.FACTORIES.getOrDefault(lowercase, DefaultFactory.EMPTY);
+    }
+
+    @Override
+    public Transformer getTransformer(final String language) {
+        final String lowercase = language.toLowerCase(Locale.ENGLISH);
+        return Provider.TRANSFORMERS.getOrDefault(lowercase, Provider.DEF_TRANS);
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern ''a'' and extracts it if matched.
+ * @since 1.0.0
+ */
+public final class Matcher0 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher0();
+
+    /**
+     * Constructor.
+     */
+    private Matcher0() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        final String data = node.getData();
+        return node.belongsToGroup("Char") && data.length() == 1 && data.charAt(0) == 'a';
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern ''b''.
+ * @since 1.0.0
+ */
+public final class Matcher1 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher1();
+
+    /**
+     * Constructor.
+     */
+    private Matcher1() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        return node.belongsToGroup("'b'") && node.getChildCount() == 0;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern ''c''.
+ * @since 1.0.0
+ */
+public final class Matcher2 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher2();
+
+    /**
+     * Constructor.
+     */
+    private Matcher2() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        return node.belongsToGroup("'c'") && node.getChildCount() == 0;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * This package contains matchers that map subtrees to some pattern and extract nodes and data
+ *  when matched.
+ * @since 1.0.0
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Map;
+import org.cqfn.astranaut.core.base.DefaultFactory;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.astranaut.core.utils.MapUtils;
+
+/**
+ * Factory that creates nodes for the 'Common' language.
+ * @since 1.0.0
+ */
+public final class CommonFactory extends DefaultFactory {
+    /**
+     * The factory instance.
+     */
+    public static final Factory INSTANCE = new CommonFactory();
+
+    /**
+     * Default properties of nodes describing the language.
+     */
+    public static final Map<String, String> PROPERTIES =
+        new MapUtils<String, String>().put("language", "common").put("color", "green").make();
+
+    /**
+     * Constructor.
+     */
+    private CommonFactory() {
+        super(CommonFactory.createMapOfTypes());
+    }
+
+    /**
+     * Returns collection of types supported by this factory.
+     * @return All types supported by this factory, by name
+     */
+    private static Map<String, Type> createMapOfTypes() {
+        return new MapUtils<String, Type>().put(FakeNode.NAME, FakeNode.TYPE).make();
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.Type;
+
+/**
+ * Node of the 'FakeNode' type.
+ * @since 1.0.0
+ */
+public final class FakeNode implements Node {
+    /**
+     * Name of the type.
+     */
+    public static final String NAME = "FakeNode";
+
+    /**
+     * Type of the node.
+     */
+    public static final Type TYPE = new FakeNodeType();
+
+    /**
+     * Fragment of source code that is associated with the node.
+     */
+    private Fragment fragment;
+
+    /**
+     * Value of the node.
+     */
+    private String data;
+
+    /**
+     * Constructor.
+     */
+    private FakeNode() {
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this.fragment;
+    }
+
+    @Override
+    public Type getType() {
+        return FakeNode.TYPE;
+    }
+
+    @Override
+    public String getData() {
+        return this.data;
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public Node getChild(final int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    /**
+     * Returns the value of the node in native form.
+     * @return Value of the node
+     */
+    public String getValue() {
+        return this.data;
+    }
+
+    @Override
+    public List<Node> getChildrenList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Type implementation describing 'FakeNode' nodes.
+     * @since 1.0.0
+     */
+    private static final class FakeNodeType implements Type {
+        /**
+         * Node hierarchy.
+         */
+        private static final List<String> HIERARCHY = Collections.singletonList(FakeNode.NAME);
+
+        @Override
+        public String getName() {
+            return FakeNode.NAME;
+        }
+
+        @Override
+        public List<String> getHierarchy() {
+            return FakeNodeType.HIERARCHY;
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return CommonFactory.PROPERTIES;
+        }
+
+        @Override
+        public Builder createBuilder() {
+            return new FakeNode.Constructor();
+        }
+    }
+
+    /**
+     * Constructor (builder) that creates nodes of the 'FakeNode' type.
+     * @since 1.0.0
+     */
+    public static final class Constructor implements Builder {
+        /**
+         * Fragment of source code that is associated with the node.
+         */
+        private Fragment fragment;
+
+        /**
+         * Value of the node to be created.
+         */
+        private String data;
+
+        /**
+         * Constructor.
+         */
+        public Constructor() {
+            this.fragment = EmptyFragment.INSTANCE;
+            this.data = "";
+        }
+
+        @Override
+        public void setFragment(final Fragment object) {
+            this.fragment = object;
+        }
+
+        /**
+         * Sets the value of the node to be created.
+         * @param value Value of the node
+         */
+        public void setValue(final String value) {
+            this.data = value;
+        }
+
+        @Override
+        public boolean setData(final String value) {
+            this.data = value;
+            return true;
+        }
+
+        @Override
+        public boolean setChildrenList(final List<Node> list) {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Node createNode() {
+            final FakeNode node = new FakeNode();
+            node.fragment = this.fragment;
+            node.data = this.data;
+            return node;
+        }
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * This package contains common ('green') nodes.
+ * @since 1.0.0
+ */
+package org.cqfn.uast.tree.common.nodes;
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.rules;
+
+import java.util.LinkedList;
+import java.util.List;
+import org.cqfn.astranaut.core.algorithms.conversion.Converter;
+import org.cqfn.astranaut.core.algorithms.conversion.DefaultTransformer;
+import org.cqfn.astranaut.core.base.Transformer;
+import org.cqfn.uast.tree.common.nodes.CommonFactory;
+
+/**
+ * Transformer that performs transformations for common cases.
+ * @since 1.0.0
+ */
+public final class CommonTransformer extends DefaultTransformer {
+    /**
+     * The transformer instance.
+     */
+    public static final Transformer INSTANCE = new CommonTransformer();
+
+    /**
+     * Constructor.
+     */
+    private CommonTransformer() {
+        super(CommonTransformer.collectConverters(), CommonFactory.INSTANCE);
+    }
+
+    /**
+     * Collects converter objects for common cases.
+     * @return List of converter objects
+     */
+    private static List<Converter> collectConverters() {
+        final List<Converter> list = new LinkedList<>();
+        Converter.collectConverters("org.cqfn.uast.tree.common.rules", list);
+        return list;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.rules;
+
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import org.cqfn.astranaut.core.algorithms.conversion.ConversionResult;
+import org.cqfn.astranaut.core.algorithms.conversion.Converter;
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.DummyNode;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.uast.tree.common.matchers.Matcher0;
+import org.cqfn.uast.tree.common.matchers.Matcher1;
+import org.cqfn.uast.tree.common.matchers.Matcher2;
+
+/**
+ * Converter implementing the rule ''a', {'b'}, ['c'] -> FakeNode'.
+ * @since 1.0.0
+ */
+public final class Converter0 implements Converter {
+    /**
+     * The instance.
+     */
+    public static final Converter INSTANCE = new Converter0();
+
+    /**
+     * Constructor.
+     */
+    private Converter0() {
+    }
+
+    @Override
+    public Optional<ConversionResult> convert(final List<Node> list, final int index,
+        final Factory factory) {
+        Optional<ConversionResult> result = Optional.empty();
+        do {
+            if (index + 1 > list.size()) {
+                break;
+            }
+            final Extracted extracted = new Extracted();
+            final Deque<Node> queue = new LinkedList<>(list.subList(index, list.size()));
+            final int size = queue.size();
+            final boolean matched = Converter0.checkFirst(queue, extracted);
+            if (!matched) {
+                break;
+            }
+            Converter0.checkSecond(queue, extracted);
+            Converter0.checkThird(queue, extracted);
+            final int consumed = size - queue.size();
+            final Fragment fragment = Fragment.fromNodes(list.subList(index, index + consumed));
+            final Node node = Converter0.buildRoot(factory, fragment);
+            if (node == DummyNode.INSTANCE) {
+                break;
+            }
+            result = Optional.of(new ConversionResult(node, consumed));
+        } while (false);
+        return result;
+    }
+
+    @Override
+    public int getMinConsumed() {
+        return 1;
+    }
+
+    /**
+     * Matches a node with the pattern ''a''.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the next node is matched to the pattern
+     */
+    private static boolean checkFirst(final Deque<Node> queue, final Extracted extracted) {
+        final Node node = queue.poll();
+        return Matcher0.INSTANCE.match(node, extracted);
+    }
+
+    /**
+     * Matches a node with the pattern '{'b'}'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     */
+    private static void checkSecond(final Deque<Node> queue, final Extracted extracted) {
+        while (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            final boolean matched = Matcher1.INSTANCE.match(node, extracted);
+            if (!matched) {
+                queue.addFirst(node);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Matches a node with the pattern '['c']'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     */
+    private static void checkThird(final Deque<Node> queue, final Extracted extracted) {
+        if (queue.isEmpty()) {
+            return;
+        }
+        final Node node = queue.poll();
+        final boolean matched = Matcher2.INSTANCE.match(node, extracted);
+        if (!matched) {
+            queue.addFirst(node);
+        }
+    }
+
+    /**
+     * Constructs a node based on the descriptor 'FakeNode'.
+     * @param factory Factory for creating nodes
+     * @param fragment Code fragment that is covered by the node being created
+     * @return Created node
+     */
+    private static Node buildRoot(final Factory factory, final Fragment fragment) {
+        Node result = DummyNode.INSTANCE;
+        final Builder builder = factory.createBuilder("FakeNode");
+        do {
+            if (!builder.isValid()) {
+                break;
+            }
+            builder.setFragment(fragment);
+            result = builder.createNode();
+        } while (false);
+        return result;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * This package contains transformation rules for common ('green') nodes.
+ * @since 1.0.0
+ */
+package org.cqfn.uast.tree.common.rules;
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * Nodes describing syntax trees, and algorithms to process them, generated from the description
+ *  in the DSL language.
+ * @since 1.0.0
+ */
+package org.cqfn.uast.tree;
+
