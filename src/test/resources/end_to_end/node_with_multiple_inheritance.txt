@@ -430,10 +430,18 @@ public final class CommonFactory extends DefaultFactory {
         new MapUtils<String, String>().put("language", "common").put("color", "green").make();
 
     /**
-     * Collection of types supported by this factory.
+     * Constructor.
      */
-    private static final Map<String, Type> TYPES =
-        new MapUtils<String, Type>()
+    private CommonFactory() {
+        super(CommonFactory.createMapOfTypes());
+    }
+
+    /**
+     * Returns collection of types supported by this factory.
+     * @return All types supported by this factory, by name
+     */
+    private static Map<String, Type> createMapOfTypes() {
+        return new MapUtils<String, Type>()
             .put(Addition.NAME, Addition.TYPE)
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(PostfixDecrement.NAME, PostfixDecrement.TYPE)
@@ -441,14 +449,7 @@ public final class CommonFactory extends DefaultFactory {
             .put(PrefixDecrement.NAME, PrefixDecrement.TYPE)
             .put(PrefixIncrement.NAME, PrefixIncrement.TYPE)
             .put(StringLiteral.NAME, StringLiteral.TYPE)
-            .put(Subtraction.NAME, Subtraction.TYPE)
-            .make();
-
-    /**
-     * Constructor.
-     */
-    private CommonFactory() {
-        super(CommonFactory.TYPES);
+            .put(Subtraction.NAME, Subtraction.TYPE).make();
     }
 }
 

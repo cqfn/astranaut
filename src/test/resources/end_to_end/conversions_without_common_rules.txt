@@ -129,16 +129,18 @@ public final class AlphaFactory extends DefaultFactory {
         new MapUtils<String, String>().put("language", "alpha").put("color", "red").make();
 
     /**
-     * Collection of types supported by this factory.
-     */
-    private static final Map<String, Type> TYPES =
-        new MapUtils<String, Type>().put(NodeAlpha.NAME, NodeAlpha.TYPE).make();
-
-    /**
      * Constructor.
      */
     private AlphaFactory() {
-        super(AlphaFactory.TYPES);
+        super(AlphaFactory.createMapOfTypes());
+    }
+
+    /**
+     * Returns collection of types supported by this factory.
+     * @return All types supported by this factory, by name
+     */
+    private static Map<String, Type> createMapOfTypes() {
+        return new MapUtils<String, Type>().put(NodeAlpha.NAME, NodeAlpha.TYPE).make();
     }
 }
 
@@ -578,16 +580,18 @@ public final class BetaFactory extends DefaultFactory {
         new MapUtils<String, String>().put("language", "beta").put("color", "red").make();
 
     /**
-     * Collection of types supported by this factory.
-     */
-    private static final Map<String, Type> TYPES =
-        new MapUtils<String, Type>().put(NodeBeta.NAME, NodeBeta.TYPE).make();
-
-    /**
      * Constructor.
      */
     private BetaFactory() {
-        super(BetaFactory.TYPES);
+        super(BetaFactory.createMapOfTypes());
+    }
+
+    /**
+     * Returns collection of types supported by this factory.
+     * @return All types supported by this factory, by name
+     */
+    private static Map<String, Type> createMapOfTypes() {
+        return new MapUtils<String, Type>().put(NodeBeta.NAME, NodeBeta.TYPE).make();
     }
 }
 

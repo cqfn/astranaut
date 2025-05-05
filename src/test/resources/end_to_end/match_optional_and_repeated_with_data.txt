@@ -216,16 +216,18 @@ public final class CommonFactory extends DefaultFactory {
         new MapUtils<String, String>().put("language", "common").put("color", "green").make();
 
     /**
-     * Collection of types supported by this factory.
-     */
-    private static final Map<String, Type> TYPES =
-        new MapUtils<String, Type>().put(FakeNode.NAME, FakeNode.TYPE).make();
-
-    /**
      * Constructor.
      */
     private CommonFactory() {
-        super(CommonFactory.TYPES);
+        super(CommonFactory.createMapOfTypes());
+    }
+
+    /**
+     * Returns collection of types supported by this factory.
+     * @return All types supported by this factory, by name
+     */
+    private static Map<String, Type> createMapOfTypes() {
+        return new MapUtils<String, Type>().put(FakeNode.NAME, FakeNode.TYPE).make();
     }
 }
 
