@@ -321,14 +321,20 @@ public final class LeftSideParser {
      */
     private LeftSideItem parseOptionalItem() throws ParsingException {
         final Token first = this.scanner.getToken();
-        if (!(first instanceof Identifier) && !(first instanceof  SymbolicToken)) {
+        final LeftSideParser parser;
+        final LeftSideItem item;
+        if (first instanceof Identifier) {
+            parser = new LeftSideParser(this.scanner, 0, this.holes);
+            item = parser.parsePatternOrTypedHole(first.toString());
+        } else if (first instanceof SymbolicToken) {
+            parser = new LeftSideParser(this.scanner, 0, this.holes);
+            item = parser.parseSymbolDescriptor((SymbolicToken) first);
+        } else {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
                 "An identifier or symbol is expected after '['. Only patterns or typed holes can be optional"
             );
         }
-        final LeftSideParser parser = new LeftSideParser(this.scanner, 0, this.holes);
-        final LeftSideItem item = parser.parsePatternOrTypedHole(first.toString());
         item.setMatchingMode(PatternMatchingMode.OPTIONAL);
         Token next = parser.getLastToken();
         if (next == null) {
@@ -350,14 +356,20 @@ public final class LeftSideParser {
      */
     private LeftSideItem parseRepeatedItem() throws ParsingException {
         final Token first = this.scanner.getToken();
-        if (!(first instanceof Identifier) && !(first instanceof  SymbolicToken)) {
+        final LeftSideParser parser;
+        final LeftSideItem item;
+        if (first instanceof Identifier) {
+            parser = new LeftSideParser(this.scanner, 0, this.holes);
+            item = parser.parsePatternOrTypedHole(first.toString());
+        } else if (first instanceof SymbolicToken) {
+            parser = new LeftSideParser(this.scanner, 0, this.holes);
+            item = parser.parseSymbolDescriptor((SymbolicToken) first);
+        } else {
             throw new CommonParsingException(
                 this.scanner.getLocation(),
                 "An identifier or symbol is expected after '{'. Only patterns or typed holes can be repeated"
             );
         }
-        final LeftSideParser parser = new LeftSideParser(this.scanner, 0, this.holes);
-        final LeftSideItem item = parser.parsePatternOrTypedHole(first.toString());
         item.setMatchingMode(PatternMatchingMode.REPEATED);
         Token next = parser.getLastToken();
         if (next == null) {
