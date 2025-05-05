@@ -24,57 +24,48 @@
 package org.cqfn.astranaut.parser;
 
 /**
- * Token representing a string in single or double quotes.
+ * Token representing a single character in single quotes.
  * @since 1.0.0
  */
-public final class StringToken extends CharSequenceToken {
+public final class SymbolToken extends SymbolicToken {
     /**
-     * Quotation mark that opens and closes a string.
+     * The symbol itself.
      */
-    private final char quote;
-
-    /**
-     * Value of the token.
-     */
-    private final String value;
+    private final char symbol;
 
     /**
      * Constructor.
-     * @param quote Quotation mark that opens and closes a string
-     * @param value Value of the token
+     * @param symbol The symbol itself
      */
-    public StringToken(final char quote, final String value) {
-        this.quote = StringToken.checkQuote(quote);
-        this.value = value;
+    public SymbolToken(final char symbol) {
+        this.symbol = symbol;
     }
 
     /**
-     * Returns value of the token.
-     * @return String value of the token
+     * Returns the symbol stored in the token.
+     * @return Symbol
      */
-    public String getValue() {
-        return this.value;
+    public char getSymbol() {
+        return this.symbol;
+    }
+
+    @Override
+    public char getFirstSymbol() {
+        return this.symbol;
+    }
+
+    @Override
+    public char getLastSymbol() {
+        return this.symbol;
     }
 
     @Override
     public String getValueAsString() {
-        return this.value;
+        return String.valueOf(this.symbol);
     }
 
     @Override
     public String toString() {
-        return this.toQuotedString(this.quote);
-    }
-
-    /**
-     * Checks the “quote” parameter to see if it is valid.
-     * @param quote Quote parameter
-     * @return The same quote
-     */
-    private static char checkQuote(final char quote) {
-        if (quote != '\'' && quote != '\"') {
-            throw new IllegalArgumentException();
-        }
-        return quote;
+        return this.toQuotedString('\'');
     }
 }

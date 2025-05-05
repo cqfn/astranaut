@@ -186,9 +186,32 @@ public final class Scanner {
      * Parses a sequence of characters as a string literal.
      * @param quote Quotation mark that opens a string
      * @return A token
-     * @throws ParsingException If the string literal could not be parsed
+     * @throws ParsingException If the string literal is not properly closed or contains an invalid
+     *  escape sequence.
      */
     private Token parseString(final char quote) throws ParsingException {
+        final String string = this.readString(quote);
+        final Token token;
+        if (quote == '\'' && string.length() == 1) {
+            token = new SymbolToken(string.charAt(0));
+        } else if (quote == '\'' && string.length() == 4
+            && string.charAt(1) == '.' && string.charAt(2) == '.') {
+            token = new SymbolRangeToken(string.charAt(0), string.charAt(3));
+        } else {
+            token = new StringToken(quote, string);
+        }
+        return token;
+    }
+
+    /**
+     * Reads and parses a quoted string literal, handling escape sequences.
+     * @param quote The quotation mark character that started the string (either {@code '}
+     *  or {@code "})
+     * @return The unescaped string content between the quotes
+     * @throws ParsingException If the string literal is not properly closed or contains an invalid
+     *  escape sequence.
+     */
+    private String readString(final char quote) throws ParsingException {
         char chr = this.nextChar();
         final StringBuilder builder = new StringBuilder();
         while (chr != quote) {
@@ -224,7 +247,7 @@ public final class Scanner {
             chr = this.nextChar();
         }
         this.nextChar();
-        return new StringToken(quote, builder.toString());
+        return builder.toString();
     }
 
     /**

@@ -413,6 +413,20 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void symbolicPatterns(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("symbolic_patterns.txt");
+        final String actual = this.run("symbolic_patterns.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void parserForIdentifiers(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("parser_for_identifiers.txt");
+        final String actual = this.run("parser_for_identifiers.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.

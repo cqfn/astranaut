@@ -39,7 +39,7 @@ import org.cqfn.astranaut.exceptions.BaseException;
  * @since 1.0.0
  */
 @SuppressWarnings("PMD.CloseResource")
-public class ProgramParser {
+public final class ProgramParser {
     /**
      * Current language.
      */

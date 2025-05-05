@@ -120,21 +120,22 @@ public final class CommonFactory extends DefaultFactory {
         new MapUtils<String, String>().put("language", "common").put("color", "green").make();
 
     /**
-     * Collection of types supported by this factory.
-     */
-    private static final Map<String, Type> TYPES =
-        new MapUtils<String, Type>()
-            .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
-            .put(Return.NAME, Return.TYPE)
-            .put(StrangeButValidStatement.NAME, StrangeButValidStatement.TYPE)
-            .put(StringLiteral.NAME, StringLiteral.TYPE)
-            .make();
-
-    /**
      * Constructor.
      */
     private CommonFactory() {
-        super(CommonFactory.TYPES);
+        super(CommonFactory.createMapOfTypes());
+    }
+
+    /**
+     * Returns collection of types supported by this factory.
+     * @return All types supported by this factory, by name
+     */
+    private static Map<String, Type> createMapOfTypes() {
+        return new MapUtils<String, Type>()
+            .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
+            .put(Return.NAME, Return.TYPE)
+            .put(StrangeButValidStatement.NAME, StrangeButValidStatement.TYPE)
+            .put(StringLiteral.NAME, StringLiteral.TYPE).make();
     }
 }
 
@@ -1113,22 +1114,23 @@ public final class JavaFactory extends DefaultFactory {
         new MapUtils<String, String>().put("language", "java").put("color", "red").make();
 
     /**
-     * Collection of types supported by this factory.
+     * Constructor.
      */
-    private static final Map<String, Type> TYPES =
-        new MapUtils<String, Type>()
+    private JavaFactory() {
+        super(JavaFactory.createMapOfTypes());
+    }
+
+    /**
+     * Returns collection of types supported by this factory.
+     * @return All types supported by this factory, by name
+     */
+    private static Map<String, Type> createMapOfTypes() {
+        return new MapUtils<String, Type>()
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(Return.NAME, Return.TYPE)
             .put(StrangeButValidStatement.NAME, StrangeButValidStatement.TYPE)
             .put(StringLiteral.NAME, StringLiteral.TYPE)
-            .put(Synchronized.NAME, Synchronized.TYPE)
-            .make();
-
-    /**
-     * Constructor.
-     */
-    private JavaFactory() {
-        super(JavaFactory.TYPES);
+            .put(Synchronized.NAME, Synchronized.TYPE).make();
     }
 }
 

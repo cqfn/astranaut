@@ -33,7 +33,7 @@ import org.cqfn.astranaut.dsl.TransformationDescriptor;
  * Parser that parses transformation descriptors.
  * @since 1.0.0
  */
-public class TransformationDescriptorParser {
+public final class TransformationDescriptorParser {
     /**
      * Name of the programming language whose entity this transformation descriptor covers.
      */

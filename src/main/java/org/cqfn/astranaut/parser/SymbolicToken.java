@@ -24,57 +24,35 @@
 package org.cqfn.astranaut.parser;
 
 /**
- * Token representing a string in single or double quotes.
+ * A token containing a symbol or range of symbols.
  * @since 1.0.0
  */
-public final class StringToken extends CharSequenceToken {
+public abstract class SymbolicToken extends CharSequenceToken {
     /**
-     * Quotation mark that opens and closes a string.
+     * Returns the first character in the range.
+     * @return Symbol
      */
-    private final char quote;
+    public abstract char getFirstSymbol();
 
     /**
-     * Value of the token.
+     * Returns the first symbol as a Java-compatible character literal.
+     * @return A quoted and escaped string representing the first symbol, suitable for Java code.
      */
-    private final String value;
-
-    /**
-     * Constructor.
-     * @param quote Quotation mark that opens and closes a string
-     * @param value Value of the token
-     */
-    public StringToken(final char quote, final String value) {
-        this.quote = StringToken.checkQuote(quote);
-        this.value = value;
+    public String getFirstSymbolAsQuotedString() {
+        return CharSequenceToken.toQuotedString('\'', String.valueOf(this.getFirstSymbol()));
     }
 
     /**
-     * Returns value of the token.
-     * @return String value of the token
+     * Returns the last character in the range.
+     * @return Symbol
      */
-    public String getValue() {
-        return this.value;
-    }
-
-    @Override
-    public String getValueAsString() {
-        return this.value;
-    }
-
-    @Override
-    public String toString() {
-        return this.toQuotedString(this.quote);
-    }
+    public abstract char getLastSymbol();
 
     /**
-     * Checks the “quote” parameter to see if it is valid.
-     * @param quote Quote parameter
-     * @return The same quote
+     * Returns the last symbol as a Java-compatible character literal.
+     * @return A quoted and escaped string representing the last symbol, suitable for Java code.
      */
-    private static char checkQuote(final char quote) {
-        if (quote != '\'' && quote != '\"') {
-            throw new IllegalArgumentException();
-        }
-        return quote;
+    public String getLastSymbolAsQuotedString() {
+        return CharSequenceToken.toQuotedString('\'', String.valueOf(this.getLastSymbol()));
     }
 }

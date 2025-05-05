@@ -21,46 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cqfn.astranaut.dsl;
 
-import org.cqfn.astranaut.parser.CharSequenceToken;
+SmallLetter <- 'char';
+'a..z'<#1> -> SmallLetter<#1>;
 
-/**
- * Entity that represents a static string.
- * @since 1.0.0
- */
-public final class StaticString implements LeftDataDescriptor, RightDataDescriptor {
-    /**
-     * Token from which this descriptor is generated.
-     */
-    private final CharSequenceToken token;
+CapitalLetter <- 'char';
+'A..Z'<#1> -> CapitalLetter<#1>;
 
-    /**
-     * Constructor to initialize the StaticString with the provided value.
-     * @param token Token from which this descriptor is generated
-     */
-    public StaticString(final CharSequenceToken token) {
-        this.token = token;
-    }
+Underscore <- 'char', "'_'";
+'_' -> Underscore;
 
-    /**
-     * Gets the value of the static string.
-     * @return The string value
-     */
-    public String getValue() {
-        return this.token.getValueAsString();
-    }
+Letter <- SmallLetter | CapitalLetter | Underscore;
 
-    @Override
-    public String toString() {
-        return this.token.toString();
-    }
+Digit <- 'int';
+'0..9'<#1> -> Digit<#1>;
 
-    /**
-     * Converts the entity into a Java-compatible string literal.
-     * @return The Java string literal representation of the token
-     */
-    public String toJavaCode() {
-        return this.token.toQuotedString('"');
-    }
-}
+LetterOrDigit <- Letter | Digit;
+
+Identifier <- 'String', '""';
+Letter<#1>, {LetterOrDigit<#1>} -> Identifier<#1>;

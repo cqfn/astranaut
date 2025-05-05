@@ -275,6 +275,41 @@ class ScannerTest {
     }
 
     @Test
+    void symbol() {
+        final String code = "'x'";
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, code);
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof SymbolToken);
+            Assertions.assertEquals('x', ((SymbolToken) token).getSymbol());
+            Assertions.assertEquals('x', ((SymbolToken) token).getFirstSymbol());
+            Assertions.assertEquals('x', ((SymbolToken) token).getLastSymbol());
+            Assertions.assertEquals(code, token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void symbolRange() {
+        final String code = "'a..z'";
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, code);
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof SymbolRangeToken);
+            Assertions.assertEquals('a', ((SymbolRangeToken) token).getFirstSymbol());
+            Assertions.assertEquals('z', ((SymbolRangeToken) token).getLastSymbol());
+            Assertions.assertEquals(code, token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
     void stringInSingleQuotes() {
         final String code = "'abc'";
         final Scanner scanner = new Scanner(ScannerTest.LOCATION, code);
@@ -355,5 +390,28 @@ class ScannerTest {
             );
         }
         Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void stringLooksLikeRangeButNotIt() {
+        String code = "'a.,b'";
+        Scanner scanner = new Scanner(ScannerTest.LOCATION, code);
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof StringToken);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        code = "'a,.b'";
+        scanner = new Scanner(ScannerTest.LOCATION, code);
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof StringToken);
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }

@@ -73,7 +73,7 @@ public final class FactoryGenerator {
         klass.setSuperclass("DefaultFactory");
         final Constructor ctor = klass.createConstructor();
         ctor.makePrivate();
-        ctor.setBody(String.format("super(%s.TYPES);", classname));
+        ctor.setBody(String.format("super(%s.createMapOfTypes());", classname));
         final Field instance = new Field(
             "Factory",
             "INSTANCE",
@@ -84,7 +84,8 @@ public final class FactoryGenerator {
         instance.makeFinal(String.format("new %s()", classname));
         klass.addField(instance);
         FactoryGenerator.createMapOfProperties(language, klass);
-        final Set<NodeDescriptor> dependencies = this.createMapOfTypes(language, klass);
+        final Set<NodeDescriptor> dependencies =
+            this.createFunctionReturnsMapOfTypes(language, klass);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
@@ -137,22 +138,24 @@ public final class FactoryGenerator {
     }
 
     /**
-     * Creates a collection that contains types supported by this factory.
+     * Creates a function that creates a map of types.
      * @param language Language for which the factory is generated
-     * @param klass The class to which to add the field
+     * @param klass The class to which to add the function
      * @return Dependencies Set of descriptors to be imported
      */
-    private Set<NodeDescriptor> createMapOfTypes(final String language, final Klass klass) {
+    private Set<NodeDescriptor> createFunctionReturnsMapOfTypes(final String language,
+        final Klass klass) {
         final Set<NodeDescriptor> dependencies = new HashSet<>();
-        final Field field = new Field(
+        final Method method = new Method(
             "Map<String, Type>",
-            "TYPES",
-            "Collection of types supported by this factory"
+            "createMapOfTypes",
+            "Returns collection of types supported by this factory"
         );
-        field.makePrivate();
-        field.makeStatic();
+        method.setReturnsDescription("All types supported by this factory, by name");
+        method.makePrivate();
+        method.makeStatic();
         final StringBuilder builder = new StringBuilder(128);
-        builder.append("new MapUtils<String, Type>()");
+        builder.append("return new MapUtils<String, Type>()");
         final Map<String, NodeDescriptor> rules;
         if (language.equals("common")) {
             rules = this.program.getNodeDescriptorsByLanguage(language);
@@ -174,9 +177,9 @@ public final class FactoryGenerator {
                 dependencies.add(rule);
             }
         }
-        builder.append(".make()");
-        field.makeFinal(builder.toString());
-        klass.addField(field);
+        builder.append(".make();");
+        method.setBody(builder.toString());
+        klass.addMethod(method);
         return dependencies;
     }
 }

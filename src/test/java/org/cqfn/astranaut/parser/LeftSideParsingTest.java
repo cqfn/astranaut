@@ -30,6 +30,7 @@ import org.cqfn.astranaut.dsl.PatternDescriptor;
 import org.cqfn.astranaut.dsl.PatternItem;
 import org.cqfn.astranaut.dsl.PatternMatchingMode;
 import org.cqfn.astranaut.dsl.StaticString;
+import org.cqfn.astranaut.dsl.SymbolDescriptor;
 import org.cqfn.astranaut.dsl.TypedHole;
 import org.cqfn.astranaut.dsl.UntypedHole;
 import org.junit.jupiter.api.Assertions;
@@ -580,6 +581,86 @@ class LeftSideParsingTest {
             oops = true;
         }
         Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void oneSymbol() {
+        final String code = "'x'";
+        LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof SymbolDescriptor);
+            final SymbolDescriptor descr = (SymbolDescriptor) item;
+            Assertions.assertEquals('x', descr.getToken().getFirstSymbol());
+            Assertions.assertEquals('x', descr.getToken().getLastSymbol());
+            Assertions.assertNull(descr.getData());
+            Assertions.assertEquals(code, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+        parser = this.createParser(code);
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof SymbolDescriptor);
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void symbolRange() {
+        final String code = "'a..z'";
+        final LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof SymbolDescriptor);
+            final SymbolDescriptor descr = (SymbolDescriptor) item;
+            Assertions.assertEquals('a', descr.getToken().getFirstSymbol());
+            Assertions.assertEquals('z', descr.getToken().getLastSymbol());
+            Assertions.assertNull(descr.getData());
+            Assertions.assertEquals(code, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void oneSymbolWithHole() {
+        final String code = "'x'<#1>";
+        final LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final PatternItem item = parser.parsePatternItem();
+            Assertions.assertTrue(item instanceof SymbolDescriptor);
+            final SymbolDescriptor descr = (SymbolDescriptor) item;
+            Assertions.assertEquals('x', descr.getToken().getFirstSymbol());
+            Assertions.assertEquals('x', descr.getToken().getLastSymbol());
+            final UntypedHole hole = descr.getData();
+            Assertions.assertNotNull(hole);
+            Assertions.assertEquals(1, hole.getNumber());
+            Assertions.assertEquals(code, descr.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void badHoleInSymbolicDescriptor() {
+        final LeftSideParser parser = this.createParser("'x'<'test'>");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void badUnclosedDataInSymbolicDescriptor() {
+        final LeftSideParser parser = this.createParser("'x'<#1 ");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
     }
 
     /**
