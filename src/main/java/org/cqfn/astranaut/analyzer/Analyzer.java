@@ -31,7 +31,10 @@ import org.cqfn.astranaut.dsl.ChildDescriptorExt;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.Program;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
+import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
+import org.cqfn.astranaut.dsl.RightSideItem;
 import org.cqfn.astranaut.dsl.Rule;
+import org.cqfn.astranaut.dsl.TransformationDescriptor;
 import org.cqfn.astranaut.exceptions.BaseException;
 import org.cqfn.astranaut.parser.Location;
 
@@ -68,9 +71,12 @@ public class Analyzer {
     public void analyze() throws BaseException {
         final Set<String> languages = this.program.getAllLanguages();
         for (final String language : languages) {
-            final Map<String, NodeDescriptor> descriptors =
+            final Map<String, NodeDescriptor> nodes =
                 this.program.getNodeDescriptorsByLanguage(language);
-            this.linkNodes(descriptors);
+            this.linkNodes(nodes);
+            final List<TransformationDescriptor> conversions =
+                this.program.getTransformationDescriptorsByLanguage(language);
+            this.checkTransformationRules(conversions);
         }
         for (final Rule rule : this.program.getAllRules()) {
             if (rule instanceof RegularNodeDescriptor) {
@@ -167,6 +173,54 @@ public class Analyzer {
         for (final AbstractNodeDescriptor base : bases) {
             base.mergeTags(tags);
             Analyzer.addTagsToBaseNodes(base);
+        }
+    }
+
+    /**
+     * Validates a list of transformation descriptors to ensure their right-hand sides are
+     *  well-formed. For each descriptor, if the right-hand side is a resulting subtree,
+     *  it recursively checks that the type of each node exists in the program and is properly
+     *  defined for the descriptor's language.
+     * @param descriptors The list of transformation descriptors to validate.
+     * @throws BaseException If any resulting node refers to an undefined type.
+     */
+    private void checkTransformationRules(final List<TransformationDescriptor> descriptors)
+        throws BaseException {
+        for (final TransformationDescriptor descriptor : descriptors) {
+            final RightSideItem right = descriptor.getRight();
+            if (right instanceof ResultingSubtreeDescriptor) {
+                this.checkResultingDescriptor(descriptor, (ResultingSubtreeDescriptor) right);
+            }
+        }
+    }
+
+    /**
+     * Recursively validates a resulting subtree descriptor to ensure all node types are defined.
+     *  This method checks whether the specified resulting node type is defined in the program
+     *  for the given language. It then applies the same validation recursively to all children.
+     *
+     * @param descriptor The transformation descriptor containing the context (e.g., language).
+     * @param subtree The resulting subtree descriptor to validate.
+     * @throws BaseException If the type of any resulting node in the subtree is undefined.
+     */
+    private void checkResultingDescriptor(final TransformationDescriptor descriptor,
+        final ResultingSubtreeDescriptor subtree) throws BaseException  {
+        final String name = subtree.getType();
+        final NodeDescriptor rule =
+            this.program.getNodeDescriptorByNameAndLanguage(name, descriptor.getLanguage());
+        if (rule == null) {
+            throw new CommonAnalyzerException(
+                this.locations.get(descriptor),
+                String.format(
+                    "The resulting node is of type '%s' which is not defined",
+                    name
+                )
+            );
+        }
+        for (final RightSideItem child : subtree.getChildren()) {
+            if (child instanceof ResultingSubtreeDescriptor) {
+                this.checkResultingDescriptor(descriptor, (ResultingSubtreeDescriptor) child);
+            }
         }
     }
 }
