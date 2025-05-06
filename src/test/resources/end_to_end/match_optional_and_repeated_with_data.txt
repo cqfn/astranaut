@@ -112,8 +112,8 @@ import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
 import org.cqfn.astranaut.core.base.Node;
 
 /**
- * Matches a node with the pattern 'AAA<#1>(#2, BBB<#3>, [CCC<#4>], {DDD<#5>})' and extracts
- *  nested nodes and data if matched.
+ * Matches a node with the pattern 'AAA<#1>(#2, BBB<#3>, [CCC<#4>], {DDD<#5>}, EEE, FFF, GGG)' and
+ *  extracts nested nodes and data if matched.
  * @since 1.0.0
  */
 public final class Matcher0 implements Matcher {
@@ -135,11 +135,14 @@ public final class Matcher0 implements Matcher {
         do {
             Matcher0.checkFirst(queue, extracted);
             matches = Matcher0.checkSecond(queue, extracted);
+            Matcher0.checkThird(queue, extracted);
+            Matcher0.checkFourth(queue, extracted);
+            matches = Matcher0.checkFifth(queue, extracted);
+            matches = Matcher0.checkSixth(queue, extracted);
             if (!matches) {
                 break;
             }
-            Matcher0.checkThird(queue, extracted);
-            Matcher0.checkFourth(queue, extracted);
+            matches = Matcher0.checkSeventh(queue, extracted);
         } while (false);
         if (matches) {
             extracted.addData(Matcher0.HOLE_NUMBER, node.getData());
@@ -201,6 +204,51 @@ public final class Matcher0 implements Matcher {
                 break;
             }
         }
+    }
+
+    /**
+     * Matches a node with the pattern 'EEE'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the next node is matched to the pattern
+     */
+    private static boolean checkFifth(final Deque<Node> queue, final Extracted extracted) {
+        boolean result = false;
+        if (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            result = Matcher4.INSTANCE.match(node, extracted);
+        }
+        return result;
+    }
+
+    /**
+     * Matches a node with the pattern 'FFF'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the next node is matched to the pattern
+     */
+    private static boolean checkSixth(final Deque<Node> queue, final Extracted extracted) {
+        boolean result = false;
+        if (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            result = Matcher5.INSTANCE.match(node, extracted);
+        }
+        return result;
+    }
+
+    /**
+     * Matches a node with the pattern 'GGG'.
+     * @param queue Node queue
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the next node is matched to the pattern
+     */
+    private static boolean checkSeventh(final Deque<Node> queue, final Extracted extracted) {
+        boolean result = false;
+        if (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            result = Matcher6.INSTANCE.match(node, extracted);
+        }
+        return result;
     }
 }
 
@@ -366,6 +414,159 @@ public final class Matcher3 implements Matcher {
             extracted.addData(5, node.getData());
         }
         return matches;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'EEE'.
+ * @since 1.0.0
+ */
+public final class Matcher4 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher4();
+
+    /**
+     * Constructor.
+     */
+    private Matcher4() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        return node.belongsToGroup("EEE") && node.getChildCount() == 0;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'FFF'.
+ * @since 1.0.0
+ */
+public final class Matcher5 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher5();
+
+    /**
+     * Constructor.
+     */
+    private Matcher5() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        return node.belongsToGroup("FFF") && node.getChildCount() == 0;
+    }
+}
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.uast.tree.common.matchers;
+
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.algorithms.conversion.Matcher;
+import org.cqfn.astranaut.core.base.Node;
+
+/**
+ * Matches a node with the pattern 'GGG'.
+ * @since 1.0.0
+ */
+public final class Matcher6 implements Matcher {
+    /**
+     * The instance.
+     */
+    public static final Matcher INSTANCE = new Matcher6();
+
+    /**
+     * Constructor.
+     */
+    private Matcher6() {
+    }
+
+    @Override
+    public boolean match(final Node node, final Extracted extracted) {
+        return node.belongsToGroup("GGG") && node.getChildCount() == 0;
     }
 }
 
@@ -758,7 +959,8 @@ import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.uast.tree.common.matchers.Matcher0;
 
 /**
- * Converter implementing the rule 'AAA<#1>(#2, BBB<#3>, [CCC<#4>], {DDD<#5>}) -> FakeNode'.
+ * Converter implementing the rule 'AAA<#1>(#2, BBB<#3>, [CCC<#4>], {DDD<#5>}, EEE, FFF, GGG) ->
+ *  FakeNode'.
  * @since 1.0.0
  */
 public final class Converter0 implements Converter {

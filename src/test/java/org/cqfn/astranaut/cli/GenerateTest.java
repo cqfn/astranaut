@@ -427,6 +427,19 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void notDefinedTypeInTransformationRule(final @TempDir Path temp) {
+        final String message = this.runAndReadErrorMessage(
+            "not_defined_type_in_transformation_rule.dsl",
+            temp,
+            GenerateTest.ANALYZER_EXCERT
+        );
+        Assertions.assertEquals(
+            "not_defined_type_in_transformation_rule.dsl, 25: The resulting node is of type 'BBB' which is not defined",
+            message
+        );
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.

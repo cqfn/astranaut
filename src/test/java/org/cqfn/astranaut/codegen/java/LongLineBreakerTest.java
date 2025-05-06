@@ -21,6 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.cqfn.astranaut.codegen.java;
 
-FakeNode <- 0;
-AAA<#1>(#2, BBB<#3>, [CCC<#4>], {DDD<#5>}, EEE, FFF, GGG) -> FakeNode;
+import java.util.List;
+import org.cqfn.astranaut.core.utils.Pair;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+/**
+ * Tests covering {@link LongLineBreaker} class.
+ * @since 1.0.0
+ */
+class LongLineBreakerTest {
+    @Test
+    void tooLongSectionInCallChain() {
+        final String code =
+            "longLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongMethodName().doSomethingElse();";
+        final LongLineBreaker llb = new LongLineBreaker(code, 0, 0);
+        final List<Pair<String, Integer>> result = llb.split();
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void tooLongLastSectionInCallChain() {
+        final String code =
+            "methodName().doSomethingAndSomethingAndSomethingAndSomethingAndSomethingAndSomethingAndSomethingAndSomethingAndSomethingElse();";
+        final LongLineBreaker llb = new LongLineBreaker(code, 0, 0);
+        final List<Pair<String, Integer>> result = llb.split();
+        Assertions.assertTrue(result.isEmpty());
+    }
+}
