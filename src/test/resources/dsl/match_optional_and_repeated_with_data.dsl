@@ -23,4 +23,4 @@
  */
 
 FakeNode <- 0;
-AAA<#1>([BBB], {CCC}) -> FakeNode;
+AAA<#1>(#2, BBB<#3>, [CCC<#4>], {DDD<#5>}) -> FakeNode;

@@ -237,7 +237,7 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
                     pair.getKey()
                 )
             );
-            if (rest < 3) {
+            if (rest < 3 && index < checkers.size() - 1) {
                 code.addAll(
                     Arrays.asList(
                         "if (!matches) {",
