@@ -27,6 +27,8 @@ import java.util.Map;
 import org.cqfn.astranaut.codegen.java.Klass;
 import org.cqfn.astranaut.codegen.java.LeftSideGenerationContext;
 import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
  * A pattern descriptor or typed hole. It is located on the left side of the transformation rules.
@@ -78,4 +80,13 @@ public interface LeftSideItem {
         }
         return klass;
     }
+
+    /**
+     * For the interpreter: matches a node with this descriptor and extracts child nodes
+     *  and/or data when matched.
+     * @param node Node to be matched
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if matched
+     */
+    boolean matchNode(Node node, Extracted extracted);
 }

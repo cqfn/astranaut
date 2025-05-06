@@ -27,16 +27,21 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.codegen.java.TransformationGenerator;
+import org.cqfn.astranaut.core.algorithms.conversion.ConversionResult;
+import org.cqfn.astranaut.core.algorithms.conversion.Converter;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
  * Transformation descriptor describing the transformation of one or more subtrees into a single
  *  subtree by DSL rule.
  * @since 1.0.0
  */
-public final class TransformationDescriptor implements Rule {
+public final class TransformationDescriptor implements Rule, Converter {
     /**
      * Left side of the rule, that is, at least one pattern or typed hole.
      */
@@ -103,15 +108,6 @@ public final class TransformationDescriptor implements Rule {
     }
 
     /**
-     * Returns the minimum number of elements consumed by the left side
-     *  of this transformation rule.
-     * @return Minimum number of consumed elements
-     */
-    public int getMinConsumed() {
-        return TransformationDescriptor.calcMinConsumed(this.left);
-    }
-
-    /**
      * Checks if the left side of this transformation rule contains
      *  optional or repeated descriptors.
      * @return Check result, {@code true} if any
@@ -155,6 +151,22 @@ public final class TransformationDescriptor implements Rule {
         }
         builder.append(" -> ").append(this.right.toString());
         return builder.toString();
+    }
+
+    @Override
+    public Optional<ConversionResult> convert(final List<Node> list, final int index,
+        final Factory factory) {
+        return Optional.empty();
+    }
+
+    @Override
+    public int getMinConsumed() {
+        return TransformationDescriptor.calcMinConsumed(this.left);
+    }
+
+    @Override
+    public boolean isRightToLeft() {
+        return false;
     }
 
     /**

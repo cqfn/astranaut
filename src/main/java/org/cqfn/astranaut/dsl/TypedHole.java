@@ -25,6 +25,8 @@ package org.cqfn.astranaut.dsl;
 
 import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
 import org.cqfn.astranaut.codegen.java.TypedHoleMatcherGenerator;
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.base.Node;
 
 /**
  * A typed hole, identified by its type and number.
@@ -114,5 +116,10 @@ public final class TypedHole implements Hole, LeftSideItem {
             builder.append('}');
         }
         return builder.toString();
+    }
+
+    @Override
+    public boolean matchNode(final Node node, final Extracted extracted) {
+        return false;
     }
 }
