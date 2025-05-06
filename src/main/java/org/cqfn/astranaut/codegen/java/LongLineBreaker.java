@@ -172,7 +172,7 @@ final class LongLineBreaker {
         } else {
             result = false;
         }
-        if (result && !this.tail.isEmpty() && SourceCodeBuilder.tryOn(sum, this.tail)) {
+        if (result && SourceCodeBuilder.tryOn(sum, this.tail)) {
             lines.add(new Pair<>(this.tail, this.offset + this.bias));
         } else {
             result = false;
