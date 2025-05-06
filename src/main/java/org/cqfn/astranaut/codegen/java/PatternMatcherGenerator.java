@@ -279,45 +279,29 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
         final List<Pair<String, Boolean>> checkers = new ArrayList<>(children.size());
         final NameGenerator names = new NameGenerator();
         for (int index = 0; index < children.size(); index = index + 1) {
+            final String name = names.nextName();
             final PatternItem child = children.get(index);
-            if (!(child instanceof LeftSideItem)) {
+            if (child instanceof UntypedHole) {
+                final Pair<Method, Boolean> checker =
+                    PatternMatcherGenerator.generateCheckerForUntypedHole(
+                        name,
+                        (UntypedHole) child,
+                        index
+                    );
+                checkers.add(new Pair<>(checker.getKey().getName(), checker.getValue()));
+                klass.addMethod(checker.getKey());
                 continue;
             }
             final LeftSideItem item = (LeftSideItem) child;
-            final String name = names.nextName();
             final PatternMatchingMode mode = item.getMatchingMode();
-            final String ret;
-            if (mode == PatternMatchingMode.NORMAL) {
-                ret = Strings.TYPE_BOOLEAN;
-            } else {
-                ret = Strings.TYPE_VOID;
-            }
-            final Method method = new Method(
-                ret,
-                String.format(
-                    "check%s%s",
-                    name.substring(0, 1).toUpperCase(Locale.ENGLISH),
-                    name.substring(1)
-                ),
-                String.format(
-                    "Matches a node with the pattern '%s'",
-                    item.toString(true)
-                )
+            final Method method = PatternMatcherGenerator.generateCheckerMethod(
+                name,
+                mode == PatternMatchingMode.NORMAL,
+                child
             );
-            checkers.add(new Pair<>(method.getName(), ret.equals(Strings.TYPE_BOOLEAN)));
-            method.makePrivate();
-            method.makeStatic();
-            method.addArgument("Deque<Node>", "queue", "Node queue");
-            method.addArgument(
-                "Extracted",
-                "extracted",
-                "Extracted nodes and data"
-            );
+            checkers.add(new Pair<>(method.getName(), mode == PatternMatchingMode.NORMAL));
             final Klass matcher = item.generateMatcher(context);
             if (mode == PatternMatchingMode.NORMAL) {
-                method.setReturnsDescription(
-                    "Matching result, {@code true} if the next node is matched to the pattern"
-                );
                 PatternMatcherGenerator.generateCheckerForNormalPattern(
                     method,
                     matcher.getName(),
@@ -337,6 +321,78 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
             klass.addMethod(method);
         }
         return checkers;
+    }
+
+    /**
+     * Generates a checker method with or without a return value.
+     * @param name Method name
+     * @param ret Is there a return value
+     * @param item Pattern item
+     * @return Generated method
+     */
+    private static Method generateCheckerMethod(final String name, final boolean ret,
+        final PatternItem item) {
+        final String type;
+        if (ret) {
+            type = Strings.TYPE_BOOLEAN;
+        } else {
+            type = Strings.TYPE_VOID;
+        }
+        final Method method = new Method(
+            type,
+            "check".concat(name.substring(0, 1).toUpperCase(Locale.ENGLISH))
+                .concat(name.substring(1)),
+            String.format(
+                "Matches a node with the pattern '%s'",
+                item.toString()
+            )
+        );
+        method.makePrivate();
+        method.makeStatic();
+        method.addArgument("Deque<Node>", "queue", "Node queue");
+        method.addArgument(
+            "Extracted",
+            "extracted",
+            "Extracted nodes and data"
+        );
+        if (ret) {
+            method.setReturnsDescription(
+                "Matching result, {@code true} if the next node is matched to the pattern"
+            );
+        }
+        return method;
+    }
+
+    /**
+     * Generates a checker for an untyped hole.
+     * @param name The checker name
+     * @param hole Untyped hole
+     * @param index Index of the pattern
+     * @return Checker method and flag whether the checker returns a value
+     */
+    private static Pair<Method, Boolean> generateCheckerForUntypedHole(final String name,
+        final UntypedHole hole, final int index) {
+        final Method method = PatternMatcherGenerator.generateCheckerMethod(
+            name,
+            index > 0,
+            hole
+        );
+        if (index == 0) {
+            method.setBody(
+                String.format("extracted.addNode(%d, queue.poll());", hole.getNumber())
+            );
+        } else {
+            final List<String> code = Arrays.asList(
+                "boolean result = false;",
+                "if (!queue.isEmpty()) {",
+                String.format("extracted.addNode(%d, queue.poll());", hole.getNumber()),
+                "    result = true;",
+                "}",
+                "return result;"
+            );
+            method.setBody(String.join("\n", code));
+        }
+        return new Pair<>(method, index > 0);
     }
 
     /**
