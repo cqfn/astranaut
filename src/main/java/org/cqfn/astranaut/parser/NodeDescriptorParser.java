@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
@@ -39,6 +40,16 @@ import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public final class NodeDescriptorParser {
+    /**
+     * List of reserved names that cannot be used as node names.
+     */
+    private static final List<String> RESERVED_NAMES = Arrays.asList(
+        "Char",
+        "Insert",
+        "Replace",
+        "Delete"
+    );
+
     /**
      * Name of the programming language whose entity this node descriptor covers.
      */
@@ -112,7 +123,14 @@ public final class NodeDescriptorParser {
                 "Can't parse the node name. This name must consist of only one identifier"
             );
         }
-        return first.toString();
+        final String name = first.toString();
+        if (NodeDescriptorParser.RESERVED_NAMES.contains(name)) {
+            throw new CommonParsingException(
+                loc,
+                String.format("The name '%s' is reserved and cannot be used as node name", name)
+            );
+        }
+        return name;
     }
 
     /**

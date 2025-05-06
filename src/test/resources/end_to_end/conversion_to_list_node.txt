@@ -226,7 +226,9 @@ public final class CommonFactory extends DefaultFactory {
      */
     private static Map<String, Type> createMapOfTypes() {
         return new MapUtils<String, Type>()
-            .put(FakeList.NAME, FakeList.TYPE).put(FakeNode.NAME, FakeNode.TYPE).make();
+            .put(FakeList.NAME, FakeList.TYPE)
+            .put(FakeNode.NAME, FakeNode.TYPE)
+            .make();
     }
 }
 

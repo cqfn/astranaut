@@ -41,7 +41,7 @@ final class LongLineBreaker {
 
     /**
      * Indentation from the beginning of the line (used for calculations,
-     *  but not included in the result).
+     * but not included in the result).
      */
     private final int indent;
 
@@ -57,6 +57,7 @@ final class LongLineBreaker {
 
     /**
      * Constructor.
+     *
      * @param code Source code line
      * @param indent Indentation from the beginning of the line
      * @param offset Additional offset to the indentation
@@ -69,9 +70,10 @@ final class LongLineBreaker {
 
     /**
      * Attempts to split a source code line into multiple indented parts
-     *  based on known patterns such as assignment, logical AND, or method call chains.
-     *  Returns the result as a list of (line, indent) pairs.
-     *  If no pattern matches, returns empty list.
+     * based on known patterns such as assignment, logical AND, or method call chains.
+     * Returns the result as a list of (line, indent) pairs.
+     * If no pattern matches, returns empty list.
+     *
      * @return List of indented line parts, or empty if no split was applicable
      */
     List<Pair<String, Integer>> split() {
@@ -93,7 +95,8 @@ final class LongLineBreaker {
 
     /**
      * Tries to split the line by assignment (`=`) operator.
-     *  If successful, adds the left-hand part and updates internal state for further splitting.
+     * If successful, adds the left-hand part and updates internal state for further splitting.
+     *
      * @param lines Output list of line parts with indentation
      * @return End of operation flag, if no further separation is no longer required
      */
@@ -115,7 +118,8 @@ final class LongLineBreaker {
 
     /**
      * Tries to split the line by logical AND (`&&`) operator.
-     *  If successful, adds split parts and updates internal state accordingly.
+     * If successful, adds split parts and updates internal state accordingly.
+     *
      * @param lines Output list of line parts with indentation
      * @return End of operation flag, if no further separation is no longer required
      */
@@ -142,27 +146,36 @@ final class LongLineBreaker {
 
     /**
      * Tries to split the line by method call chaining (`).`).
-     *  If successful, adds split parts and updates internal state accordingly.
-     *  @param lines Output list of line parts with indentation
-     *  @return End of operation flag, if no further separation is no longer required
+     * If successful, adds split parts and updates internal state accordingly.
+     *
+     * @param lines Output list of line parts with indentation
+     * @return End of operation flag, if no further separation is no longer required
      */
     private boolean splitByCallChain(final List<Pair<String, Integer>> lines) {
-        boolean result = false;
+        boolean result;
         int index = this.tail.indexOf(").");
-        while (!result && index > 0) {
-            lines.add(
-                new Pair<>(
-                    this.tail.substring(0, index + 1).trim(),
-                    this.offset + this.bias
-                )
-            );
-            this.tail = this.tail.substring(index + 1).trim();
-            this.bias = 1;
-            if (SourceCodeBuilder.tryOn(this.indent + this.offset + 1, this.tail)) {
-                lines.add(new Pair<>(this.tail, this.offset + 1));
-                result = true;
+        int sum = this.indent + this.offset + this.bias;
+        if (index > 0) {
+            result = true;
+            while (index > 0) {
+                final String head = this.tail.substring(0, index + 1).trim();
+                if (!SourceCodeBuilder.tryOn(sum, head)) {
+                    result = false;
+                    break;
+                }
+                lines.add(new Pair<>(head, this.offset + this.bias));
+                this.tail = this.tail.substring(index + 1).trim();
+                this.bias = 1;
+                sum = this.indent + this.offset + this.bias;
+                index = this.tail.indexOf(").", 2);
             }
-            index = this.tail.indexOf(").", 2);
+        } else {
+            result = false;
+        }
+        if (result && SourceCodeBuilder.tryOn(sum, this.tail)) {
+            lines.add(new Pair<>(this.tail, this.offset + this.bias));
+        } else {
+            result = false;
         }
         return result;
     }

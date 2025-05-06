@@ -391,7 +391,8 @@ public final class CommonFactory extends DefaultFactory {
             .put(Addition.NAME, Addition.TYPE)
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(StringLiteral.NAME, StringLiteral.TYPE)
-            .put(Subtraction.NAME, Subtraction.TYPE).make();
+            .put(Subtraction.NAME, Subtraction.TYPE)
+            .make();
     }
 }
 

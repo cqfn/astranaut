@@ -144,7 +144,9 @@ public final class AlphaFactory extends DefaultFactory {
      */
     private static Map<String, Type> createMapOfTypes() {
         return new MapUtils<String, Type>()
-            .put(FakeNode.NAME, FakeNode.TYPE).put(NodeAlpha.NAME, NodeAlpha.TYPE).make();
+            .put(FakeNode.NAME, FakeNode.TYPE)
+            .put(NodeAlpha.NAME, NodeAlpha.TYPE)
+            .make();
     }
 }
 
@@ -598,7 +600,9 @@ public final class BetaFactory extends DefaultFactory {
      */
     private static Map<String, Type> createMapOfTypes() {
         return new MapUtils<String, Type>()
-            .put(FakeNode.NAME, FakeNode.TYPE).put(NodeBeta.NAME, NodeBeta.TYPE).make();
+            .put(FakeNode.NAME, FakeNode.TYPE)
+            .put(NodeBeta.NAME, NodeBeta.TYPE)
+            .make();
     }
 }
 

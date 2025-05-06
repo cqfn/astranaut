@@ -723,7 +723,9 @@ public final class CommonFactory extends DefaultFactory {
             .put(IntegerLiteral.NAME, IntegerLiteral.TYPE)
             .put(Return.NAME, Return.TYPE)
             .put(StatementExpression.NAME, StatementExpression.TYPE)
-            .put(Subtraction.NAME, Subtraction.TYPE).put(Variable.NAME, Variable.TYPE).make();
+            .put(Subtraction.NAME, Subtraction.TYPE)
+            .put(Variable.NAME, Variable.TYPE)
+            .make();
     }
 }
 

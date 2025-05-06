@@ -502,6 +502,17 @@ class NodeDescriptionParsingTest {
         Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
     }
 
+    @Test
+    void reservedName() {
+        final NodeDescriptorParser parser = new NodeDescriptorParser(
+            NodeDescriptionParsingTest.LANGUAGE,
+            this.createStatement(
+                "Insert <- 0;"
+            )
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
     /**
      * Parses a single descriptor from the DSL source code.
      * @param code DSL source code

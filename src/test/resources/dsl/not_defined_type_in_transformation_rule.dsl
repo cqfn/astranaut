@@ -22,5 +22,4 @@
  * SOFTWARE.
  */
 
-FakeNode <- 0;
-AAA<#1>(#2, BBB<#3>, [CCC<#4>], {DDD<#5>}, EEE, FFF, GGG) -> FakeNode;
+AAA -> BBB;

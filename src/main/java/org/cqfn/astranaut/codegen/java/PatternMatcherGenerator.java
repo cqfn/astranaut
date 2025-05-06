@@ -26,10 +26,12 @@ package org.cqfn.astranaut.codegen.java;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import org.cqfn.astranaut.core.utils.Pair;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.PatternDescriptor;
 import org.cqfn.astranaut.dsl.PatternItem;
+import org.cqfn.astranaut.dsl.PatternMatchingMode;
 import org.cqfn.astranaut.dsl.StaticString;
 import org.cqfn.astranaut.dsl.UntypedHole;
 
@@ -41,40 +43,40 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
     /**
      * Item for which the matcher is generated.
      */
-    private final PatternDescriptor item;
+    private final PatternDescriptor pattern;
 
     /**
      * Constructor.
-     * @param item Item for which the matcher is generated
+     * @param pattern Item for which the matcher is generated
      */
-    public PatternMatcherGenerator(final PatternDescriptor item) {
-        this.item = item;
+    public PatternMatcherGenerator(final PatternDescriptor pattern) {
+        this.pattern = pattern;
     }
 
     @Override
     public Klass generate(final LeftSideGenerationContext context) {
-        final boolean data = this.item.getData() instanceof UntypedHole;
-        final boolean children = !this.item.getChildren().isEmpty();
+        final boolean data = this.pattern.getData() instanceof UntypedHole;
+        final boolean children = !this.pattern.getChildren().isEmpty();
         final String brief;
         if (data && children) {
             brief = String.format(
                 "Matches a node with the pattern '%s' and extracts nested nodes and data if matched",
-                this.item.toString(false)
+                this.pattern.toString(false)
             );
         } else if (data) {
             brief = String.format(
                 "Matches a node with the pattern '%s' and extracts data if matched",
-                this.item.toString(false)
+                this.pattern.toString(false)
             );
         } else if (children) {
             brief = String.format(
                 "Matches a node with the pattern '%s' and extracts nested nodes if matched",
-                this.item.toString(false)
+                this.pattern.toString(false)
             );
         } else {
             brief = String.format(
                 "Matches a node with the pattern '%s'",
-                this.item.toString(false)
+                this.pattern.toString(false)
             );
         }
         final Klass klass = new Klass(context.generateClassName(), brief);
@@ -89,7 +91,7 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
      */
     private List<Pair<Integer, Integer>> getNumbersOfUntypedHoles() {
         final List<Pair<Integer, Integer>> list = new ArrayList<>(0);
-        final List<PatternItem> children = this.item.getChildren();
+        final List<PatternItem> children = this.pattern.getChildren();
         for (int index = 0; index < children.size(); index = index + 1) {
             final PatternItem child = children.get(index);
             if (child instanceof UntypedHole) {
@@ -111,12 +113,12 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
         method.addArgument("Node", "node");
         method.addArgument("Extracted", "extracted");
         do {
-            if (this.item.hasOptionalOrRepeated()) {
-                method.setBody(this.generateBodyWithComplexCondition(klass));
+            if (this.pattern.hasOptionalOrRepeated()) {
+                method.setBody(this.generateBodyWithComplexCondition(klass, context));
                 break;
             }
             final List<Pair<Integer, Integer>> holes = this.getNumbersOfUntypedHoles();
-            if (this.item.getData() instanceof UntypedHole || !holes.isEmpty()) {
+            if (this.pattern.getData() instanceof UntypedHole || !holes.isEmpty()) {
                 final List<String> code = new ArrayList<>(
                     Arrays.asList(
                         String.format(
@@ -126,11 +128,11 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
                         "if (matches) {"
                     )
                 );
-                if (this.item.getData() instanceof UntypedHole) {
+                if (this.pattern.getData() instanceof UntypedHole) {
                     code.add(
                         String.format(
                             "extracted.addData(%d, node.getData());",
-                            ((UntypedHole) this.item.getData()).getNumber()
+                            ((UntypedHole) this.pattern.getData()).getNumber()
                         )
                     );
                 }
@@ -164,14 +166,14 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
      */
     private String composeCondition(final LeftSideGenerationContext context) {
         final List<String> list = new ArrayList<>(1);
-        list.add(String.format("node.belongsToGroup(\"%s\")", this.item.getType()));
-        final List<PatternItem> children = this.item.getChildren();
+        list.add(String.format("node.belongsToGroup(\"%s\")", this.pattern.getType()));
+        final List<PatternItem> children = this.pattern.getChildren();
         list.add(String.format("node.getChildCount() == %d", children.size()));
-        if (this.item.getData() instanceof StaticString) {
+        if (this.pattern.getData() instanceof StaticString) {
             list.add(
                 String.format(
                     "node.getData().equals(%s)",
-                    ((StaticString) this.item.getData()).toJavaCode()
+                    ((StaticString) this.pattern.getData()).toJavaCode()
                 )
             );
         }
@@ -196,12 +198,58 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
      *  Such a condition, for example, can be if a descriptor contains optional or repeating
      *  child descriptors.
      * @param klass The class to which the {@code match} method will be added
+     * @param context Generation context
      * @return Body content as a string
      */
-    private String generateBodyWithComplexCondition(final Klass klass) {
-        final List<String> code = new ArrayList<>(2);
-        code.add("final boolean matches = false; // stub");
-        if (this.item.getData() instanceof UntypedHole) {
+    private String generateBodyWithComplexCondition(final Klass klass,
+        final LeftSideGenerationContext context) {
+        context.addImport(klass, "java.util.Deque");
+        context.addImport(klass, "java.util.LinkedList");
+        final List<String> code = new ArrayList<>(8);
+        code.add("boolean matches;");
+        code.add("final Deque<Node> queue = new LinkedList<>(node.getChildrenList());");
+        code.add("do {");
+        final List<Pair<String, Boolean>> checkers = this.generateCheckers(klass, context);
+        int count = 0;
+        int first = -1;
+        for (int index = 0; index < checkers.size(); index = index + 1) {
+            final Pair<String, Boolean> pair = checkers.get(index);
+            if (pair.getValue()) {
+                if (first < 0) {
+                    first = index;
+                }
+                count = count + 1;
+            }
+        }
+        int rest = count;
+        for (int index = 0; index < checkers.size(); index = index + 1) {
+            final Pair<String, Boolean> pair = checkers.get(index);
+            if (!pair.getValue()) {
+                code.add(
+                    String.format("%s.%s(queue, extracted);", klass.getName(), pair.getKey())
+                );
+                continue;
+            }
+            code.add(
+                String.format(
+                    "matches = %s.%s(queue, extracted);",
+                    klass.getName(),
+                    pair.getKey()
+                )
+            );
+            if (rest < 3 && index < checkers.size() - 1) {
+                code.addAll(
+                    Arrays.asList(
+                        "if (!matches) {",
+                        "    break;",
+                        "}"
+                    )
+                );
+            }
+            rest = rest - 1;
+        }
+        code.add("} while (false);");
+        if (this.pattern.getData() instanceof UntypedHole) {
             code.addAll(
                 Arrays.asList(
                     "if (matches) {",
@@ -215,5 +263,202 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
         }
         code.add("return matches;");
         return String.join("\n", code);
+    }
+
+    /**
+     * Generates checkers, that is, functions that take the next node and check it with a matcher.
+     *  A complex condition consists of consecutive calls of such checkers.
+     * @param klass The class to which checkers methods will be added
+     * @param context Generation context
+     * @return List of generated checkers, specifying for each checker whether the checker
+     *  returns a boolean value
+     */
+    private List<Pair<String, Boolean>> generateCheckers(final Klass klass,
+        final LeftSideGenerationContext context) {
+        final List<PatternItem> children = this.pattern.getChildren();
+        final List<Pair<String, Boolean>> checkers = new ArrayList<>(children.size());
+        final NameGenerator names = new NameGenerator();
+        for (int index = 0; index < children.size(); index = index + 1) {
+            final String name = names.nextName();
+            final PatternItem child = children.get(index);
+            if (child instanceof UntypedHole) {
+                final Pair<Method, Boolean> checker =
+                    PatternMatcherGenerator.generateCheckerForUntypedHole(
+                        name,
+                        (UntypedHole) child,
+                        index
+                    );
+                checkers.add(new Pair<>(checker.getKey().getName(), checker.getValue()));
+                klass.addMethod(checker.getKey());
+                continue;
+            }
+            final LeftSideItem item = (LeftSideItem) child;
+            final PatternMatchingMode mode = item.getMatchingMode();
+            final Method method = PatternMatcherGenerator.generateCheckerMethod(
+                name,
+                mode == PatternMatchingMode.NORMAL,
+                child
+            );
+            checkers.add(new Pair<>(method.getName(), mode == PatternMatchingMode.NORMAL));
+            final Klass matcher = item.generateMatcher(context);
+            if (mode == PatternMatchingMode.NORMAL) {
+                PatternMatcherGenerator.generateCheckerForNormalPattern(
+                    method,
+                    matcher.getName(),
+                    index
+                );
+            } else if (mode == PatternMatchingMode.OPTIONAL) {
+                PatternMatcherGenerator.generateCheckerForOptionalPattern(
+                    method,
+                    matcher.getName()
+                );
+            } else {
+                PatternMatcherGenerator.generateCheckerForRepeatedPattern(
+                    method,
+                    matcher.getName()
+                );
+            }
+            klass.addMethod(method);
+        }
+        return checkers;
+    }
+
+    /**
+     * Generates a checker method with or without a return value.
+     * @param name Method name
+     * @param ret Is there a return value
+     * @param item Pattern item
+     * @return Generated method
+     */
+    private static Method generateCheckerMethod(final String name, final boolean ret,
+        final PatternItem item) {
+        final String type;
+        if (ret) {
+            type = Strings.TYPE_BOOLEAN;
+        } else {
+            type = Strings.TYPE_VOID;
+        }
+        final Method method = new Method(
+            type,
+            "check".concat(name.substring(0, 1).toUpperCase(Locale.ENGLISH))
+                .concat(name.substring(1)),
+            String.format(
+                "Matches a node with the pattern '%s'",
+                item.toString()
+            )
+        );
+        method.makePrivate();
+        method.makeStatic();
+        method.addArgument("Deque<Node>", "queue", "Node queue");
+        method.addArgument(
+            "Extracted",
+            "extracted",
+            "Extracted nodes and data"
+        );
+        if (ret) {
+            method.setReturnsDescription(
+                "Matching result, {@code true} if the next node is matched to the pattern"
+            );
+        }
+        return method;
+    }
+
+    /**
+     * Generates a checker for an untyped hole.
+     * @param name The checker name
+     * @param hole Untyped hole
+     * @param index Index of the pattern
+     * @return Checker method and flag whether the checker returns a value
+     */
+    private static Pair<Method, Boolean> generateCheckerForUntypedHole(final String name,
+        final UntypedHole hole, final int index) {
+        final Method method = PatternMatcherGenerator.generateCheckerMethod(
+            name,
+            index > 0,
+            hole
+        );
+        if (index == 0) {
+            method.setBody(
+                String.format("extracted.addNode(%d, queue.poll());", hole.getNumber())
+            );
+        } else {
+            final List<String> code = Arrays.asList(
+                "boolean result = false;",
+                "if (!queue.isEmpty()) {",
+                String.format("extracted.addNode(%d, queue.poll());", hole.getNumber()),
+                "    result = true;",
+                "}",
+                "return result;"
+            );
+            method.setBody(String.join("\n", code));
+        }
+        return new Pair<>(method, index > 0);
+    }
+
+    /**
+     * Generates a checker for a “normal” pattern (not repetitive or optional).
+     * @param method Checker method
+     * @param matcher Matcher used inside the checker
+     * @param index Index of the pattern
+     */
+    private static void generateCheckerForNormalPattern(final Method method, final String matcher,
+        final int index) {
+        final List<String> code;
+        if (index == 0) {
+            code = Arrays.asList(
+                "final Node node = queue.poll();",
+                String.format("return %s.INSTANCE.match(node, extracted);", matcher)
+            );
+        } else {
+            code = Arrays.asList(
+                "boolean result = false;",
+                "if (!queue.isEmpty()) {",
+                "    final Node node = queue.poll();",
+                String.format("result = %s.INSTANCE.match(node, extracted);", matcher),
+                "}",
+                "return result;"
+            );
+        }
+        method.setBody(String.join("\n", code));
+    }
+
+    /**
+     * Generates a checker for an optional pattern.
+     * @param method Checker method
+     * @param matcher Matcher used inside the checker
+     */
+    private static void generateCheckerForOptionalPattern(final Method method,
+        final String matcher) {
+        final List<String> code = Arrays.asList(
+            "if (queue.isEmpty()) {",
+            "    return;",
+            "}",
+            "final Node node = queue.poll();",
+            String.format("final boolean matched = %s.INSTANCE.match(node, extracted);", matcher),
+            "if (!matched) {",
+            "    queue.addFirst(node);",
+            "}"
+        );
+        method.setBody(String.join("\n", code));
+    }
+
+    /**
+     * Generates a checker for a repeating pattern.
+     * @param method Checker method
+     * @param matcher Matcher used inside the checker
+     */
+    private static void generateCheckerForRepeatedPattern(final Method method,
+        final String matcher) {
+        final List<String> code = Arrays.asList(
+            "while (!queue.isEmpty()) {",
+            "    final Node node = queue.poll();",
+            String.format("final boolean matched = %s.INSTANCE.match(node, extracted);", matcher),
+            "    if (!matched) {",
+            "        queue.addFirst(node);",
+            "        break;",
+            "    }",
+            "}"
+        );
+        method.setBody(String.join("\n", code));
     }
 }
