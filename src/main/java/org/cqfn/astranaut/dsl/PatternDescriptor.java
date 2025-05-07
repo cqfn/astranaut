@@ -24,6 +24,8 @@
 package org.cqfn.astranaut.dsl;
 
 import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
 import org.cqfn.astranaut.codegen.java.PatternMatcherGenerator;
@@ -37,6 +39,7 @@ import org.cqfn.astranaut.core.base.Node;
  *  themselves. This is used to describe the left side of a transformation rule.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public final class PatternDescriptor implements PatternItem, LeftSideItem {
     /**
      * The type of the node. A pattern is considered matched if the type name matches.
@@ -152,7 +155,31 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
 
     @Override
     public boolean matchNode(final Node node, final Extracted extracted) {
-        return false;
+        boolean matches;
+        do {
+            matches = node.belongsToGroup(this.type);
+            if (!matches) {
+                break;
+            }
+            if (this.data instanceof StaticString) {
+                matches = node.getData().equals(((StaticString) this.data).getValue());
+            }
+            if (!matches) {
+                break;
+            }
+            if (this.children.isEmpty()) {
+                matches = node.getChildCount() == 0;
+            } else {
+                matches = this.matchChildren(node, extracted);
+            }
+            if (!matches) {
+                break;
+            }
+            if (this.data instanceof UntypedHole) {
+                extracted.addData(((UntypedHole) this.data).getNumber(), node.getData());
+            }
+        } while (false);
+        return matches;
     }
 
     /**
@@ -198,5 +225,106 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
             builder.append('}');
         }
         return builder.toString();
+    }
+
+    /**
+     * Matches the child nodes of the passed node with the child nodes of this descriptor.
+     * @param node Node to be matched
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if matched
+     */
+    private boolean matchChildren(final Node node, final Extracted extracted) {
+        final Deque<Node> queue = new LinkedList<>(node.getChildrenList());
+        boolean matches = true;
+        for (final PatternItem child : this.children) {
+            if (child instanceof UntypedHole) {
+                matches = PatternDescriptor.matchUntypedHole((UntypedHole) child, queue, extracted);
+            }
+            final LeftSideItem lsi = (LeftSideItem) child;
+            final PatternMatchingMode pmm = lsi.getMatchingMode();
+            if (pmm == PatternMatchingMode.OPTIONAL) {
+                PatternDescriptor.matchOptionalNode(lsi, queue, extracted);
+            } else if (pmm == PatternMatchingMode.REPEATED) {
+                PatternDescriptor.matchRepeatedNode(lsi, queue, extracted);
+            } else {
+                matches = PatternDescriptor.matchRegularNode(lsi, queue, extracted);
+            }
+            if (!matches) {
+                break;
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * Matches the next child node and the untyped hole.
+     * @param hole Untyped hole
+     * @param queue Queue with nodes not yet processed
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the queue contained another element and
+     *  it was extracted
+     */
+    private static boolean matchUntypedHole(final UntypedHole hole,
+        final Deque<Node> queue, final Extracted extracted) {
+        boolean result = false;
+        if (!queue.isEmpty()) {
+            extracted.addNode(hole.getNumber(), queue.poll());
+            result = true;
+        }
+        return result;
+    }
+
+    /**
+     * Matches a "normal" (not optional and not repeated) pattern and the next node.
+     * @param lsi Pattern
+     * @param queue Queue with nodes not yet processed
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the queue contained another element and
+     *  it was extracted
+     */
+    private static boolean matchRegularNode(final LeftSideItem lsi, final Deque<Node> queue,
+        final Extracted extracted) {
+        boolean matches = false;
+        if (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            matches = lsi.matchNode(node, extracted);
+        }
+        return matches;
+    }
+
+    /**
+     * Matches an optional pattern and the next node.
+     * @param lsi Pattern
+     * @param queue Queue with nodes not yet processed
+     * @param extracted Extracted nodes and data
+     */
+    private static void matchOptionalNode(final LeftSideItem lsi, final Deque<Node> queue,
+        final Extracted extracted) {
+        if (queue.isEmpty()) {
+            return;
+        }
+        final Node node = queue.poll();
+        final boolean matches = lsi.matchNode(node, extracted);
+        if (!matches) {
+            queue.addFirst(node);
+        }
+    }
+
+    /**
+     * Matches a repeated pattern and the next node.
+     * @param lsi Pattern
+     * @param queue Queue with nodes not yet processed
+     * @param extracted Extracted nodes and data
+     */
+    private static void matchRepeatedNode(final LeftSideItem lsi, final Deque<Node> queue,
+        final Extracted extracted) {
+        while (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            final boolean matches = lsi.matchNode(node, extracted);
+            if (!matches) {
+                queue.addFirst(node);
+                break;
+            }
+        }
     }
 }

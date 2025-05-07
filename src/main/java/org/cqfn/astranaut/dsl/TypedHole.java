@@ -120,6 +120,10 @@ public final class TypedHole implements Hole, LeftSideItem {
 
     @Override
     public boolean matchNode(final Node node, final Extracted extracted) {
-        return false;
+        final boolean matches = node.belongsToGroup(this.type);
+        if (matches) {
+            extracted.addNode(this.number, node);
+        }
+        return matches;
     }
 }

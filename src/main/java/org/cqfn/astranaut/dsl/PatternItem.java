@@ -23,20 +23,9 @@
  */
 package org.cqfn.astranaut.dsl;
 
-import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
-import org.cqfn.astranaut.core.base.Node;
-
 /**
  * A child element of the pattern, which can either be a pattern descriptor or a hole.
  * @since 1.0.0
  */
 public interface PatternItem {
-    /**
-     * For the interpreter: matches a node with this descriptor and extracts child nodes
-     *  and/or data when matched.
-     * @param node Node to be matched
-     * @param extracted Extracted nodes and data
-     * @return Matching result, {@code true} if matched
-     */
-    boolean matchNode(Node node, Extracted extracted);
 }

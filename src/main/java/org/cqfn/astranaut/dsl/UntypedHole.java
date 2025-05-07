@@ -25,8 +25,6 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
-import org.cqfn.astranaut.core.base.Node;
 
 /**
  * A non-typed hole, identified only by its number.
@@ -72,10 +70,5 @@ public final class UntypedHole
     @Override
     public String toString() {
         return String.format("#%d", this.number);
-    }
-
-    @Override
-    public boolean matchNode(final Node node, final Extracted extracted) {
-        return false;
     }
 }
