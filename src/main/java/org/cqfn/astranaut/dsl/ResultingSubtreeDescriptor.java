@@ -150,10 +150,10 @@ public final class ResultingSubtreeDescriptor implements RightSideItem {
         do {
             final Builder builder = factory.createBuilder(this.type);
             builder.setFragment(fragment);
-            boolean flag;
+            boolean flag = true;
             if (this.data instanceof StaticString) {
                 flag = builder.setData(((StaticString) this.data).getValue());
-            } else {
+            } else if (this.data instanceof UntypedHole) {
                 flag = builder.setData(extracted.getData(((UntypedHole) this.data).getNumber()));
             }
             if (!flag) {

@@ -24,8 +24,10 @@
 package org.cqfn.astranaut.dsl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.cqfn.astranaut.core.base.Type;
+import org.cqfn.astranaut.core.utils.MapUtils;
 
 /**
  * Descriptor of a non-abstract node, that is, a node that can be instantiated.
@@ -47,5 +49,15 @@ public abstract class NonAbstractNodeDescriptor extends NodeDescriptor implement
     public final List<String> getHierarchy() {
         return this.getTopology().stream().map(NodeDescriptor::getName)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public final Map<String, String> getProperties() {
+        final String language = this.getLanguage();
+        String color = "red";
+        if (language.equals("common")) {
+            color = "green";
+        }
+        return new MapUtils<String, String>().put("language", language).put("color", color).make();
     }
 }
