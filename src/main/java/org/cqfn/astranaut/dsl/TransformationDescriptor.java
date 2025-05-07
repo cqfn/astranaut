@@ -243,6 +243,47 @@ public final class TransformationDescriptor implements Rule, Converter {
      *  and the data and nodes have been retrieved
      */
     private boolean matchNodes(final Deque<Node> queue, final Extracted extracted) {
+        final boolean matches;
+        if (this.left.size() == 1
+            && this.left.get(0).getMatchingMode() == PatternMatchingMode.REPEATED) {
+            matches = this.matchRepeatedPattern(queue, extracted);
+        } else {
+            matches = this.matchListOfDifferentNodes(queue, extracted);
+        }
+        return matches;
+    }
+
+    /**
+     * Special case: matches a repeating pattern, and it must match at least once.
+     * @param queue Queue with nodes not yet processed
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the queue contained elements and they
+     *  were extracted
+     */
+    private boolean matchRepeatedPattern(final Deque<Node> queue, final Extracted extracted) {
+        final LeftSideItem lsi = this.left.get(0);
+        boolean flag = false;
+        while (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            final boolean matches = lsi.matchNode(node, extracted);
+            if (!matches) {
+                queue.addFirst(node);
+                break;
+            }
+            flag = true;
+        }
+        return flag;
+    }
+
+    /**
+     * Matches list of different nodes with patterns from the left side of the transformation
+     *  and extracts nodes and data.
+     * @param queue Queue with nodes not yet processed
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the node sequence has been matched
+     *  and the data and nodes have been retrieved
+     */
+    private boolean matchListOfDifferentNodes(final Deque<Node> queue, final Extracted extracted) {
         boolean matches = true;
         for (final LeftSideItem lsi : this.left) {
             final PatternMatchingMode pmm = lsi.getMatchingMode();
