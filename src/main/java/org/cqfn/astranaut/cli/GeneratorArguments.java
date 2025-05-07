@@ -29,10 +29,10 @@ import java.util.List;
 import org.cqfn.astranaut.core.utils.FilesReader;
 
 /**
- * Parses command line arguments.
+ * Parses command line arguments for generator.
  * @since 1.0.0
  */
-public class ArgumentParser {
+public final class GeneratorArguments extends Arguments {
     /**
      * The folder or file where the result is placed.
      * And yes, I hate jcommander.
@@ -57,7 +57,7 @@ public class ArgumentParser {
     /**
      * Constructor.
      */
-    public ArgumentParser() {
+    public GeneratorArguments() {
         this.output = "output";
         this.licence = String.format(
             "Copyright (c) %d %s",
@@ -80,7 +80,7 @@ public class ArgumentParser {
             switch (arg) {
                 case "--output":
                 case "-o":
-                    this.output = ArgumentParser.parseString(arg, iterator);
+                    this.output = this.parseString(arg, iterator);
                     break;
                 case "--license":
                 case "-l":
@@ -134,38 +134,6 @@ public class ArgumentParser {
     }
 
     /**
-     * Parses the parameter value as a string.
-     * @param name Name of the parameter
-     * @param iterator Iterator by parameters
-     * @return Parameter value as a string
-     * @throws CliException If parsing failed
-     */
-    private static String parseString(final String name, final Iterator<String> iterator)
-        throws CliException {
-        boolean oops = true;
-        String value = "";
-        do {
-            if (!iterator.hasNext()) {
-                break;
-            }
-            value = iterator.next();
-            if (value.charAt(0) == '-') {
-                break;
-            }
-            oops = false;
-        } while (false);
-        if (oops) {
-            throw new CommonCliException(
-                String.format(
-                    "The value after the '%s' parameter is expected",
-                    name
-                )
-            );
-        }
-        return value;
-    }
-
-    /**
      * Parses the name of the file containing the license and reads the file.
      * @param arg Parameter
      * @param iterator Iterator by parameters
@@ -173,7 +141,7 @@ public class ArgumentParser {
      */
     private void parseLicense(final String arg, final Iterator<String> iterator)
         throws CliException {
-        final String name = ArgumentParser.parseString(arg, iterator);
+        final String name = this.parseString(arg, iterator);
         this.licence = new FilesReader(name)
             .readAsString(
                 new FilesReader.CustomExceptionCreator<CliException>() {
@@ -198,7 +166,7 @@ public class ArgumentParser {
      */
     private void parsePackageName(final String arg, final Iterator<String> iterator)
         throws CliException {
-        final String name = ArgumentParser.parseString(arg, iterator);
+        final String name = this.parseString(arg, iterator);
         final String pattern = "^[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*$";
         if (!name.matches(pattern)) {
             throw new CommonCliException(
@@ -219,7 +187,7 @@ public class ArgumentParser {
      */
     private void parseVersion(final String arg, final Iterator<String> iterator)
         throws CliException {
-        final String name = ArgumentParser.parseString(arg, iterator);
+        final String name = this.parseString(arg, iterator);
         final String pattern = "^\\d+(\\.\\d+){1,2}(\\.[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$";
         if (!name.matches(pattern)) {
             throw new CommonCliException(
