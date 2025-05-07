@@ -24,7 +24,9 @@
 package org.cqfn.astranaut.dsl;
 
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -33,7 +35,10 @@ import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.codegen.java.TransformationGenerator;
 import org.cqfn.astranaut.core.algorithms.conversion.ConversionResult;
 import org.cqfn.astranaut.core.algorithms.conversion.Converter;
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.base.DummyNode;
 import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
 
 /**
@@ -41,6 +46,7 @@ import org.cqfn.astranaut.core.base.Node;
  *  subtree by DSL rule.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public final class TransformationDescriptor implements Rule, Converter {
     /**
      * Left side of the rule, that is, at least one pattern or typed hole.
@@ -156,7 +162,32 @@ public final class TransformationDescriptor implements Rule, Converter {
     @Override
     public Optional<ConversionResult> convert(final List<Node> list, final int index,
         final Factory factory) {
-        return Optional.empty();
+        Optional<ConversionResult> result = Optional.empty();
+        do {
+            if (index + this.getMinConsumed() > list.size()) {
+                break;
+            }
+            final Extracted extracted = new Extracted();
+            final Deque<Node> queue = new LinkedList<>(list.subList(index, list.size()));
+            final int size = queue.size();
+            if (!this.matchNodes(queue, extracted)) {
+                break;
+            }
+            final int consumed = size - queue.size();
+            final Node node;
+            if (this.right instanceof UntypedHole) {
+                node = extracted.getNodes(((UntypedHole) this.right).getNumber()).get(0);
+            } else {
+                final ResultingSubtreeDescriptor rsd = (ResultingSubtreeDescriptor) this.right;
+                final Fragment fragment = Fragment.fromNodes(list.subList(index, index + consumed));
+                node = rsd.createNode(extracted, factory, fragment);
+                if (node == DummyNode.INSTANCE) {
+                    break;
+                }
+            }
+            result = Optional.of(new ConversionResult(node, consumed));
+        } while (false);
+        return result;
     }
 
     @Override
@@ -201,5 +232,85 @@ public final class TransformationDescriptor implements Rule, Converter {
             consumed = 1;
         }
         return consumed;
+    }
+
+    /**
+     * Matches nodes with patterns from the left side of the transformation
+     *  and extracts nodes and data.
+     * @param queue Queue with nodes not yet processed
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the node sequence has been matched
+     *  and the data and nodes have been retrieved
+     */
+    private boolean matchNodes(final Deque<Node> queue, final Extracted extracted) {
+        boolean matches = true;
+        for (final LeftSideItem lsi : this.left) {
+            final PatternMatchingMode pmm = lsi.getMatchingMode();
+            if (pmm == PatternMatchingMode.OPTIONAL) {
+                TransformationDescriptor.matchOptionalNode(lsi, queue, extracted);
+            } else if (pmm == PatternMatchingMode.REPEATED) {
+                TransformationDescriptor.matchRepeatedNode(lsi, queue, extracted);
+            } else {
+                matches = TransformationDescriptor.matchRegularNode(lsi, queue, extracted);
+            }
+            if (!matches) {
+                break;
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * Matches a "normal" (not optional and not repeated) pattern and the next node.
+     * @param lsi Pattern
+     * @param queue Queue with nodes not yet processed
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if the queue contained another element and
+     *  it was extracted
+     */
+    private static boolean matchRegularNode(final LeftSideItem lsi, final Deque<Node> queue,
+        final Extracted extracted) {
+        boolean matches = false;
+        if (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            matches = lsi.matchNode(node, extracted);
+        }
+        return matches;
+    }
+
+    /**
+     * Matches an optional pattern and the next node.
+     * @param lsi Pattern
+     * @param queue Queue with nodes not yet processed
+     * @param extracted Extracted nodes and data
+     */
+    private static void matchOptionalNode(final LeftSideItem lsi, final Deque<Node> queue,
+        final Extracted extracted) {
+        if (queue.isEmpty()) {
+            return;
+        }
+        final Node node = queue.poll();
+        final boolean matches = lsi.matchNode(node, extracted);
+        if (!matches) {
+            queue.addFirst(node);
+        }
+    }
+
+    /**
+     * Matches a repeated pattern and the next node.
+     * @param lsi Pattern
+     * @param queue Queue with nodes not yet processed
+     * @param extracted Extracted nodes and data
+     */
+    private static void matchRepeatedNode(final LeftSideItem lsi, final Deque<Node> queue,
+        final Extracted extracted) {
+        while (!queue.isEmpty()) {
+            final Node node = queue.poll();
+            final boolean matches = lsi.matchNode(node, extracted);
+            if (!matches) {
+                queue.addFirst(node);
+                break;
+            }
+        }
     }
 }
