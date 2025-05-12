@@ -162,7 +162,9 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
                 break;
             }
             if (this.data instanceof StaticString) {
-                matches = node.getData().equals(((StaticString) this.data).getValue());
+                final String expected = ((StaticString) this.data).getValue();
+                final String actual = node.getData();
+                matches = actual.equals(expected);
             }
             if (!matches) {
                 break;

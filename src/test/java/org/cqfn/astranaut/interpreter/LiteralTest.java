@@ -42,10 +42,10 @@ class LiteralTest {
         final LiteralDescriptor.Constructor ctor =
             new LiteralDescriptor.Constructor("Identifier");
         ctor.setType("String");
-        final String initial = "abc";
+        final String initial = "\"abc\"";
         ctor.setInitial(initial);
         final LiteralDescriptor descriptor = ctor.createDescriptor();
-        Assertions.assertEquals(initial, descriptor.getInitial());
+        Assertions.assertEquals(initial, descriptor.getInitialCode());
         final Builder builder = descriptor.createBuilder();
         Assertions.assertTrue(builder.isValid());
         builder.setFragment(EmptyFragment.INSTANCE);
@@ -61,5 +61,56 @@ class LiteralTest {
         Assertions.assertTrue(second.getType().getChildTypes().isEmpty());
         Assertions.assertEquals(0, second.getChildCount());
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> second.getChild(0));
+    }
+
+    @Test
+    void emptyInitialValueForBuiltInType() {
+        final LiteralDescriptor.Constructor ctor =
+            new LiteralDescriptor.Constructor("Something");
+        ctor.setType("int");
+        final LiteralDescriptor descriptor = ctor.createDescriptor();
+        final Builder builder = descriptor.createBuilder();
+        final Node node = builder.createNode();
+        Assertions.assertEquals("0", node.getData());
+    }
+
+    @Test
+    void initialValueForCustomType() {
+        final LiteralDescriptor.Constructor ctor =
+            new LiteralDescriptor.Constructor("Something");
+        ctor.setType("Object");
+        LiteralDescriptor descriptor = ctor.createDescriptor();
+        Builder builder = descriptor.createBuilder();
+        Node node = builder.createNode();
+        Assertions.assertEquals("", node.getData());
+        ctor.setInitial("new Object()");
+        descriptor = ctor.createDescriptor();
+        builder = descriptor.createBuilder();
+        node = builder.createNode();
+        Assertions.assertEquals("", node.getData());
+    }
+
+    @Test
+    void initialValueForCharType() {
+        final LiteralDescriptor.Constructor ctor =
+            new LiteralDescriptor.Constructor("Plus");
+        ctor.setType("char");
+        ctor.setInitial("'+'");
+        final LiteralDescriptor descriptor = ctor.createDescriptor();
+        final Builder builder = descriptor.createBuilder();
+        final Node node = builder.createNode();
+        Assertions.assertEquals("+", node.getData());
+    }
+
+    @Test
+    void initialValueForIntType() {
+        final LiteralDescriptor.Constructor ctor =
+            new LiteralDescriptor.Constructor("Digit");
+        ctor.setType("int");
+        ctor.setInitial("0");
+        final LiteralDescriptor descriptor = ctor.createDescriptor();
+        final Builder builder = descriptor.createBuilder();
+        final Node node = builder.createNode();
+        Assertions.assertEquals("0", node.getData());
     }
 }

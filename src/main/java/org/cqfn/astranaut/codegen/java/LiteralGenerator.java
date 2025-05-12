@@ -114,7 +114,7 @@ public final class LiteralGenerator extends NonAbstractNodeGenerator {
     @Override
     public void createSpecificEntitiesInBuilderClass(final Klass klass) {
         String body = "this.fragment = EmptyFragment.INSTANCE;";
-        final String initial = this.rule.getInitial();
+        final String initial = this.rule.getInitialCode();
         if (!initial.isEmpty()) {
             body = String.format("%s\nthis.data = %s;", body, initial);
         }

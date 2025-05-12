@@ -29,6 +29,7 @@ import java.util.Set;
 import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
 import org.cqfn.astranaut.dsl.ChildDescriptorExt;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
+import org.cqfn.astranaut.dsl.NonAbstractNodeDescriptor;
 import org.cqfn.astranaut.dsl.Program;
 import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
@@ -79,7 +80,7 @@ public class Analyzer {
             this.checkTransformationRules(conversions);
         }
         for (final Rule rule : this.program.getAllRules()) {
-            if (rule instanceof RegularNodeDescriptor) {
+            if (rule instanceof NonAbstractNodeDescriptor) {
                 Analyzer.addTagsToBaseNodes((NodeDescriptor) rule);
             }
         }
