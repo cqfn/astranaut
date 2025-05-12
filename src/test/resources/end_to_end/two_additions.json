@@ -9,12 +9,12 @@
             "type": "Addition",
             "children": [
               {
-                "type": "Identifier",
-                "data": "text"
-              },
-              {
                 "type": "IntegerLiteral",
                 "data": "123"
+              },
+              {
+                "type": "Identifier",
+                "data": "test"
               }
             ]
           },
