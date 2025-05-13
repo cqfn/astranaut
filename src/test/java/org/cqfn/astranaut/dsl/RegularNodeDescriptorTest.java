@@ -25,6 +25,7 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -57,5 +58,17 @@ class RegularNodeDescriptorTest {
         final String actual = rule.toString();
         final String expected = "Variable <- [Type], name@Identifier, [init@Expression]";
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void properties() {
+        final RegularNodeDescriptor rule = new RegularNodeDescriptor(
+            "Break",
+            Collections.emptyList()
+        );
+        rule.setLanguage("java");
+        final Map<String, String> properties = rule.getProperties();
+        Assertions.assertEquals("red", properties.get("color"));
+        Assertions.assertEquals("java", properties.get("language"));
     }
 }

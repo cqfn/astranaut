@@ -31,6 +31,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Transformer;
+import org.cqfn.astranaut.core.base.Type;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -63,6 +66,14 @@ class ProgramTest {
             .values();
         Assertions.assertEquals(1, descriptors.size());
         Assertions.assertSame(second, descriptors.iterator().next());
+        final Factory factory = program.getFactory(null);
+        final Type type = factory.getType("AAA");
+        Assertions.assertEquals("AAA", type.getName());
+        Assertions.assertSame(factory, program.getFactory(""));
+        Transformer transformer = program.getTransformer(null);
+        Assertions.assertNotNull(transformer);
+        transformer = program.getTransformer("");
+        Assertions.assertNotNull(transformer);
     }
 
     /**
