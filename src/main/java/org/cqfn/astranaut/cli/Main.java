@@ -82,6 +82,8 @@ public final class Main {
             action = new Generate();
         } else if (args[0].equals("parse")) {
             action = Parse.INSTANCE;
+        } else if (args[0].equals("transform")) {
+            action = Transform.INSTANCE;
         } else {
             throw new CommonCliException(String.format("Unknown action: '%s'", args[0]));
         }

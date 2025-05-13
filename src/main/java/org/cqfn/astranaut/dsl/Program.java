@@ -187,7 +187,12 @@ public final class Program implements Provider {
 
     @Override
     public Factory getFactory(final String language) {
-        final String lowercase = language.toLowerCase(Locale.ENGLISH);
+        final String lowercase;
+        if (language == null || language.isEmpty()) {
+            lowercase = "common";
+        } else {
+            lowercase = language.toLowerCase(Locale.ENGLISH);
+        }
         final Factory factory;
         if (this.factories.containsKey(lowercase)) {
             factory = this.factories.get(lowercase);
@@ -207,7 +212,12 @@ public final class Program implements Provider {
 
     @Override
     public Transformer getTransformer(final String language) {
-        final String lowercase = language.toLowerCase(Locale.ENGLISH);
+        final String lowercase;
+        if (language == null || language.isEmpty()) {
+            lowercase = "common";
+        } else {
+            lowercase = language.toLowerCase(Locale.ENGLISH);
+        }
         return new DefaultTransformer(
             this.getTransformationDescriptorsByLanguage(lowercase)
                 .stream()
