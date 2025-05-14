@@ -239,8 +239,12 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
         final Deque<Node> queue = new LinkedList<>(node.getChildrenList());
         boolean matches = true;
         for (final PatternItem child : this.children) {
+            if (!matches) {
+                break;
+            }
             if (child instanceof UntypedHole) {
                 matches = PatternDescriptor.matchUntypedHole((UntypedHole) child, queue, extracted);
+                continue;
             }
             final LeftSideItem lsi = (LeftSideItem) child;
             final PatternMatchingMode pmm = lsi.getMatchingMode();
@@ -250,9 +254,6 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
                 PatternDescriptor.matchRepeatedNode(lsi, queue, extracted);
             } else {
                 matches = PatternDescriptor.matchRegularNode(lsi, queue, extracted);
-            }
-            if (!matches) {
-                break;
             }
         }
         return matches;
