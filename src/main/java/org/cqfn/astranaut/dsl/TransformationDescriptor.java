@@ -311,12 +311,8 @@ public final class TransformationDescriptor implements Rule, Converter {
      */
     private static boolean matchRegularNode(final LeftSideItem lsi, final Deque<Node> queue,
         final Extracted extracted) {
-        boolean matches = false;
-        if (!queue.isEmpty()) {
-            final Node node = queue.poll();
-            matches = lsi.matchNode(node, extracted);
-        }
-        return matches;
+        final Node node = queue.poll();
+        return lsi.matchNode(node, extracted);
     }
 
     /**
