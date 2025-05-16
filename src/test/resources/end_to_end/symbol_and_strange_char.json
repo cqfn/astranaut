@@ -1,0 +1,15 @@
+{
+  "root": {
+    "type": "Root",
+    "children": [
+      {
+        "type": "Identifier",
+        "data": "x"
+      },
+      {
+        "type": "Char",
+        "data": "abc"
+      }
+    ]
+  }
+}

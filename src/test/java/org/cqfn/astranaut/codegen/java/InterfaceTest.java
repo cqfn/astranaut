@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,57 +21,146 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astranaut.codegen.java;
 
-import java.io.IOException;
-import org.cqfn.astranaut.core.utils.FilesReader;
+import java.util.Arrays;
+import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link Interface} class.
- *
- * @since 0.1.5
+ * Tests covering {@link Interface} class.
+ * @since 1.0.0
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class InterfaceTest {
-    /**
-     * The folder with test resources.
-     */
-    private static final String TESTS_PATH = "src/test/resources/codegen/java/";
-
-    /**
-     * Testing code generation with interface descriptor.
-     */
     @Test
-    void testInterface() {
-        final Interface iface = new Interface("DSL rule", "Rule");
-        final MethodDescriptor method = new MethodDescriptor(
-            "Generates source code from the rule",
-            "generate"
+    void simpleEmptyInterface() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Empty interface.",
+                " */",
+                "interface Test0 {",
+                "}",
+                ""
+            )
         );
-        method.addArgument("Options", "opt", "The options set");
-        iface.addMethod(method);
-        final String expected = this.readTest("interface.txt");
-        final String actual = iface.generate(0);
-        Assertions.assertEquals(expected, actual);
+        final Interface iface = new Interface("Test0", "Empty interface");
+        final boolean result = this.testCodegen(iface, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void publicEmptyInterface() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Public empty interface.",
+                " */",
+                "public interface Test1 {",
+                "}",
+                ""
+            )
+        );
+        final Interface iface = new Interface("Test1", "Public empty interface");
+        iface.makePublic();
+        final boolean result = this.testCodegen(iface, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void interfaceInheritsAnother() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Interface inherits another.",
+                " */",
+                "interface Test2 extends Test3 {",
+                "}",
+                ""
+            )
+        );
+        final Interface iface = new Interface("Test2", "Interface inherits another");
+        iface.setExtendsList("Test3");
+        final boolean result = this.testCodegen(iface, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void interfaceInheritsOtherTwo() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Interface inherits other two.",
+                " */",
+                "interface Test4 extends Test5, Test6 {",
+                "}",
+                ""
+            )
+        );
+        final Interface iface = new Interface("Test4", "Interface inherits other two");
+        iface.setExtendsList("Test5", "Test6");
+        final boolean result = this.testCodegen(iface, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void interfaceWithMethod() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Interface with a method.",
+                " */",
+                "interface Adder {",
+                "    /**",
+                "     * Adds one integer value to another.",
+                "     * @param first First value",
+                "     * @param second Second value",
+                "     * @return Sum of two values",
+                "     */",
+                "    int add(int first, int second);",
+                "}",
+                ""
+            )
+        );
+        final Interface iface = new Interface("Adder", "Interface with a method");
+        final String type = "int";
+        final MethodSignature method = new MethodSignature(
+            type,
+            "add",
+            "Adds one integer value to another"
+        );
+        method.setReturnsDescription("Sum of two values");
+        method.addArgument(type, "first", "First value");
+        method.addArgument(type, "second", "Second value");
+        iface.addMethodSignature(method);
+        final boolean result = this.testCodegen(iface, expected);
+        Assertions.assertTrue(result);
     }
 
     /**
-     * Reads test source from the file.
-     * @param name The file name
-     * @return Test source
+     * Tests the source code generation from an object describing a class.
+     * @param iface Object describing an interface
+     * @param expected Expected generated code
+     * @return Test result, {@code true} if the generated code matches the expected code
      */
-    private String readTest(final String name) {
-        String result = "";
+    private boolean testCodegen(final Interface iface, final String expected) {
         boolean oops = false;
+        boolean equals = false;
         try {
-            result = new FilesReader(InterfaceTest.TESTS_PATH.concat(name))
-                .readAsString();
-        } catch (final IOException ignored) {
+            final SourceCodeBuilder builder = new SourceCodeBuilder();
+            iface.build(0, builder);
+            final String actual = builder.toString();
+            equals = expected.equals(actual);
+        } catch (final BaseException ignored) {
             oops = true;
         }
-        Assertions.assertFalse(oops);
-        return result;
+        return !oops && equals;
     }
 }

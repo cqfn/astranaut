@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,134 +21,322 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astranaut.codegen.java;
 
-import java.io.IOException;
-import org.cqfn.astranaut.core.utils.FilesReader;
+import java.util.Arrays;
+import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link Method} class.
- *
- * @since 0.1.5
+ * Tests covering {@link Method} class.
+ * @since 1.0.0
  */
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 class MethodTest {
-    /**
-     * Typical method name for tests.
-     */
-    private static final String METHOD_NAME = "test";
-
-    /**
-     * The folder with test resources.
-     */
-    private static final String TESTS_PATH = "src/test/resources/codegen/java/";
-
-    /**
-     * Testing code generation with a very simple method.
-     */
     @Test
     void simpleMethod() {
-        final Method method = new Method("Prints test string", MethodTest.METHOD_NAME);
-        method.setCode("System.out.print(\"Ok.\");");
-        final String expected = this.readTest("simple_method.txt");
-        final String actual = method.generate(0);
-        Assertions.assertEquals(expected, actual);
-    }
-
-    /**
-     * Testing code generation with a private method.
-     */
-    @Test
-    void simplePrivateMethod() {
-        final Method method = new Method("Prints another test string", MethodTest.METHOD_NAME);
-        method.setCode("System.out.print(\"Hello )\");");
-        method.makePrivate();
-        final String expected = this.readTest("simple_private_method.txt");
-        final String actual = method.generate(0);
-        Assertions.assertEquals(expected, actual);
-    }
-
-    /**
-     * Testing code generation for method with arguments and return value.
-     */
-    @Test
-    void methodWithArgsAndReturn() {
-        final Method method = new Method("Finds the sum of two numbers", MethodTest.METHOD_NAME);
-        final String type = "int";
-        method.addArgument(type, "aaa", "First number");
-        method.addArgument(type, "bbb", "Second number");
-        method.setReturnType(type, "The sum");
-        method.setCode("return aaa + bbb;");
-        final String expected = this.readTest("method_with_args_and_return.txt");
-        final String actual = method.generate(1);
-        Assertions.assertEquals(expected, actual);
-    }
-
-    /**
-     * Testing code generation for method that contains 'if' statement.
-     */
-    @Test
-    void methodWithIfStatement() {
-        final Method method = new Method(
-            "Finds the maximum of two numbers",
-            MethodTest.METHOD_NAME
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Simple method.",
+                " */",
+                "String getData() {",
+                "    return \"\";",
+                "}",
+                ""
+            )
         );
-        final String type = "float";
-        method.addArgument(type, "left", "Left number");
-        method.addArgument(type, "right", "Right number");
-        method.setReturnType(type, "The maximum");
-        final String code =
-            "final float ret;\nif (left > right) {ret = left;} else {ret = right;}\nreturn ret;";
-        method.setCode(code);
-        final String expected = this.readTest("method_with_if_statement.txt");
-        final String actual = method.generate(0);
-        Assertions.assertEquals(expected, actual);
+        final Method method = new Method("String", "getData", "Simple method");
+        method.setBody("return \"\";");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
     }
 
-    /**
-     * Testing code generation with overridden method.
-     */
+    @Test
+    void publicMethod() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Public method.",
+                " */",
+                "public String getData() {",
+                "    return \"\";",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method("String", "getData", "Public method");
+        method.makePublic();
+        method.setBody("return \"\";");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void protectedMethod() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Protected method.",
+                " */",
+                "protected String getData() {",
+                "    return \"\";",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method("String", "getData", "Protected method");
+        method.makeProtected();
+        method.setBody("return \"\";");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void privateMethod() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Private method.",
+                " */",
+                "private String getData() {",
+                "    return \"\";",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method("String", "getData", "Private method");
+        method.makePrivate();
+        method.setBody("return \"\";");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void staticMethod() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Static method.",
+                " */",
+                "static String getData() {",
+                "    return \"\";",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method("String", "getData", "Static method");
+        method.makeStatic();
+        method.setBody("return \"\";");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void finalMethod() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Final method.",
+                " */",
+                "final String getData() {",
+                "    return \"\";",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method("String", "getData", "Final method");
+        method.makeFinal();
+        method.setBody("return \"\";");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
     @Test
     void overriddenMethod() {
-        final Method method = new Method("Represents the object as a string", "toString");
-        method.setReturnType("String", "A string");
-        method.setCode("return \"test\";");
-        method.makeOverridden();
-        final String expected = this.readTest("overridden_method.txt");
-        final String actual = method.generate(0);
-        Assertions.assertEquals(expected, actual);
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "@Override",
+                "public String toString() {",
+                "    return \"\";",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method("String", "toString");
+        method.makePublic();
+        method.setBody("return \"\";");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
     }
 
-    /**
-     * Testing code generation with abstract method.
-     */
     @Test
-    void abstractMethod() {
-        final Method method = new Method("Associates new data with the object", "setData");
-        method.addArgument("Data", "data", "The new data");
-        method.makeAbstract();
-        final String expected = this.readTest("abstract_method.txt");
-        final String actual = method.generate(0);
-        Assertions.assertEquals(expected, actual);
+    void methodWithMultilineBody() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Method with multi-line body.",
+                " */",
+                "public void doSomething() {",
+                "    if (true) {",
+                "        System.out.println(\"it works!\");",
+                "    }",
+                "    return;",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method(
+            "void",
+            "doSomething",
+            "Method with multi-line body"
+        );
+        method.makePublic();
+        method.setBody("   if (true) { System.out.println(\"it works!\"); } \n return; ");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
     }
 
-    /**
-     * Reads test source from the file.
-     * @param name The file name
-     * @return Test source
-     */
-    private String readTest(final String name) {
-        String result = "";
+    @Test
+    void methodWithMultilineStatement() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Method with multi-line body.",
+                " */",
+                "public void doSomething() {",
+                "    if (true) {",
+                "        final StringBuilder builder = new StringBuilder();",
+                "        builder.append('a')",
+                "            .append('b')",
+                "            .append('c');",
+                "        System.out.println(builder.toString());",
+                "    }",
+                "    return;",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method(
+            "void",
+            "doSomething",
+            "Method with multi-line body"
+        );
+        method.makePublic();
+        method.setBody(
+            "if (true) { final StringBuilder builder = new StringBuilder(); builder.append('a')\n.append('b')\n.append('c');  System.out.println(builder.toString()); } \n return; "
+        );
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void methodWithArguments() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Method with arguments.",
+                " */",
+                "static int max(final int first, final int second) {",
+                "    return first > second ? first : second;",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method("int", "max", "Method with arguments");
+        method.makeStatic();
+        method.addArgument("int", "first");
+        method.addArgument("int", "second");
+        method.setBody("return first > second ? first : second;");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void methodWithSyntaxError() {
+        final Method method = new Method("void", "doSomething");
+        method.setBody("if (true) { aaa }");
+        final SourceCodeBuilder builder = new SourceCodeBuilder();
         boolean oops = false;
         try {
-            result = new FilesReader(MethodTest.TESTS_PATH.concat(name))
-                .readAsString();
-        } catch (final IOException ignored) {
+            method.build(0, builder);
+        } catch (final BaseException exception) {
+            oops = true;
+            Assertions.assertEquals("Codegen", exception.getInitiator());
+            Assertions.assertEquals(
+                "Syntax error in source code: 'aaa }'",
+                exception.getErrorMessage()
+            );
+        }
+        Assertions.assertTrue(oops);
+    }
+
+    @Test
+    void methodWithLineThatIsTooLong() {
+        final Method method = new Method("void", "doSomething");
+        method.setBody(
+            "System.out.println(\"The infantile goat accompanies this delightful sunset with an indifferent stare.\")"
+        );
+        final SourceCodeBuilder builder = new SourceCodeBuilder();
+        Assertions.assertThrows(BaseException.class, () -> method.build(0, builder));
+    }
+
+    @Test
+    void methodWithDoWhileStatement() {
+        final String expected = String.join(
+            "\n",
+            Arrays.asList(
+                "/**",
+                " * Method with do..while statement.",
+                " */",
+                "public void doSomething() {",
+                "    do {",
+                "        System.out.println(\"it works!\");",
+                "    } while (false);",
+                "    return;",
+                "}",
+                ""
+            )
+        );
+        final Method method = new Method(
+            "void",
+            "doSomething",
+            "Method with do..while statement"
+        );
+        method.makePublic();
+        method.setBody("   do { System.out.println(\"it works!\"); } while (false); \n return; ");
+        final boolean result = this.testCodegen(method, expected);
+        Assertions.assertTrue(result);
+    }
+
+    /**
+     * Tests the source code generation from an object describing a method.
+     * @param method Object describing a method
+     * @param expected Expected generated code
+     * @return Test result, {@code true} if the generated code matches the expected code
+     */
+    private boolean testCodegen(final Method method, final String expected) {
+        boolean oops = false;
+        boolean equals = false;
+        try {
+            final SourceCodeBuilder builder = new SourceCodeBuilder();
+            method.build(0, builder);
+            final String actual = builder.toString();
+            equals = expected.equals(actual);
+        } catch (final BaseException ignored) {
             oops = true;
         }
-        Assertions.assertFalse(oops);
-        return result;
+        return !oops && equals;
     }
 }

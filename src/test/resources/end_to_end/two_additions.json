@@ -1,0 +1,29 @@
+{
+  "root": {
+    "type": "Root",
+    "children": [
+      {
+        "type": "Addition",
+        "children": [
+          {
+            "type": "Addition",
+            "children": [
+              {
+                "type": "IntegerLiteral",
+                "data": "123"
+              },
+              {
+                "type": "Identifier",
+                "data": "test"
+              }
+            ]
+          },
+          {
+            "type": "IntegerLiteral",
+            "data": "456"
+          }
+        ]
+      }
+    ]
+  }
+}

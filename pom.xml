@@ -2,7 +2,7 @@
 <!--
 The MIT License (MIT)
 
-Copyright (c) 2023 Ivan Kniazkov
+Copyright (c) 2025 Ivan Kniazkov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ SOFTWARE.
   </parent>
   <groupId>org.cqfn</groupId>
   <artifactId>astranaut</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
   <developers>
     <developer>
@@ -67,7 +67,7 @@ SOFTWARE.
     <maven.compiler.target>8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <qulice.license>${project.basedir}/LICENSE.txt</qulice.license>
-    <core.version>1.1.4</core.version>
+    <core.version>1.2.11</core.version>
   </properties>
   <build>
     <plugins>
@@ -113,8 +113,8 @@ SOFTWARE.
             <exclude>pmd:/src/test/resources/.*</exclude>
             <exclude>dependencies:/src/test/resources/.*</exclude>
             <exclude>duplicatefinder:/src/test/resources/.*</exclude>
-            <exclude>checkstyle:/src/it/.*</exclude>
-            <exclude>pmd:.*/src/it/.*</exclude>
+            <exclude>dependencies:ch.qos.logback:logback-classic</exclude>
+            <exclude>dependencies:guru.nidi:graphviz-java:jar:0.18.1</exclude>
           </excludes>
         </configuration>
         <executions>
@@ -148,34 +148,6 @@ SOFTWARE.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <!-- JUnit 5 requires Surefire version 2.22.0 or higher -->
-      </plugin>
-      <plugin>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <version>3.3.0</version>
-        <configuration>
-          <postBuildHookScript>verify</postBuildHookScript>
-          <projectsDirectory>src/it</projectsDirectory>
-          <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-          <showErrors>true</showErrors>
-          <pomIncludes>
-            <pomInclude>processor-visualizer/pom.xml</pomInclude>
-            <pomInclude>serializer-deserializer/pom.xml</pomInclude>
-          </pomIncludes>
-          <settingsFile>src/it/settings.xml</settingsFile>
-          <environmentVariables>
-            <core.version>${core.version}</core.version>
-          </environmentVariables>
-        </configuration>
-        <executions>
-          <execution>
-            <id>integration-test</id>
-            <goals>
-              <goal>install</goal>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
@@ -189,11 +161,6 @@ SOFTWARE.
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.beust</groupId>
-      <artifactId>jcommander</artifactId>
-      <version>1.82</version>
     </dependency>
     <dependency>
       <groupId>org.cqfn</groupId>

@@ -1,5 +1,0 @@
-/**
- * Associates new data with the object.
- * @param data The new data
- */
-public abstract void setData(Data data);
