@@ -64,7 +64,7 @@ class PatternDescriptorTest {
     }
 
     @Test
-    void matchPatternWithHole() {
+    void matchPatternWithUntypedHole() {
         final PatternDescriptor pattern = new PatternDescriptor(
             "C",
             null,
@@ -82,6 +82,25 @@ class PatternDescriptorTest {
         Assertions.assertFalse(extracted.getNodes(2).isEmpty());
         Assertions.assertEquals("E", extracted.getNodes(2).get(0).getTypeName());
         node = DraftNode.create("C(D)");
+        matches = pattern.matchNode(node, extracted);
+        Assertions.assertFalse(matches);
+    }
+
+    @Test
+    void matchPatternWithTypedHole() {
+        final TypedHole hole = new TypedHole("D", 1);
+        final PatternDescriptor pattern = new PatternDescriptor(
+            "C",
+            null,
+            Collections.singletonList(hole)
+        );
+        final Extracted extracted = new Extracted();
+        Node node = DraftNode.create("C(D)");
+        boolean matches = pattern.matchNode(node, extracted);
+        Assertions.assertTrue(matches);
+        Assertions.assertFalse(extracted.getNodes(1).isEmpty());
+        Assertions.assertEquals("D", extracted.getNodes(1).get(0).getTypeName());
+        node = DraftNode.create("C(E)");
         matches = pattern.matchNode(node, extracted);
         Assertions.assertFalse(matches);
     }
@@ -132,6 +151,31 @@ class PatternDescriptorTest {
         matches = pattern.matchNode(node, extracted);
         Assertions.assertTrue(matches);
         node = DraftNode.create("K(L,M)");
+        matches = pattern.matchNode(node, extracted);
+        Assertions.assertFalse(matches);
+    }
+
+    @Test
+    void matchPatternWithRepeatedChild() {
+        final PatternDescriptor child = new PatternDescriptor(
+            "R",
+            null,
+            Collections.emptyList()
+        );
+        child.setMatchingMode(PatternMatchingMode.REPEATED);
+        final PatternDescriptor pattern = new PatternDescriptor(
+            "P",
+            null,
+            Arrays.asList(
+                new PatternDescriptor("Q", null, Collections.emptyList()),
+                child
+            )
+        );
+        final Extracted extracted = new Extracted();
+        Node node = DraftNode.create("P(Q,R,R,R)");
+        boolean matches = pattern.matchNode(node, extracted);
+        Assertions.assertTrue(matches);
+        node = DraftNode.create("P(Q,R,R,S)");
         matches = pattern.matchNode(node, extracted);
         Assertions.assertFalse(matches);
     }
