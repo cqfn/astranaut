@@ -79,9 +79,9 @@ class TransformTest extends EndToEndTest {
         final String[] args = {
             "transform",
             "src/test/resources/dsl/identifiers_numbers_and_operators.dsl",
-            "--s",
+            "-s",
             "src/test/resources/sources/correct_and_strange_chars.json",
-            "--t",
+            "-t",
             ast.toFile().getAbsolutePath(),
         };
         Assertions.assertThrows(BaseException.class, () -> Main.run(args));
