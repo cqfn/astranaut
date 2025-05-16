@@ -114,6 +114,7 @@ SOFTWARE.
             <exclude>dependencies:/src/test/resources/.*</exclude>
             <exclude>duplicatefinder:/src/test/resources/.*</exclude>
             <exclude>dependencies:ch.qos.logback:logback-classic</exclude>
+            <exclude>dependencies:guru.nidi:graphviz-java:jar:0.18.1</exclude>
           </excludes>
         </configuration>
         <executions>

@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.cli;
 
 import java.nio.file.Path;
+import org.cqfn.astranaut.exceptions.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.io.TempDir;
  * End-to-end tests checking AST transformations with different rule sets.
  * @since 1.0.0
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class TransformTest extends EndToEndTest {
     @Test
     void twoAdditions(final @TempDir Path temp) {
@@ -42,6 +44,65 @@ class TransformTest extends EndToEndTest {
         );
         final String expected = this.loadStringResource("symbol_and_strange_char.json");
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void readingNonExistingFile() {
+        final String[] args = {
+            "transform",
+            "src/test/resources/dsl/identifiers_numbers_and_operators.dsl",
+            "--source",
+            "file.that.does.not.exist",
+        };
+        Assertions.assertThrows(BaseException.class, () -> Main.run(args));
+    }
+
+    @Test
+    void wrongGraphFileExtension(final @TempDir Path temp) {
+        final Path image = temp.resolve("image.txt");
+        final String[] args = {
+            "transform",
+            "src/test/resources/dsl/identifiers_numbers_and_operators.dsl",
+            "--source",
+            "src/test/resources/sources/correct_and_strange_chars.json",
+            "--image",
+            image.toFile().getAbsolutePath(),
+        };
+        Assertions.assertThrows(BaseException.class, () -> Main.run(args));
+    }
+
+    @Test
+    void writeProtectedGraphFile(final @TempDir Path temp) {
+        final Path output = temp.resolve("output");
+        this.createWriteProtectedFolder(output);
+        final Path ast = temp.resolve("output/ast.json");
+        final String[] args = {
+            "transform",
+            "src/test/resources/dsl/identifiers_numbers_and_operators.dsl",
+            "--s",
+            "src/test/resources/sources/correct_and_strange_chars.json",
+            "--t",
+            ast.toFile().getAbsolutePath(),
+        };
+        Assertions.assertThrows(BaseException.class, () -> Main.run(args));
+        this.clearWriteProtectedFlag(output);
+    }
+
+    @Test
+    void writeProtectedImageFile(final @TempDir Path temp) {
+        final Path output = temp.resolve("output");
+        this.createWriteProtectedFolder(output);
+        final Path image = temp.resolve("output/image.png");
+        final String[] args = {
+            "transform",
+            "src/test/resources/dsl/identifiers_numbers_and_operators.dsl",
+            "--source",
+            "src/test/resources/sources/correct_and_strange_chars.json",
+            "--image",
+            image.toFile().getAbsolutePath(),
+        };
+        Assertions.assertThrows(BaseException.class, () -> Main.run(args));
+        this.clearWriteProtectedFlag(output);
     }
 
     /**

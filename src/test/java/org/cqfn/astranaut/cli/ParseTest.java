@@ -35,12 +35,13 @@ import org.junit.jupiter.api.io.TempDir;
 @SuppressWarnings("PMD.TooManyMethods")
 class ParseTest extends EndToEndTest {
     @Test
-    void allParameters(final @TempDir Path temp) {
+    void allLongParameters(final @TempDir Path temp) {
         final Path ast = temp.resolve("ast.json");
         final Path image = temp.resolve("image.png");
         final String[] args = {
             "parse",
             "src/test/resources/dsl/identifiers_numbers_and_operators.dsl",
+            "--ignored",
             "--source",
             "src/test/resources/sources/two_additions.txt",
             "--language",
@@ -48,6 +49,27 @@ class ParseTest extends EndToEndTest {
             "--ast",
             ast.toFile().getAbsolutePath(),
             "--image",
+            image.toFile().getAbsolutePath(),
+        };
+        Main.main(args);
+        Assertions.assertTrue(ast.toFile().exists());
+        Assertions.assertTrue(image.toFile().exists());
+    }
+
+    @Test
+    void allShortParameters(final @TempDir Path temp) {
+        final Path ast = temp.resolve("ast.json");
+        final Path image = temp.resolve("image.png");
+        final String[] args = {
+            "parse",
+            "src/test/resources/dsl/identifiers_numbers_and_operators.dsl",
+            "-s",
+            "src/test/resources/sources/two_additions.txt",
+            "-l",
+            "common",
+            "-t",
+            ast.toFile().getAbsolutePath(),
+            "-i",
             image.toFile().getAbsolutePath(),
         };
         Main.main(args);

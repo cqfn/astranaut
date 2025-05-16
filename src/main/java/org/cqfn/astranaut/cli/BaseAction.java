@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.cli;
 
+import guru.nidi.graphviz.engine.GraphvizException;
 import java.io.File;
 import java.io.IOException;
 import org.cqfn.astranaut.core.base.Tree;
@@ -84,10 +85,10 @@ class BaseAction {
             final TreeVisualizer visualizer = new TreeVisualizer(tree);
             try {
                 visualizer.visualize(new File(options.getResultingImagePath()));
-            } catch (final IOException ignored) {
-                throw new CannotWriteFile(options.getResultingImagePath());
             } catch (final WrongFileExtension exception) {
                 throw new CommonCliException(exception.getErrorMessage());
+            } catch (final GraphvizException | IOException ignored) {
+                throw new CannotWriteFile(options.getResultingImagePath());
             }
         }
     }
