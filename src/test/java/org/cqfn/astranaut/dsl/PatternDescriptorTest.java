@@ -44,7 +44,7 @@ class PatternDescriptorTest {
             Collections.emptyList()
         );
         final Node node = DraftNode.create("A(B,C)");
-        boolean matches = pattern.matchNode(node, new Extracted());
+        final boolean matches = pattern.matchNode(node, new Extracted());
         Assertions.assertFalse(matches);
     }
 
@@ -59,7 +59,7 @@ class PatternDescriptorTest {
             )
         );
         final Node node = DraftNode.create("A");
-        boolean matches = pattern.matchNode(node, new Extracted());
+        final boolean matches = pattern.matchNode(node, new Extracted());
         Assertions.assertFalse(matches);
     }
 
@@ -75,11 +75,33 @@ class PatternDescriptorTest {
         );
         final Node node = DraftNode.create("C(D,E)");
         final Extracted extracted = new Extracted();
-        boolean matches = pattern.matchNode(node, extracted);
+        final boolean matches = pattern.matchNode(node, extracted);
         Assertions.assertTrue(matches);
         Assertions.assertFalse(extracted.getNodes(1).isEmpty());
         Assertions.assertEquals("D", extracted.getNodes(1).get(0).getTypeName());
         Assertions.assertFalse(extracted.getNodes(2).isEmpty());
         Assertions.assertEquals("E", extracted.getNodes(2).get(0).getTypeName());
+    }
+
+    @Test
+    void matchPatternWithRegularChildren() {
+        final PatternDescriptor pattern = new PatternDescriptor(
+            "F",
+            null,
+            Arrays.asList(
+                new PatternDescriptor("G", null, Collections.emptyList()),
+                new PatternDescriptor("H", null, Collections.emptyList())
+            )
+        );
+        final Extracted extracted = new Extracted();
+        Node node = DraftNode.create("F(G)");
+        boolean matches = pattern.matchNode(node, extracted);
+        Assertions.assertFalse(matches);
+        node = DraftNode.create("F(G,I)");
+        matches = pattern.matchNode(node, extracted);
+        Assertions.assertFalse(matches);
+        node = DraftNode.create("F(G,H)");
+        matches = pattern.matchNode(node, extracted);
+        Assertions.assertTrue(matches);
     }
 }
