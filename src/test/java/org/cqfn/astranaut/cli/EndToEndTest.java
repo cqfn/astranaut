@@ -27,11 +27,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclEntryPermission;
+import java.nio.file.attribute.AclEntryType;
+import java.nio.file.attribute.AclFileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import org.cqfn.astranaut.core.utils.FilesReader;
+import org.junit.jupiter.api.Assertions;
 
 /**
  * Common methods for tests that perform end-to-end testing of the entire application
@@ -73,5 +83,67 @@ class EndToEndTest {
         } catch (final IOException ignored) {
         }
         return listing;
+    }
+
+    /**
+     * Creates a directory at the given path and removes write permissions to make it
+     *  write-protected.
+     * @param dir The path to the directory to create and protect
+     */
+    void createWriteProtectedFolder(final Path dir) {
+        boolean oops = false;
+        try {
+            Files.createDirectories(dir);
+            if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("win")) {
+                final AclFileAttributeView view = Files.getFileAttributeView(
+                    dir,
+                    AclFileAttributeView.class
+                );
+                final AclEntry denied = AclEntry.newBuilder()
+                    .setType(AclEntryType.DENY)
+                    .setPrincipal(view.getOwner())
+                    .setPermissions(AclEntryPermission.WRITE_DATA, AclEntryPermission.APPEND_DATA)
+                    .build();
+                final List<AclEntry> acl = new ArrayList<>(view.getAcl());
+                acl.add(0, denied);
+                view.setAcl(acl);
+            } else {
+                final Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(dir);
+                permissions.remove(PosixFilePermission.OWNER_WRITE);
+                permissions.remove(PosixFilePermission.GROUP_WRITE);
+                permissions.remove(PosixFilePermission.OTHERS_WRITE);
+                Files.setPosixFilePermissions(dir, permissions);
+            }
+        } catch (final IOException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    /**
+     * Restores write permissions for a previously write-protected directory.
+     * @param dir The path to the directory whose write protection should be removed
+     */
+    void clearWriteProtectedFlag(final Path dir) {
+        boolean oops = false;
+        try {
+            if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("win")) {
+                final AclFileAttributeView view = Files.getFileAttributeView(
+                    dir,
+                    AclFileAttributeView.class
+                );
+                final List<AclEntry> acl = new ArrayList<>(view.getAcl());
+                acl.removeIf(entry -> entry.type() == AclEntryType.DENY);
+                view.setAcl(acl);
+            } else {
+                Files.setPosixFilePermissions(
+                    dir,
+                    PosixFilePermissions.fromString("rwxr-xr-x")
+                );
+            }
+        } catch (final IOException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 }

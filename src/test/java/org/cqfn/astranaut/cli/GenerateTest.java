@@ -26,14 +26,7 @@ package org.cqfn.astranaut.cli;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.AclEntry;
-import java.nio.file.attribute.AclEntryPermission;
-import java.nio.file.attribute.AclEntryType;
-import java.nio.file.attribute.AclFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import org.cqfn.astranaut.core.utils.FilesWriter;
@@ -213,70 +206,31 @@ class GenerateTest extends EndToEndTest {
 
     @Test
     void writeToProtectedFolder(final @TempDir Path temp) {
-        boolean oops = false;
+        final Path dir = temp.resolve("output");
+        this.createWriteProtectedFolder(dir);
+        String message = "";
+        final String[] args = {
+            "generate",
+            "src/test/resources/dsl/node_without_children.dsl",
+            "--output",
+            dir.toFile().getAbsolutePath(),
+            "--package",
+            "org.cqfn.uast.tree",
+            "--license",
+            "LICENSE.txt",
+            "--version",
+            "1.0.0",
+        };
+        boolean wow = false;
         try {
-            final Path dir = temp.resolve("output");
-            Files.createDirectories(dir);
-            if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("win")) {
-                final AclFileAttributeView view = Files.getFileAttributeView(
-                    dir,
-                    AclFileAttributeView.class
-                );
-                final AclEntry denied = AclEntry.newBuilder()
-                    .setType(AclEntryType.DENY)
-                    .setPrincipal(view.getOwner())
-                    .setPermissions(AclEntryPermission.WRITE_DATA, AclEntryPermission.APPEND_DATA)
-                    .build();
-                final List<AclEntry> acl = new ArrayList<>(view.getAcl());
-                acl.add(0, denied);
-                view.setAcl(acl);
-            } else {
-                final Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(dir);
-                permissions.remove(PosixFilePermission.OWNER_WRITE);
-                permissions.remove(PosixFilePermission.GROUP_WRITE);
-                permissions.remove(PosixFilePermission.OTHERS_WRITE);
-                Files.setPosixFilePermissions(dir, permissions);
-            }
-            String message = "";
-            final String[] args = {
-                "generate",
-                "src/test/resources/dsl/node_without_children.dsl",
-                "--output",
-                dir.toFile().getAbsolutePath(),
-                "--package",
-                "org.cqfn.uast.tree",
-                "--license",
-                "LICENSE.txt",
-                "--version",
-                "1.0.0",
-            };
-            boolean wow = false;
-            try {
-                Main.run(args);
-            } catch (final BaseException exception) {
-                wow = true;
-                message = exception.getErrorMessage();
-            }
-            if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("win")) {
-                final AclFileAttributeView view = Files.getFileAttributeView(
-                    dir,
-                    AclFileAttributeView.class
-                );
-                final List<AclEntry> acl = new ArrayList<>(view.getAcl());
-                acl.removeIf(entry -> entry.type() == AclEntryType.DENY);
-                view.setAcl(acl);
-            } else {
-                Files.setPosixFilePermissions(
-                    dir,
-                    PosixFilePermissions.fromString("rwxr-xr-x")
-                );
-            }
-            Assertions.assertTrue(wow);
-            Assertions.assertTrue(message.startsWith("Cannot create destination folder"));
-        } catch (final IOException ignored) {
-            oops = true;
+            Main.run(args);
+        } catch (final BaseException exception) {
+            wow = true;
+            message = exception.getErrorMessage();
         }
-        Assertions.assertFalse(oops);
+        this.clearWriteProtectedFlag(dir);
+        Assertions.assertTrue(wow);
+        Assertions.assertTrue(message.startsWith("Cannot create destination folder"));
     }
 
     @Test

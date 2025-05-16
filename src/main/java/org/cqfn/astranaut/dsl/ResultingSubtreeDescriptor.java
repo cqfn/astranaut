@@ -25,6 +25,14 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.Collections;
 import java.util.List;
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.base.Builder;
+import org.cqfn.astranaut.core.base.DummyNode;
+import org.cqfn.astranaut.core.base.EmptyFragment;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Fragment;
+import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.utils.ListUtils;
 
 /**
  * Descriptor representing the resulting subtree after a transformation.
@@ -127,5 +135,59 @@ public final class ResultingSubtreeDescriptor implements RightSideItem {
             }
         }
         return result;
+    }
+
+    /**
+     * Creates a node based on this descriptor and the extracted nodes and data.
+     * @param extracted Extracted nodes and data
+     * @param factory Factory for creating nodes
+     * @param fragment The fragment that is covered by the created node
+     * @return Created node or dummy node if node can't be created
+     */
+    public Node createNode(final Extracted extracted, final Factory factory,
+        final Fragment fragment) {
+        Node result = DummyNode.INSTANCE;
+        do {
+            final Builder builder = factory.createBuilder(this.type);
+            builder.setFragment(fragment);
+            boolean flag = true;
+            if (this.data instanceof StaticString) {
+                flag = builder.setData(((StaticString) this.data).getValue());
+            } else if (this.data instanceof UntypedHole) {
+                flag = builder.setData(extracted.getData(((UntypedHole) this.data).getNumber()));
+            }
+            if (!flag) {
+                break;
+            }
+            if (this.children.isEmpty()) {
+                flag = builder.setChildrenList(Collections.emptyList());
+            } else {
+                flag = builder.setChildrenList(this.createChildrenList(extracted, factory));
+            }
+            if (!flag || !builder.isValid()) {
+                break;
+            }
+            result = builder.createNode();
+        } while (false);
+        return result;
+    }
+
+    /**
+     * Creates a list of child nodes based on this descriptor and the extracted nodes and data.
+     * @param extracted Extracted nodes and data
+     * @param factory Factory for creating nodes
+     * @return Created children list
+     */
+    private List<Node> createChildrenList(final Extracted extracted, final Factory factory) {
+        final ListUtils<Node> list = new ListUtils<>();
+        for (final RightSideItem item : this.children) {
+            if (item instanceof UntypedHole) {
+                list.add(extracted.getNodes(((UntypedHole) item).getNumber()));
+            } else {
+                final ResultingSubtreeDescriptor descriptor = (ResultingSubtreeDescriptor) item;
+                list.add(descriptor.createNode(extracted, factory, EmptyFragment.INSTANCE));
+            }
+        }
+        return list.make();
     }
 }

@@ -30,13 +30,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests covering {@link ArgumentParser} class.
+ * Tests covering {@link GeneratorArguments} class.
  * @since 1.0.0
  */
-class ArgumentParserTest {
+class GeneratorArgumentsTest {
     @Test
     void output() {
-        final ArgumentParser parser = new ArgumentParser();
+        final GeneratorArguments parser = new GeneratorArguments();
         Assertions.assertEquals("output", parser.getOutput());
         boolean oops = false;
         try {
@@ -50,7 +50,7 @@ class ArgumentParserTest {
 
     @Test
     void outputShort() {
-        final ArgumentParser parser = new ArgumentParser();
+        final GeneratorArguments parser = new GeneratorArguments();
         boolean oops = false;
         try {
             parser.parse(Arrays.asList("-o", "test2"));
@@ -63,7 +63,7 @@ class ArgumentParserTest {
 
     @Test
     void badOutput() {
-        final ArgumentParser parser = new ArgumentParser();
+        final GeneratorArguments parser = new GeneratorArguments();
         Assertions.assertThrows(
             CommonCliException.class,
             () -> parser.parse(Collections.singletonList("-o"))
@@ -76,7 +76,7 @@ class ArgumentParserTest {
 
     @Test
     void licenseGood() {
-        final ArgumentParser parser = new ArgumentParser();
+        final GeneratorArguments parser = new GeneratorArguments();
         final String filename = "LICENSE.txt";
         Assertions.assertTrue(parser.getLicence().startsWith("Copyright"));
         boolean oops = false;
@@ -92,7 +92,7 @@ class ArgumentParserTest {
 
     @Test
     void licenseBad() {
-        final ArgumentParser parser = new ArgumentParser();
+        final GeneratorArguments parser = new GeneratorArguments();
         boolean oops = false;
         try {
             parser.parse(Arrays.asList("-l", "bad.file.name"));
@@ -109,7 +109,7 @@ class ArgumentParserTest {
 
     @Test
     void packageGood() {
-        final ArgumentParser parser = new ArgumentParser();
+        final GeneratorArguments parser = new GeneratorArguments();
         final String name = "org.cqfn.ast";
         Assertions.assertEquals("ast", parser.getPackage());
         boolean oops = false;
@@ -124,7 +124,7 @@ class ArgumentParserTest {
 
     @Test
     void packageBad() {
-        final ArgumentParser parser = new ArgumentParser();
+        final GeneratorArguments parser = new GeneratorArguments();
         boolean oops = false;
         try {
             parser.parse(Arrays.asList("--package", "bad#package$name"));
@@ -140,7 +140,7 @@ class ArgumentParserTest {
 
     @Test
     void versionGood() {
-        final ArgumentParser parser = new ArgumentParser();
+        final GeneratorArguments parser = new GeneratorArguments();
         final String version = "2.1.13";
         Assertions.assertEquals("1.0.0", parser.getVersion());
         boolean oops = false;
@@ -155,7 +155,7 @@ class ArgumentParserTest {
 
     @Test
     void versionBad() {
-        final ArgumentParser parser = new ArgumentParser();
+        final GeneratorArguments parser = new GeneratorArguments();
         boolean oops = false;
         try {
             parser.parse(Arrays.asList("-v", "1.0-bad"));
@@ -171,7 +171,7 @@ class ArgumentParserTest {
 
     @Test
     void unknownArgument() {
-        final ArgumentParser parser = new ArgumentParser();
+        final GeneratorArguments parser = new GeneratorArguments();
         boolean oops = false;
         try {
             parser.parse(Arrays.asList("-o", "test3", "unknown", "-l", "LICENSE.txt"));

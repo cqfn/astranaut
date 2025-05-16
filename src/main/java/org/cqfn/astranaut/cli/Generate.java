@@ -45,7 +45,6 @@ import org.cqfn.astranaut.codegen.java.PackageInfo;
 import org.cqfn.astranaut.codegen.java.ProviderGenerator;
 import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.codegen.java.TransformerGenerator;
-import org.cqfn.astranaut.core.utils.FilesWriter;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.NodeDescriptor;
 import org.cqfn.astranaut.dsl.Program;
@@ -56,11 +55,11 @@ import org.cqfn.astranaut.exceptions.BaseException;
  * Generates source code from the described rules.
  * @since 1.0.0
  */
-public final class Generate implements Action {
+public final class Generate extends BaseAction implements Action {
     /**
      * Command line options.
      */
-    private final ArgumentParser options;
+    private final GeneratorArguments options;
 
     /**
      * License object (required for all generated files).
@@ -91,7 +90,7 @@ public final class Generate implements Action {
      * Constructor.
      */
     public Generate() {
-        this.options = new ArgumentParser();
+        this.options = new GeneratorArguments();
     }
 
     @SuppressWarnings("PMD.PreserveStackTrace")
@@ -134,7 +133,7 @@ public final class Generate implements Action {
             this.basepkg
         );
         info.setVersion(this.options.getVersion());
-        Generate.writeFile(
+        this.writeFile(
             new File(this.root.toString(), "package-info.java"),
             info.generateJavaCode()
         );
@@ -144,7 +143,7 @@ public final class Generate implements Action {
         cct.setVersion(this.options.getVersion());
         final Context context = cct.createContext();
         final CompilationUnit provider = new ProviderGenerator(program).createUnit(context);
-        Generate.writeFile(
+        this.writeFile(
             new File(this.root.toString(), provider.getFileName()),
             provider.generateJavaCode()
         );
@@ -172,19 +171,19 @@ public final class Generate implements Action {
         }
         final PackageInfo info = new PackageInfo(this.license, brief, pkg);
         info.setVersion(this.options.getVersion());
-        Generate.writeFile(new File(folder, "package-info.java"), info.generateJavaCode());
+        this.writeFile(new File(folder, "package-info.java"), info.generateJavaCode());
         final Context.Constructor cct = new Context.Constructor();
         cct.setLicense(this.license);
         cct.setPackage(pkg);
         cct.setVersion(this.options.getVersion());
         final Context context = cct.createContext();
         final CompilationUnit factory = this.factories.createUnit(language, context);
-        Generate.writeFile(new File(folder, factory.getFileName()), factory.generateJavaCode());
+        this.writeFile(new File(folder, factory.getFileName()), factory.generateJavaCode());
         for (final NodeDescriptor rule : program.getNodeDescriptorsByLanguage(language).values()) {
             final RuleGenerator generator = rule.createGenerator();
             final Set<CompilationUnit> units = generator.createUnits(context);
             for (final CompilationUnit unit : units) {
-                Generate.writeFile(new File(folder, unit.getFileName()), unit.generateJavaCode());
+                this.writeFile(new File(folder, unit.getFileName()), unit.generateJavaCode());
             }
         }
     }
@@ -227,7 +226,7 @@ public final class Generate implements Action {
             pkg
         );
         info.setVersion(this.options.getVersion());
-        Generate.writeFile(new File(folder, "package-info.java"), info.generateJavaCode());
+        this.writeFile(new File(folder, "package-info.java"), info.generateJavaCode());
         final LeftSideGenerationContext context = new LeftSideGenerationContext();
         for (final TransformationDescriptor rule : rules) {
             for (final LeftSideItem item : rule.getLeft()) {
@@ -247,7 +246,7 @@ public final class Generate implements Action {
             for (final String name : context.getImports(klass)) {
                 unit.addImport(name);
             }
-            Generate.writeFile(new File(folder, unit.getFileName()), unit.generateJavaCode());
+            this.writeFile(new File(folder, unit.getFileName()), unit.generateJavaCode());
         }
         return matchers;
     }
@@ -293,7 +292,7 @@ public final class Generate implements Action {
         }
         final PackageInfo info = new PackageInfo(this.license, brief, pkg);
         info.setVersion(this.options.getVersion());
-        Generate.writeFile(new File(folder, "package-info.java"), info.generateJavaCode());
+        this.writeFile(new File(folder, "package-info.java"), info.generateJavaCode());
         final Context.Constructor cct = new Context.Constructor();
         cct.setLicense(this.license);
         cct.setPackage(pkg);
@@ -301,7 +300,7 @@ public final class Generate implements Action {
         cct.setMatchers(matchers);
         final Context context = cct.createContext();
         final CompilationUnit transformer = this.transformers.createUnit(language, context);
-        Generate.writeFile(
+        this.writeFile(
             new File(folder, transformer.getFileName()),
             transformer.generateJavaCode()
         );
@@ -309,50 +308,8 @@ public final class Generate implements Action {
             final RuleGenerator generator = rule.createGenerator();
             final Set<CompilationUnit> units = generator.createUnits(context);
             for (final CompilationUnit unit : units) {
-                Generate.writeFile(new File(folder, unit.getFileName()), unit.generateJavaCode());
+                this.writeFile(new File(folder, unit.getFileName()), unit.generateJavaCode());
             }
-        }
-    }
-
-    /**
-     * Writes a file.
-     * @param file File
-     * @param content File content
-     * @throws CliException In case it is not possible to write a file.
-     */
-    private static void writeFile(final File file, final String content) throws CliException {
-        final boolean result = new FilesWriter(file.getAbsolutePath()).writeStringNoExcept(content);
-        if (!result) {
-            throw new CannotWriteFile(file.getName());
-        }
-    }
-
-    /**
-     * Exception 'Cannot write file'.
-     * @since 1.0.0
-     */
-    private static final class CannotWriteFile extends CliException {
-        /**
-         * Version identifier.
-         */
-        private static final long serialVersionUID = -1;
-
-        /**
-         * The name of the file that could not be written.
-         */
-        private final String name;
-
-        /**
-         * Constructor.
-         * @param name The name of the file that could not be written
-         */
-        private CannotWriteFile(final String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String getErrorMessage() {
-            return String.format("Cannot write file: '%s'", this.name);
         }
     }
 }

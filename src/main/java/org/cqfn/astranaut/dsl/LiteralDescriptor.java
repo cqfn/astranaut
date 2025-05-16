@@ -32,7 +32,6 @@ import org.cqfn.astranaut.codegen.java.RuleGenerator;
 import org.cqfn.astranaut.core.base.Builder;
 import org.cqfn.astranaut.core.base.ChildDescriptor;
 import org.cqfn.astranaut.core.utils.MapUtils;
-import org.cqfn.astranaut.core.utils.Pair;
 import org.cqfn.astranaut.interpreter.LiteralBuilder;
 
 /**
@@ -49,39 +48,71 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
     /**
      * Collection of primitive types.
      */
-    public static final Map<String, Pair<String, String>> PRIMITIVES =
-        new MapUtils<String, Pair<String, String>>()
+    public static final Map<String, PrimitiveDescriptor> PRIMITIVES =
+        new MapUtils<String, PrimitiveDescriptor>()
             .put(
                 "byte",
-                new Pair<>("Byte.parseByte(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+                new PrimitiveDescriptor(
+                    "Byte.parseByte(#)",
+                    LiteralDescriptor.NUMBER_EXCEPTION,
+                    "0"
+                )
             )
             .put(
                 "short",
-                new Pair<>("Short.parseShort(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+                new PrimitiveDescriptor(
+                    "Short.parseShort(#)",
+                    LiteralDescriptor.NUMBER_EXCEPTION,
+                    "0"
+                )
             )
             .put(
                 "int",
-                new Pair<>("Integer.parseInt(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+                new PrimitiveDescriptor(
+                    "Integer.parseInt(#)",
+                    LiteralDescriptor.NUMBER_EXCEPTION,
+                    "0"
+                )
             )
             .put(
                 "long",
-                new Pair<>("Long.parseLong(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+                new PrimitiveDescriptor(
+                    "Long.parseLong(#)",
+                    LiteralDescriptor.NUMBER_EXCEPTION,
+                    "0"
+                )
             )
             .put(
                 "float",
-                new Pair<>("Float.parseFloat(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+                new PrimitiveDescriptor(
+                    "Float.parseFloat(#)",
+                    LiteralDescriptor.NUMBER_EXCEPTION,
+                    "0"
+                )
             )
             .put(
                 "double",
-                new Pair<>("Double.parseDouble(#)", LiteralDescriptor.NUMBER_EXCEPTION)
+                new PrimitiveDescriptor(
+                    "Double.parseDouble(#)",
+                    LiteralDescriptor.NUMBER_EXCEPTION,
+                    "0"
+                )
             )
             .put(
                 "char",
-                new Pair<>("#.charAt(0)", "IndexOutOfBoundsException")
+                new PrimitiveDescriptor(
+                    "#.charAt(0)",
+                    "IndexOutOfBoundsException",
+                    " "
+                )
             )
             .put(
                 "boolean",
-                new Pair<>("Boolean.parseBoolean(value)", "")
+                new PrimitiveDescriptor(
+                    "Boolean.parseBoolean(value)",
+                    "",
+                    "false"
+                )
             )
             .make();
 
@@ -133,10 +164,30 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
 
     /**
      * Returns the initial data of the nodes to be created.
+     * @return Data represented as Java code
+     */
+    public String getInitialCode() {
+        return this.initial;
+    }
+
+    /**
+     * Returns the initial data of the nodes to be created.
      * @return Data represented as a string
      */
-    public String getInitial() {
-        return this.initial;
+    public String getInitialAsString() {
+        final String result;
+        if (this.initial.isEmpty() && LiteralDescriptor.PRIMITIVES.containsKey(this.type)) {
+            result = LiteralDescriptor.PRIMITIVES.get(this.type).initial;
+        } else if (this.initial.isEmpty()) {
+            result = "";
+        } else if (this.type.equals("char") || this.type.equals("String")) {
+            result = this.initial.substring(1, this.initial.length() - 1);
+        } else if (LiteralDescriptor.PRIMITIVES.containsKey(this.type)) {
+            result = this.initial;
+        } else {
+            result = "";
+        }
+        return result;
     }
 
     /**
@@ -160,7 +211,7 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
     public String getParser() {
         final String code;
         if (this.parser.isEmpty() && LiteralDescriptor.PRIMITIVES.containsKey(this.type)) {
-            code = LiteralDescriptor.PRIMITIVES.get(this.type).getKey();
+            code = LiteralDescriptor.PRIMITIVES.get(this.type).parser;
         } else {
             code = this.parser;
         }
@@ -174,7 +225,7 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
     public String getException() {
         final String code;
         if (this.exception.isEmpty() && LiteralDescriptor.PRIMITIVES.containsKey(this.type)) {
-            code = LiteralDescriptor.PRIMITIVES.get(this.type).getValue();
+            code = LiteralDescriptor.PRIMITIVES.get(this.type).exception;
         } else {
             code = this.exception;
         }
@@ -417,6 +468,40 @@ public final class LiteralDescriptor extends NonAbstractNodeDescriptor {
                 result = String.format("'%s'", parameter);
             }
             return result;
+        }
+    }
+
+    /**
+     * Primitive type descriptor.
+     * @since 1.0.0
+     */
+    private static final class PrimitiveDescriptor {
+        /**
+         * Line of Java code that parses data represented as a string into a native Java type.
+         */
+        private final String parser;
+
+        /**
+         * Java exception thrown when attempting to set invalid data and which must be caught.
+         */
+        private final String exception;
+
+        /**
+         * Initial value (used for the interpreter).
+         */
+        private final String initial;
+
+        /**
+         * Constructor.
+         * @param parser Line of Java code that parses data
+         * @param exception Java exception thrown when attempting to set invalid data
+         * @param initial Initial value
+         */
+        private PrimitiveDescriptor(final String parser, final String exception,
+            final String initial) {
+            this.parser = parser;
+            this.exception = exception;
+            this.initial = initial;
         }
     }
 }

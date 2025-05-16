@@ -25,6 +25,8 @@ package org.cqfn.astranaut.dsl;
 
 import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
 import org.cqfn.astranaut.codegen.java.SymbolMatcherGenerator;
+import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
+import org.cqfn.astranaut.core.base.Node;
 import org.cqfn.astranaut.parser.SymbolicToken;
 
 /**
@@ -104,6 +106,27 @@ public final class SymbolDescriptor implements PatternItem, LeftSideItem {
     @Override
     public String toString() {
         return this.toFullString();
+    }
+
+    @Override
+    public boolean matchNode(final Node node, final Extracted extracted) {
+        boolean matches = false;
+        do {
+            if (!node.belongsToGroup("Char")) {
+                break;
+            }
+            final String string = node.getData();
+            if (string.length() != 1) {
+                break;
+            }
+            final char symbol = string.charAt(0);
+            matches = symbol >= this.token.getFirstSymbol()
+                && symbol <= this.token.getLastSymbol();
+            if (matches && this.data != null) {
+                extracted.addData(this.data.getNumber(), string);
+            }
+        } while (false);
+        return matches;
     }
 
     /**

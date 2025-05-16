@@ -143,6 +143,10 @@ public final class Matcher0 implements Matcher {
                 break;
             }
             matches = Matcher0.checkSeventh(queue, extracted);
+            if (!matches) {
+                break;
+            }
+            matches = queue.isEmpty();
         } while (false);
         if (matches) {
             extracted.addData(Matcher0.HOLE_NUMBER, node.getData());

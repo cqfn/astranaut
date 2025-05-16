@@ -140,6 +140,10 @@ public final class Matcher0 implements Matcher {
             Matcher0.checkSecond(queue, extracted);
             Matcher0.checkThird(queue, extracted);
             matches = Matcher0.checkFourth(queue, extracted);
+            if (!matches) {
+                break;
+            }
+            matches = queue.isEmpty();
         } while (false);
         return matches;
     }

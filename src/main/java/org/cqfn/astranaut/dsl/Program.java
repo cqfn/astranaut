@@ -26,16 +26,25 @@ package org.cqfn.astranaut.dsl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import org.cqfn.astranaut.core.algorithms.conversion.Converter;
+import org.cqfn.astranaut.core.algorithms.conversion.DefaultTransformer;
+import org.cqfn.astranaut.core.base.DefaultFactory;
+import org.cqfn.astranaut.core.base.Factory;
+import org.cqfn.astranaut.core.base.Provider;
+import org.cqfn.astranaut.core.base.Transformer;
+import org.cqfn.astranaut.core.base.Type;
 
 /**
  * Program, that is, a set of rules described in DSL.
  * @since 1.0.0
  */
-public final class Program {
+public final class Program implements Provider {
     /**
      * List of all rules (immutable).
      */
@@ -57,6 +66,11 @@ public final class Program {
     private final Map<String, List<TransformationDescriptor>> converters;
 
     /**
+     * Cached result for getFactory().
+     */
+    private final Map<String, Factory> factories;
+
+    /**
      * Constructor.
      * @param all List of all rules
      */
@@ -64,6 +78,7 @@ public final class Program {
         this.all = Collections.unmodifiableList(new ArrayList<>(all));
         this.nodes = new TreeMap<>();
         this.converters = new TreeMap<>();
+        this.factories = new TreeMap<>();
     }
 
     /**
@@ -168,5 +183,46 @@ public final class Program {
             this.converters.put(language, result);
         }
         return result;
+    }
+
+    @Override
+    public Factory getFactory(final String language) {
+        final String lowercase;
+        if (language == null || language.isEmpty()) {
+            lowercase = "common";
+        } else {
+            lowercase = language.toLowerCase(Locale.ENGLISH);
+        }
+        final Factory factory;
+        if (this.factories.containsKey(lowercase)) {
+            factory = this.factories.get(lowercase);
+        } else {
+            final Map<String, Type> types = new TreeMap<>();
+            for (final Map.Entry<String, NodeDescriptor> entry
+                : this.getNodeDescriptorsByLanguage(lowercase).entrySet()) {
+                if (entry.getValue() instanceof NonAbstractNodeDescriptor) {
+                    types.put(entry.getKey(), (Type) entry.getValue());
+                }
+            }
+            factory = new DefaultFactory(types);
+            this.factories.put(lowercase, factory);
+        }
+        return factory;
+    }
+
+    @Override
+    public Transformer getTransformer(final String language) {
+        final String lowercase;
+        if (language == null || language.isEmpty()) {
+            lowercase = "common";
+        } else {
+            lowercase = language.toLowerCase(Locale.ENGLISH);
+        }
+        return new DefaultTransformer(
+            this.getTransformationDescriptorsByLanguage(lowercase)
+                .stream()
+                .map(d -> (Converter) d).collect(Collectors.toList()),
+            this.getFactory(lowercase)
+        );
     }
 }

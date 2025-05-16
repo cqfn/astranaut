@@ -51,7 +51,7 @@ public final class LiteralBuilder  implements Builder {
      */
     public LiteralBuilder(final LiteralDescriptor descriptor) {
         this.descriptor = descriptor;
-        this.data = descriptor.getInitial();
+        this.data = descriptor.getInitialAsString();
     }
 
     @Override
