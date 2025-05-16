@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,53 +23,83 @@
  */
 package org.cqfn.astranaut.parser;
 
-import org.cqfn.astranaut.core.base.CoreException;
-import org.cqfn.astranaut.exceptions.ExceptionWithLineNumber;
-import org.cqfn.astranaut.exceptions.ParserException;
-import org.cqfn.astranaut.rules.Program;
-import org.cqfn.astranaut.utils.CommentsRemover;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.cqfn.astranaut.dsl.NodeDescriptor;
+import org.cqfn.astranaut.dsl.Program;
+import org.cqfn.astranaut.dsl.Rule;
+import org.cqfn.astranaut.dsl.TransformationDescriptor;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * Parses the whole DSL program.
- *
- * @since 0.1.5
+ * Parses a program written in the DSL language. The whole program.
+ * @since 1.0.0
  */
-public class ProgramParser {
+@SuppressWarnings("PMD.CloseResource")
+public final class ProgramParser {
     /**
-     * Source string.
+     * Current language.
      */
-    private final String source;
+    private String language;
+
+    /**
+     * Rules in relation to the location of the DSL code from which they are parsed.
+     */
+    private final Map<Rule, Location> locations;
 
     /**
      * Constructor.
-     * @param source The source string.
      */
-    public ProgramParser(final String source) {
-        this.source = source;
+    public ProgramParser() {
+        this.language = "common";
+        this.locations = new HashMap<>();
     }
 
     /**
-     * Parses the whole DSL program.
-     * @return Parsed program.
-     * @throws CoreException If source can't be parsed
+     * Parses a program written in the DSL language.
+     * @param reader Reader that reads the DSL source code and separates it into statements
+     * @return Entire program
+     * @throws BaseException If there is an error in the program
      */
-    public Program parse() throws CoreException {
-        final String code = new CommentsRemover(this.source).remove();
-        final String[] lines = code.split(";");
-        final Program program = new Program();
-        final InstructionParser parser = new InstructionParser(program);
-        int number = 1;
-        for (final String line : lines) {
-            final String dsl = line.trim();
-            if (!dsl.isEmpty()) {
-                try {
-                    parser.parse(dsl);
-                } catch (final ParserException error) {
-                    throw new ExceptionWithLineNumber(error, number);
-                }
+    public Program parse(final DslReader reader) throws BaseException {
+        final List<Rule> list = new ArrayList<>(0);
+        Statement stmt = reader.getStatement();
+        while (stmt != null) {
+            final String newlang = stmt.getLanguage();
+            if (!newlang.isEmpty()) {
+                this.language = newlang;
             }
-            number = number + 1;
+            final String code = stmt.getCode();
+            if (code.contains("<-")) {
+                final NodeDescriptorParser parser = new NodeDescriptorParser(this.language, stmt);
+                final NodeDescriptor descr = parser.parseDescriptor();
+                list.add(descr);
+                this.locations.put(descr, stmt.getLocation());
+            } else if (code.contains("->")) {
+                final TransformationDescriptorParser parser =
+                    new TransformationDescriptorParser(this.language, stmt);
+                final TransformationDescriptor descr = parser.parseDescriptor();
+                list.add(descr);
+                this.locations.put(descr, stmt.getLocation());
+            } else {
+                throw new CommonParsingException(
+                    stmt.getLocation(),
+                    "The rule does not contain a separator"
+                );
+            }
+            stmt = reader.getStatement();
         }
-        return program;
+        return new Program(list);
+    }
+
+    /**
+     * Returns rules in relation to the location of the DSL code from which they are parsed.
+     * @return Locations map
+     */
+    public Map<Rule, Location> getLocations() {
+        return Collections.unmodifiableMap(this.locations);
     }
 }

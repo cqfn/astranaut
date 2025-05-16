@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,62 +23,145 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
-import org.cqfn.astranaut.rules.Instruction;
-import org.cqfn.astranaut.rules.Node;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.cqfn.astranaut.dsl.ListNodeDescriptor;
+import org.cqfn.astranaut.dsl.NodeDescriptor;
 
 /**
- * Generates source code for rules that describe list nodes.
- *
- * @since 0.1.5
+ * Generator that creates source code for a list node, that is, node that can contain
+ *  an unlimited number of child nodes of the same type.
+ * @since 1.0.0
  */
-final class ListNodeGenerator extends BaseNodeGenerator {
+public final class ListNodeGenerator extends NonAbstractNodeGenerator {
     /**
-     * The DSL instruction.
+     * Descriptor on the basis of which the source code will be built.
      */
-    private final Instruction<Node> instruction;
+    private final ListNodeDescriptor rule;
+
+    /**
+     * Java type of node list.
+     */
+    private final String ltype;
 
     /**
      * Constructor.
-     * @param env The environment required for generation.
-     * @param instruction The DSL instruction
+     * @param rule The rule that describes regular node
      */
-    ListNodeGenerator(final Environment env, final Instruction<Node> instruction) {
-        super(env);
-        this.instruction = instruction;
+    public ListNodeGenerator(final ListNodeDescriptor rule) {
+        this.rule = rule;
+        this.ltype = String.format("List<%s>", this.rule.getChildType());
     }
 
     @Override
-    public CompilationUnit generate() {
-        final Environment env = this.getEnv();
-        final Node rule = this.instruction.getRule();
-        final Klass klass = this.createClass(rule);
-        new ListNodeClassConstructor(env, rule, klass).run();
-        final String pkg = this.getPackageName(this.instruction.getLanguage());
-        final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
-        this.generateImports(unit, rule);
-        return unit;
+    public NodeDescriptor getRule() {
+        return this.rule;
     }
 
-    /**
-     * Generates imports block.
-     * @param unit The compilation unit
-     * @param rule The rule
-     */
-    private void generateImports(final CompilationUnit unit, final Node rule) {
-        unit.addImport("java.util.ArrayList");
-        if (this.getEnv().getHierarchy(rule.getType()).size() > 1) {
-            unit.addImport("java.util.Arrays");
-        }
-        unit.addImport("java.util.Collections");
-        unit.addImport("java.util.List");
-        unit.addImport("java.util.Map");
-        unit.addImport("org.cqfn.astranaut.core.utils.MapUtils");
-        final String base = "org.cqfn.astranaut.core.base";
-        unit.addImport(base.concat(".Builder"));
-        unit.addImport(base.concat(".ChildDescriptor"));
-        unit.addImport(base.concat(".EmptyFragment"));
-        unit.addImport(base.concat(".Fragment"));
-        unit.addImport(base.concat(".Node"));
-        unit.addImport(base.concat(".Type"));
+    @Override
+    public void createSpecificEntitiesInNodeClass(final Klass klass) {
+        final String type = this.rule.getChildType();
+        final Field children = new Field(
+            this.ltype,
+            "children",
+            "List of child nodes"
+        );
+        children.makePrivate();
+        klass.addField(children);
+        final Method getter = new Method(
+            type,
+            String.format("get%s", type),
+            "Returns child node by its index"
+        );
+        getter.makePublic();
+        getter.addArgument(Strings.TYPE_INT, "index", "Child index");
+        getter.setBody("return this.children.get(index);");
+        getter.setReturnsDescription("Child node");
+        klass.addMethod(getter);
+    }
+
+    @Override
+    public String getDataGetterBody() {
+        return "return \"\";";
+    }
+
+    @Override
+    public String getChildCountGetterBody() {
+        return "return this.children.size();";
+    }
+
+    @Override
+    public String getChildGetterBody() {
+        return "return this.children.get(index);";
+    }
+
+    @Override
+    public void createSpecificEntitiesInTypeClass(final ConstantStrings constants,
+        final Klass klass) {
+        this.getClass();
+    }
+
+    @Override
+    public void createSpecificEntitiesInBuilderClass(final Klass klass) {
+        this.needCollectionsClass();
+        final Field children = new Field(
+            this.ltype,
+            "children",
+            "List of child nodes"
+        );
+        children.makePrivate();
+        klass.addField(children);
+        final Constructor ctor = klass.createConstructor();
+        ctor.makePublic();
+        ctor.setBody(
+            String.join(
+                "\n",
+                Arrays.asList(
+                    "this.fragment = EmptyFragment.INSTANCE;",
+                    "this.children = Collections.emptyList();"
+                )
+            )
+        );
+    }
+
+    @Override
+    public String getDataSetterBody() {
+        return "return value.isEmpty();";
+    }
+
+    @Override
+    public String getChildrenListSetterBody() {
+        this.needArrayListClass();
+        final String type = this.rule.getChildType();
+        final List<String> lines = new ArrayList<>(16);
+        lines.add(
+            String.format(
+                "final %s temp = new ArrayList<>(list.size());",
+               this.ltype
+            )
+        );
+        lines.add("boolean result = true;");
+        lines.add("for (final Node node: list) {");
+        lines.add(String.format("if (node instanceof %s) {", type));
+        lines.add(String.format("temp.add((%s) node);", type));
+        lines.add("} else {");
+        lines.add("result = false;");
+        lines.add("break;");
+        lines.add("}");
+        lines.add("}");
+        lines.add("this.children = temp;");
+        lines.add("return result;");
+        return String.join("\n", lines);
+    }
+
+    @Override
+    public String getValidatorBody() {
+        return "return true;";
+    }
+
+    @Override
+    public void fillNodeCreator(final List<String> lines) {
+        lines.add("node.children = Collections.unmodifiableList(this.children);");
     }
 }

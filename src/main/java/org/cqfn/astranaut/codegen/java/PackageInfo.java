@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,72 +23,53 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
-import java.util.Objects;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * The package info generator.
- *
- * @since 0.1.5
+ * Describes 'package-info.java' file.
+ * @since 1.0.0
  */
-public final class PackageInfo implements JavaFile {
+public final class PackageInfo implements JavaFileGenerator {
     /**
-     * The license.
+     * License.
      */
     private final License license;
 
     /**
-     * The brief description.
+     * Documentation.
      */
-    private final String brief;
+    private final JavaDoc doc;
 
     /**
-     * The version.
+     * Package itself.
      */
-    private String version;
-
-    /**
-     * The package name.
-     */
-    private final String pkg;
+    private final Package pkg;
 
     /**
      * Constructor.
-     * @param license The license
-     * @param brief The brief description
-     * @param pkg The package name
+     * @param license License
+     * @param brief Brief description of the package
+     * @param pkg Package itself
      */
-    public PackageInfo(final License license, final String brief, final String pkg) {
+    public PackageInfo(final License license, final String brief, final Package pkg) {
         this.license = license;
-        this.brief = brief;
-        this.version = "1.0";
+        this.doc = new JavaDoc(brief);
         this.pkg = pkg;
     }
 
-    @Override
-    public void setVersion(final String str) {
-        this.version = Objects.requireNonNull(str);
-    }
-
-    @Override
-    public String generate() {
-        final StringBuilder builder = new StringBuilder();
-        if (this.license.isValid()) {
-            builder.append(this.license.generate());
-        }
-        this.generateHeader(builder);
-        builder.append("package ").append(this.pkg).append(";\n");
-        return builder.toString();
-    }
-
     /**
-     * Generates package info header.
-     * @param builder Where to generate
+     * Sets the version number. It will be added to JavaDoc.
+     * @param value Version number
      */
-    private void generateHeader(final StringBuilder builder) {
-        builder.append("/**\n * ")
-            .append(this.brief)
-            .append(".\n * @since ")
-            .append(this.version)
-            .append("\n */\n");
+    public void setVersion(final String value) {
+        this.doc.setVersion(value);
+    }
+
+    @Override
+    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
+        this.license.build(indent, code);
+        code.addEmpty();
+        this.doc.build(indent, code);
+        this.pkg.build(indent, code);
     }
 }

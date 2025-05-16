@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,84 +23,167 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import java.util.ArrayList;
 import java.util.List;
-import org.cqfn.astranaut.rules.Instruction;
-import org.cqfn.astranaut.rules.Literal;
+import org.cqfn.astranaut.dsl.LiteralDescriptor;
+import org.cqfn.astranaut.dsl.NodeDescriptor;
 
 /**
- * Generates source code for rules that describe literals.
- *
- * @since 0.1.5
+ * Generator that creates source code for a literal, that is, a node that has data
+ *  and no child nodes.
+ * @since 1.0.0
  */
-final class LiteralGenerator extends BaseGenerator {
+public final class LiteralGenerator extends NonAbstractNodeGenerator {
     /**
-     * The DSL instruction.
+     * Descriptor on the basis of which the source code will be built.
      */
-    private final Instruction<Literal> instruction;
+    private final LiteralDescriptor rule;
 
     /**
      * Constructor.
-     * @param env The environment required for generation.
-     * @param instruction The DSL instruction
+     * @param rule The rule that describes regular node
      */
-    LiteralGenerator(final Environment env, final Instruction<Literal> instruction) {
-        super(env);
-        this.instruction = instruction;
+    public LiteralGenerator(final LiteralDescriptor rule) {
+        this.rule = rule;
     }
 
     @Override
-    public CompilationUnit generate() {
-        final Environment env = this.getEnv();
-        final Literal rule = this.instruction.getRule();
-        final Klass klass = this.createClass(rule);
-        new LiteralClassConstructor(env, rule, klass).run();
-        final String pkg = this.getPackageName(this.instruction.getLanguage());
-        final CompilationUnit unit = new CompilationUnit(env.getLicense(), pkg, klass);
-        this.generateImports(unit, rule);
-        return unit;
+    public NodeDescriptor getRule() {
+        return this.rule;
     }
 
-    /**
-     * Creates class for node construction.
-     * @param rule The rule
-     * @return The class constructor
-     */
-    private Klass createClass(final Literal rule) {
-        final String type = rule.getType();
-        final Klass klass = new Klass(
-            String.format("Node that describes the '%s' type", type),
-            type
+    @Override
+    public void createSpecificEntitiesInNodeClass(final Klass klass) {
+        final Field value = new Field(
+            this.rule.getDataType(),
+            "data",
+            "Value of the node"
         );
-        klass.makeFinal();
-        final List<String> hierarchy = this.getEnv().getHierarchy(type);
-        if (hierarchy.size() > 1) {
-            klass.setInterfaces(hierarchy.get(1));
-        } else {
-            klass.setInterfaces("Node");
+        value.makePrivate();
+        klass.addField(value);
+        this.needCollectionsClass();
+        final Method getter = new Method(
+            this.rule.getDataType(),
+            "getValue",
+            "Returns the value of the node in native form"
+        );
+        getter.setReturnsDescription("Value of the node");
+        getter.makePublic();
+        getter.setBody("return this.data;");
+        if (this.rule.getDataType().equals("boolean")) {
+            getter.suppressWarning("PMD.BooleanGetMethodName");
         }
-        return klass;
+        klass.addMethod(getter);
+        final Method list = new Method(Strings.TYPE_NODE_LIST, "getChildrenList");
+        list.makePublic();
+        list.setBody("return Collections.emptyList();");
+        klass.addMethod(list);
     }
 
-    /**
-     * Generates imports block.
-     * @param unit The compilation unit
-     * @param rule The rule
-     */
-    private void generateImports(final CompilationUnit unit, final Literal rule) {
-        final List<String> hierarchy = this.getEnv().getHierarchy(rule.getType());
-        if (hierarchy.size() > 1) {
-            unit.addImport("java.util.Arrays");
+    @Override
+    public String getDataGetterBody() {
+        final String serializer = this.rule.getSerializer();
+        final String body;
+        if (serializer.isEmpty()) {
+            body = "return this.data;";
+        } else {
+            body = String.format(
+                "return %s;",
+                this.rule.getSerializer().replace("#", "this.data")
+            );
         }
-        unit.addImport("java.util.Collections");
-        unit.addImport("java.util.List");
-        unit.addImport("java.util.Map");
-        unit.addImport("org.cqfn.astranaut.core.utils.MapUtils");
-        final String base = "org.cqfn.astranaut.core.base";
-        unit.addImport(base.concat(".Builder"));
-        unit.addImport(base.concat(".ChildDescriptor"));
-        unit.addImport(base.concat(".EmptyFragment"));
-        unit.addImport(base.concat(".Fragment"));
-        unit.addImport(base.concat(".Node"));
-        unit.addImport(base.concat(".Type"));
+        return body;
+    }
+
+    @Override
+    public String getChildCountGetterBody() {
+        return "return 0;";
+    }
+
+    @Override
+    public String getChildGetterBody() {
+        return "throw new IndexOutOfBoundsException();";
+    }
+
+    @Override
+    public void createSpecificEntitiesInTypeClass(final ConstantStrings constants,
+        final Klass klass) {
+        this.getClass();
+    }
+
+    @Override
+    public void createSpecificEntitiesInBuilderClass(final Klass klass) {
+        String body = "this.fragment = EmptyFragment.INSTANCE;";
+        final String initial = this.rule.getInitialCode();
+        if (!initial.isEmpty()) {
+            body = String.format("%s\nthis.data = %s;", body, initial);
+        }
+        final Constructor ctor = klass.createConstructor();
+        ctor.makePublic();
+        ctor.setBody(body);
+        final Field value = new Field(
+            this.rule.getDataType(),
+            "data",
+            "Value of the node to be created"
+        );
+        value.makePrivate();
+        klass.addField(value);
+        final Method setter = new Method(
+            "void",
+            "setValue",
+            "Sets the value of the node to be created."
+        );
+        setter.makePublic();
+        setter.addArgument(this.rule.getDataType(), "value", "Value of the node");
+        setter.setBody("this.data = value;");
+        klass.addMethod(setter);
+    }
+
+    @Override
+    public String getDataSetterBody() {
+        final List<String> lines = new ArrayList<>(2);
+        final String parser = this.rule.getParser();
+        final String exception = this.rule.getException();
+        String ret = "true";
+        if (parser.isEmpty()) {
+            lines.add("this.data = value;");
+        } else if (exception.isEmpty()) {
+            lines.add(
+                String.format(
+                    "this.data = %s;",
+                    parser.replace("#", "value")
+                )
+            );
+        } else {
+            ret = "result";
+            lines.add("boolean result = true;");
+            lines.add("try {");
+            lines.add(
+                String.format(
+                    "this.data = %s;",
+                    parser.replace("#", "value")
+                )
+            );
+            lines.add(String.format("} catch (final %s ignored) {", exception));
+            lines.add("result = false;");
+            lines.add("}");
+        }
+        lines.add(String.format("return %s;", ret));
+        return String.join("\n", lines);
+    }
+
+    @Override
+    public String getChildrenListSetterBody() {
+        return "return list.isEmpty();";
+    }
+
+    @Override
+    public String getValidatorBody() {
+        return "return true;";
+    }
+
+    @Override
+    public void fillNodeCreator(final List<String> lines) {
+        lines.add("node.data = this.data;");
     }
 }

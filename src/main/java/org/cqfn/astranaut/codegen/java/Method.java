@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,237 +23,231 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
-import org.cqfn.astranaut.utils.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
+import org.cqfn.astranaut.core.utils.Pair;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * Java method body.
- *
- * @since 0.1.5
+ * Describes a method and generates source code for it.
+ * @since 1.0.0
  */
-public final class Method implements Entity {
+public final class Method extends BaseMethod {
     /**
-     * The beginning of the method body.
+     * Type of return value.
      */
-    private static final String BODY_BEGIN = " {\n";
+    private final String ret;
 
     /**
-     * The descriptor.
+     * Name of the method.
      */
-    private final MethodDescriptor descriptor;
+    private final String name;
 
     /**
-     * The body.
+     * Documentation.
      */
-    private final MethodBody body;
+    private final JavaDoc doc;
 
     /**
-     * The flag indicates that the method is public.
+     * Suppresses compiler or codechecker warnings.
      */
-    private boolean fpublic;
+    private final Suppress suppress;
 
     /**
-     * The flag indicates that the method is private.
+     * Flag indicating that the generated method is overridden.
      */
-    private boolean fprivate;
+    private final boolean over;
 
     /**
-     * The flag indicates that the method is static.
+     * Flag indicating that the generated method is static.
      */
-    private boolean fstatic;
+    private boolean stat;
 
     /**
-     * The flag indicates that the method is abstract.
+     * Flag indicating that the generated method is final.
      */
-    private boolean fabstract;
+    private boolean fin;
 
     /**
-     * The flag indicates that the method is overridden.
+     * List of method arguments (where key is type, value is name).
      */
-    private boolean foverride;
+    private final List<Pair<String, String>> args;
 
     /**
-     * Main constructor.
-     * @param brief The brief description.
-     * @param name The name of the method.
-     * @param foverride Flag indicates that the method is overridden
+     * Body of the method.
      */
-    private Method(final String brief, final String name, final boolean foverride) {
-        this.descriptor = new MethodDescriptor(brief, name);
-        this.body = new MethodBody();
-        this.fpublic = true;
-        this.foverride = foverride;
+    private String body;
+
+    /**
+     * Constructor of overridden method.
+     * @param ret Type of the method.
+     * @param name Name of the method.
+     */
+    public Method(final String ret, final String name) {
+        this(ret, name, "");
     }
 
     /**
      * Constructor.
-     * @param brief The brief description.
-     * @param name The name of the method.
+     * @param ret Type of the method.
+     * @param name Name of the method.
+     * @param brief Brief description of the method
      */
-    public Method(final String brief, final String name) {
-        this(brief, name, false);
+    public Method(final String ret, final String name, final String brief) {
+        this.ret = ret;
+        this.name = name;
+        this.doc = new JavaDoc(brief);
+        this.suppress = new Suppress();
+        this.over = brief.isEmpty();
+        this.args = new ArrayList<>(0);
+        this.body = "";
     }
 
     /**
-     * Constructor (for overridden methods).
-     * @param name The name of the method.
-     */
-    public Method(final String name) {
-        this("", name, true);
-    }
-
-    /**
-     * Adds the argument to the method.
-     * @param type The type
-     * @param name The name
-     * @param description The brief description
-     */
-    public void addArgument(final String type, final String name, final String description) {
-        this.descriptor.addArgument(type, name, description);
-    }
-
-    /**
-     * Adds the argument to the method, without description.
-     * @param type The type
-     * @param name The name
-     */
-    public void addArgument(final String type, final String name) {
-        this.descriptor.addArgument(type, name, "");
-    }
-
-    /**
-     * Sets the return type.
-     * @param type The type name
-     * @param description The description what the method returns
-     */
-    public void setReturnType(final String type, final String description) {
-        this.descriptor.setReturnType(type, description);
-    }
-
-    /**
-     * Sets the return type (without description).
-     * @param type The type name
-     */
-    public void setReturnType(final String type) {
-        this.descriptor.setReturnType(type, "");
-    }
-
-    /**
-     * Sets the new code.
-     * @param str The new code
-     */
-    public void setCode(final String str) {
-        this.body.setCode(str);
-    }
-
-    /**
-     * Resets all flags.
-     */
-    public void resetFlags() {
-        this.fpublic = false;
-        this.fprivate = false;
-        this.fstatic = false;
-        this.fabstract = false;
-        this.foverride = false;
-    }
-
-    /**
-     * Makes this method public.
-     */
-    public void makePublic() {
-        this.fpublic = true;
-        this.fprivate = false;
-    }
-
-    /**
-     * Makes this method private.
-     */
-    public void makePrivate() {
-        this.resetFlags();
-        this.fprivate = true;
-    }
-
-    /**
-     * Makes this method abstract.
-     */
-    public void makeAbstract() {
-        this.resetFlags();
-        this.fpublic = true;
-        this.fabstract = true;
-        this.fstatic = false;
-    }
-
-    /**
-     * Makes this method overridden.
-     */
-    public void makeOverridden() {
-        this.resetFlags();
-        this.fpublic = true;
-        this.foverride = true;
-        this.fstatic = false;
-    }
-
-    /**
-     * Makes this method static.
-     */
-    public void makeStatic() {
-        this.fabstract = false;
-        this.foverride = false;
-        this.fstatic = true;
-    }
-
-    /**
-     * Returns the name of the method.
-     * @return The name
+     * Returns name of the method.
+     * @return Name of the method
      */
     public String getName() {
-        return this.descriptor.getName();
+        return this.name;
+    }
+
+    /**
+     * Adds a warning that needs to be suppressed.
+     * @param warning Warning
+     */
+    public void suppressWarning(final String warning) {
+        this.suppress.addWarning(warning);
+    }
+
+    /**
+     * Makes the method static.
+     */
+    public void makeStatic() {
+        this.stat = true;
+    }
+
+    /**
+     * Makes the method final.
+     */
+    public void makeFinal() {
+        this.fin = true;
+    }
+
+    /**
+     * Adds an argument to the method.
+     * @param type Type of the argument
+     * @param identifier Name of the argument
+     */
+    public void addArgument(final String type, final String identifier) {
+        this.args.add(new Pair<>(type, identifier));
+    }
+
+    /**
+     * Adds an argument to the method.
+     * @param type Type of the argument
+     * @param identifier Name of the argument
+     * @param brief Brief description of the argument
+     */
+    public void addArgument(final String type, final String identifier, final String brief) {
+        this.addArgument(type, identifier);
+        this.doc.addParameter(identifier, brief);
+    }
+
+    /**
+     * Sets the body of the method.
+     * @param text Method body source code
+     */
+    public void setBody(final String text) {
+        this.body = text;
+    }
+
+    /**
+     * Adds a description to be printed after the '@return' tag.
+     * @param description Description
+     */
+    public void setReturnsDescription(final String description) {
+        this.doc.setReturnsDescription(description);
+    }
+
+    /**
+     * Returns the priority of the method.
+     *  Fields with higher priority are placed at the beginning of classes.
+     * @return Priority of the method
+     */
+    public int getPriority() {
+        final int priority;
+        if (!this.stat && this.isPublic()) {
+            priority = 4;
+        } else if (this.isPublic()) {
+            priority = 3;
+        } else if (this.stat) {
+            priority = 1;
+        } else {
+            priority = 2;
+        }
+        return priority;
     }
 
     @Override
-    public String generate(final int indent) {
-        final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
-        final StringBuilder header = new StringBuilder(64);
-        if (this.foverride) {
-            header.append(tabulation).append("@Override\n");
-        } else {
-            header.append(this.descriptor.generateHeader(indent));
+    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
+        if (this.doc.hasNonEmptyBrief()) {
+            this.doc.build(indent, code);
         }
-        return header.toString().concat(this.generateCodeBlock(tabulation, indent));
+        this.suppress.build(indent, code);
+        if (this.over) {
+            code.add(indent, "@Override");
+        }
+        this.composeHeader(indent, code);
+        this.buildBody(indent + 1, code);
+        code.add(indent, "}");
+    }
+
+    @Override
+    public String getBody() {
+        return this.body;
     }
 
     /**
-     * Generates code block, i.e. signature and body.
-     * @param tabulation Calculated tabulation
-     * @param indent Current indentation
-     * @return Source code
+     * Composes the header (signature) of the method.
+     * @param indent Code indentation
+     * @param code Source code builder
+     * @throws BaseException If there are any problems during code generation
      */
-    private String generateCodeBlock(final String tabulation, final int indent) {
-        StringBuilder block = new StringBuilder();
-        block.append(tabulation);
-        if (this.fprivate) {
-            block.append("private ");
-        } else if (this.fpublic) {
-            block.append("public ");
+    private void composeHeader(final int indent, final SourceCodeBuilder code)
+        throws BaseException {
+        final StringBuilder builder = new StringBuilder(128);
+        if (this.isPublic()) {
+            builder.append("public ");
+        } else if (this.isProtected()) {
+            builder.append("protected ");
+        } else if (this.isPrivate()) {
+            builder.append("private ");
         }
-        if (this.fstatic) {
-            block.append("static ");
+        if (this.stat) {
+            builder.append("static ");
         }
-        if (this.fabstract) {
-            final String signature = this.descriptor.generateSignature(true);
-            block.append("abstract ").append(signature).append(";\n");
-        } else {
-            String signature = this.descriptor.generateSignature(false);
-            final StringBuilder copy = new StringBuilder(block.toString());
-            block.append(signature).append(Method.BODY_BEGIN);
-            if (block.toString().length() >= Entity.MAX_LINE_LENGTH) {
-                block = copy;
-                final String offset = StringUtils.SPACE.repeat((indent + 1) * Entity.TAB_SIZE);
-                signature = this.descriptor.generateLongSignature().replace("\t", offset);
-                block.append(signature).append(Method.BODY_BEGIN);
+        if (this.fin) {
+            builder.append("final ");
+        }
+        builder.append(this.ret).append(' ').append(this.name).append('(');
+        boolean flag = false;
+        int offset = 0;
+        String header = builder.toString();
+        for (final Pair<String, String> arg : this.args) {
+            if (flag) {
+                header = header.concat(", ");
             }
-            final String code = this.body.generate(indent + 1);
-            block.append(code).append(tabulation).append("}\n");
+            flag = true;
+            final String argstr = String.format("final %s %s", arg.getKey(), arg.getValue());
+            final String bigger = header.concat(argstr);
+            if (SourceCodeBuilder.tryOn(indent + offset, bigger)) {
+                header = bigger;
+            } else {
+                code.add(indent + offset, header.trim());
+                header = argstr;
+                offset = 1;
+            }
         }
-        return block.toString();
+        code.add(indent + offset, header.concat(") {"));
     }
 }

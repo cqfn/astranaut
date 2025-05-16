@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,13 +25,13 @@ package org.cqfn.astranaut;
 
 /**
  * This class provides static information about the library, such as the version.
- * @since 1.0.6
+ * @since 1.0.0
  */
 public final class Info {
     /**
      * The Astranaut version.
      */
-    public static final String VERSION = "0.2.21";
+    public static final String VERSION = "1.0.0";
 
     /**
      * Private constructor.

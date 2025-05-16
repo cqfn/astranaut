@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,269 +23,315 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import org.cqfn.astranaut.utils.StringUtils;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * Java class field.
- *
- * @since 0.1.5
+ * Describes a field and generates source code for it.
+ * @since 1.0.0
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public final class Field implements Entity {
     /**
-     * End of line string constant.
-     */
-    private static final String EOL = ";\n";
-
-    /**
-     * Assignment construction.
-     */
-    private static final String ASSIGN = " = ";
-
-    /**
-     * The brief description.
-     */
-    private final String brief;
-
-    /**
-     * The type name.
+     * Type of the field.
      */
     private final String type;
 
     /**
-     * The name.
+     * Name of the field.
      */
     private final String name;
 
     /**
-     * The flag indicates that the field is public.
+     * Initial value of the field.
      */
-    private boolean fpublic;
+    private String initial;
 
     /**
-     * The flag indicates that the field is private.
+     * Documentation.
      */
-    private boolean fprivate;
+    private final JavaDoc doc;
 
     /**
-     * The flag indicates that the field is static.
+     * Flag indicating that the generated field is public.
      */
-    private boolean fstatic;
+    private boolean pub;
 
     /**
-     * The flag indicates that the field is final.
+     * Flag indicating that the generated field is protected.
      */
-    private boolean ffinal;
+    private boolean prt;
 
     /**
-     * Expression that initializes the field.
+     * Flag indicating that the generated field is private.
      */
-    private List<String> init;
+    private boolean pvt;
+
+    /**
+     * Flag indicating that the generated field is static.
+     */
+    private boolean stat;
+
+    /**
+     * Flag indicating that the generated field is final.
+     */
+    private boolean fin;
 
     /**
      * Constructor.
-     * @param brief The brief description
-     * @param type The type name
-     * @param name The name
+     * @param type Type of the field.
+     * @param name Name of the field.
+     * @param brief Brief description of the field
      */
-    public Field(final String brief, final String type, final String name) {
-        this.brief = brief;
+    public Field(final String type, final String name, final String brief) {
         this.type = type;
         this.name = name;
-        this.fprivate = true;
-        this.init = Collections.emptyList();
+        this.doc = new JavaDoc(brief);
+        this.initial = "";
     }
 
     /**
-     * Returns the field name.
-     * @return The name
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Return the flag indicates that the field is static.
-     * @return The flag
-     */
-    public boolean isStatic() {
-        return this.fstatic;
-    }
-
-    /**
-     * Resets all flags.
-     */
-    public void resetFlags() {
-        this.fpublic = false;
-        this.fprivate = false;
-        this.fstatic = false;
-        this.ffinal = false;
-    }
-
-    /**
-     * Makes this field public.
+     * Makes the field public.
      */
     public void makePublic() {
-        this.fpublic = true;
-        this.fprivate = false;
+        this.pub = true;
+        this.prt = false;
+        this.pvt = false;
     }
 
     /**
-     * Makes this field private.
+     * Makes the field protected.
+     */
+    public void makeProtected() {
+        this.pub = false;
+        this.prt = true;
+        this.pvt = false;
+    }
+
+    /**
+     * Makes the field private.
      */
     public void makePrivate() {
-        this.fpublic = false;
-        this.fprivate = true;
+        this.pub = false;
+        this.prt = false;
+        this.pvt = true;
     }
 
     /**
-     * Makes this field static and final.
+     * Makes the field static.
      */
-    public void makeStaticFinal() {
-        this.fstatic = true;
-        this.ffinal = true;
+    public void makeStatic() {
+        this.stat = true;
     }
 
     /**
-     * Makes this field final.
+     * Makes the field final.
+     * @param value Initial value of the field
      */
-    public void makeFinal() {
-        this.ffinal = true;
+    public void makeFinal(final String value) {
+        this.fin = true;
+        this.initial = value;
     }
 
     /**
-     * Sets the expression that initializes the field.
-     * @param expr The expression
+     * Sets the initial value of the field.
+     * @param value Initial value of the field
      */
-    public void setInitExpr(final String expr) {
-        this.init = Collections.singletonList(expr);
+    public void setInitial(final String value) {
+        this.initial = value;
     }
 
     /**
-     * Sets the expression that initializes the field.
-     * @param list The expression that takes several lines
+     * Returns the priority of the field.
+     *  Fields with higher priority are placed at the beginning of classes.
+     * @return Priority of the field
      */
-    public void setInitExpr(final List<String> list) {
-        this.init = list;
+    public int getPriority() {
+        final int priority;
+        if (this.stat && this.pub) {
+            priority = 4;
+        } else if (this.stat) {
+            priority = 3;
+        } else if (this.pub) {
+            priority = 2;
+        } else {
+            priority = 1;
+        }
+        return priority;
     }
 
     @Override
-    public String generate(final int indent) {
-        final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
-        final StringBuilder builder = new StringBuilder(256);
-        builder.append(tabulation)
-            .append("/**\n")
-            .append(tabulation)
-            .append(" * ")
-            .append(this.brief)
-            .append(".\n")
-            .append(tabulation)
-            .append(" */\n");
-        final String declaration = tabulation.concat(this.generateDeclaration());
-        if (this.init.isEmpty()) {
-            builder.append(declaration).append(Field.EOL);
-        } else if (this.init.size() == 1) {
-            final StringBuilder line = new StringBuilder();
-            line.append(declaration).append(Field.ASSIGN)
-                .append(this.init.get(0)).append(Field.EOL);
-            String result = line.toString();
-            if (result.length() > Entity.MAX_LINE_LENGTH) {
-                final StringBuilder multiline = new StringBuilder();
-                multiline.append(declaration);
-                this.generateInitFromSingleLine(multiline, indent + 1);
-                result = multiline.toString();
-            }
-            builder.append(result);
+    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
+        this.doc.build(indent, code);
+        final String declaration = this.composeDeclaration();
+        if (this.initial.isEmpty()) {
+            code.add(indent, declaration.concat(";"));
         } else {
-            builder.append(declaration);
-            this.generateInitFromList(builder, indent + 1);
+            this.buildFieldWithInitialValue(indent, code, declaration);
         }
+    }
+
+    /**
+     * Compiles a declaration of the field.
+     * @return String declaration of the field without an initial value
+     */
+    private String composeDeclaration() {
+        final StringBuilder builder = new StringBuilder(100);
+        if (this.pub) {
+            builder.append("public ");
+        } else if (this.prt) {
+            builder.append("protected ");
+        } else if (this.pvt) {
+            builder.append("private ");
+        }
+        if (this.stat) {
+            builder.append("static ");
+        }
+        if (this.fin) {
+            builder.append("final ");
+        }
+        builder.append(this.type).append(' ').append(this.name);
         return builder.toString();
     }
 
     /**
-     * Generates field declaration, without init expression.
-     * @return Field declaration
+     * Builds field declaration with initial value.
+     * @param indent Code indentation. Each generated line will be indented as follows
+     * @param code Source code builder
+     * @param head Field declaration without initial value
+     * @throws BaseException If there are any problems during code generation
      */
-    private String generateDeclaration() {
-        final StringBuilder declaration = new StringBuilder(32);
-        if (this.fprivate) {
-            declaration.append("private ");
-        } else if (this.fpublic) {
-            declaration.append("public ");
-        }
-        if (this.fstatic) {
-            declaration.append("static ");
-        }
-        if (this.ffinal) {
-            declaration.append("final ");
-        }
-        declaration.append(this.type).append(' ').append(this.name);
-        return declaration.toString();
+    private void buildFieldWithInitialValue(final int indent, final SourceCodeBuilder code,
+        final String head) throws BaseException {
+        do {
+            final String simple = String.format("%s = %s;", head, this.initial);
+            if (SourceCodeBuilder.tryOn(indent, simple)) {
+                code.add(indent, simple);
+                break;
+            }
+            code.add(indent, String.format("%s =", head));
+            final String second =  String.format("%s;", this.initial);
+            if (SourceCodeBuilder.tryOn(indent + 1, second)) {
+                code.add(indent + 1, second);
+                break;
+            }
+            if (!second.contains(").")
+                && Field.tryBreakLineByDepthOfCalls(indent + 1, code, second)) {
+                break;
+            }
+            if (Field.tryBreakLineByCallChain(indent + 1, code, second)) {
+                break;
+            }
+            throw new SourceCodeBuilder.CodeLineIsTooLong(this.initial);
+        } while (false);
     }
 
     /**
-     * Generates init expression from single line (case if it really
-     *  takes more than one line).
-     * @param builder Where to generate
+     * Trying to break down the line of code along the call chain.
+     *  Each new call in the chain starts with a new line.
      * @param indent Indentation
+     * @param code Source code builder
+     * @param line Line of code that should be broken into smaller lines
+     * @return Result, {@code true} if successful
+     * @throws BaseException If there are any problems during code generation
      */
-    private void generateInitFromSingleLine(final StringBuilder builder, final int indent) {
-        builder.append(" =");
-        final String[] lines = this.init.get(0).replace("(", "(\n")
-            .replace(")", "\n)")
-            .replace(",", ",\n")
-            .split("\n");
-        int offset = 0;
-        for (int index = 0; index < lines.length; index = index + 1) {
-            final String line = lines[index].trim();
-            if (line.isEmpty()) {
-                continue;
+    private static boolean tryBreakLineByCallChain(final int indent, final SourceCodeBuilder code,
+        final String line) throws BaseException {
+        final String[] list = line.split("(?<=\\))(?=\\.)");
+        boolean result;
+        do {
+            result = SourceCodeBuilder.tryOn(indent, list[0]);
+            if (!result) {
+                break;
             }
-            if (line.charAt(0) == ')') {
-                offset = offset - 1;
+            int index;
+            for (index = 1; index < list.length && result; index = index + 1) {
+                result = SourceCodeBuilder.tryOn(indent + 1, list[index]);
             }
-            builder.append('\n')
-                .append(StringUtils.SPACE.repeat((indent + offset) * Entity.TAB_SIZE))
-                .append(line);
-            if (line.endsWith("(")) {
-                offset = offset + 1;
+            if (!result) {
+                break;
             }
-        }
-        builder.append(Field.EOL);
+            code.add(indent, list[0]);
+            for (index = 1; index < list.length; index = index + 1) {
+                code.add(indent + 1, list[index]);
+            }
+        } while (false);
+        return result;
     }
 
     /**
-     * Generates init expression from list of lines.
-     * @param builder Where to generate
+     * Tries to break down the line by the parentheses that define function calls.
+     *  Each new call is made on a new line and indented.
      * @param indent Indentation
+     * @param code Source code builder
+     * @param line Line of code that should be broken into smaller lines
+     * @return Result, {@code true} if successful
+     * @throws BaseException If there are any problems during code generation
      */
-    private void generateInitFromList(final StringBuilder builder, final int indent) {
-        builder.append(Field.ASSIGN);
-        for (int index = 0; index < this.init.size(); index = index + 1) {
-            String line = this.init.get(index);
-            int gap = 0;
-            if (line.startsWith("\t")) {
-                final int len = line.length();
-                for (int symbol = 0; symbol < len; symbol = symbol + 1) {
-                    if (line.charAt(symbol) == '\t') {
-                        gap = gap + 1;
-                    } else {
-                        break;
-                    }
+    private static boolean tryBreakLineByDepthOfCalls(final int indent,
+        final SourceCodeBuilder code, final String line) throws BaseException {
+        final int begin = line.indexOf('(');
+        final int end = line.lastIndexOf(')');
+        if (begin >= 0 && end < 0) {
+            throw new BaseException() {
+                private static final long serialVersionUID = -1;
+
+                @Override
+                public String getInitiator() {
+                    return "Codegen";
                 }
+
+                @Override
+                public String getErrorMessage() {
+                    return "Unclosed parenthesis";
+                }
+            };
+        }
+        boolean result = false;
+        if (begin >= 0) {
+            code.add(indent, line.substring(0, begin + 1).trim());
+            final String middle = line.substring(begin + 1, end);
+            result = Field.tryBreakLineByDepthOfCalls(indent + 1, code, middle)
+                || Field.tryBreakLineByCommas(indent + 1, code, middle);
+            code.add(indent, line.substring(end).trim());
+        }
+        return result;
+    }
+
+    /**
+     * Tries to break down the line by the commas that separate the arguments.
+     * @param indent Indentation
+     * @param code Source code builder
+     * @param line Line of code that should be broken into smaller lines
+     * @return Result, {@code true} if successful
+     * @throws BaseException If there are any problems during code generation
+     */
+    private static boolean tryBreakLineByCommas(final int indent,
+        final SourceCodeBuilder code, final String line) throws BaseException {
+        boolean result = true;
+        final List<String> arguments = new ArrayList<>(2);
+        final Pattern pattern = Pattern.compile("[^,()]+|\\([^()]*\\)");
+        final Matcher matcher = pattern.matcher(line);
+        while (matcher.find()) {
+            arguments.add(matcher.group().trim());
+        }
+        for (int index = 0; index < arguments.size() && result; index = index + 1) {
+            final String argument;
+            if (index < arguments.size() - 1) {
+                argument = arguments.get(index).concat(",");
+            } else {
+                argument = arguments.get(index);
             }
-            line = line.trim();
-            if (line.isEmpty()) {
+            result = SourceCodeBuilder.tryOn(indent, argument);
+            if (result) {
+                code.add(indent, argument);
                 continue;
             }
-            if (index > 0) {
-                builder.append('\n')
-                    .append(StringUtils.SPACE.repeat((indent + gap) * Entity.TAB_SIZE));
-            }
-            builder.append(line);
+            result = Field.tryBreakLineByDepthOfCalls(indent, code, argument);
         }
-        builder.append(Field.EOL);
+        return result;
     }
 }

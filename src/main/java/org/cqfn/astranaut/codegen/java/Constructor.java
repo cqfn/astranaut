@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,92 +23,100 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
-import org.cqfn.astranaut.utils.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
+import org.cqfn.astranaut.core.utils.Pair;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
- * Java constructor.
- *
- * @since 0.1.5
+ * Describes a constructor (constructor without return value) and generates source code for it.
+ * @since 1.0.0
  */
-public final class Constructor implements Entity {
+public final class Constructor extends BaseMethod {
     /**
-     * The descriptor.
+     * Name of the constructor.
      */
-    private final MethodDescriptor descriptor;
+    private final String name;
 
     /**
-     * The body.
+     * Documentation.
      */
-    private final MethodBody body;
+    private final JavaDoc doc;
 
     /**
-     * The flag indicates that the method is public.
+     * List of constructor arguments (where key is type, value is name).
      */
-    private boolean fpublic;
+    private final List<Pair<String, String>> args;
 
     /**
-     * The flag indicates that the method is private.
+     * Body of the constructor.
      */
-    private boolean fprivate;
+    private String body;
 
     /**
      * Constructor.
-     * @param name The name of the method.
+     * @param name Name of the constructor.
      */
     public Constructor(final String name) {
-        this.descriptor = new MethodDescriptor("Constructor", name).removeReturnType();
-        this.body = new MethodBody();
-        this.fpublic = true;
+        this.name = name;
+        this.doc = new JavaDoc("Constructor");
+        this.args = new ArrayList<>(0);
+        this.body = "";
     }
 
     /**
-     * Adds the argument to the descriptor.
-     * @param type The type
-     * @param name The name
-     * @param description The brief description
+     * Adds an argument to the constructor.
+     * @param type Type of the argument
+     * @param identifier Name of the argument
      */
-    public void addArgument(final String type, final String name, final String description) {
-        this.descriptor.addArgument(type, name, description);
+    public void addArgument(final String type, final String identifier) {
+        this.args.add(new Pair<>(type, identifier));
     }
 
     /**
-     * Sets the new code.
-     * @param str The new code
+     * Sets the body of the constructor.
+     * @param text Method body source code
      */
-    public void setCode(final String str) {
-        this.body.setCode(str);
-    }
-
-    /**
-     * Makes this method public.
-     */
-    public void makePublic() {
-        this.fpublic = true;
-        this.fprivate = false;
-    }
-
-    /**
-     * Makes this method private.
-     */
-    public void makePrivate() {
-        this.fpublic = false;
-        this.fprivate = true;
+    public void setBody(final String text) {
+        this.body = text;
     }
 
     @Override
-    public String generate(final int indent) {
-        final String tabulation = StringUtils.SPACE.repeat(indent * Entity.TAB_SIZE);
-        final StringBuilder builder = new StringBuilder(64);
-        builder.append(this.descriptor.generateHeader(indent)).append(tabulation);
-        if (this.fprivate) {
-            builder.append("private ");
-        } else if (this.fpublic) {
-            builder.append("public ");
+    public void build(final int indent, final SourceCodeBuilder code) throws BaseException {
+        this.doc.build(indent, code);
+        code.add(indent, this.composeHeader());
+        this.buildBody(indent + 1, code);
+        code.add(indent, "}");
+    }
+
+    @Override
+    public String getBody() {
+        return this.body;
+    }
+
+    /**
+     * Composes the header (signature) of the constructor.
+     * @return Method header
+     */
+    private String composeHeader() {
+        final StringBuilder header = new StringBuilder(128);
+        if (this.isPublic()) {
+            header.append("public ");
+        } else if (this.isProtected()) {
+            header.append("protected ");
+        } else if (this.isPrivate()) {
+            header.append("private ");
         }
-        final String signature = this.descriptor.generateSignature(false);
-        builder.append(signature).append(" {\n");
-        final String code = this.body.generate(indent + 1);
-        builder.append(code).append(tabulation).append("}\n");
-        return builder.toString();
+        header.append(this.name).append('(');
+        boolean flag = false;
+        for (final Pair<String, String> arg : this.args) {
+            if (flag) {
+                header.append(", ");
+            }
+            flag = true;
+            header.append("final ").append(arg.getKey()).append(' ').append(arg.getValue());
+        }
+        header.append(") {");
+        return header.toString();
     }
 }

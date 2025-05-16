@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,374 +21,207 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.cqfn.astranaut.analyzer;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.Stack;
-import org.cqfn.astranaut.exceptions.DuplicateRule;
-import org.cqfn.astranaut.exceptions.ExtendedNodeNotFound;
-import org.cqfn.astranaut.exceptions.GeneratorException;
-import org.cqfn.astranaut.rules.Child;
-import org.cqfn.astranaut.rules.Descriptor;
-import org.cqfn.astranaut.rules.Disjunction;
-import org.cqfn.astranaut.rules.Empty;
-import org.cqfn.astranaut.rules.Extension;
-import org.cqfn.astranaut.rules.Node;
-import org.cqfn.astranaut.rules.Vertex;
+import org.cqfn.astranaut.dsl.AbstractNodeDescriptor;
+import org.cqfn.astranaut.dsl.ChildDescriptorExt;
+import org.cqfn.astranaut.dsl.NodeDescriptor;
+import org.cqfn.astranaut.dsl.NonAbstractNodeDescriptor;
+import org.cqfn.astranaut.dsl.Program;
+import org.cqfn.astranaut.dsl.RegularNodeDescriptor;
+import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
+import org.cqfn.astranaut.dsl.RightSideItem;
+import org.cqfn.astranaut.dsl.Rule;
+import org.cqfn.astranaut.dsl.TransformationDescriptor;
+import org.cqfn.astranaut.exceptions.BaseException;
+import org.cqfn.astranaut.parser.Location;
 
 /**
- * Analyzes vertices hierarchy described with DSL.
- *
- * @since 0.1.5
+ * Analyzer that analyzes an Astranaut program before code generation or execution
+ *  and builds the necessary relationships between rules.
+ * @since 1.0.0
  */
 public class Analyzer {
     /**
-     * Mappings between a vertex type and a result of its analysis.
+     * DSL program.
      */
-    private final Map<Vertex, Result> info;
+    private final Program program;
 
     /**
-     * Stack to save nodes with tagged types to be analyzed.
+     * Rules in relation to the location of the DSL code from which they are parsed.
      */
-    private final Stack<Node> stack;
-
-    /**
-     * Storage of nodes.
-     */
-    private final VertexStorage storage;
+    private final Map<Rule, Location> locations;
 
     /**
      * Constructor.
-     * @param storage The vertex storage
-     * @throws DuplicateRule exception if vertices described in rules
-     *  contain duplications
+     * @param program DSL program
+     * @param locations Rules in relation to the location of the DSL code
      */
-    public Analyzer(
-        final VertexStorage storage) throws DuplicateRule {
-        this.storage = storage;
-        this.info = new HashMap<>();
-        this.stack = new Stack<>();
+    public Analyzer(final Program program, final Map<Rule, Location> locations) {
+        this.program = program;
+        this.locations = locations;
     }
 
     /**
-     * The hierarchy of names of groups the vertex type belongs to.
-     * @param type The type of the vertex
-     * @param language The programming language
-     * @return The list of type names, cannot be {@code null}
+     * Analyzes the DSL program and builds relationships between rules.
+     * @throws BaseException If the DSL program contains errors
      */
-    public List<String> getHierarchy(final String type, final String language) {
-        List<String> hierarchy = Collections.emptyList();
-        final Vertex vertex = this.storage.getVertexByType(type, language);
-        if (vertex != null) {
-            hierarchy = this.info.get(vertex).getHierarchy();
+    public void analyze() throws BaseException {
+        final Set<String> languages = this.program.getAllLanguages();
+        for (final String language : languages) {
+            final Map<String, NodeDescriptor> nodes =
+                this.program.getNodeDescriptorsByLanguage(language);
+            this.linkNodes(nodes);
+            final List<TransformationDescriptor> conversions =
+                this.program.getTransformationDescriptorsByLanguage(language);
+            this.checkTransformationRules(conversions);
         }
-        return hierarchy;
-    }
-
-    /**
-     * The list of tagged names which the provided node has.
-     * @param type The type of the node
-     * @param language The programming language
-     * @return The list of tagged names, cannot be {@code null}
-     */
-    public List<TaggedName> getTags(final String type, final String language) {
-        List<TaggedName> tags = new LinkedList<>();
-        final Vertex vertex = this.storage.getVertexByType(type, language);
-        if (vertex != null) {
-            tags = this.info.get(vertex).getTaggedNames();
-        }
-        return tags;
-    }
-
-    /**
-     * The list of vertex types that should be added to an import block
-     *  of the specified node.
-     * @param type The type of the vertex
-     * @param language The programming language
-     * @return The list of type names, cannot be {@code null}
-     */
-    public Set<String> getImports(final String type, final String language) {
-        return this.storage.getVerticesToBeImported(type, language);
-    }
-
-    /**
-     * Processes language-specific vertices.
-     * @param language The programming language
-     * @throws GeneratorException exception if vertices described in rules
-     *  contain duplications or a node was not found
-     */
-    public void analyze(final String language) throws GeneratorException {
-        final List<Vertex> specific = this.storage.getSpecificVertices(language);
-        this.pipeline(specific, language);
-    }
-
-    /**
-     * Processes green vertices.
-     * @throws GeneratorException exception if vertices described in rules
-     *  contain duplications or a node was not found
-     */
-    public void analyzeGreen() throws GeneratorException {
-        final List<Vertex> green = this.storage.getGreenVertices();
-        this.pipeline(green, "");
-    }
-
-    /**
-     * Conducts analysis of the provided vertex set:
-     * - processes final vertices;
-     * - processes abstract nodes.
-     * @param vertices The list of vertices to be analyzed
-     * @param language The programming language
-     * @throws ExtendedNodeNotFound exception if extended green node
-     *  was not found
-     */
-    public void pipeline(final List<Vertex> vertices, final String language)
-        throws ExtendedNodeNotFound {
-        for (final Vertex vertex : vertices) {
-            if (vertex.isFinal()) {
-                this.processFinalVertex(vertex);
-            }
-        }
-        for (final Vertex vertex : vertices) {
-            if (vertex.isAbstract() && !this.info.containsKey(vertex)) {
-                this.processAbstractNode((Node) vertex, language, new LinkedList<>());
+        for (final Rule rule : this.program.getAllRules()) {
+            if (rule instanceof NonAbstractNodeDescriptor) {
+                Analyzer.addTagsToBaseNodes((NodeDescriptor) rule);
             }
         }
     }
 
     /**
-     * Processes an abstract node:
-     * - creates result entity;
-     * - updates hierarchy for descendant nodes;
-     * - iterates over descriptors to process them firstly and find descendants with tags;
-     * - excludes not described nodes from processing;
-     * - processes nodes with common tags;
-     * - saves the result.
-     * @param node The abstract node
-     * @param language The programming language
-     * @param ancestors The list of ancestor vertex types
-     * @throws ExtendedNodeNotFound exception if extended green node
-     *  was not found
+     * Builds links between nodes: abstract and non-abstract nodes of the same language,
+     *  child nodes.
+     * @param descriptors Node descriptors mapped by their names
+     * @throws BaseException If the DSL program contains errors
      */
-    private void processAbstractNode(
-        final Node node, final String language, final List<String> ancestors)
-        throws ExtendedNodeNotFound {
-        final List<String> hierarchy = new LinkedList<>();
-        hierarchy.add(node.getType());
-        final Result result = new Result(hierarchy);
-        result.addAncestors(ancestors);
-        final List<Descriptor> descriptors =
-            ((Disjunction) node.getComposition().get(0)).getDescriptors();
-        ((LinkedList<String>) ancestors).addFirst(node.getType());
-        int empty = 0;
-        Vertex extended = null;
-        for (final Descriptor descriptor : descriptors) {
-            if (descriptor.equals(Extension.INSTANCE)) {
-                extended = this.getExtendedNode(node);
-                this.processAbstractNodeExtension(extended, ancestors, result);
-            } else if (!descriptor.equals(Empty.INSTANCE)) {
-                this.processVertex(descriptor.getType(), language, ancestors);
-                if (this.storage.getVertexByType(descriptor.getType(), language) == null) {
-                    empty += 1;
-                }
-            }
-        }
-        ((LinkedList<String>) ancestors).removeFirst();
-        if (!this.stack.empty()) {
-            this.processCommonTags(descriptors.size() - empty, result, extended);
-            if (result.containsTags()) {
-                this.stack.push(node);
-            }
-        }
-        this.info.put(node, result);
-    }
-
-    /**
-     * Processes dependencies of a language-specific abstract node that extends a green
-     * abstract node.
-     * @param extended The abstract green node that was extended by the current node
-     * @param ancestors The list of ancestor vertex types
-     * @param result The result of the analysis
-     */
-    private void processAbstractNodeExtension(
-        final Vertex extended,
-        final List<String> ancestors,
-        final Result result) {
-        final List<String> extension = this.getHierarchyOfExtendedNode(extended);
-        ancestors.addAll(extension);
-        result.addAncestors(extension);
-        if (!this.stack.contains((Node) extended)) {
-            this.stack.push((Node) extended);
-        }
-    }
-
-    /**
-     * Returns the hierarchy of the abstract green node that was extended
-     *  by a language-specific node.
-     * @param ancestor The abstract green node
-     * @return The list of ancestor vertex types
-     */
-    private List<String> getHierarchyOfExtendedNode(final Vertex ancestor) {
-        final Result result = this.info.get(ancestor);
-        return result.getHierarchy();
-    }
-
-    /**
-     * Returns the abstract green node that was extended
-     *  by a language-specific node.
-     * @param node The abstract language-specific node
-     * @return The extended green node
-     * @throws ExtendedNodeNotFound exception if extended green node
-     *  was not found
-     */
-    private Vertex getExtendedNode(final Node node)
-        throws ExtendedNodeNotFound {
-        Vertex result = null;
-        final Optional<Vertex> optional = this.storage.getGreenVertices()
-            .stream()
-            .filter(item -> node.getType().equals(item.getType()))
-            .findFirst();
-        if (optional.isPresent() && optional.get().isAbstract()) {
-            if (this.info.containsKey(optional.get())) {
-                result = optional.get();
-            }
-        } else {
-            throw new ExtendedNodeNotFound(node.getType());
-        }
-        return result;
-    }
-
-    /**
-     * Finds and processes common tags of an abstract node and its descendants:
-     * - iterates over nodes in stack to collect common tagged names;
-     * - if processed nodes count equals descendants size, update
-     *  {@code overridden} fields and add tags to the ancestor.
-     * @param count The count of described descendant nodes
-     * @param ancestor The result of ancestor analysis
-     * @param extended The abstract green node that was extended by the current node
-     */
-    private void processCommonTags(final int count, final Result ancestor, final Vertex extended) {
-        final Set<Node> related = new HashSet<>();
-        final Set<TaggedName> common = new HashSet<>();
-        final int idx = this.findCommonTags(count, related, common);
-        if (count == idx) {
-            for (final Node node : related) {
-                final Result result = this.info.get(node);
-                if (node.equals(extended) && common.isEmpty()) {
-                    result.removeTags();
-                    this.updateExtendedNodeDescendants(extended, common);
-                } else {
-                    result.setOverriddenTags(common);
-                }
-            }
-            for (final TaggedName name : common) {
-                ancestor.addTaggedName(name.getTag(), name.getType());
+    private void linkNodes(final Map<String, NodeDescriptor> descriptors)
+        throws BaseException {
+        for (final Map.Entry<String, NodeDescriptor> entry : descriptors.entrySet()) {
+            final NodeDescriptor descriptor = entry.getValue();
+            if (descriptor instanceof AbstractNodeDescriptor) {
+                this.linkAbstractNode((AbstractNodeDescriptor) descriptor);
+            } else if (descriptor instanceof RegularNodeDescriptor) {
+                this.linkRegularNode((RegularNodeDescriptor) descriptor);
             }
         }
     }
 
     /**
-     * Iterates over nodes in stack to collect common tagged names.
-     * @param count The count of described descendant nodes
-     * @param related The set of nodes to be updated after finding common tagged names
-     * @param common The set of found common tagged names
-     * @return The amount of processed nodes
+     * Links abstract nodes to their subtypes and base descriptors.
+     * @param descriptor The abstract node descriptor to process
+     * @throws BaseException If the base node or subtype is not defined
      */
-    private int findCommonTags(
-        final int count,
-        final Set<Node> related,
-        final Set<TaggedName> common) {
-        int idx = 0;
-        while (!this.stack.empty() && idx < count) {
-            idx += 1;
-            final Node node = this.stack.pop();
-            final Result result = this.info.get(node);
-            final List<TaggedName> names = result.getTaggedNames();
-            if (idx == 1) {
-                common.addAll(names);
+    private void linkAbstractNode(final AbstractNodeDescriptor descriptor)
+        throws BaseException {
+        for (final String subtype : descriptor.getSubtypes()) {
+            final NodeDescriptor subdescr =
+                this.program.getNodeDescriptorByNameAndLanguage(subtype, descriptor.getLanguage());
+            if (subdescr == null) {
+                throw new CommonAnalyzerException(
+                    this.locations.get(descriptor),
+                    String.format(
+                        "The abstract node '%s' is the base for the node '%s' which is not defined",
+                        descriptor.getName(),
+                        subtype
+                    )
+                );
+            }
+            final boolean alien = !subdescr.getLanguage().equals(descriptor.getLanguage());
+            final boolean revert = alien && subdescr instanceof AbstractNodeDescriptor;
+            if (revert) {
+                descriptor.addBaseDescriptor((AbstractNodeDescriptor) subdescr);
             } else {
-                common.removeIf(name -> !names.contains(name));
+                subdescr.addBaseDescriptor(descriptor);
             }
-            related.add(node);
-        }
-        return idx;
-    }
-
-    /**
-     * Updates tags of the descendant nodes of the abstract green node that was extended
-     * in other language.
-     * @param extended The abstract green node that was extended by other abstract node
-     *  in some language
-     * @param tags The common tagged names
-     */
-    private void updateExtendedNodeDescendants(
-        final Vertex extended, final Set<TaggedName> tags) {
-        final List<Vertex> descendants = new VerticesProcessor(this.storage.getGreenVertices())
-            .getDescendantVerticesByType((Node) extended);
-        for (final Vertex descendant : descendants) {
-            final Result result = this.info.get(descendant);
-            result.setOverriddenTags(tags);
         }
     }
 
     /**
-     * Processes the vertex:
-     * - updates the already processed vertices results;
-     * - pushes nodes with tagged names to the stack;
-     * - finds a not processed node from the list and processes it if
-     *  it is abstract;
-     * - ignores a not described vertex, but prints warning about it.
-     * @param type The node type
-     * @param language The programming language
-     * @param ancestors The list of ancestor node types
-     * @throws ExtendedNodeNotFound exception if extended green node
-     *  was not found
+     * Links regular nodes to their child descriptors.
+     * @param descriptor The regular node descriptor to process
+     * @throws BaseException If the child node is not defined
      */
-    private void processVertex(
-        final String type, final String language, final List<String> ancestors)
-        throws ExtendedNodeNotFound {
-        final Vertex vertex = this.storage.getVertexByType(type, language);
-        if (vertex != null && this.info.containsKey(vertex)) {
-            final Result result = this.info.get(vertex);
-            result.addAncestors(ancestors);
-            if (result.containsTags() && !this.stack.contains(vertex)) {
-                this.stack.push((Node) vertex);
+    private void linkRegularNode(final RegularNodeDescriptor descriptor)
+        throws BaseException {
+        for (final ChildDescriptorExt child : descriptor.getExtChildTypes()) {
+            final NodeDescriptor rule =
+                this.program.getNodeDescriptorByNameAndLanguage(
+                    child.getType(),
+                    descriptor.getLanguage()
+                );
+            if (rule == null) {
+                throw new CommonAnalyzerException(
+                    this.locations.get(descriptor),
+                    String.format(
+                        "The '%s' node contains a child node '%s' which is not defined",
+                        descriptor.getName(),
+                        child.getType()
+                    )
+                );
             }
-        } else if (vertex != null && vertex.isAbstract()) {
-            this.processAbstractNode((Node) vertex, language, ancestors);
+            child.setRule(rule);
+            descriptor.addDependency(rule);
         }
     }
 
     /**
-     * Conducts initial processing of final vertices:
-     * - creates the result entity;
-     * - adds tagged names of children to result.
-     * @param vertex The final vertex
+     * Recursively adds tags to the base nodes of the given descriptor.
+     *  For each base node descriptor, it merges the tags from the current descriptor
+     *  and then recursively calls this method for the base node.
+     * @param descriptor The node descriptor whose tags will be added to its base nodes.
      */
-    private void processFinalVertex(final Vertex vertex) {
-        final List<String> hierarchy = new LinkedList<>();
-        hierarchy.add(vertex.getType());
-        final Result result = new Result(hierarchy);
-        if (vertex.isOrdinary()) {
-            final Node node = (Node) vertex;
-            final List<Child> composition = node.getComposition();
-            for (final Child child : composition) {
-                final Descriptor descriptor = (Descriptor) child;
-                if (!descriptor.getTag().isEmpty()) {
-                    result.addTaggedName(
-                        descriptor.getTag(),
-                        descriptor.getType()
-                    );
-                }
+    private static void addTagsToBaseNodes(final NodeDescriptor descriptor) {
+        final List<AbstractNodeDescriptor> bases = descriptor.getBaseDescriptors();
+        final Map<String, ChildDescriptorExt> tags = descriptor.getTags();
+        for (final AbstractNodeDescriptor base : bases) {
+            base.mergeTags(tags);
+            Analyzer.addTagsToBaseNodes(base);
+        }
+    }
+
+    /**
+     * Validates a list of transformation descriptors to ensure their right-hand sides are
+     *  well-formed. For each descriptor, if the right-hand side is a resulting subtree,
+     *  it recursively checks that the type of each node exists in the program and is properly
+     *  defined for the descriptor's language.
+     * @param descriptors The list of transformation descriptors to validate.
+     * @throws BaseException If any resulting node refers to an undefined type.
+     */
+    private void checkTransformationRules(final List<TransformationDescriptor> descriptors)
+        throws BaseException {
+        for (final TransformationDescriptor descriptor : descriptors) {
+            final RightSideItem right = descriptor.getRight();
+            if (right instanceof ResultingSubtreeDescriptor) {
+                this.checkResultingDescriptor(descriptor, (ResultingSubtreeDescriptor) right);
             }
         }
-        this.info.put(vertex, result);
+    }
+
+    /**
+     * Recursively validates a resulting subtree descriptor to ensure all node types are defined.
+     *  This method checks whether the specified resulting node type is defined in the program
+     *  for the given language. It then applies the same validation recursively to all children.
+     *
+     * @param descriptor The transformation descriptor containing the context (e.g., language).
+     * @param subtree The resulting subtree descriptor to validate.
+     * @throws BaseException If the type of any resulting node in the subtree is undefined.
+     */
+    private void checkResultingDescriptor(final TransformationDescriptor descriptor,
+        final ResultingSubtreeDescriptor subtree) throws BaseException  {
+        final String name = subtree.getType();
+        final NodeDescriptor rule =
+            this.program.getNodeDescriptorByNameAndLanguage(name, descriptor.getLanguage());
+        if (rule == null) {
+            throw new CommonAnalyzerException(
+                this.locations.get(descriptor),
+                String.format(
+                    "The resulting node is of type '%s' which is not defined",
+                    name
+                )
+            );
+        }
+        for (final RightSideItem child : subtree.getChildren()) {
+            if (child instanceof ResultingSubtreeDescriptor) {
+                this.checkResultingDescriptor(descriptor, (ResultingSubtreeDescriptor) child);
+            }
+        }
     }
 }

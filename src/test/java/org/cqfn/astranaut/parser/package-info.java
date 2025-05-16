@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Ivan Kniazkov
+ * Copyright (c) 2025 Ivan Kniazkov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,7 @@
  */
 
 /**
- * This package contains tests for parser.
- *
- * @since 0.1.5
+ * This package contains test set covering parser of the Astranaut domain-specific language.
+ * @since 1.0.0
  */
 package org.cqfn.astranaut.parser;
