@@ -24,7 +24,13 @@
 package org.cqfn.astranaut.cli;
 
 import java.io.File;
+import java.io.IOException;
+import org.cqfn.astranaut.core.base.Tree;
 import org.cqfn.astranaut.core.utils.FilesWriter;
+import org.cqfn.astranaut.core.utils.JsonSerializer;
+import org.cqfn.astranaut.core.utils.TreeVisualizer;
+import org.cqfn.astranaut.core.utils.visualizer.WrongFileExtension;
+import org.cqfn.astranaut.exceptions.BaseException;
 
 /**
  * Basic methods that are suitable for any action.
@@ -42,6 +48,47 @@ class BaseAction {
         final boolean result = new FilesWriter(file.getAbsolutePath()).writeStringNoExcept(content);
         if (!result) {
             throw new CannotWriteFile(file.getName());
+        }
+    }
+
+    /**
+     * Writes the transformation result to a JSON file and/or an image file,
+     * based on the provided options.
+     * <p>
+     *     If the resulting tree path is specified in the options, the method attempts to serialize
+     *     the tree to a JSON file. If serialization fails, a {@link CannotWriteFile}
+     *     exception is thrown.
+     * </p>
+     * <p>
+     *     If the resulting image path is specified, the method attempts to generate
+     *     a visualization of the tree and save it as an image. Failures in writing or using
+     *     an invalid extension are reported via exceptions.
+     * </p>
+     *
+     * @param tree The tree to be serialized and/or visualized
+     * @param options The transformation output options including file paths
+     * @throws BaseException If the output cannot be written or the file extension is invalid
+     */
+    @SuppressWarnings("PMD.PreserveStackTrace")
+    protected void writeTransformationResult(final Tree tree, final TransformerArguments options)
+        throws BaseException {
+        this.getClass();
+        if (!options.getResultingTreePath().isEmpty()) {
+            final JsonSerializer serializer = new JsonSerializer(tree);
+            final boolean flag = serializer.serializeToFile(options.getResultingTreePath());
+            if (!flag) {
+                throw new CannotWriteFile(options.getResultingTreePath());
+            }
+        }
+        if (!options.getResultingImagePath().isEmpty()) {
+            final TreeVisualizer visualizer = new TreeVisualizer(tree);
+            try {
+                visualizer.visualize(new File(options.getResultingImagePath()));
+            } catch (final IOException ignored) {
+                throw new CannotWriteFile(options.getResultingImagePath());
+            } catch (final WrongFileExtension exception) {
+                throw new CommonCliException(exception.getErrorMessage());
+            }
         }
     }
 

@@ -30,7 +30,7 @@ import java.util.List;
  * Parses command line arguments for transformer.
  * @since 1.0.0
  */
-public final class TransformerArguments extends Arguments {
+public final class TransformerArguments extends BaseArguments {
     /**
      * The name of the file for processing.
      */

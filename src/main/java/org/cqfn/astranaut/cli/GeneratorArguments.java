@@ -32,7 +32,7 @@ import org.cqfn.astranaut.core.utils.FilesReader;
  * Parses command line arguments for generator.
  * @since 1.0.0
  */
-public final class GeneratorArguments extends Arguments {
+public final class GeneratorArguments extends BaseArguments {
     /**
      * The folder or file where the result is placed.
      * And yes, I hate jcommander.

@@ -29,7 +29,7 @@ import java.util.Iterator;
  * Parses command line arguments (common methods).
  * @since 1.0.0
  */
-class Arguments {
+class BaseArguments {
     /**
      * Extracts a string parameter from command line.
      * @param name Name of the parameter

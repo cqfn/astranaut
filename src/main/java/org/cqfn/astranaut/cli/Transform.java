@@ -23,16 +23,11 @@
  */
 package org.cqfn.astranaut.cli;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import org.cqfn.astranaut.core.base.Transformer;
 import org.cqfn.astranaut.core.base.Tree;
 import org.cqfn.astranaut.core.utils.FilesReader;
 import org.cqfn.astranaut.core.utils.JsonDeserializer;
-import org.cqfn.astranaut.core.utils.JsonSerializer;
-import org.cqfn.astranaut.core.utils.TreeVisualizer;
-import org.cqfn.astranaut.core.utils.visualizer.WrongFileExtension;
 import org.cqfn.astranaut.dsl.Program;
 import org.cqfn.astranaut.exceptions.BaseException;
 
@@ -70,22 +65,6 @@ public final class Transform extends BaseAction implements Action {
         final Tree before = deserializer.convert();
         final Transformer transformer = program.getTransformer(options.getLanguage());
         final Tree after = transformer.transform(before);
-        if (!options.getResultingTreePath().isEmpty()) {
-            final JsonSerializer serializer = new JsonSerializer(after);
-            final boolean flag = serializer.serializeToFile(options.getResultingTreePath());
-            if (!flag) {
-                throw new CannotWriteFile(options.getResultingTreePath());
-            }
-        }
-        if (!options.getResultingImagePath().isEmpty()) {
-            final TreeVisualizer visualizer = new TreeVisualizer(after);
-            try {
-                visualizer.visualize(new File(options.getResultingImagePath()));
-            } catch (final IOException ignored) {
-                throw new CannotWriteFile(options.getResultingImagePath());
-            } catch (final WrongFileExtension exception) {
-                throw new CommonCliException(exception.getErrorMessage());
-            }
-        }
+        this.writeTransformationResult(after, options);
     }
 }
