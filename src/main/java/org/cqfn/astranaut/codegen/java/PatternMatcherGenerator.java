@@ -237,7 +237,7 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
                     pair.getKey()
                 )
             );
-            if (rest < 3 && index < checkers.size() - 1) {
+            if (rest < 3) {
                 code.addAll(
                     Arrays.asList(
                         "if (!matches) {",
@@ -248,6 +248,7 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
             }
             rest = rest - 1;
         }
+        code.add("    matches = queue.isEmpty();");
         code.add("} while (false);");
         if (this.pattern.getData() instanceof UntypedHole) {
             code.addAll(
