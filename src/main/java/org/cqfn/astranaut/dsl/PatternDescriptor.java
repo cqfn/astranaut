@@ -256,6 +256,9 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
                 matches = PatternDescriptor.matchRegularNode(lsi, queue, extracted);
             }
         }
+        if (!queue.isEmpty()) {
+            matches = false;
+        }
         return matches;
     }
 

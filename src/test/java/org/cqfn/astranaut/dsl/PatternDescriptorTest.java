@@ -73,14 +73,17 @@ class PatternDescriptorTest {
                 UntypedHole.getInstance(2)
             )
         );
-        final Node node = DraftNode.create("C(D,E)");
         final Extracted extracted = new Extracted();
-        final boolean matches = pattern.matchNode(node, extracted);
+        Node node = DraftNode.create("C(D,E)");
+        boolean matches = pattern.matchNode(node, extracted);
         Assertions.assertTrue(matches);
         Assertions.assertFalse(extracted.getNodes(1).isEmpty());
         Assertions.assertEquals("D", extracted.getNodes(1).get(0).getTypeName());
         Assertions.assertFalse(extracted.getNodes(2).isEmpty());
         Assertions.assertEquals("E", extracted.getNodes(2).get(0).getTypeName());
+        node = DraftNode.create("C(D)");
+        matches = pattern.matchNode(node, extracted);
+        Assertions.assertFalse(matches);
     }
 
     @Test
@@ -103,5 +106,33 @@ class PatternDescriptorTest {
         node = DraftNode.create("F(G,H)");
         matches = pattern.matchNode(node, extracted);
         Assertions.assertTrue(matches);
+    }
+
+    @Test
+    void matchPatternWithOptionalChild() {
+        final PatternDescriptor child = new PatternDescriptor(
+            "O",
+            null,
+            Collections.emptyList()
+        );
+        child.setMatchingMode(PatternMatchingMode.OPTIONAL);
+        final PatternDescriptor pattern = new PatternDescriptor(
+            "K",
+            null,
+            Arrays.asList(
+                new PatternDescriptor("L", null, Collections.emptyList()),
+                child
+            )
+        );
+        final Extracted extracted = new Extracted();
+        Node node = DraftNode.create("K(L)");
+        boolean matches = pattern.matchNode(node, extracted);
+        Assertions.assertTrue(matches);
+        node = DraftNode.create("K(L,O)");
+        matches = pattern.matchNode(node, extracted);
+        Assertions.assertTrue(matches);
+        node = DraftNode.create("K(L,M)");
+        matches = pattern.matchNode(node, extracted);
+        Assertions.assertFalse(matches);
     }
 }
