@@ -5,34 +5,23 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/cqfn/astranaut/blob/master/LICENSE.txt)
 ___
 
-## Brief
+## 👨‍🚀 Brief
 
-**Astranaut** is a software system developed as part of an internal research initiative focused on the automation
-of transformations and unification of syntactic trees. The project explores how domain-specific languages (DSLs)
-can be used to formally describe both the structure of syntactic trees and the transformations applied to them.
+Welcome aboard **Astranaut** — a quirky little Java project with a cosmic name and a singular mission:
+to explore, describe, and reshape **syntax trees** (you know, ASTs).
 
-The name combines **AST** (Abstract Syntax Tree) with the ideas of **automation** and **transformation**,
-reflecting the core functionality of the project.
+Yes, the name is a pun. It's a mash-up of:
+- **AST** — as in _Abstract Syntax Tree_, the skeletal structure of code,
+- **transformation** — because we're not just reading trees, we're changing them,
+- and **automation** — because doing it all by hand is so last century.
 
-The system operates in two primary modes:
+In short, **Astranaut** lets you:
+- define and reason about the structure of syntax trees,
+- perform pattern-based transformations: find specific nodes (or entire subtrees) and replace them with something 
+  smarter, simpler, or just different.
 
-1. **Compilation Mode**  
-   In this mode, Astranaut generates Java source code from DSL rules. The output includes:
-   - Data classes representing tree node structures
-   - Transformation methods for subtree rewriting
-   - Auxiliary utilities to facilitate integration
-     
-   The resulting codebase is suitable for inclusion in external projects, and this approach bears conceptual similarity
-   to tools like ANTLR or parser generators.
-
-2. **Interpretation Mode**  
-   In this mode, Astranaut directly consumes either a JSON-encoded tree or raw text. Based on the DSL definitions,
-   it applies in-memory transformations and produces:
-   - A transformed syntactic tree in JSON format
-   - An optional visual representation of the tree structure
-
-This dual-mode approach allows for both static integration into production systems and rapid experimentation
-during DSL design and testing.
+Whether you're building a code linter, refactoring engine, domain-specific transpiler, or just a curious developer
+who loves playing with compilers — Astranaut is your friendly toolkit for working with trees like a pro.
 
 ## Requirements
 
@@ -54,146 +43,262 @@ mvn package
 
 In both ways, the executable file named `generator.jar` will be in the `target` folder.
 
+## How It Works
+
+At the heart of Astranaut is a tiny, cozy DSL — a **Domain-Specific Language** for describing the structure of your
+syntax trees *and* the rules for transforming them. It’s intentionally simple (because nobody wants to learn
+Yet Another Language), but still powerful enough to express real-world transformations.
+Or at least, we like to think so.
+
+Astranaut runs in **two distinct modes**, depending on your mood and use case:
+
+### Mode 1: Code Generation
+
+This is the real deal. Astranaut takes your DSL definitions and spits out full-blown Java code:
+- 🧱 Classes representing AST nodes.
+- 🔁 Transformers that walk and mutate the trees.
+- 🛠️ Utility classes to help you wire everything into your Java project with minimal fuss.
+
+Think of it like ANTLR, but focused purely on AST structure and transformation.
+If you've ever used tools that generate parser or visitor classes — you're in familiar territory.
+
+### Mode 2: On-the-Fly Interpretation
+
+Too impatient to generate code and compile it? We got you. In interpretation mode, Astranaut:
+- loads your DSL definitions,
+- parses input (either raw text or a JSON-formatted syntax tree),
+- runs the transformation right then and there,
+- and gives you back a new JSON tree as output.
+
+Yes, it’s a bit slower than the generated code. But it’s perfect for quick experimentation, debugging,
+or just getting a feel for your rules.
+
+Bonus: Astranaut can also draw pretty pictures of your trees — PNG or SVG — which is super handy when you’re trying
+to debug a pattern or just admire your beautifully structured code.
+
+## 🌳 Trees, Glorious Trees
+
+At the core of Astranaut lies a clean, minimalistic model for representing syntax trees.
+It’s all based around just **three interfaces** — elegant, extensible, and designed with transformation in mind.
+
+Every tree node you’ll ever meet in Astranaut is an implementation of the `Node` interface.
+Here’s what you need to know:
+
+### Node — The Backbone of the Forest
+
+Think of this as the universal interface for AST nodes. It’s immutable (on purpose!), thread-safe, and designed to be
+friendly for both humans and code generators. With just a few methods to implement, it's easy to extend — but behind
+the scenes, it still packs a punch.
+
+Highlights include:
+- Access to the node’s **type**, **data**, **properties**, and **children**.
+- Methods for **deep comparison**, **cloning**, and even generating string representations.
+- A custom `List<Node>` wrapper for children (yay, no more reinventing `.getChild()` loops).
+- Utility methods to iterate, stream, and pattern-match your way through the tree.
+
+### Type — What Kind of Node Is This?
+
+Each node has a `Type`, which describes:
+- its **name**,
+- its **child type constraints** (useful for validation),
+- optional **group hierarchy** membership,
+- and a handful of helpful **properties**.
+
+It’s like a schema for your tree, but in a form that plays nice with both DSL and Java code.
+
+### Builder — Assemble Your Node
+
+Last but not least, there’s the `Builder` interface. You’ll use this when creating new nodes — whether manually,
+or during a transformation. Builders are stateful, chainable, and they validate things for you before you ever
+call `createNode()`.
+
+You set:
+- the **fragment** (a bit of source code, if you have it),
+- the **textual data** (optional),
+- the **children** (obviously),
+and then, if all is good, voilà — you get a brand-new immutable `Node`.
+
+## JSON Input/Output (Interpreter Mode)
+
+When running in **interpreter mode**, Astranaut doesn’t generate code — instead, it takes a tree (in JSON format),
+applies your transformation rules on the fly, and spits out a new JSON tree. It’s perfect for quick prototyping,
+testing, and exploring.
+
+Here’s a real-life example of a minimal input tree:
+
+```json
+{
+  "root": {
+    "language": "java",
+    "type": "Root",
+    "children": [
+      {
+        "type": "Addition",
+        "children": [
+          {
+            "type": "Addition",
+            "children": [
+              {
+                "type": "Identifier",
+                "data": "text"
+              },
+              {
+                "type": "IntegerLiteral",
+                "data": "123"
+              }
+            ]
+          },
+          {
+            "type": "IntegerLiteral",
+            "data": "456"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Let’s break it down:
+- The tree starts with a Root node — this is your entry point.
+- Inside, there's an Addition node with two children:
+  - Another nested Addition, combining an identifier ("text") and a number (123).
+  - And finally, a second IntegerLiteral with value 456.
+This structure might come from parsing an expression like:
+
+```java
+text + 123 + 456
+```
+
+Oh, and of course, Astranaut’s core library (astranaut-core) comes with full support for reading and writing these
+JSON trees. So you can integrate it into your tools, editors, or pipelines effortlessly.
+
+### Where to Find All This
+
+These interfaces (and a bunch of handy utilities) live in the separate Maven module:
+[`astranaut-core`](https://github.com/cqfn/astranaut-core) — a lightweight library that provides all the foundational
+plumbing for AST modeling and manipulation.
+
+Generated nodes, transformers, and everything your DSL produces will implement these interfaces.
+So once you learn this model, you're good to go across the whole platform.
+
+Want to explore the guts? Head to the [core documentation](https://github.com/cqfn/astranaut-core/blob/master/README.md) 
+for deep-dives, advanced examples, and a few delightful hacks.
+
+## Command-Line Interface
+
+Astranaut ships with a CLI so you can generate code or run transformations with minimal effort and maximum control.
+
+### Basic Usage
+
+```bash
+java -jar generator.jar <action> <path-to-dsl> [options...]
+```
+
+Yep, that’s it. Just two required arguments:
+
+1. `<action>` — what you want Astranaut to do (generate, etc.)
+2. `<path-to-dsl>` — path to your DSL file (the one that defines the AST structure and transformation rules)
+
+After that, optional flags kick in depending on what you're doing.
+
+### Action: `generate`
+
+This is the bread and butter of Astranaut: turn your DSL into shiny, compile-ready Java code.
+
+```bash
+java -jar generator.jar generate my.dsl \
+  [--output out/folder] \
+  [--license license.txt] \
+  [--package com.example.ast] \
+  [--version 1.2.3]
+```
+
+**Available options:**
+
+| Flag              | Description                                                                                                                                                           |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--output`, `-o`  | Folder where Java files will be generated. Defaults to `./output`.                                                                                                    |
+| `--license`, `-l` | Path to a license (copyright) text file. If provided, its contents will be prepended to all generated files. If not provided, a basic autogenerated one will be used. |
+| `--package`, `-p` | Java package name for the generated classes. Default is simply `ast`, but you can (and should!) use something that fits your project.                                 |
+| `--version`, `-v` | Version number to embed in the generated classes. Makes version tracking — and passing static analysis — way easier.                                                  |
+
+Why bother with license headers and versioning? Because we’re perfectionists. We want the generated code to pass
+every linter, every checker (CodeStyle, PMD, whatever your build throws at it) without needing any exceptions
+or suppressions.
+
+Yes, the generated code is clean. Yes, it looks like something you'd proudly write by hand. Yes, you can trust it.
+Believe us. Or better yet — try it. 😎
+
+### Action: `transform`
+
+Use this action when you want to apply your DSL-defined transformations directly to a JSON tree.
+No codegen, no compilation — just in-place tree magic.
+
+```bash
+java -jar generator.jar transform my.dsl \
+  --source input.json \
+  [--language java] \
+  [--ast output.json] \
+  [--image tree.svg]
+```
+
+**Options:**
+
+| Flag               | Description                                                                                                                                                     |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--source`, `-s`   | Path to the input JSON file (your original syntax tree). **Required.**                                                                                          |
+| `--language`, `-l` | Target language name. Defaults to `"common"`. This comes into play if your DSL supports multiple languages (yes, that’s a thing — see "green-red trees" below). |
+| `--ast`, `-t`      | Output path for the transformed syntax tree in JSON format. Optional — skip this if you just want to sanity-check your DSL or transformations.                  |
+| `--image`, `-i`    | If specified, generates a visual representation of the final tree (after transformation). Just pass the file name, either `.png` or `.svg`, and you’re set.     |
+
+**🎨 Tree Visuals?** Absolutely. Sometimes looking at a transformed AST as JSON is... less than inspiring.
+Use --image tree.png or tree.svg to see your result laid out as an actual tree diagram.
+It’s great for debugging — and even better for slide decks or documentation.
+
+Here is an image of the tree derived from the JSON example above:
+
+![SIMPLE AST](src/main/documents/simple_ast.png)
+
+### Action: `parse`
+
+This one’s a bit different — instead of feeding Astranaut a full-blown syntax tree in JSON, you give it plain **text**.
+A regular file. Just characters.
+
+Astranaut then:
+1. Parses your file **character by character** into a flat "degenerate" AST
+   (basically a `Root` node with one child per character).
+2. Applies your transformation rules to fold those characters into meaningful nonterminals.
+3. Outputs a full, structured AST as JSON — or as an image, if you like pictures.
+
+Here is an example of a degenerated tree before processing:
+
+![SIMPLE AST](src/main/documents/degenerate_tree.png)
+
+#### Usage:
+
+```bash
+java -jar generator.jar parse my.dsl \
+  --source code.txt \
+  [--language java] \
+  [--ast output.json] \
+  [--image tree.png]
+```
+
+**Options** (same as `transform`):
+
+| Flag               | Description                                                                                      |
+| ------------------ |--------------------------------------------------------------------------------------------------|
+| `--source`, `-s`   | A plain-text file to parse. **Required**.                                                        |
+| `--language`, `-l` | Target language (from your DSL). Defaults to `"common"`.                                         |
+| `--ast`, `-t`      | Output path for the resulting AST in JSON format. Optional.                                      |
+| `--image`, `-i`    | Path to an image file (SVG or PNG) that will visualize the final tree. Optional, but super cool. |
+
+This is your go-to action when you want to define your own parser using transformation rules alone.
+
 ## Syntax
 
-Astranaut operates on a custom-designed domain-specific language (DSL), which serves as the foundation for both tree
-structure definitions and transformation logic. This DSL supports two core types of rules:
 
-1. **Node Definitions**  
-2. **Transformation Rules**  
-
-The syntax has been deliberately kept minimal and readable. While simple by design, it has proven to be both expressive
-and powerful in practice — striking a balance between approachability and capability.
-
-### Statement Separation
-
-All rules in the Astranaut DSL are separated by semicolons (`;`).
-
-Line breaks are ignored by the parser, allowing long rules to be split across multiple lines purely for readability.
-
-### Structure of a Rule
-
-Each rule in the DSL consists of a **left-hand side (LHS)** and a **right-hand side (RHS)**, separated by an arrow
-symbol. There are two types of arrows, each with a distinct semantic purpose:
-
-- `<-` (left arrow) — used for **node declarations**  
-  Defines a syntax tree node and its internal structure.  
-  Format:
-  ```
-  NodeName <- NodeDescription;
-  ```
-- `->` (right arrow) — used for **transformation rules**  
-  Describes how a subtree (or set of subtrees) should be transformed into a new structure.  
-  Format:
-  ```
-  SourcePattern -> TargetPattern;
-  ```
-
-### Node Declarations
-
-Node declarations in Astranaut DSL define the structural schema of tree nodes. They serve as static type definitions
-for syntax tree elements and impose strict constraints on the number and types of child nodes.
-
-**Key rules:**
-
-- A node declaration uses the `<-` operator.
-- The left-hand side is the name of the node being declared.
-- The right-hand side is a comma-separated list of required child node types.
-- The number and order of child nodes are fixed and must be strictly followed.
-
-Node declarations are non-executable and declarative by nature — they do not perform any computation or transformation.
-Their primary purpose is to define *what a valid node looks like*.
-
-Each child node must be either:
-- A previously declared type
-- Or a type that will be declared later
-
-Once defined, these rules guarantee:
-
-- Nodes can only be constructed if all their children are present and match the declared types.
-- The tree structure is inherently self-validating — **if a node exists, it is structurally correct** by definition.
-- The root node (if present) represents a complete and valid syntax tree.
-- No transformation can produce an invalid tree.
-
-#### Example
-
-Consider the following node declaration:
-
-```
-Addition <- Expression, Expression;
-```
-
-This defines a node named `Addition`, which must have exactly **two** children, each of type `Expression`
-The declaration enforces:
-
-- **Cardinality:** The number of children is fixed — no more, no less.
-- **Type constraints:** Both children must be of type `Expression`, or of a type that inherits from `Expression`.
-
-Any attempt to construct an `Addition` node with fewer or more children, or with children of incorrect types,
-will be rejected at the structural level — before any transformations are applied.
-
-This kind of declarative schema enables:
-
-- Safe assumptions during transformation
-- Clear, readable structure definitions
-- Enforcement of correctness without additional runtime checks
-
-### Optional Child Nodes
-
-To support flexible tree structures, Astranaut DSL allows node declarations to include **optional** child nodes.
-Optional elements are enclosed in square brackets `[...]`.
-
-For example:
-
-```
-VariableDeclaration <- DataType, Identifier, [Expression];
-```
-
-In this declaration:
-
-- `DataType` and `Identifier` are **required** child nodes.
-- `Expression` is **optional** — it may be present or omitted.
-- If present, it must conform to the declared type (`Expression` or its subtype).
-
-Only the presence of the node is optional — its type is still strictly enforced if the node is present.
-
-### Tags
-
-Tags provide **named access** to specific child nodes within a node declaration. They serve as semantic labels,
-helping both humans and the code generator understand the role of each child node.
-
-The syntax is simple: a tag is written as `tagName@Type`.
-
-#### Examples
-
-```
-Addition <- left@Expression, right@Expression;
-VariableDeclaration <- dataType@DataType, name@Identifier, [initialValue@Expression];
-```
-
-In these examples:
-
-- The `Addition` node has two required children: `left` and `right`, both of type `Expression`.
-- The `VariableDeclaration` node has two required children and one optional child, each tagged with a meaningful name.
-
-#### Purpose and Benefits
-
-While tags are **optional**, they provide important advantages:
-
-- **Readable structure**: Tags make the role of each child node immediately obvious.
-- **Generated accessors**: When tags are present, the Astranaut code generator (currently targeting Java)
-  produces named getter methods such as:
-  - `getLeft()`, `getRight()` for `Addition`
-  - `getInitialValue()` for `VariableDeclaration`
-
-When no tags are specified, access to child nodes is performed by **index**. For example, in a node declared as:
-
-```
-Addition <- Expression, Expression;
-```
-
-the generated code will expose generic accessors such as `getChild(0)` and `getChild(1)`.
-While this approach is fully functional, it is less expressive and more error-prone compared to named accessors.
 
 ## Contributors
 
