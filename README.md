@@ -406,6 +406,7 @@ python:
 java:
 ```
 You can switch back and forth as needed.
+**Language names are case-insensitive** and are always lowercased internally.
 
 #### Green-Red Trees (Yes, seriously)
 
@@ -438,6 +439,236 @@ red nodes into green subtrees with equivalent meaning.
 
 We found this model delightful. It made our tooling more robust, our trees more beautiful, and our team just a
 little bit happier. We hope it sparks the same joy for you.
+
+### Two Types of Rules — Structure vs. Transformation
+
+The Astranaut DSL has just **two kinds of rules**, and they're both dead simple.
+
+Each rule has:
+- a **left-hand side**,
+- a **right-hand side**,
+- and a **separator** in between that tells us what kind of rule we're dealing with.
+
+Let’s break it down:
+
+#### Structure Rules: `<-`
+
+These describe what a node **should look like**.
+
+Example:
+
+```dsl
+Addition <- Expression, Expression;
+```
+
+This defines a node called Addition that always has exactly two children, both of type Expression.
+
+What does this rule do?
+
+- In code generation mode, it causes Astranaut to generate:
+  - a `Node` implementation (Addition),
+  - a corresponding `Type`,
+  - and a `Builder` class.
+- In interpreter mode, it just registers the expected shape of this node for later use in transformations.
+
+💡 And here’s the really important part:
+
+> Nodes are only ever created if their structure is valid.  
+  So **if a node exists** — you can trust that **it’s syntactically correct**.
+
+Since the **root** of a tree is also a node, this means: 
+
+> **If a root exists, the whole tree is valid**.
+
+#### Transformation Rules: `->`
+
+These describe how to convert one tree pattern into another.
+
+Example:
+
+```dsl
+Expression#1, [Whitespace], Operator<'+'>, [Whitespace], Expression#2
+    -> Addition(#1, #2);
+```
+
+Here’s what happens:
+- The left-hand side defines a **pattern** to match in the tree.
+- The right-hand side defines **how to replace it** — in this case, with an `Addition` node.
+
+This rule will:
+- generate Java code that performs this transformation (if you're using `generate`),
+- or apply the transformation on-the-fly (if you're using `transform` or `parse`).
+
+One important thing:
+
+> The node on the right-hand side must be previously defined with a **structure rule** (`<-`).  
+  Otherwise, you’ll get a compile-time error in the DSL.
+
+This separation between structure and behavior keeps things clean and modular:
+
+- You define what nodes are.
+- You define how they evolve.
+
+Everything else flows from there.
+
+### Defining Nodes
+
+You’ve already seen this one a few times — let’s give it the spotlight it deserves:
+
+```dsl
+Addition <- Expression, Expression;
+```
+
+This is a **structure rule**. You’re telling Astranaut: "Please define a node named `Addition`,
+which always has two children, both of type `Expression`".
+
+#### Left-hand side: the node name
+
+The thing on the left of `<-` is the node type name — just a single identifier. A few important notes:
+
+- It must be **unique** within the DSL file.
+- It’s case-sensitive.
+- **Some names are reserved**, and using them will throw an error:
+
+```
+Char, Insert, Replace, Delete, Object, List, Map, Set, Arrays
+```
+
+Why? Because:
+
+- Some of these are **Java standard classes** (`List`, `Map`, `Set`, etc.),
+- Others are **used internally** in `astranaut-core` (like `Insert`, `Replace`, etc.),
+- And all of them are just asking for trouble if reused.
+
+Play it safe — use domain-specific names that reflect the actual intent of your tree structures.
+
+####  Right-hand side: node descriptor list
+
+The part to the right of `<-` is a **comma-separated list of descriptors** — one for each child node.
+In our example:
+- The node `Addition` **must** have **two children**.
+- Both **must** be nodes of type `Expression`.
+
+This is the most common and straightforward case.  
+There are more advanced descriptors (e.g., optional nodes, repeated nodes, constraints),
+and we’ll get to those soon — but at its core, this is how you define what a node should contain.
+
+Simple, declarative, powerful.
+
+### Nodes Without Children
+
+Sometimes a node has **no children at all**. This might sound odd at first, but it’s quite common — especially for
+things like literals, keywords, or constants.
+
+Example:
+
+```dsl
+This <- 0;
+```
+
+This defines a node called `This` that has exactly zero children. In Java, the `this` keyword is a self-reference —
+a special kind of expression with no internal structure. This rule captures that perfectly.
+
+### Optional Children: `[...]`
+
+Sometimes a node can have **optional children** — fields that may or may not be present, depending on the context.
+
+In Astranaut DSL, optional children are wrapped in **square brackets**:
+
+```dsl
+VariableDeclaration <- [TypeName], Identifier, [Expression];
+```
+
+This defines a VariableDeclaration node with up to three children:
+
+1. An optional `TypeName`,
+2. a required `Identifier`,
+3. and an optional `Expression`.
+
+So the following are all valid:
+
+- `int x = 42;` → all three children present,
+- `x = 42`; → no type name,
+- `int x;` → no initializer.
+
+The order of descriptors defines structure, but not always how transformation rules must match or build them —
+and that’s where things get interesting.
+
+### ⚠️ A Word on Child Matching During Transformations
+
+When a transformation rule fires, Astranaut tries to build a new node based on its structure
+(as defined via a <- rule).
+
+Here’s how it works:
+- If the node has **multiple children of the same type**, the **order matters** in the transformation rule. 
+  For example, mixing up two `Expression`s may flip your operands — and that would be bad.
+- But if the node’s children are of **different types**, Astranaut can match them **positionally or by type**,
+  as needed. It will "slot" each matched child into the right place — smartly and safely.
+
+This makes rule-writing easier and less error-prone — especially for cases with optional or heterogeneous children.
+
+Don’t worry — we’ll go deeper into how this matching works when we talk about transformation rule syntax.
+It’s both intuitive and powerful. Stay tuned!
+
+### Tags for Child Nodes
+
+Let’s revisit a couple of earlier examples, but this time — with a little twist:
+
+```dsl
+Addition <- left@Expression, right@Expression;
+VariableDeclaration <- [className@TypeName], name@Identifier, [initial@Expression];
+```
+
+That `name@Identifier` syntax? It’s called a tag, and it’s awesome.
+
+**So, what are tags?**  
+Tags let you **name** each child in a structure rule. This does two things:
+
+- **Improves DSL readability** — it’s way easier to tell what each part is.
+- **Enhances generated Java code** — each tagged child becomes a named getter.
+
+Example:
+
+```java
+Identifier varName = varDecl.getName();  // thanks to name@Identifier
+```
+
+Without the tag, you'd be stuck with something like:
+
+```java
+Identifier varName = (Identifier) varDecl.getChild(1);  // ouch.
+```
+
+Rules for tagging:
+- Tags must be valid Java identifiers.
+- Tags are optional — but highly recommended.
+- ❌ Tags must be unique within a single node.  
+  You can’t have two children with the same tag — the DSL compiler will throw an error.
+
+Tags are especially helpful when your node has multiple children of the same type —
+like two `Expression`s in an `Addition`. The tag helps prevent confusion and improves both safety and clarity.
+
+In short: if you care about naming things (and you should), tag your children.
+
+### Repeated Children — `{...}`
+
+Sometimes a node needs to hold a **flexible number of children** — like a list of arguments, statements, or elements.
+
+In Astranaut DSL, this is done with **curly braces**:
+
+```dsl
+ArgumentsList <- {Expression};
+```
+
+This defines an `ArgumentsList` node that can have zero or more `Expression` children — all of the same type.
+Think of it like `List<Expression>` — only in tree form.
+
+Key rules for repeated children:
+- The curly braces mean "**repeating**" — you’re saying: "this child may occur 0, 1, 2... N times."
+- Only **one repeated child is allowed per node** . You can’t have `{A}, {B}` in the same rule.
+- Repeated children must all be of the same type — no mixing.
+
+
 
 ## Contributors
 
