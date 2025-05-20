@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/cqfn/astranaut/blob/master/LICENSE.txt)
 ___
 
-## 👨‍🚀 Brief
+# 👨‍🚀 Brief
 
 Welcome aboard **Astranaut** — a quirky little Java project with a cosmic name and a singular mission:
 to explore, describe, and reshape **syntax trees** (you know, ASTs).
@@ -23,7 +23,7 @@ In short, **Astranaut** lets you:
 Whether you're building a code linter, refactoring engine, domain-specific transpiler, or just a curious developer
 who loves playing with compilers — Astranaut is your friendly toolkit for working with trees like a pro.
 
-## Requirements
+# Requirements
 
 * Java 1.8
 * Maven 3.6.3+ (to build)
@@ -43,7 +43,7 @@ mvn package
 
 In both ways, the executable file named `generator.jar` will be in the `target` folder.
 
-## How It Works
+# How It Works
 
 At the heart of Astranaut is a tiny, cozy DSL — a **Domain-Specific Language** for describing the structure of your
 syntax trees *and* the rules for transforming them. It’s intentionally simple (because nobody wants to learn
@@ -52,7 +52,7 @@ Or at least, we like to think so.
 
 Astranaut runs in **two distinct modes**, depending on your mood and use case:
 
-### Mode 1: Code Generation
+## Mode 1: Code Generation
 
 This is the real deal. Astranaut takes your DSL definitions and spits out full-blown Java code:
 - 🧱 Classes representing AST nodes.
@@ -62,7 +62,7 @@ This is the real deal. Astranaut takes your DSL definitions and spits out full-b
 Think of it like ANTLR, but focused purely on AST structure and transformation.
 If you've ever used tools that generate parser or visitor classes — you're in familiar territory.
 
-### Mode 2: On-the-Fly Interpretation
+## Mode 2: On-the-Fly Interpretation
 
 Too impatient to generate code and compile it? We got you. In interpretation mode, Astranaut:
 - loads your DSL definitions,
@@ -76,7 +76,7 @@ or just getting a feel for your rules.
 Bonus: Astranaut can also draw pretty pictures of your trees — PNG or SVG — which is super handy when you’re trying
 to debug a pattern or just admire your beautifully structured code.
 
-## 🌳 Trees, Glorious Trees
+# 🌳 Trees, Glorious Trees
 
 At the core of Astranaut lies a clean, minimalistic model for representing syntax trees.
 It’s all based around just **three interfaces** — elegant, extensible, and designed with transformation in mind.
@@ -84,7 +84,7 @@ It’s all based around just **three interfaces** — elegant, extensible, and d
 Every tree node you’ll ever meet in Astranaut is an implementation of the `Node` interface.
 Here’s what you need to know:
 
-### Node — The Backbone of the Forest
+## Node — The Backbone of the Forest
 
 Think of this as the universal interface for AST nodes. It’s immutable (on purpose!), thread-safe, and designed to be
 friendly for both humans and code generators. With just a few methods to implement, it's easy to extend — but behind
@@ -96,7 +96,7 @@ Highlights include:
 - A custom `List<Node>` wrapper for children (yay, no more reinventing `.getChild()` loops).
 - Utility methods to iterate, stream, and pattern-match your way through the tree.
 
-### Type — What Kind of Node Is This?
+## Type — What Kind of Node Is This?
 
 Each node has a `Type`, which describes:
 - its **name**,
@@ -106,7 +106,7 @@ Each node has a `Type`, which describes:
 
 It’s like a schema for your tree, but in a form that plays nice with both DSL and Java code.
 
-### Builder — Assemble Your Node
+## Builder — Assemble Your Node
 
 Last but not least, there’s the `Builder` interface. You’ll use this when creating new nodes — whether manually,
 or during a transformation. Builders are stateful, chainable, and they validate things for you before you ever
@@ -173,7 +173,7 @@ text + 123 + 456
 Oh, and of course, Astranaut’s core library (astranaut-core) comes with full support for reading and writing these
 JSON trees. So you can integrate it into your tools, editors, or pipelines effortlessly.
 
-### Where to Find All This
+## Where to Find All This
 
 These interfaces (and a bunch of handy utilities) live in the separate Maven module:
 [`astranaut-core`](https://github.com/cqfn/astranaut-core) — a lightweight library that provides all the foundational
@@ -185,11 +185,11 @@ So once you learn this model, you're good to go across the whole platform.
 Want to explore the guts? Head to the [core documentation](https://github.com/cqfn/astranaut-core/blob/master/README.md) 
 for deep-dives, advanced examples, and a few delightful hacks.
 
-## Command-Line Interface
+# Command-Line Interface
 
 Astranaut ships with a CLI so you can generate code or run transformations with minimal effort and maximum control.
 
-### Basic Usage
+## Basic Usage
 
 ```bash
 java -jar generator.jar <action> <path-to-dsl> [options...]
@@ -202,7 +202,7 @@ Yep, that’s it. Just two required arguments:
 
 After that, optional flags kick in depending on what you're doing.
 
-### Action: `generate`
+## Action: `generate`
 
 This is the bread and butter of Astranaut: turn your DSL into shiny, compile-ready Java code.
 
@@ -230,7 +230,7 @@ or suppressions.
 Yes, the generated code is clean. Yes, it looks like something you'd proudly write by hand. Yes, you can trust it.
 Believe us. Or better yet — try it. 😎
 
-### Action: `transform`
+## Action: `transform`
 
 Use this action when you want to apply your DSL-defined transformations directly to a JSON tree.
 No codegen, no compilation — just in-place tree magic.
@@ -260,7 +260,7 @@ Here is an image of the tree derived from the JSON example above:
 
 ![SIMPLE AST](src/main/documents/simple_ast.png)
 
-### Action: `parse`
+## Action: `parse`
 
 This one’s a bit different — instead of feeding Astranaut a full-blown syntax tree in JSON, you give it plain **text**.
 A regular file. Just characters.
@@ -275,7 +275,7 @@ Here is an example of a degenerated tree before processing:
 
 ![DEGENERATE TREE](src/main/documents/degenerate_tree.png)
 
-#### Usage:
+Usage:
 
 ```bash
 java -jar generator.jar parse my.dsl \
@@ -296,14 +296,14 @@ java -jar generator.jar parse my.dsl \
 
 This is your go-to action when you want to define your own parser using transformation rules alone.
 
-## The DSL Syntax
+# The DSL Syntax
 
 Ah yes, the **DSL** — the tiny language you write to define your trees and how they evolve.
 
 We’ve kept the syntax intentionally minimal and — dare we say — _pleasant_. You can probably guess what things do just
 by reading them. No weird symbols, no cryptic meta-rules. Just clean, declarative structure.
 
-### Basic Structure
+## Basic Structure
 
 A DSL file is simply a list of **rules**, and each rule ends with a **semicolon** (`;`).
 
@@ -325,14 +325,14 @@ Expression#1, [Whitespace], Operator<'+'>, [Whitespace], Expression#2
 Addition(#1, #2);
 ```
 
-### Comments are totally a thing
+## Comments are totally a thing
 
 Like any decent language, the Astranaut DSL lets you sprinkle in **comments** — because future-you (or your teammates)
 will thank you.
 
 We support good old **C-style comments**, in both formats:
 
-#### Single-line comments
+### Single-line comments
 
 Use `//` to comment from that point to the end of the line:
 
@@ -341,7 +341,7 @@ Use `//` to comment from that point to the end of the line:
 Addition <- Expression, Expression;
 ```
 
-#### Multi-line comments
+### Multi-line comments
 
 Use `/* ... */` to comment across multiple lines — or inline, if you're feeling fancy:
 
@@ -357,7 +357,7 @@ Addition(#1, #2);
 
 Comments are completely ignored during parsing, so feel free to get as wordy (or poetic) as you like.
 
-### Languages & Green-Red Trees
+## Languages & Green-Red Trees
 
 During development of the larger project that Astranaut was originally built for, we ran into an interesting challenge:
 **some rules are universal**, while others are **language-specific**.
@@ -408,7 +408,7 @@ java:
 You can switch back and forth as needed.
 **Language names are case-insensitive** and are always lowercased internally.
 
-#### Green-Red Trees (Yes, seriously)
+### Green-Red Trees (Yes, seriously)
 
 Here's where it gets fun. Every generated node in Astranaut includes a few built-in properties:
 
@@ -440,7 +440,7 @@ red nodes into green subtrees with equivalent meaning.
 We found this model delightful. It made our tooling more robust, our trees more beautiful, and our team just a
 little bit happier. We hope it sparks the same joy for you.
 
-### Two Types of Rules — Structure vs. Transformation
+## Two Types of Rules — Structure vs. Transformation
 
 The Astranaut DSL has just **two kinds of rules**, and they're both dead simple.
 
@@ -451,7 +451,7 @@ Each rule has:
 
 Let’s break it down:
 
-#### Structure Rules: `<-`
+### Structure Rules: `<-`
 
 These describe what a node **should look like**.
 
@@ -480,7 +480,7 @@ Since the **root** of a tree is also a node, this means:
 
 > **If a root exists, the whole tree is valid**.
 
-#### Transformation Rules: `->`
+### Transformation Rules: `->`
 
 These describe how to convert one tree pattern into another.
 
@@ -511,7 +511,7 @@ This separation between structure and behavior keeps things clean and modular:
 
 Everything else flows from there.
 
-### Defining Nodes
+## Defining Nodes
 
 You’ve already seen this one a few times — let’s give it the spotlight it deserves:
 
@@ -522,7 +522,7 @@ Addition <- Expression, Expression;
 This is a **structure rule**. You’re telling Astranaut: "Please define a node named `Addition`,
 which always has two children, both of type `Expression`".
 
-#### Left-hand side: the node name
+### Left-hand side: the node name
 
 The thing on the left of `<-` is the node type name — just a single identifier. A few important notes:
 
@@ -542,7 +542,7 @@ Why? Because:
 
 Play it safe — use domain-specific names that reflect the actual intent of your tree structures.
 
-####  Right-hand side: node descriptor list
+###  Right-hand side: node descriptor list
 
 The part to the right of `<-` is a **comma-separated list of descriptors** — one for each child node.
 In our example:
@@ -555,7 +555,7 @@ and we’ll get to those soon — but at its core, this is how you define what a
 
 Simple, declarative, powerful.
 
-### Nodes Without Children
+## Nodes Without Children
 
 Sometimes a node has **no children at all**. This might sound odd at first, but it’s quite common — especially for
 things like literals, keywords, or constants.
@@ -569,7 +569,7 @@ This <- 0;
 This defines a node called `This` that has exactly zero children. In Java, the `this` keyword is a self-reference —
 a special kind of expression with no internal structure. This rule captures that perfectly.
 
-### Optional Children: `[...]`
+## Optional Children: `[...]`
 
 Sometimes a node can have **optional children** — fields that may or may not be present, depending on the context.
 
@@ -594,7 +594,7 @@ So the following are all valid:
 The order of descriptors defines structure, but not always how transformation rules must match or build them —
 and that’s where things get interesting.
 
-### ⚠️ A Word on Child Matching During Transformations
+## ⚠️ A Word on Child Matching During Transformations
 
 When a transformation rule fires, Astranaut tries to build a new node based on its structure
 (as defined via a <- rule).
@@ -610,7 +610,7 @@ This makes rule-writing easier and less error-prone — especially for cases wit
 Don’t worry — we’ll go deeper into how this matching works when we talk about transformation rule syntax.
 It’s both intuitive and powerful. Stay tuned!
 
-### Tags for Child Nodes
+## Tags for Child Nodes
 
 Let’s revisit a couple of earlier examples, but this time — with a little twist:
 
@@ -650,7 +650,7 @@ like two `Expression`s in an `Addition`. The tag helps prevent confusion and imp
 
 In short: if you care about naming things (and you should), tag your children.
 
-### Repeated Children — `{...}`
+## Repeated Children — `{...}`
 
 Sometimes a node needs to hold a **flexible number of children** — like a list of arguments, statements, or elements.
 
@@ -668,9 +668,209 @@ Key rules for repeated children:
 - Only **one repeated child is allowed per node** . You can’t have `{A}, {B}` in the same rule.
 - Repeated children must all be of the same type — no mixing.
 
+## Literals — Nodes With Data, Not Children
 
+Some nodes don’t have children — instead, they just **store a value**.  
+Meet **literals**.  
+Literals in Astranaut aren’t just “string fragments” — they can carry actual **typed values**, backed by real
+Java types. You can even plug in your own serializers and parsers.
 
-## Contributors
+A **literal rule** has:
+- a **name** on the left (as usual),
+- and **1 to 5 comma-separated parameters** on the right — all string literals in single or double quotes.
+
+```dsl
+IntegerLiteral <- 'int', '0', 'String.valueOf(#)', 'Integer.parseInt(#)', 'NumberFormatException';
+```
+
+Breakdown:
+
+| Position | Meaning                        | Required?    |
+| -------- | ------------------------------ | ------------ |
+| 1st      | **Java type**                  | ✅ Yes        |
+| 2nd      | **Default value**              | Optional\*   |
+| 3rd      | **Serializer expression**      | Optional\*\* |
+| 4th      | **Parser expression**          | Optional\*\* |
+| 5th      | **Exception class for parser** | Optional     |
+
+\* Required if Java type is non-primitive.  
+\*\* Both serializer and parser must be specified together, or not at all.
+
+### 1. Java Type
+This is the native type your literal node will hold. It can be:
+- a primitive type (`int`, `double`, `boolean`)
+- or a full class name like `String`, `BigDecimal`, or even a custom type.
+
+```dsl
+IntegerLiteral <- 'int';
+```
+
+Primitive types get standard default values (0, 0.0, false), so you can skip other parameters.
+
+### 2. Default Value
+
+If your type is not primitive, you must specify a default value:
+
+```dsl
+StringLiteral <- 'String', '""';
+```
+Why? Because when you create a node using the `Builder`, you can skip calling `setData()` — and this value will be used
+automatically.
+
+Please don’t use `null`. You can — but we beg you not to. Nulls are like smoking: legal, common,
+and almost always a bad idea.
+
+### 3 & 4. Serializer and Parser
+
+Since Astranaut stores data internally as strings (via `.getData()`), we need to serialize and parse complex types.
+
+That’s where these expressions come in:
+
+```dsl
+IntegerLiteral <- 'int', '0', 'String.valueOf(#)', 'Integer.parseInt(#)';
+```
+
+Use `#` as a placeholder for the value being processed:
+- The serializer turns your value into a string.
+- The parser takes a string and returns the native value.
+
+### 5. Parser Exception Class
+
+If the parser can throw an exception (e.g. on malformed input), you can specify its class name.
+If thrown, it’ll be caught — and `setData()` will return false.
+
+```dsl
+IntegerLiteral <- 'int', '0', 'String.valueOf(#)', 'Integer.parseInt(#)', 'NumberFormatException';
+```
+
+### Full Custom Example
+
+```dsl
+JsonLiteral <-
+  'com.kniazkov.json.JsonElement',
+  'com.kniazkov.json.JsonNull.INSTANCE',
+  '#.toString()',
+  'com.kniazkov.json.Json.parse(#)',
+  'com.kniazkov.json.JsonException';
+```
+
+This literal holds a full-blown custom JSON object from your library. Just remember:
+- Always use **fully qualified class names** — Astranaut doesn’t generate import statements.
+- You get strong typing, automatic getters, and robust serialization.
+
+### Bonus: Code Generation Perks
+
+For each parameterized literal, Astranaut will generate a getValue() method in Java that returns the native value:
+
+```java
+public int getValue();           // for IntegerLiteral
+public String getValue();        // for StringLiteral
+public JsonElement getValue();  // for JsonLiteral
+```
+
+No casting. No conversions. No boilerplate. Just grab the value and go. Unlike ANTLR, Astranaut won’t make you
+wrestle with tokens and string coercion. We still love ANTLR, but we’d never do you like that.
+
+## Abstract Nodes — Defining Families of Types
+
+Sometimes you want to group several node types together — not to create them directly,
+but to use them **as a concept**.
+
+That’s where **abstract nodes** come in.
+
+### Here's how it looks:
+
+```dsl
+Addition <- Expression, Expression;
+Subtraction <- Expression, Expression;
+Multiplication <- Expression, Expression;
+Division <- Expression, Expression;
+
+BinaryOperation <- Addition | Subtraction | Multiplication | Division;
+
+IntegerLiteral <- 'int';
+StringLiteral <- 'String', '""';
+
+Literals <- IntegerLiteral | StringLiteral;
+
+Expression <- BinaryOperation | Literals;
+```
+
+### What’s happening here?
+
+- `BinaryOperation`, `Literals`, and `Expression` are abstract nodes.
+- You **can’t create** them directly in transformation rules.
+- But you **can use them on the left side of a pattern** — as a flexible match.
+
+### How Matching Works
+
+Let’s say you write a transformation like this:
+```dsl
+Expression#1, [Whitespace], Operator<'+'>, [Whitespace], Expression#2
+    -> Addition(#1, #2);
+```
+What does `Expression` mean here?
+
+It means: **match any node that is a descendant** of `Expression` — like:
+- `IntegerLiteral`
+- `Addition`
+- `Subtraction`
+- anything else that inherits from `Expression`
+
+So instead of writing a rule for every specific type — you write one general rule that catches all of them.
+Abstract nodes enable **polymorphism in tree matching**.
+
+### What Happens During Code Generation?
+
+- For each abstract node, Astranaut generates a **Java interface**.
+- Concrete nodes implement this interface (and possibly more than one).
+- No intermediate AST nodes are generated — unlike in some well-known parser generators. That means: your actual tree
+  stays clean. No extra `BinaryOperation` → `Addition` → `Expression` nesting. Just the real node (`Addition`) —  
+  but with rich group semantics.
+
+### Multiple Inheritance Is Allowed
+
+Yes, really.
+A node can belong to **more than one abstract group**:
+
+```dsl
+Something <- A | B;
+OtherThing <- B | C;
+```
+
+This is particularly useful in complex grammars where certain node types overlap in meaning.
+
+### Tags Propagate (Smartly)
+
+If all child types of an abstract node **share the same tag(s)** — and those tags have the **same type** —
+the abstract node **inherits** the tag.
+
+Example:
+
+```dsl
+Addition <- left@Expression, right@Expression;
+Subtraction <- left@Expression, right@Expression;
+BinaryOperation <- Addition | Subtraction;
+```
+
+Result:
+
+- BinaryOperation will have `.getLeft()` and `.getRight()` methods.
+- The tag types are preserved.
+
+If the tag types differ, Astranaut tries to infer the **most general shared type**.  
+If one is found — great! If not, the tag is dropped from the abstract interface.
+
+### Summary
+
+- Abstract nodes give you powerful **grouping and polymorphism**.
+- They clean up your DSL, reduce repetition, and **don’t pollute your trees**.
+- You get smart Java interfaces that reflect the actual structure.
+- Tags propagate up the hierarchy when possible — so your code stays consistent and pleasant to use.
+
+This is one of those features that quietly makes everything better.
+
+# Contributors
 
 * Ivan Kniazkov, @kniazkov
 * Polina Volkhontseva, @pollyvolk
