@@ -273,7 +273,7 @@ Astranaut then:
 
 Here is an example of a degenerated tree before processing:
 
-![SIMPLE AST](src/main/documents/degenerate_tree.png)
+![DEGENERATE TREE](src/main/documents/degenerate_tree.png)
 
 #### Usage:
 
@@ -296,9 +296,148 @@ java -jar generator.jar parse my.dsl \
 
 This is your go-to action when you want to define your own parser using transformation rules alone.
 
-## Syntax
+## The DSL Syntax
 
+Ah yes, the **DSL** — the tiny language you write to define your trees and how they evolve.
 
+We’ve kept the syntax intentionally minimal and — dare we say — _pleasant_. You can probably guess what things do just
+by reading them. No weird symbols, no cryptic meta-rules. Just clean, declarative structure.
+
+### Basic Structure
+
+A DSL file is simply a list of **rules**, and each rule ends with a **semicolon** (`;`).
+
+That’s it. That’s the one rule to remember.
+
+Newlines? Totally optional. You can:
+- write **long rules** across multiple lines (for readability),
+- or cram **multiple short rules** into a single line (for compactness).
+
+Whichever makes it easier to read — do that. Astranaut doesn’t judge.
+
+Here’s an example of both styles:
+
+```dsl
+Addition <- Expression, Expression;
+
+Expression#1, [Whitespace], Operator<'+'>, [Whitespace], Expression#2 
+->
+Addition(#1, #2);
+```
+
+### Comments are totally a thing
+
+Like any decent language, the Astranaut DSL lets you sprinkle in **comments** — because future-you (or your teammates)
+will thank you.
+
+We support good old **C-style comments**, in both formats:
+
+#### Single-line comments
+
+Use `//` to comment from that point to the end of the line:
+
+```dsl
+// This rule declares an 'Addition' node that has two children:
+Addition <- Expression, Expression;
+```
+
+#### Multi-line comments
+
+Use `/* ... */` to comment across multiple lines — or inline, if you're feeling fancy:
+
+```dsl
+/*
+   This rule declares a conversion to a node of type 'Addition',
+   by consuming a minimum of three and a maximum of five nodes:
+*/
+Expression#1 /* required */, [Whitespace] /* optional */, Operator<'+'>, [Whitespace], Expression#2 
+->
+Addition(#1, #2);
+```
+
+Comments are completely ignored during parsing, so feel free to get as wordy (or poetic) as you like.
+
+### Languages & Green-Red Trees
+
+During development of the larger project that Astranaut was originally built for, we ran into an interesting challenge:
+**some rules are universal**, while others are **language-specific**.
+
+Take this rule, for instance:
+
+```dsl
+Addition <- Expression, Expression;
+```
+
+This makes sense for pretty much any programming language — C, Java, Python, you name it.
+Addition is universal: it takes two operands, both are expressions. No surprises there.
+
+But then consider something like:
+
+```dsl
+Synchronized <- Expression, StatementBlock;
+```
+
+Yeah... that’s very Java. C doesn't have it. Python certainly doesn’t.
+
+To handle this, we introduced a **simple language tagging mechanism**:
+Just write a language name followed by a colon. Like this:
+
+```dsl
+// General rules for any language
+Addition <- Expression, Expression;
+
+// --- Language-specific section ---
+java:
+
+// Java-only constructs
+Synchronized <- Expression, StatementBlock;
+```
+
+**`common` is the default**
+
+By default, all rules go into the "common" bucket — that is, they apply to all languages unless you specify otherwise.
+So if you’re writing a simple DSL with no language variations, you can forget this feature even exists.
+
+But if you’re building a cross-language DSL, just toggle between languages with lines like:
+
+```dsl
+common:
+python:
+java:
+```
+You can switch back and forth as needed.
+
+#### Green-Red Trees (Yes, seriously)
+
+Here's where it gets fun. Every generated node in Astranaut includes a few built-in properties:
+
+- `language` — the name of the language the rule belongs to.
+- `color` — a visual tag used when drawing trees.
+
+If a node comes from a `common` rule, it gets marked:
+```json
+{"color": "green"}
+```
+If it comes from a language-specific rule, like `java`:, it’s marked:
+```json
+{"color": "red"}
+```
+When visualizing your trees (e.g. with --image), this gives you a green-red tree:
+- Most of it will be green, representing universal structure.
+- The red parts are language-specific nuances.
+
+![GREEN_RED TREE](src/main/documents/green_red_tree.png)
+
+Why does this matter? Because:
+
+- Green trees are portable. You can write generic algorithms that work across all languages.
+- Red trees are fragile. You often need to handle them case-by-case.
+
+So we aim for maximum greenery — and when we can’t avoid red, we write "greening" transformations that convert
+red nodes into green subtrees with equivalent meaning.
+
+We found this model delightful. It made our tooling more robust, our trees more beautiful, and our team just a
+little bit happier. We hope it sparks the same joy for you.
 
 ## Contributors
 
