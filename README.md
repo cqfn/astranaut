@@ -511,7 +511,7 @@ This separation between structure and behavior keeps things clean and modular:
 
 Everything else flows from there.
 
-## Defining Nodes
+# Defining Nodes
 
 You’ve already seen this one a few times — let’s give it the spotlight it deserves:
 
@@ -522,7 +522,7 @@ Addition <- Expression, Expression;
 This is a **structure rule**. You’re telling Astranaut: "Please define a node named `Addition`,
 which always has two children, both of type `Expression`".
 
-### Left-hand side: the node name
+## Left-hand side: the node name
 
 The thing on the left of `<-` is the node type name — just a single identifier. A few important notes:
 
@@ -542,7 +542,7 @@ Why? Because:
 
 Play it safe — use domain-specific names that reflect the actual intent of your tree structures.
 
-###  Right-hand side: node descriptor list
+##  Right-hand side: node descriptor list
 
 The part to the right of `<-` is a **comma-separated list of descriptors** — one for each child node.
 In our example:
@@ -861,6 +861,46 @@ Result:
 If the tag types differ, Astranaut tries to infer the **most general shared type**.  
 If one is found — great! If not, the tag is dropped from the abstract interface.
 
+### Note on Cyclic Inheritance
+
+The DSL compiler checks to ensure that no abstract node — either directly or indirectly — includes itself in its own
+inheritance chain.  
+If a cycle is detected (e.g., `A <- B | C`, `C <- A | D`), the compiler will throw an error.  
+This prevents infinite loops and ensures your tree structure remains well-founded and acyclic.
+
+### Placeholder with `0`:
+
+Sometimes an abstract node might temporarily have only one concrete subtype — especially early in DSL development,
+when other types are still in the works. In that case, you can use `0` as a placeholder for future types:
+
+```dsl
+BinaryOperator <- Addition | 0;
+```
+
+This tells the compiler: _"Yes, there will be more types later — trust me"._
+It keeps the rule syntactically valid without forcing you to list types that don’t yet exist.
+
+### Extending Abstract Nodes Across Languages
+
+You can **extend abstract nodes** from the common section inside a language-specific section.  
+For example:
+
+```dsl
+// Common rules
+Return <- [expression@Expression];
+StatementExpression <- Expression;
+Statement <- Return | StatementExpression;
+
+java: // Language-specific rules
+
+Synchronized <- Statement;
+JavaStatement <- Statement | Synchronized;
+```
+
+Here, `Statement` is a general concept defined in `common`, and `JavaStatement` expands on it by adding the
+Java-only `Synchronized`.  
+This lets you keep your shared logic clean and minimal, while allowing each language to add its own syntactic flavor.
+
 ### Summary
 
 - Abstract nodes give you powerful **grouping and polymorphism**.
@@ -869,6 +909,210 @@ If one is found — great! If not, the tag is dropped from the abstract interfac
 - Tags propagate up the hierarchy when possible — so your code stays consistent and pleasant to use.
 
 This is one of those features that quietly makes everything better.
+
+# Defining Transformation Rules
+
+Transformation rules are where the real magic happens. They let you turn raw, flat trees into meaningful structure by
+recognizing patterns — and replacing them with something better.
+
+## Basic Syntax
+
+A transformation rule consists of:
+- a **left-hand side** — one or more **patterns**, separated by commas,
+- a **right-hand side** — a single **node descriptor**, which describes what should be built,
+- and a separator in between: `->`
+
+```dsl
+Expression#1, [Whitespace], Operator<'+'>, [Whitespace], Expression#2
+    -> Addition(#1, #2);
+```
+
+What does it do? Let’s break it down.
+
+Astranaut takes a list of child nodes inside some parent and:
+
+1. Slides over them left-to-right.
+2. At each position, tries to match the pattern on the **left-hand side**.
+3. If it finds a match:
+   - Those nodes are **removed**,
+   - A new node (from the **right-hand side**) is **inserted in their place**.
+4. The process repeats until no more transformations apply.
+
+It’s simple, predictable, and extremely powerful.
+
+### Left Side: Pattern Matching
+
+The left-hand side describes the sequence of nodes you want to match. These can include:
+
+- Concrete node types (`Expression`, `Operator`, etc.),
+- Literal values (`"+"`, `"if"`),
+- Tagged captures (`Expression#1`),
+- Optional patterns (`[Whitespace]`),
+- (More advanced stuff coming up later...)
+
+### Right Side: Build One Node
+The right-hand side must describe a single node to create — but this node can have children,
+tags, default values, etc.
+
+```dsl
+... -> Addition(#1, #2);
+```
+
+You’re telling Astranaut:  
+"Take the matched pattern, extract nodes #1 and #2, and build an Addition node from them."
+
+You can use the same result node in **multiple transformation rules** — just like how parsing frameworks allow
+multiple rules to reduce to the same non-terminal.
+
+This idea is used everywhere — including:
+- parser generators (e.g., **LALR reductions**),
+- compiler backends (e.g., **instruction selection**),
+- even machine learning ensembles (e.g., **voting over multiple inputs**).
+
+Same principle here: **many ways in** → **one result out**.
+
+## Rule Order Matters
+
+Transformation rules are applied **in the order they’re written**. First match wins.
+
+That means you can fine-tune behavior by:
+- Putting specific patterns first (e.g., long expressions),
+- Falling back to simpler ones later (e.g., single literals).
+
+Just like with pattern matching in functional languages — **order controls priority**.
+
+## Matching by Type
+
+The simplest possible pattern is... just a **node type name**:
+
+```dsl
+AAA -> BBB;
+```
+
+This rule says:  
+> "If you find a node of type `AAA`, and it has no children and no data —
+  just remove it and replace it with a `BBB` node."
+
+No conditions, no captures, no arguments. Pure structural substitution.
+
+When does this apply?
+
+This only matches nodes that:
+
+- are exactly of type `AAA`,
+- have **no children**,
+- and no data (i.e., `.getData().isEmpty()` is `true`).
+
+If any of those things are present — children, a data value, whatever — the pattern doesn’t match.
+
+## Matching Data with `<"value">`
+
+Sometimes you want to match not just a node’s type, but also its **exact data**.
+
+That’s where **angle brackets with string literals** come in:
+
+```dsl
+Request<"hello"> -> Response<"hi">;
+```
+This rule matches:
+
+- a node of type `Request`
+- **with no children**
+- and **with data exactly equal to `"hello"`**
+
+If it matches, Astranaut creates a Response node with data "hi"
+
+### Syntax
+
+Use angle brackets <...> and wrap the value in single or double quotes:
+
+```dsl
+Keyword<'if'> -> IfNode;
+Char<"\n"> -> Newline;
+```
+You can use common escape sequences inside strings:
+
+
+| Escape | Meaning         |
+| ------ | --------------- |
+| `\\n`  | newline         |
+| `\\r`  | carriage return |
+| `\\t`  | tab             |
+| `\\\"` | double quote    |
+| `\\'`  | single quote    |
+| `\\\\` | backslash       |
+
+You can also use it on the right-hand side. This sets the `.getData()` value of the generated node:
+
+```dsl
+Command<'exit'> -> Response<'Goodbye'>;
+```
+
+If you don’t specify data on the right-hand side, the generated node will use its default
+(as defined in the structure rule or its Java type).
+
+### Summary
+
+- Use `<"value">` in a pattern to match by exact data.
+- Use `<"value">` in the result to set the data.
+- Useful for literals, tokens, keywords, or exact string-based switches.
+
+## Patterns with Data Holes — `#1`, `#2`, etc.
+
+Sometimes you want to **capture the data** from one node and pass it into another.
+
+Astranaut lets you do that using **data holes** — placeholders like `#1`, `#2`, and so on:
+
+```dsl
+AAA<#1> -> BBB<#1>;
+```
+
+This means:
+- If there’s a node of type `AAA` with some data (e.g., `"hello"`),
+- that data will be stored in slot `#1`,
+- and inserted as the data for the new node `BBB`.
+
+### How it works
+
+- Holes are written as `#` followed by a non-negative number (`#0`, `#1`, `#42`...).
+- Each hole stores **a string**, which may be:
+  - **empty by default**, or
+  - **populated by matching a node** with that hole.
+- If multiple patterns write to the same hole, the new data is **concatenated**.
+
+```dsl
+Char<#1>, Char<#1> -> Text<#1>;  
+// Matches two characters, stores both in #1 → creates Text
+```
+
+### ⚠️ Rule validation
+
+- You can use **any number of holes**, and reuse them freely on the **left**.
+- But: if you use a hole on the **right-hand** side that was never written to —
+  ❌ the compiler will throw an error.
+
+So this is fine:
+
+```dsl
+Literal<#1> -> Quoted<#1>;
+```
+
+But this is not:
+
+```dsl
+Something -> Other<#1>; // ❌ Hole #1 was never defined
+```
+
+### Why this matters
+
+This lets you:
+
+- Extract and **carry over exact values** from matched nodes.
+- Build new nodes based on **concatenated** or **composed** data.
+- Implement things like string assembly, token normalization, and flexible literal matching.
+
+**Holes are global within each rule**. Think of them as temporary string registers you can write to and read from —
+once per transformation.
 
 # Contributors
 
