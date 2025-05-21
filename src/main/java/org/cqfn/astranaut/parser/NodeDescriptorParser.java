@@ -47,7 +47,12 @@ public final class NodeDescriptorParser {
         "Char",
         "Insert",
         "Replace",
-        "Delete"
+        "Delete",
+        "Object",
+        "List",
+        "Map",
+        "Set",
+        "Arrays"
     );
 
     /**
