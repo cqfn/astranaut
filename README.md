@@ -1114,6 +1114,566 @@ This lets you:
 **Holes are global within each rule**. Think of them as temporary string registers you can write to and read from —
 once per transformation.
 
+## Nested Trees in Transformation Rules
+
+Until now, we've only shown simple, flat patterns — but real trees are rarely that simple.
+
+Good news: Astranaut supports **full tree structures** on both the **left** and **right** sides of a
+transformation rule.
+
+Here’s the syntax:
+
+```dsl
+AAA(BBB, CCC) -> DDD(EEE, FFF);
+```
+
+Let’s unpack that.
+
+### Left-hand side: Matching a subtree
+
+You can match not just a single node, but an entire subtree with a specific shape:
+
+```dsl
+AAA(BBB, CCC) -> ...;
+```
+
+This pattern will only match:
+
+- a node of type `AAA`,
+- with exactly **two children**:
+  - the first must be of type `BBB`,
+  - the second must be of type `CCC`,
+
+This gives you surgical control over **what you're replacing** — and makes it easy to collapse deeply nested patterns
+into a single node. You can nest patterns to **any depth**:
+
+```dsl
+Outer(Inner(Leaf1, Leaf2), OtherLeaf) -> ...;
+```
+
+### Right-hand side: Building a new tree
+
+The result of a transformation is always **a single node** — but that node can have children,
+which can have children, and so on.
+
+Example:
+
+```dsl
+... -> Outer(Inner(Leaf1, Leaf2), Leaf3);
+```
+
+### Key rules
+
+- On the **left**, you can list **multiple patterns**, separated by commas.
+- On the **right**, you can only create **one node**, but that node can have an entire **subtree** as its argument list.
+- Both sides use **parentheses** `(...)` to indicate child nodes.
+
+### Why this matters
+
+This feature lets you:
+
+- Match deep tree fragments in one shot,
+- Replace sequences of nodes with rich hierarchical structures,
+- Encode complex logic declaratively, without writing traversal code.
+
+It’s like structural pattern matching — but for entire AST fragments.
+
+And yes, you can use holes, optional patterns, and even nested captures inside these parentheses. We'll get there next.
+
+## Mixing Data and Children in a Pattern
+
+Can a pattern match **both** the data of a node **and** its children?
+
+**Absolutely.**
+
+```dsl
+AAA<"data">(BBB, CCC) -> Something;
+```
+
+This pattern matches:
+
+- a node of type `AAA`,
+- with **exact data equal to** `"data"`,
+- and with exactly **two children**:
+  - the first is a `BBB`,
+  - the second is a `CCC`.
+
+This is super useful when your syntax tree includes **typed literals** or **keywords with parameters** — for example:
+
+```dsl
+Command<"print">(Expression#1) -> PrintCommand(#1);
+```
+
+### Summary
+
+You can mix:
+
+- **Type** — via the node name (AAA)
+- **Data** — via `<"...">`
+- ** Children — via `(...)`
+ 
+in a single pattern. Use as much or as little as you need — the parser will handle it.
+
+## Node Holes — Capturing and Reusing Subtrees
+
+You’ve seen **data holes** like `#1`, which capture string values.  
+Now meet their sibling: **node holes**, which capture actual **nodes** — even multiple ones.
+
+### Syntax
+
+Node holes look like this:
+
+```dsl
+#1            // untyped hole
+Expression#1  // typed hole
+```
+
+These capture nodes (or subtrees) during matching, and inject them when building new ones.
+
+### How They Work
+
+For every transformation rule, Astranaut creates an infinite set of empty slots (holes).  
+Each hole can:
+
+- hold **zero or more nodes**,
+- collect them during matching (left-hand side),
+- and inject them as children during construction (right-hand side).
+
+### Untyped Node Holes — `#1`
+
+You can use these **in child lists only**, and they match **any node**.
+
+```dsl
+AAA(#1, BBB, CCC) -> Something(#1); // Valid
+AAA, #1, BBB -> ...                 // ❌ Invalid (top-level #1 must be typed)
+```
+
+On the **right-hand side**, an untyped hole means: "Take **all the nodes** stored in this hole and insert them
+as children". This is perfect for things like lists, blocks, or argument spreads:
+
+```dsl
+{Statement#1} -> StatementBlock(#1);
+```
+
+### Typed Node Holes — `Type#1`
+
+Used only on the **left-hand side**, these match specific node types and assign them to a numbered slot:
+
+```dsl
+Expression#1, Operator<"+">, Expression#2 -> Addition(#1, #2);
+```
+
+You can then reuse them on the right-hand side to build the new node.
+
+### Holes Are Independent
+
+- Data holes (`#1` in `<...>`) and node holes (`#1` in `(...)`) are **completely separate** namespaces.
+- You **can** use the same number for both — but please don’t, unless you enjoy confusing your future self.
+
+This works (but hurts to look at):
+
+```dsl
+Literal<#1>(#1) -> Echo(#1);  // Data hole + node hole + same number = 👀
+```
+
+### Summary Rules
+
+| Hole type               | Syntax          | Left side?               | Right side? | Notes                         |
+| ----------------------- | --------------- | ------------------------ | ----------- | ----------------------------- |
+| **Data hole**           | `#1` in `<...>` | ✅                        | ✅           | Stores strings                |
+| **Node hole** (untyped) | `#1` in `(...)` | ✅ (only inside children) | ✅           | Stores list of nodes          |
+| **Node hole** (typed)   | `Type#1`        | ✅                        | ❌           | Single match of specific type |
+
+## Optional Patterns — `[ ... ]`
+
+Sometimes you want to match a node **if it’s there**, but not require it. That’s where **optional patterns** come in.
+
+Just like in structure rules, you use **square brackets** to wrap optional parts of a pattern:
+
+```dsl
+Expression#1, [Whitespace], Operator<'+'>, [Whitespace], Expression#2
+    -> Addition(#1, #2);
+```
+
+This rule will match:
+
+- two `Expression` nodes,
+- separated by a `+` operator,
+- and possibly surrounded by `Whitespace` nodes — but only **if they’re present**.
+
+### Where you can use optional patterns
+
+Optional patterns are allowed only:
+
+- on the **left-hand side** of transformation rules,
+- **inside** the list of patterns or children.
+
+### Where you can’t use them
+
+Optional patterns **are not allowed** on the right-hand side. That part must always build a concrete, fully-formed node.
+
+Also: the entire left-hand side **cannot be made up of only optional patterns**. You must have **at least one
+required element**.
+
+This is invalid:
+
+```dsl
+[Whitespace] -> Something; // ❌ Not allowed — no required pattern
+```
+
+This is fine:
+
+```dsl
+Keyword<'if'>, [Whitespace], Expression -> IfStatement(...); // ✅
+```
+
+### How matching works
+
+If the optional pattern **is present in the tree**, Astranaut matches and consumes it.
+If it’s **not there**, the rule still applies — and the optional part is skipped.  
+
+This is useful for:
+
+- ignoring formatting tokens (`Whitespace`, `Comma`, etc.),
+- making rules tolerant to optional syntax elements (e.g., trailing semicolons),
+- reducing redundancy in rule definitions.
+
+Optional patterns add flexibility to the input side of transformations — but not to the output.  
+Output is always explicit and complete.
+
+## Repeated Patterns — `{ ... }`
+
+Sometimes you want to match **a sequence** of repeating elements — zero or more of the same kind.  
+Astranaut lets you do this using **curly braces**:
+
+```dsl
+AAA, {BBB} -> ...;
+```
+
+This pattern means:
+
+- Match an `AAA` node,
+- Followed by **zero or more** `BBB` nodes.
+
+All matched `BBB` nodes will be **collected into a node hole**, and can be reused on the right-hand side.
+
+### How it works
+
+- The pattern inside `{ ... }` is matched **repeatedly** — greedily, as long as it fits.
+- Each matched instance is **added to a node hole** (if tagged) or just discarded.
+- You can only **repeat one pattern at a time** — not lists.
+
+Example:
+
+```dsl
+{Statement#1} -> StatementList(#1);
+```
+
+This rule matches one or more `Statement` nodes, collects them into hole `#1`, and wraps them
+in a `StatementList` node. Yes, even though it says "zero or more", this rule will only apply if **at least one**
+Statement is matched — because it’s the **only** pattern in the rule.
+
+### Restrictions
+
+Repeated patterns cannot:
+- Be used **alone** in the left-hand side **unless** they are the **only** pattern.
+- Be combined **only** with optional patterns.
+
+These examples are invalid:
+
+```dsl
+{AAA}, {BBB}, [CCC] -> Something; // ❌ No required, non-repeating pattern
+[Whitespace], {Comment} -> ...    // ❌ Same issue
+```
+
+But this is perfectly fine:
+
+```dsl
+Start, {Item#1} -> Group(#1);     // ✅ Required + repeat
+{Statement#1} -> Block(#1);       // ✅ One allowed repeat — special case
+```
+
+## Special Case: Right-Hand Side as Just a Hole
+
+Sometimes you don’t want to **create a new node** — you just want to **extract an existing one** from deep inside
+a subtree and lift it up.
+
+Astranaut allows that. Just use a **hole** as the entire right-hand side:
+
+```dsl
+AAA(BBB(CCC(#1))) -> #1;
+```
+
+This rule matches:
+
+- a node `AAA`, with
+  - a single child `BBB`, which has
+     - a single child `CCC`, which contains
+        - the node captured into `#1`.
+
+Once matched, Astranaut doesn’t create a new node — it simply **replaces the whole subtree**
+with the node stored in `#1`.
+
+No node allocation. No wrapper. Just clean tree surgery.
+
+### Why is this useful?
+
+This is especially handy when:
+
+- You're using **ANTLR** (yes, we love it too!) — and it builds trees with a ton of **redundant wrapper nodes**,
+- You're using someone else's grammar or parser — and you don’t want to rewrite all the rules,
+- You want to **flatten** or **normalize** the tree structure before applying deeper transformations.
+
+## Special Pattern: Character Matching
+
+When working in `parse` mode — or manually building degenerate trees — you’ll often want to match individual
+**characters**.
+
+Astranaut provides a clean, expressive shorthand for that.
+
+### Syntax
+
+You can write character patterns using **single quotes**:
+
+```dsl
+'a'       -> FirstSymbol;
+'a..z'<#1> -> SmallLetter<#1>;
+```
+
+This is shorthand for matching nodes of type `Char`, which is a **special internal node** used to represent individual
+characters when parsing raw text.
+
+So:
+
+```dsl
+'a'
+```
+
+is exactly equivalent to:
+
+```dsl
+Char<'a'>
+```
+
+Only shorter — and much nicer to read.
+
+### Syntax Options
+
+| Pattern  | Meaning                                    |
+| -------- | ------------------------------------------ |
+| `'x'`    | A single character (with optional escapes) |
+| `'x..y'` | A **range** of characters, inclusive       |
+
+You can use escape sequences too:
+
+```dsl
+'\r'     // carriage return
+'\n'     // newline
+'\t'     // tab
+'\''     // single quote
+'\\'     // backslash
+```
+
+### Ranges + Data Holes
+
+You can combine a character range with a data hole to capture the matched character:
+
+```dsl
+'a..z'<#1> -> LowercaseLetter<#1>;
+```
+This rule matches any lowercase Latin letter, captures its value, and creates a `LowercaseLetter` node containing
+the character as data.
+
+### Where This Is Used
+
+- In `parse` mode: plain text is converted into a degenerate tree of `Char` nodes, one per character.
+- You can match and fold those into meaningful nodes using character patterns.
+- If you're not using `parse`, but still want to simulate a character stream, use `StringSource` or `FileSource` from
+  `astranaut-core` — it’ll build a tree from text the same way.
+
+# Example: Parsing Arithmetic Expressions from Raw Text
+
+Let’s put everything together.
+
+Here’s a compact but complete example that parses **simple arithmetic expressions** like:
+
+```
+a + 123
+```
+
+...and transforms them into a proper AST using character-level parsing rules.
+
+```dsl
+// Define nodes
+Whitespace <- 0;
+' ' -> Whitespace;
+
+SmallLetter <- 'char';
+'a..z'<#1> -> SmallLetter<#1>;
+
+CapitalLetter <- 'char';
+'A..Z'<#1> -> CapitalLetter<#1>;
+
+Underscore <- 'char', "'_'";
+'_' -> Underscore;
+
+Letter <- SmallLetter | CapitalLetter | Underscore;
+
+Digit <- 'int';
+'0..9'<#1> -> Digit<#1>;
+
+LetterOrDigit <- Letter | Digit;
+
+// Identifier = letter followed by zero or more letters or digits
+Identifier <- 'String', '""';
+Letter<#1>, {LetterOrDigit<#1>} -> Identifier<#1>;
+
+// Integer literal = one or more digits
+IntegerLiteral <- 'int';
+Digit<#1>, {Digit<#1>} -> IntegerLiteral<#1>;
+
+// Expressions
+Expression <- Identifier | IntegerLiteral | Addition;
+Addition <- left@Expression, right@Expression;
+
+// Operators
+Plus <- 'char', "'+'";
+'+' -> Plus;
+
+Minus <- 'char', "'-'";
+'-' -> Minus;
+
+OperatorSymbol <- Plus | Minus;
+
+Operator <- 'String', '""';
+{OperatorSymbol<#1>} -> Operator<#1>;
+
+// Transformation rule for addition
+Expression#1, [Whitespace], Operator<'+'>, [Whitespace], Expression#2
+    -> Addition(#1, #2);
+```
+
+### What This DSL Does
+
+- Parses raw text **character by character** (using parse mode),
+- Recognizes:
+  - Identifiers like `x`, `myVar`, `A1`,
+  - Integer literals like `42`, `123`,
+  - Operators like `+` and `-`,
+- Collapses these into proper AST nodes: `Identifier`, `IntegerLiteral`, `Operator`, `Addition`, etc.
+
+### Example Input
+
+Input file (`code.txt`):
+
+```text
+a + 123
+```
+
+Run it like this:
+
+```bash
+java -jar generator.jar parse arithmetic.dsl \
+  --source code.txt \
+  --ast output.json \
+  --image tree.png
+```
+
+You’ll get:
+
+A structured AST in `output.json`:
+
+```json
+{
+  "root": {
+    "type": "Root",
+    "children": [
+      {
+        "type": "Addition",
+        "children": [
+          {
+            "type": "Identifier",
+            "data": "a"
+          },
+          {
+            "type": "IntegerLiteral",
+            "data": "123"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+A visual `.png` image of the parsed and transformed tree:
+
+![VERY_SIMPLE_AST](src/main/documents/very_simple_ast.png)
+
+🎉 Congratulations — you just wrote a mini parser and tree rewriter using nothing but a DSL and a few dozen lines.
+No code, no lexer, no hand-written visitors — just declarative beauty.
+
+# Astranaut vs. ANTLR: Tree Structure Comparison
+
+For those of you coming from the ANTLR world — good news!  
+The exact same parsing logic we've built with Astranaut can also be implemented using ANTLR grammar rules.  
+In fact, here's a rough equivalent of our DSL-based parser, rewritten in ANTLR4 syntax:
+
+```antlr
+expression
+    : addition
+    | identifier
+    | integerLiteral
+    ;
+
+addition
+    : expression PLUS expression;
+
+identifier
+    : IDENTIFIER;
+
+integerLiteral
+    : INTEGER;
+
+PLUS: '+';
+IDENTIFIER: [a-zA-Z_][a-zA-Z_0-9]*;
+INTEGER: [0-9]+;
+WS: [ \t\r\n]+ -> skip;
+```
+
+However...
+
+### The Trees Look Very Different
+
+While the **grammar** may be equivalent (or for ANTLR even less), the parse trees generated by ANTLR tend to be
+**deeper and noisier**.
+
+Take this input:
+
+```text
+a + 123
+```
+
+ANTLR’s parse tree will look something like this:
+
+![AST_FROM_ANTLR](src/main/documents/ast_from_antlr.png)
+
+Compare that with the much flatter and cleaner AST you get from Astranaut after applying transformations:
+
+![VERY_SIMPLE_AST](src/main/documents/very_simple_ast.png)
+
+### Why the Difference?
+
+ANTLR is a **parser generator** — it creates trees that reflect **grammar structure**, not semantic intent.
+This means lots of intermediate nodes (`expression`, `identifier`, `PLUS`, etc.) that are structurally required
+but don’t add meaning.
+
+Astranaut, on the other hand, lets you define **tree transformation rules** to reshape the raw structure into 
+**precisely the AST you want** — readable, minimal, and domain-focused.
+
+**TL;DR: With ANTLR, you often get a _parse tree_. With Astranaut, you get an _abstract syntax tree_.
+You can always simplify an ANTLR tree — but Astranaut lets you skip the boilerplate entirely.**
+
 # Contributors
 
 * Ivan Kniazkov, @kniazkov
