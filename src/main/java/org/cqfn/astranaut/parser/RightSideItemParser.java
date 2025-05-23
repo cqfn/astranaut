@@ -26,6 +26,7 @@ package org.cqfn.astranaut.parser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.cqfn.astranaut.dsl.Null;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.RightDataDescriptor;
 import org.cqfn.astranaut.dsl.RightSideItem;
@@ -84,6 +85,9 @@ public final class RightSideItemParser {
             item = this.parseNodeHole();
         } else if (first instanceof Identifier) {
             item = this.parseSubtree(first.toString());
+        } else if (first instanceof Zero) {
+            item = Null.INSTANCE;
+            this.parseNull();
         } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
             item = null;
         } else {
@@ -241,5 +245,19 @@ public final class RightSideItemParser {
             }
         } while (true);
         return list;
+    }
+
+    /**
+     * Parses a sequence of tokens as a null token.
+     * @throws ParsingException If the parse fails
+     */
+    private void parseNull() throws ParsingException {
+        if (this.nesting > 0) {
+            throw new CommonParsingException(
+                this.scanner.getLocation(),
+                "A 'Null' token cannot be a child node"
+            );
+        }
+        this.last = this.scanner.getToken();
     }
 }

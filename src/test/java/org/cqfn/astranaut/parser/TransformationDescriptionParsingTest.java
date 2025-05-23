@@ -124,6 +124,29 @@ class TransformationDescriptionParsingTest {
         Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
     }
 
+    @Test
+    void nullRightSide() {
+        final String code = "AAA -> 0";
+        final TransformationDescriptor descriptor = this.parseDescriptor(code);
+        Assertions.assertEquals(code, descriptor.toString());
+    }
+
+    @Test
+    void extraTokenAfterNullRightSide() {
+        final TransformationDescriptorParser parser = this.createParser(
+            "AAA -> 0 BBB"
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
+    @Test
+    void nullInsideNode() {
+        final TransformationDescriptorParser parser = this.createParser(
+            "AAA -> BBB(0)"
+        );
+        Assertions.assertThrows(ParsingException.class, parser::parseDescriptor);
+    }
+
     /**
     * Creates a {@link TransformationDescriptorParser} from the given DSL source code.
     * @param code The DSL source code to be parsed
