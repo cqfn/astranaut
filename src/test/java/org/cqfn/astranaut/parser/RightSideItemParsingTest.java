@@ -25,6 +25,7 @@ package org.cqfn.astranaut.parser;
 
 import java.util.List;
 import org.cqfn.astranaut.dsl.DataDescriptor;
+import org.cqfn.astranaut.dsl.Null;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.RightSideItem;
 import org.cqfn.astranaut.dsl.StaticString;
@@ -292,6 +293,20 @@ class RightSideItemParsingTest {
         try {
             final RightSideItem item = parser.parseItem();
             Assertions.assertNull(item);
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void nullMarker() {
+        final RightSideItemParser parser = this.createParser("0");
+        boolean oops = false;
+        try {
+            final RightSideItem item = parser.parseItem();
+            Assertions.assertTrue(item instanceof Null);
+            Assertions.assertEquals("0", item.toString());
         } catch (final ParsingException ignored) {
             oops = true;
         }
