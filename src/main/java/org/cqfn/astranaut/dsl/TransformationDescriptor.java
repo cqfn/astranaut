@@ -40,6 +40,7 @@ import org.cqfn.astranaut.core.base.DummyNode;
 import org.cqfn.astranaut.core.base.Factory;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.NullNode;
 
 /**
  * Transformation descriptor describing the transformation of one or more subtrees into a single
@@ -177,6 +178,8 @@ public final class TransformationDescriptor implements Rule, Converter {
             final Node node;
             if (this.right instanceof UntypedHole) {
                 node = extracted.getNodes(((UntypedHole) this.right).getNumber()).get(0);
+            } else if (this.right instanceof Null) {
+                node = NullNode.INSTANCE;
             } else {
                 final ResultingSubtreeDescriptor rsd = (ResultingSubtreeDescriptor) this.right;
                 final Fragment fragment = Fragment.fromNodes(list.subList(index, index + consumed));
