@@ -118,6 +118,10 @@ public final class Scanner {
                 token = this.parseString(chr);
                 break;
             }
+            if (chr == '.') {
+                token = this.parseEllipsis();
+                break;
+            }
             throw new UnknownSymbol(this.loc, chr);
         } while (false);
         return token;
@@ -248,6 +252,23 @@ public final class Scanner {
         }
         this.nextChar();
         return builder.toString();
+    }
+
+    /**
+     * Parses a sequence of characters as an ellipsis.
+     * @return A token
+     * @throws ParsingException If it's not an ellipsis
+     */
+    private Token parseEllipsis() throws ParsingException {
+        final char second = this.nextChar();
+        final char third = this.nextChar();
+        if (second != '.' || third != '.') {
+            throw new CommonParsingException(
+                this.loc,
+                "Incorrect symbols after '.', perhaps you meant '...'?"
+            );
+        }
+        return Ellipsis.INSTANCE;
     }
 
     /**

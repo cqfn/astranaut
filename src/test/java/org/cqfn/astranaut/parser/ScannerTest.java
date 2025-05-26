@@ -414,4 +414,35 @@ class ScannerTest {
         }
         Assertions.assertFalse(oops);
     }
+
+    @Test
+    void ellipsis() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " ... ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof Ellipsis);
+            Assertions.assertEquals("...", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void badEllipsis() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " .abc ");
+        boolean oops = false;
+        try {
+            scanner.getToken();
+        } catch (final BaseException exception) {
+            oops = true;
+            Assertions.assertEquals("Parser", exception.getInitiator());
+            Assertions.assertEquals(
+                "test.dsl, 1: Incorrect symbols after '.', perhaps you meant '...'?",
+                exception.getErrorMessage()
+            );
+        }
+        Assertions.assertTrue(oops);
+    }
 }
