@@ -1424,6 +1424,22 @@ This is especially handy when:
 - You're using someone else's grammar or parser — and you don’t want to rewrite all the rules,
 - You want to **flatten** or **normalize** the tree structure before applying deeper transformations.
 
+## Another Special Case: The Vanishing Act  
+When you write:
+```dsl
+AAA -> 0;
+```
+you’re not just transforming a node—you’re *erasing it from existence*. Poof! Gone.
+Like ANTLR’s `skip`, but with fewer tokens and more drama.
+
+It all works: everything on the left is consumed, and turns into nothing. No new node is created.
+
+Example:  
+```dsl
+// Delete all commas—because syntax trees don’t need punctuation drama.
+Comma -> 0;
+```  
+
 ## Special Pattern: Character Matching
 
 When working in `parse` mode — or manually building degenerate trees — you’ll often want to match individual
