@@ -268,6 +268,7 @@ public final class Scanner {
                 "Incorrect symbols after '.', perhaps you meant '...'?"
             );
         }
+        this.nextChar();
         return Ellipsis.INSTANCE;
     }
 

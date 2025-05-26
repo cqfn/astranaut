@@ -83,6 +83,18 @@ public final class LeftSideParser {
      */
     public LeftSideItem parseLeftSideItem() throws ParsingException {
         final Token first = this.scanner.getToken();
+        return this.parseLeftSideItem(first);
+    }
+
+    /**
+     * Parses an item that is part of the left side of a transformation rule, provided that
+     *  the first token is known.
+     * @param first The first token in the token sequence
+     * @return Left item, that is, the pattern descriptor or typed hole; or {@code null} if
+     *  the scanner does not contain any more tokens
+     * @throws ParsingException If the parse fails
+     */
+    public LeftSideItem parseLeftSideItem(final Token first) throws ParsingException {
         final LeftSideItem item;
         if (first instanceof Identifier) {
             item = this.parsePatternOrTypedHole(first.toString());
