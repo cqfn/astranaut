@@ -32,8 +32,8 @@ import java.util.TreeSet;
 import org.cqfn.astranaut.core.utils.Pair;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.PatternMatchingMode;
+import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
-import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
  * Generates code for a complex condition when some nodes are optional or repeated.
@@ -142,7 +142,7 @@ final class ComplexConditionGenerator implements ConditionGenerator  {
             rest = rest - 1;
         }
         code.add("final int consumed = size - queue.size();");
-        if (!(this.rule.getRight() instanceof UntypedHole)) {
+        if (this.rule.getRight() instanceof ResultingSubtreeDescriptor) {
             code.add(
                 "final Fragment fragment = Fragment.fromNodes(list.subList(index, index + consumed));"
             );

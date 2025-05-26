@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import org.cqfn.astranaut.dsl.LeftSideItem;
+import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
-import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
  * Generates code for a simple condition, that is, when there are one or more patterns,
@@ -96,7 +96,7 @@ final class SimpleConditionGenerator implements ConditionGenerator  {
                 "}"
             )
         );
-        final boolean fragment = !(this.rule.getRight() instanceof UntypedHole);
+        final boolean fragment = this.rule.getRight() instanceof ResultingSubtreeDescriptor;
         if (fragment && left.size() < 2) {
             code.add("final Fragment fragment = list.get(index).getFragment();");
         } else if (fragment) {

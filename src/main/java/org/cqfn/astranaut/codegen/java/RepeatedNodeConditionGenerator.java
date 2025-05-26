@@ -29,8 +29,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.cqfn.astranaut.dsl.LeftSideItem;
+import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.TransformationDescriptor;
-import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
  * Generates code for a condition that consists of a single repeating node.
@@ -84,7 +84,7 @@ final class RepeatedNodeConditionGenerator implements ConditionGenerator  {
                 "}"
             )
         );
-        if (!(this.rule.getRight() instanceof UntypedHole)) {
+        if (this.rule.getRight() instanceof ResultingSubtreeDescriptor) {
             code.add(
                 "final Fragment fragment = Fragment.fromNodes(list.subList(index, index + consumed));"
             );
