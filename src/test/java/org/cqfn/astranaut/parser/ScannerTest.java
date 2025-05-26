@@ -431,7 +431,7 @@ class ScannerTest {
 
     @Test
     void badEllipsis() {
-        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " .abc ");
+        Scanner scanner = new Scanner(ScannerTest.LOCATION, " .abc ");
         boolean oops = false;
         try {
             scanner.getToken();
@@ -444,5 +444,7 @@ class ScannerTest {
             );
         }
         Assertions.assertTrue(oops);
+        scanner = new Scanner(ScannerTest.LOCATION, " ..bc ");
+        Assertions.assertThrows(ParsingException.class, scanner::getToken);
     }
 }

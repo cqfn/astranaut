@@ -65,6 +65,11 @@ public final class TransformationDescriptor implements Rule, Converter {
     private String language;
 
     /**
+     * Flag indicating that the rule is right-associative, search direction from right to left.
+     */
+    private boolean direction;
+
+    /**
      * Set of nodes on which this node depends. These can be child or base node types.
      */
     private final Set<NodeDescriptor> dependencies;
@@ -97,9 +102,20 @@ public final class TransformationDescriptor implements Rule, Converter {
         return this.right;
     }
 
-    @Override
-    public String getLanguage() {
-        return this.language;
+    /**
+     * Checks if the left side of this transformation rule contains
+     *  optional or repeated descriptors.
+     * @return Check result, {@code true} if any
+     */
+    public boolean hasOptionalOrRepeated() {
+        boolean found = false;
+        for (final LeftSideItem item : this.left) {
+            if (item.getMatchingMode() != PatternMatchingMode.NORMAL) {
+                found = true;
+                break;
+            }
+        }
+        return found;
     }
 
     /**
@@ -115,19 +131,15 @@ public final class TransformationDescriptor implements Rule, Converter {
     }
 
     /**
-     * Checks if the left side of this transformation rule contains
-     *  optional or repeated descriptors.
-     * @return Check result, {@code true} if any
+     * Sets a flag indicating that the rule is right-associative.
      */
-    public boolean hasOptionalOrRepeated() {
-        boolean found = false;
-        for (final LeftSideItem item : this.left) {
-            if (item.getMatchingMode() != PatternMatchingMode.NORMAL) {
-                found = true;
-                break;
-            }
-        }
-        return found;
+    public void setRightToLeftDirection() {
+        this.direction = true;
+    }
+
+    @Override
+    public String getLanguage() {
+        return this.language;
     }
 
     @Override
@@ -148,6 +160,9 @@ public final class TransformationDescriptor implements Rule, Converter {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
+        if (this.direction) {
+            builder.append("..., ");
+        }
         boolean flag = false;
         for (final LeftSideItem item : this.left) {
             if (flag) {
@@ -200,7 +215,7 @@ public final class TransformationDescriptor implements Rule, Converter {
 
     @Override
     public boolean isRightToLeft() {
-        return false;
+        return this.direction;
     }
 
     /**
