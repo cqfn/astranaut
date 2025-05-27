@@ -1284,6 +1284,51 @@ Literal<#1>(#1) -> Echo(#1);  // Data hole + node hole + same number = 👀
 | **Node hole** (untyped) | `#1` in `(...)` | ✅ (only inside children) | ✅           | Stores list of nodes          |
 | **Node hole** (typed)   | `Type#1`        | ✅                        | ❌           | Single match of specific type |
 
+## The Ballad of Right-Associative Operations  
+
+Some operators march to their own beat—they *start from the right* and work their way left.
+Take assignment, for example:  
+
+```java
+a = b = c + 1
+```  
+
+Here’s how the dance unfolds:  
+1. **`c + 1`** executes first (because math won’t wait).  
+2. The result **flows into `b`**.  
+3. Finally, it **lands in `a`**.  
+
+To teach Astranaut this *rightward shuffle*, we use `...` at the start of a rule:  
+
+*"Hey, check the right side first. Left can wait."*  
+
+### Syntax  
+```dsl
+   ..., Identifier#1, Assign, Expression#2 -> Assignment(#1, #2);
+// ^^^ - "Look right before left!"
+```  
+
+What `...` does: 
+- Forces the parser to **match right-associatively**—like solving the puzzle from the end backward.  
+- Ensures nested assignments (like `x = y = z`) fold correctly:  
+  ```text
+  z → y → x  // Instead of x → y → z (which would be wrong!)
+  ```  
+
+### Why it matters:  
+Without `...`, your parser might build `(x = y) = z` — a nonsensical structure that’d make compilers weep.  
+
+### Bonus: The Magic of `...` in Other Contexts  
+- Exponentiation: 
+  ```dsl
+  ..., Expression#1, Operator<'^'>, Expression#2 -> Power(#2, #1);
+  // Because 2^3^4 means 2^(3^4), not (2^3)^4!
+  ```  
+- Ternary operators:
+  ```dsl
+  ..., BinaryExpression#1, '?', Expression#2, ':', Expression#3 -> Ternary(#1, #2, #3);
+  ```  
+
 ## Optional Patterns — `[ ... ]`
 
 Sometimes you want to match a node **if it’s there**, but not require it. That’s where **optional patterns** come in.
