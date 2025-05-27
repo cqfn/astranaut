@@ -48,6 +48,7 @@ public final class Scanner {
             .put('(', OpeningRoundBracket.INSTANCE)
             .put(')', ClosingRoundBracket.INSTANCE)
             .put('#', HashSymbol.INSTANCE)
+            .put('~', Tilde.INSTANCE)
             .make();
 
     /**
