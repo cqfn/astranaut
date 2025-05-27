@@ -1,0 +1,38 @@
+{
+  "root": {
+    "type": "Root",
+    "children": [
+      {
+        "type": "Assignment",
+        "children": [
+          {
+            "type": "Identifier",
+            "data": "a"
+          },
+          {
+            "type": "Assignment",
+            "children": [
+              {
+                "type": "Identifier",
+                "data": "b"
+              },
+              {
+                "type": "Assignment",
+                "children": [
+                  {
+                    "type": "Identifier",
+                    "data": "c"
+                  },
+                  {
+                    "type": "IntegerLiteral",
+                    "data": "123"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

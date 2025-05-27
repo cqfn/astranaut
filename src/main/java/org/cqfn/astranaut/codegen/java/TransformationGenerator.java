@@ -98,6 +98,7 @@ public final class TransformationGenerator extends RuleGenerator {
         ctor.makePrivate();
         final Set<String> matchers = this.createConvertMethod(context, klass);
         this.createGetMinConsumedMethod(klass);
+        this.createIsRightToLeftMethod(klass);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
@@ -201,6 +202,22 @@ public final class TransformationGenerator extends RuleGenerator {
         method.makePublic();
         method.setBody(String.format("return %d;", this.rule.getMinConsumed()));
         klass.addMethod(method);
+    }
+
+    /**
+     * Creates a "isRightToLeft" method if needed.
+     * @param klass The class to which the method will be added
+     */
+    private void createIsRightToLeftMethod(final Klass klass) {
+        if (this.rule.isRightToLeft()) {
+            final Method method = new Method(
+                Strings.TYPE_BOOLEAN,
+                "isRightToLeft"
+            );
+            method.makePublic();
+            method.setBody("return true;");
+            klass.addMethod(method);
+        }
     }
 
     /**

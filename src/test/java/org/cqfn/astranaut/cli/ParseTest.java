@@ -99,6 +99,17 @@ class ParseTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void chainedAssignment(final @TempDir Path temp) {
+        final String actual = this.run(
+            "right_to_left_rule.dsl",
+            "chained_assignment.txt",
+            temp
+        );
+        final String expected = this.loadStringResource("chained_assignment.json");
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in parsing mode and reads the generated file.
      * @param rules Name of the file containing the rules (DSL code)
