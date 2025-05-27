@@ -52,6 +52,11 @@ public final class TypedHole implements Hole, LeftSideItem {
     private PatternMatchingMode mode;
 
     /**
+     * Negation flag.
+     */
+    private boolean negation;
+
+    /**
      * Constructor to create a typed hole.
      * @param type The type of the node that this hole can match.
      * @param number The unique number for this hole.
@@ -83,6 +88,16 @@ public final class TypedHole implements Hole, LeftSideItem {
     @Override
     public PatternMatchingMode getMatchingMode() {
         return this.mode;
+    }
+
+    @Override
+    public void setNegationFlag() {
+        this.negation = true;
+    }
+
+    @Override
+    public boolean isNegationFlagSet() {
+        return this.negation;
     }
 
     @Override

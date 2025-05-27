@@ -51,6 +51,11 @@ public final class SymbolDescriptor implements PatternItem, LeftSideItem {
     private PatternMatchingMode mode;
 
     /**
+     * Negation flag.
+     */
+    private boolean negation;
+
+    /**
      * Constructor.
      * @param token Token describing a character or range of characters
      * @param data Untyped hole for extracting the value of a symbol
@@ -85,6 +90,16 @@ public final class SymbolDescriptor implements PatternItem, LeftSideItem {
     @Override
     public PatternMatchingMode getMatchingMode() {
         return this.mode;
+    }
+
+    @Override
+    public void setNegationFlag() {
+        this.negation = true;
+    }
+
+    @Override
+    public boolean isNegationFlagSet() {
+        return this.negation;
     }
 
     @Override

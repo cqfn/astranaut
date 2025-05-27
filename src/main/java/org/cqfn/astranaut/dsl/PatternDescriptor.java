@@ -68,6 +68,11 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
     private PatternMatchingMode mode;
 
     /**
+     * Negation flag.
+     */
+    private boolean negation;
+
+    /**
      * Constructs a new {@code PatternDescriptor} with the specified type, data, and list
      *  of child nodes.
      * @param type The type of the node
@@ -130,6 +135,16 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
     @Override
     public PatternMatchingMode getMatchingMode() {
         return this.mode;
+    }
+
+    @Override
+    public void setNegationFlag() {
+        this.negation = true;
+    }
+
+    @Override
+    public boolean isNegationFlagSet() {
+        return this.negation;
     }
 
     @Override
