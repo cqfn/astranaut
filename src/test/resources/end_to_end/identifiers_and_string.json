@@ -1,0 +1,19 @@
+{
+  "root": {
+    "type": "Root",
+    "children": [
+      {
+        "type": "Identifier",
+        "data": "aaa"
+      },
+      {
+        "type": "StaticString",
+        "data": "test"
+      },
+      {
+        "type": "Identifier",
+        "data": "bbb"
+      }
+    ]
+  }
+}

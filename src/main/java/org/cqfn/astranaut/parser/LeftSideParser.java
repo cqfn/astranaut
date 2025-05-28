@@ -96,7 +96,10 @@ public final class LeftSideParser {
      */
     public LeftSideItem parseLeftSideItem(final Token first) throws ParsingException {
         final LeftSideItem item;
-        if (first instanceof Identifier) {
+        if (first instanceof Tilde) {
+            item = this.parseLeftSideItem();
+            item.setNegationFlag();
+        } else if (first instanceof Identifier) {
             item = this.parsePatternOrTypedHole(first.toString());
         } else if (first instanceof OpeningSquareBracket) {
             item = this.parseOptionalItem();
@@ -367,9 +370,14 @@ public final class LeftSideParser {
      * @throws ParsingException If the parse fails
      */
     private LeftSideItem parseRepeatedItem() throws ParsingException {
-        final Token first = this.scanner.getToken();
+        Token first = this.scanner.getToken();
         final LeftSideParser parser;
         final LeftSideItem item;
+        boolean negative = false;
+        if (first instanceof Tilde) {
+            negative = true;
+            first = this.scanner.getToken();
+        }
         if (first instanceof Identifier) {
             parser = new LeftSideParser(this.scanner, 0, this.holes);
             item = parser.parsePatternOrTypedHole(first.toString());
@@ -383,6 +391,9 @@ public final class LeftSideParser {
             );
         }
         item.setMatchingMode(PatternMatchingMode.REPEATED);
+        if (negative) {
+            item.setNegationFlag();
+        }
         Token next = parser.getLastToken();
         if (next == null) {
             next = this.scanner.getToken();

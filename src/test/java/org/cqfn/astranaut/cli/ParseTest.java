@@ -110,6 +110,17 @@ class ParseTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void repeatedAndInverted(final @TempDir Path temp) {
+        final String actual = this.run(
+            "repeated_and_inverted.dsl",
+            "identifiers_and_string.txt",
+            temp
+        );
+        final String expected = this.loadStringResource("identifiers_and_string.json");
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in parsing mode and reads the generated file.
      * @param rules Name of the file containing the rules (DSL code)

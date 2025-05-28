@@ -72,7 +72,7 @@ public final class SymbolMatcherGenerator extends LeftSideItemGenerator {
         final List<String> code = new ArrayList<>(16);
         code.add("final String data = node.getData();");
         final SymbolicToken token = this.item.getToken();
-        final String condition;
+        String condition;
         if (token.getFirstSymbol() == token.getLastSymbol()) {
             condition = String.format(
                 "node.belongsToGroup(\"Char\") && data.length() == 1 && data.charAt(0) == %s",
@@ -84,6 +84,9 @@ public final class SymbolMatcherGenerator extends LeftSideItemGenerator {
                 token.getFirstSymbolAsQuotedString(),
                 token.getLastSymbolAsQuotedString()
             );
+        }
+        if (this.item.isNegationFlagSet()) {
+            condition = String.format("!(%s)", condition);
         }
         if (this.item.getData() == null) {
             code.add(String.format("return %s;", condition));

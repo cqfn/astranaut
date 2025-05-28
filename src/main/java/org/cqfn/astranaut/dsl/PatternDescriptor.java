@@ -170,32 +170,23 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
 
     @Override
     public boolean matchNode(final Node node, final Extracted extracted) {
-        boolean matches;
-        do {
-            matches = node.belongsToGroup(this.type);
-            if (!matches) {
-                break;
-            }
-            if (this.data instanceof StaticString) {
-                final String expected = ((StaticString) this.data).getValue();
-                final String actual = node.getData();
-                matches = actual.equals(expected);
-            }
-            if (!matches) {
-                break;
-            }
-            if (this.children.isEmpty()) {
-                matches = node.getChildCount() == 0;
-            } else {
-                matches = this.matchChildren(node, extracted);
-            }
-            if (!matches) {
-                break;
-            }
-            if (this.data instanceof UntypedHole) {
-                extracted.addData(((UntypedHole) this.data).getNumber(), node.getData());
-            }
-        } while (false);
+        boolean matches = node.belongsToGroup(this.type);
+        if (this.data instanceof StaticString) {
+            final String expected = ((StaticString) this.data).getValue();
+            final String actual = node.getData();
+            matches = matches && actual.equals(expected);
+        }
+        if (this.children.isEmpty()) {
+            matches = matches && node.getChildCount() == 0;
+        } else {
+            matches = matches &&  this.matchChildren(node, extracted);
+        }
+        if (this.negation) {
+            matches = !matches;
+        }
+        if (matches && this.data instanceof UntypedHole) {
+            extracted.addData(((UntypedHole) this.data).getNumber(), node.getData());
+        }
         return matches;
     }
 
@@ -205,6 +196,9 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
      */
     private String toShortString() {
         final StringBuilder builder = new StringBuilder();
+        if (this.negation) {
+            builder.append('~');
+        }
         builder.append(this.type);
         if (this.data != null) {
             builder.append('<').append(this.data.toString()).append('>');
