@@ -1552,6 +1552,47 @@ the character as data.
 - If you're not using `parse`, but still want to simulate a character stream, use `StringSource` or `FileSource` from
   `astranaut-core` — it’ll build a tree from text the same way.
 
+## The Power of _Not_: Tilde (`~`) for Negation  
+
+Sometimes you don’t want to match a pattern—you want to match **everything _except_** it.  
+Enter the **tilde (`~`)**—your AST’s built-in "**NOT**" operator.  
+
+### Basic Syntax
+```dsl
+~Pattern
+```
+
+- **What it does**:  
+  - Fails if `Pattern` matches.  
+  - Succeeds if `Pattern` **doesn’t** match.  
+- **Example**:  
+  ```dsl
+  '"', { ~'"'<#1> }, '"' -> StaticString<#1>;  
+  //     ^^^^^^^^  
+  // "Match any character except a quote (`"`),  
+  // Collect it into `#1`, and wrap as a string literal."
+  ```  
+  Parses `"hello"` → `StaticString<"hello">`, but skips the quotes.  
+
+### Advanced Use: Optional or Repeated Negation  
+Tilde plays nice with `[]` (optional) and `{}` (repeated) patterns:  
+
+1. **Optional Negation** → `[~Pattern]`  
+   - *"Match zero or one occurrence—but only if it’s **not** `Pattern`."*  
+   - Example: Skip optional **non**-whitespace:  
+     ```dsl
+     '[', [~Whitespace#1], ']' -> BracketedContent(#1);  
+     // Matches "[x]" or "[]", but not "[ ]".
+     ```  
+
+2. **Repeated Negation** → `{~Pattern}`  
+   - *"Match zero or more occurrences—**none** of which are `Pattern`."*  
+   - Example: Extract a comment until the next `*/`:  
+     ```dsl
+     '/', '*', { ~'*'<#1> }, '*', '/' -> Comment<#>;  
+     // Grabs all chars between /* and */, ignoring '*' alone.
+     ```  
+
 # Example: Parsing Arithmetic Expressions from Raw Text
 
 Let’s put everything together.
