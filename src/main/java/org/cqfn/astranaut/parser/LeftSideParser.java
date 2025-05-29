@@ -335,9 +335,14 @@ public final class LeftSideParser {
      * @throws ParsingException If the parse fails
      */
     private LeftSideItem parseOptionalItem() throws ParsingException {
-        final Token first = this.scanner.getToken();
+        Token first = this.scanner.getToken();
         final LeftSideParser parser;
         final LeftSideItem item;
+        boolean negative = false;
+        if (first instanceof Tilde) {
+            negative = true;
+            first = this.scanner.getToken();
+        }
         if (first instanceof Identifier) {
             parser = new LeftSideParser(this.scanner, 0, this.holes);
             item = parser.parsePatternOrTypedHole(first.toString());
@@ -351,6 +356,9 @@ public final class LeftSideParser {
             );
         }
         item.setMatchingMode(PatternMatchingMode.OPTIONAL);
+        if (negative) {
+            item.setNegationFlag();
+        }
         Token next = parser.getLastToken();
         if (next == null) {
             next = this.scanner.getToken();

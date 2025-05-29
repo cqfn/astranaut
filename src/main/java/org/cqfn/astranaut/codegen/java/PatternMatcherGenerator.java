@@ -190,7 +190,11 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
                 );
             }
         }
-        return String.join(" && ", list);
+        String condition = String.join(" && ", list);
+        if (this.pattern.isNegationFlagSet()) {
+            condition = String.format("!(%s)", condition);
+        }
+        return condition;
     }
 
     /**
@@ -250,10 +254,14 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
         }
         code.add("    matches = queue.isEmpty();");
         code.add("} while (false);");
+        String negative = "";
+        if (this.pattern.isNegationFlagSet()) {
+            negative = "!";
+        }
         if (this.pattern.getData() instanceof UntypedHole) {
             code.addAll(
                 Arrays.asList(
-                    "if (matches) {",
+                    String.format("if (%smatches) {", negative),
                     String.format(
                         "extracted.addData(%s.HOLE_NUMBER, node.getData());",
                         klass.getName()
@@ -262,7 +270,7 @@ public final class PatternMatcherGenerator extends LeftSideItemGenerator {
                 )
             );
         }
-        code.add("return matches;");
+        code.add(String.format("return %smatches;", negative));
         return String.join("\n", code);
     }
 

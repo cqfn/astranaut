@@ -415,6 +415,22 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void optionalAndInverted(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("optional_and_inverted.txt");
+        final String actual = this.run("optional_and_inverted.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void optionalAndInvertedComplexCase(final @TempDir Path temp) {
+        final String expected = this.loadStringResource(
+            "optional_and_inverted_complex_case.txt"
+        );
+        final String actual = this.run("optional_and_inverted_complex_case.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.
