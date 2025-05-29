@@ -24,14 +24,22 @@
 
 ',' -> 0;
 
+Underscore <- 0;
+'_' -> Underscore;
+
+QuestionMark <- 0;
+'?' -> QuestionMark;
+
+SpecialSymbol <- Underscore | QuestionMark;
+
 Letter <- 'char';
 'a..z'<#1> -> Letter<#1>;
 
 SingleQuote <- 0;
 '\'' -> SingleQuote;
 
-CommonSymbol <- 0;
-SingleQuote, ~Letter<'b'>, SingleQuote -> CommonSymbol;
+CommonLiteral <- Letter;
+SingleQuote, ~SpecialSymbol#1, SingleQuote -> CommonLiteral(#1);
 
-SelectedSymbol <- 'char';
-SingleQuote, Letter<#1>, SingleQuote -> SelectedSymbol<#1>;
+SpecialLiteral <- SpecialSymbol;
+SingleQuote, SpecialSymbol#1, SingleQuote -> SpecialLiteral(#1);

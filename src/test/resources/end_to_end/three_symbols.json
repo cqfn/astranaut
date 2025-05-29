@@ -2,12 +2,30 @@
   "root": {
     "type": "Root",
     "children": [
-      {"type": "CommonSymbol"},
       {
-        "type": "SelectedSymbol",
-        "data": "b"
+        "type": "CommonLiteral",
+        "children": [
+          {
+            "type": "Letter",
+            "data": "a"
+          }
+        ]
       },
-      {"type": "CommonSymbol"}
+      {
+        "type": "SpecialLiteral",
+        "children": [
+          {"type": "QuestionMark"}
+        ]
+      },
+      {
+        "type": "CommonLiteral",
+        "children": [
+          {
+            "type": "Letter",
+            "data": "c"
+          }
+        ]
+      }
     ]
   }
 }
