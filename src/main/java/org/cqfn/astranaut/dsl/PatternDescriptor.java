@@ -170,20 +170,8 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
 
     @Override
     public boolean matchNode(final Node node, final Extracted extracted) {
-        boolean matches = node.belongsToGroup(this.type);
-        if (this.data instanceof StaticString) {
-            final String expected = ((StaticString) this.data).getValue();
-            final String actual = node.getData();
-            matches = matches && actual.equals(expected);
-        }
-        if (this.children.isEmpty()) {
-            matches = matches && node.getChildCount() == 0;
-        } else {
-            matches = matches &&  this.matchChildren(node, extracted);
-        }
-        if (this.negation) {
-            matches = !matches;
-        }
+        final boolean matches = (node.belongsToGroup(this.type) && this.matchData(node)
+            && this.matchChildren(node, extracted)) ^ this.negation;
         if (matches && this.data instanceof UntypedHole) {
             extracted.addData(((UntypedHole) this.data).getNumber(), node.getData());
         }
@@ -239,12 +227,46 @@ public final class PatternDescriptor implements PatternItem, LeftSideItem {
     }
 
     /**
+     * Matches the descriptor and data of the node.
+     * @param node The node
+     * @return Matching result
+     */
+    private boolean matchData(final Node node) {
+        final boolean matches;
+        if (this.data instanceof StaticString) {
+            final String expected = ((StaticString) this.data).getValue();
+            final String actual = node.getData();
+            matches = actual.equals(expected);
+        } else {
+            matches = true;
+        }
+        return matches;
+    }
+
+    /**
      * Matches the child nodes of the passed node with the child nodes of this descriptor.
      * @param node Node to be matched
      * @param extracted Extracted nodes and data
      * @return Matching result, {@code true} if matched
      */
     private boolean matchChildren(final Node node, final Extracted extracted) {
+        final boolean matches;
+        if (this.children.isEmpty()) {
+            matches = node.getChildCount() == 0;
+        } else {
+            matches = this.matchNonEmptyChildren(node, extracted);
+        }
+        return matches;
+    }
+
+    /**
+     * Matches the child nodes of the passed node with the child nodes of this descriptor.
+     *  The list of children of the descriptor is not empty.
+     * @param node Node to be matched
+     * @param extracted Extracted nodes and data
+     * @return Matching result, {@code true} if matched
+     */
+    private boolean matchNonEmptyChildren(final Node node, final Extracted extracted) {
         final Deque<Node> queue = new LinkedList<>(node.getChildrenList());
         boolean matches = true;
         for (final PatternItem child : this.children) {
