@@ -1,0 +1,13 @@
+{
+  "root": {
+    "type": "Root",
+    "children": [
+      {"type": "CommonSymbol"},
+      {
+        "type": "SelectedSymbol",
+        "data": "b"
+      },
+      {"type": "CommonSymbol"}
+    ]
+  }
+}
