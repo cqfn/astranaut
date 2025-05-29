@@ -39,6 +39,7 @@ public final class Scanner {
             .put(',', Comma.INSTANCE)
             .put('@', AtSymbol.INSTANCE)
             .put('|', VerticalLine.INSTANCE)
+            .put('&', Ampersand.INSTANCE)
             .put('{', OpeningCurlyBracket.INSTANCE)
             .put('}', ClosingCurlyBracket.INSTANCE)
             .put('[', OpeningSquareBracket.INSTANCE)
