@@ -23,24 +23,35 @@
  */
 package org.cqfn.astranaut.parser;
 
+import java.util.Map;
+import org.cqfn.astranaut.core.utils.MapUtils;
+
 /**
- * Token representing an ampersand &.
+ * A factory for creating parsers that parses items of the left side of transformation rules.
  * @since 1.0.0
  */
-public final class Ampersand extends SingleCharToken implements LogicalOperator {
+public final class LeftSideParsingFactory {
     /**
-     * The instance.
+     * Mapping token classes and parsers that fit them.
      */
-    public static final SingleCharToken INSTANCE = new Ampersand();
+    private static final Map<Class<? extends Token>, LeftSideItemParser> PARSERS =
+        new MapUtils<Class<? extends Token>, LeftSideItemParser>()
+            .put(SymbolicToken.class, SymbolicDescriptorParser.INSTANCE)
+            .make();
 
     /**
      * Private constructor.
      */
-    private Ampersand() {
+    private LeftSideParsingFactory() {
     }
 
-    @Override
-    public char getChar() {
-        return '&';
+    /**
+     * Returns the suitable parser for the first token in the chain.
+     * @param first First token in the token chain
+     * @return Suitable parser or {@code null} if there is no parser for this token
+     */
+    @SuppressWarnings("PMD.ProhibitPublicStaticMethods")
+    public static LeftSideItemParser getParser(final Token first) {
+        return LeftSideParsingFactory.PARSERS.get(first.getClass());
     }
 }

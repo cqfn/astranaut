@@ -25,6 +25,7 @@ package org.cqfn.astranaut.dsl;
 
 import java.util.List;
 import org.cqfn.astranaut.codegen.java.LeftSideItemGenerator;
+import org.cqfn.astranaut.codegen.java.OrExpressionMatcherGenerator;
 import org.cqfn.astranaut.core.algorithms.conversion.Extracted;
 import org.cqfn.astranaut.core.base.Node;
 
@@ -44,12 +45,19 @@ public final class OrExpression extends LogicalExpression {
 
     @Override
     public LeftSideItemGenerator createGenerator() {
-        return null;
+        return new OrExpressionMatcherGenerator(this);
     }
 
     @Override
     public boolean matchNode(final Node node, final Extracted extracted) {
-        return false;
+        boolean matches = false;
+        for (final LeftSideItem item : this.getItems()) {
+            if (item.matchNode(node, extracted)) {
+                matches = true;
+                break;
+            }
+        }
+        return matches;
     }
 
     @Override

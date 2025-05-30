@@ -24,23 +24,8 @@
 package org.cqfn.astranaut.parser;
 
 /**
- * Token representing an ampersand &.
+ * A marker interface denoting a logical operator.
  * @since 1.0.0
  */
-public final class Ampersand extends SingleCharToken implements LogicalOperator {
-    /**
-     * The instance.
-     */
-    public static final SingleCharToken INSTANCE = new Ampersand();
-
-    /**
-     * Private constructor.
-     */
-    private Ampersand() {
-    }
-
-    @Override
-    public char getChar() {
-        return '&';
-    }
+public interface LogicalOperator {
 }

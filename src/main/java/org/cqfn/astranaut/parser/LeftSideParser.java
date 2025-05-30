@@ -107,6 +107,8 @@ public final class LeftSideParser {
             item = this.parseRepeatedItem();
         } else if (first instanceof SymbolicToken) {
             item = this.parseSymbolDescriptor((SymbolicToken) first);
+        } else if (first instanceof LogicalOperator) {
+            item = this.parseLogicalExpression((LogicalOperator) first);
         } else if (first == null) {
             item = null;
         } else if (first instanceof HashSymbol) {
@@ -137,6 +139,8 @@ public final class LeftSideParser {
             item = (PatternItem) this.parseRepeatedItem();
         } else if (first instanceof SymbolicToken) {
             item = (PatternItem) this.parseSymbolDescriptor((SymbolicToken) first);
+        } else if (first instanceof LogicalOperator) {
+            item = (PatternItem) this.parseLogicalExpression((LogicalOperator) first);
         } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
             item = null;
         } else if (first instanceof HashSymbol) {
@@ -448,5 +452,16 @@ public final class LeftSideParser {
             }
         } while (false);
         return new SymbolDescriptor(first, data);
+    }
+
+    /**
+     * Parses a sequence of tokens as a logical expression.
+     * @param first First token (logical operator)
+     * @return Logical expression
+     * @throws ParsingException If the parse fails
+     */
+    private LeftSideItem parseLogicalExpression(final LogicalOperator first)
+        throws ParsingException {
+        return null;
     }
 }

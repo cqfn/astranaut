@@ -97,6 +97,14 @@ public abstract class LogicalExpression implements LeftSideItem, PatternItem {
     public abstract char getSymbol();
 
     /**
+     * Returns list of patterns that are combined in this expression.
+     * @return List of patterns
+     */
+    public List<LeftSideItem> getItems() {
+        return this.items;
+    }
+
+    /**
      * Represents the descriptor as a string in short form, without matching mode.
      * @return Short pattern descriptor as a string
      */
