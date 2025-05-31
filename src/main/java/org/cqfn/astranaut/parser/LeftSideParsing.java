@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.parser;
 
 import java.util.Map;
+import java.util.Stack;
 import org.cqfn.astranaut.core.utils.MapUtils;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.PatternItem;
@@ -42,16 +43,100 @@ final class LeftSideParsing {
             .make();
 
     /**
-     * Data that is required during parsing.
+     * Scanner that issues tokens.
      */
-    private final LeftSideParsingContext context;
+    private final Scanner scanner;
+
+    /**
+     * Tokens that have been received from the scanner but not used.
+     */
+    private final Stack<Token> tokens;
+
+    /**
+     * Pattern nesting level.
+     */
+    private int nesting;
+
+    /**
+     * Counter for tracking placeholders (holes).
+     */
+    private final HoleCounter holes;
 
     /**
      * Constructor.
-     * @param context Data that is required during parsing
+     * @param scanner Scanner that issues tokens
      */
-    LeftSideParsing(final LeftSideParsingContext context) {
-        this.context = context;
+    LeftSideParsing(final Scanner scanner) {
+        this.scanner = scanner;
+        this.tokens = new Stack<>();
+        this.nesting = 0;
+        this.holes = new HoleCounter();
+    }
+
+    /**
+     * Returns the next token.
+     * @return A token or {@code null} if no more tokens
+     * @throws ParsingException If the scanner fails
+     */
+    Token getToken() throws ParsingException {
+        final Token token;
+        if (this.tokens.empty()) {
+            token = this.scanner.getToken();
+        } else {
+            token = this.tokens.pop();
+        }
+        return token;
+    }
+
+    /**
+     * Returns location of the DSL code.
+     * @return Location of the DSL code
+     */
+    Location getLocation() {
+        return this.scanner.getLocation();
+    }
+
+    /**
+     * Saves an unused token so that another parser can use it.
+     * @param token A token
+     */
+    void pushToken(final Token token) {
+        if (token != null) {
+            this.tokens.push(token);
+        }
+    }
+
+    /**
+     * Returns the current nesting level of patterns.
+     * @return Nesting level
+     */
+    int getNestingLevel() {
+        return this.nesting;
+    }
+
+    /**
+     * Increases the nesting level by 1.
+     */
+    void incrementNestingLevel() {
+        this.nesting = this.nesting + 1;
+    }
+
+    /**
+     * Decreases the nesting level by 1.
+     */
+    void decrementNestingLevel() {
+        if (this.nesting == 0) {
+            throw new UnsupportedOperationException();
+        }
+        this.nesting = this.nesting - 1;
+    }
+
+    /**
+     * Returns the counter for tracking placeholders (holes).
+     * @return Hole counter
+     */
+    HoleCounter getHoleCounter() {
+        return this.holes;
     }
 
     /**
@@ -61,7 +146,7 @@ final class LeftSideParsing {
      * @throws ParsingException If the parse fails
      */
     LeftSideItem parseLeftSideItem() throws ParsingException {
-        final Token first = this.context.getToken();
+        final Token first = this.getToken();
         return this.parseLeftSideItem(first);
     }
 
@@ -82,16 +167,16 @@ final class LeftSideParsing {
             }
             final LeftSideItemParser parser = LeftSideParsing.PARSERS.get(first.getClass());
             if (parser != null) {
-                item = parser.parse(this.context, first);
+                item = parser.parse(this, first);
                 break;
             }
             if (first instanceof HashSymbol) {
                 throw new CommonParsingException(
-                    this.context.getLocation(),
+                    this.getLocation(),
                     "The left part of the transformation descriptor cannot contain untyped holes"
                 );
             } else {
-                throw new InappropriateToken(this.context.getLocation(), first);
+                throw new InappropriateToken(this.getLocation(), first);
             }
         } while (false);
         return item;
@@ -105,23 +190,23 @@ final class LeftSideParsing {
      */
     PatternItem parsePatternItem() throws ParsingException {
         final PatternItem item;
-        final Token first = this.context.getToken();
+        final Token first = this.getToken();
         do {
             if (first == null
-                || first instanceof ClosingRoundBracket && this.context.getNestingLevel() > 0) {
+                || first instanceof ClosingRoundBracket && this.getNestingLevel() > 0) {
                 item = null;
                 break;
             }
             final LeftSideItemParser parser = LeftSideParsing.PARSERS.get(first.getClass());
             if (parser != null) {
-                item = (PatternItem) parser.parse(this.context, first);
+                item = (PatternItem) parser.parse(this, first);
                 break;
             }
             if (first instanceof HashSymbol) {
-                item = LeftSideItemParser.parseUntypedNodeHole(this.context);
+                item = LeftSideItemParser.parseUntypedNodeHole(this);
                 break;
             } else {
-                throw new InappropriateToken(this.context.getLocation(), first);
+                throw new InappropriateToken(this.getLocation(), first);
             }
         } while (false);
         return item;

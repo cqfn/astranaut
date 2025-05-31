@@ -33,13 +33,13 @@ import org.cqfn.astranaut.dsl.UntypedHole;
 abstract class LeftSideItemParser {
     /**
      * Parses some item of the left side of the transformation rule using some algorithm.
-     * @param context Data that is required during parsing
+     * @param context Left side parser as a parsing context
      * @param first First token already obtained from the scanner
      *  and suitable for this type of parser
      * @return Resulting item
      * @throws ParsingException If parsing fails
      */
-    public abstract LeftSideItem parse(LeftSideParsingContext context, Token first)
+    public abstract LeftSideItem parse(LeftSideParsing context, Token first)
         throws ParsingException;
 
     /**
@@ -48,7 +48,7 @@ abstract class LeftSideItemParser {
      * @return An untyped hole
      * @throws ParsingException If the parse fails
      */
-    protected static UntypedHole parseDataHole(final LeftSideParsingContext context)
+    protected static UntypedHole parseDataHole(final LeftSideParsing context)
         throws ParsingException {
         final Token token = context.getToken();
         if (!(token instanceof Number)) {
@@ -65,7 +65,7 @@ abstract class LeftSideItemParser {
      * @return An untyped hole
      * @throws ParsingException If the parse fails
      */
-    protected static UntypedHole parseUntypedNodeHole(final LeftSideParsingContext context)
+    protected static UntypedHole parseUntypedNodeHole(final LeftSideParsing context)
         throws ParsingException {
         final Token token = context.getToken();
         if (!(token instanceof Number)) {

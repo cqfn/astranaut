@@ -44,7 +44,7 @@ final class SymbolicDescriptorParser extends LeftSideItemParser {
     }
 
     @Override
-    public LeftSideItem parse(final LeftSideParsingContext context, final Token first)
+    public LeftSideItem parse(final LeftSideParsing context, final Token first)
         throws ParsingException {
         UntypedHole data = null;
         Token next = context.getToken();
