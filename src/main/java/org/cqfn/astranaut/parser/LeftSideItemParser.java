@@ -58,4 +58,28 @@ abstract class LeftSideItemParser {
         context.getHoleCounter().addDataHole(value);
         return UntypedHole.getInstance(value);
     }
+
+    /**
+     * Parses a sequence of tokens as an untyped node hole.
+     * @param context Data that is required during parsing
+     * @return An untyped hole
+     * @throws ParsingException If the parse fails
+     */
+    protected static UntypedHole parseUntypedNodeHole(final LeftSideParsingContext context)
+        throws ParsingException {
+        final Token token = context.getToken();
+        if (!(token instanceof Number)) {
+            throw new BadHole(context.getLocation());
+        }
+        final int value = ((Number) token).getValue();
+        final HoleCounter holes = context.getHoleCounter();
+        if (holes.hasNodeHole(value)) {
+            throw new CommonParsingException(
+                context.getLocation(),
+                String.format("Hole with number #%d replacing a node has already been used", value)
+            );
+        }
+        holes.addNodeHole(value);
+        return UntypedHole.getInstance(value);
+    }
 }
