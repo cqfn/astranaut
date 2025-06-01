@@ -40,6 +40,9 @@ final class LeftSideParsing {
     private static final Map<Class<? extends Token>, LeftSideItemParser> PARSERS =
         new MapUtils<Class<? extends Token>, LeftSideItemParser>()
             .put(SymbolicToken.class, SymbolicDescriptorParser.INSTANCE)
+            .put(OpeningSquareBracket.class, OptionalItemParser.INSTANCE)
+            .put(OpeningCurlyBracket.class, RepeatedItemParser.INSTANCE)
+            .put(Identifier.class, PatternParser.INSTANCE)
             .make();
 
     /**
@@ -173,7 +176,7 @@ final class LeftSideParsing {
             if (first instanceof HashSymbol) {
                 throw new CommonParsingException(
                     this.getLocation(),
-                    "The left part of the transformation descriptor cannot contain untyped holes"
+                    "The left part of the transformation descriptor, optional and repeated items cannot contain untyped holes"
                 );
             } else {
                 throw new InappropriateToken(this.getLocation(), first);
