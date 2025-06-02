@@ -438,6 +438,13 @@ class GenerateTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void orExpression(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("or_expression.txt");
+        final String actual = this.run("or_expression.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.

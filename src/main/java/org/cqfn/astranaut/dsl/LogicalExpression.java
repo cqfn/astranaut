@@ -111,6 +111,9 @@ public abstract class LogicalExpression implements LeftSideItem, PatternItem {
      */
     private String toShortString() {
         final StringBuilder builder = new StringBuilder();
+        if (this.negation) {
+            builder.append('~');
+        }
         builder.append(this.getSymbol()).append('(');
         boolean flag = false;
         for (final LeftSideItem item : this.items) {

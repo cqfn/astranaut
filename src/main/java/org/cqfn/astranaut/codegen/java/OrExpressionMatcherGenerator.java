@@ -23,6 +23,7 @@
  */
 package org.cqfn.astranaut.codegen.java;
 
+import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.OrExpression;
 
 /**
@@ -51,21 +52,39 @@ public final class OrExpressionMatcherGenerator extends LeftSideItemGenerator {
         );
         final Klass klass = new Klass(context.generateClassName(), brief);
         LeftSideItemGenerator.generateInstanceAndConstructor(klass);
-        this.generateMatchMethod(klass);
+        this.generateMatchMethod(context, klass);
         return klass;
     }
 
     /**
      * Generates and adds a {@code match} method to the given class.
+     * @param context Generation context
      * @param klass The class to which the {@code match} method will be added
      */
-    private void generateMatchMethod(final Klass klass) {
-        this.getClass();
+    private void generateMatchMethod(final LeftSideGenerationContext context, final Klass klass) {
         final Method method = new Method("boolean", "match");
         klass.addMethod(method);
         method.makePublic();
         method.addArgument("Node", "node");
         method.addArgument("Extracted", "extracted");
-        method.setBody("return false;");
+        final StringBuilder builder = new StringBuilder(64);
+        builder.append("return ");
+        if (this.expression.isNegationFlagSet()) {
+            builder.append("!(");
+        }
+        boolean flag = false;
+        for (final LeftSideItem item : this.expression.getItems()) {
+            if (flag) {
+                builder.append(" || ");
+            }
+            flag = true;
+            final Klass matcher = item.generateMatcher(context);
+            builder.append(matcher.getName()).append(".INSTANCE.match(node, extracted)");
+        }
+        if (this.expression.isNegationFlagSet()) {
+            builder.append(')');
+        }
+        builder.append(';');
+        method.setBody(builder.toString());
     }
 }

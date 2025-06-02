@@ -1593,6 +1593,31 @@ Tilde plays nice with `[]` (optional) and `{}` (repeated) patterns:
      // Grabs all chars between /* and */, ignoring '*' alone.
      ```  
 
+## Pattern Combinators: `|` (OR) and `&` (AND) — Mix and Match  
+
+### `|` (OR) — "First Match Wins"  
+**How it works:**  
+- Checks patterns **left to right**—stops at the **first successful match**.  
+- If none match, the rule **doesn’t fire**.  
+
+**Example:**  
+```dsl
+// Match either a lowercase letter, uppercase letter, or underscore  
+|('a..z'<#1>, 'A..Z'<#1>, '_'<#1>) -> Letter<#1>;  
+```  
+
+**Use cases:**  
+- Handling **alternative syntax** (e.g., `+` vs `plus`).  
+- Simplifying **heterogeneous rules** into one line.  
+
+### `&` (AND) — "All or Nothing"  
+**How it works:**  
+- **All patterns** inside `&(...)` must match **simultaneously**.  
+- Order-agnostic (but checked left-to-right for efficiency).  
+
+**Why does this exist?**  
+Honestly, we’re not sure yet 😅. We added `&` for future-proofing.  
+
 # Example: Parsing Arithmetic Expressions from Raw Text
 
 Let’s put everything together.
