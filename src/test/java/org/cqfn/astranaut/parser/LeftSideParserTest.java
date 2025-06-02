@@ -773,6 +773,18 @@ class LeftSideParserTest {
         Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
     }
 
+    @Test
+    void nestingLevel() {
+        final LeftSideParser parser = this.createParser("A");
+        parser.incrementNestingLevel();
+        Assertions.assertEquals(1, parser.getNestingLevel());
+        parser.decrementNestingLevel();
+        Assertions.assertThrows(
+            UnsupportedOperationException.class,
+            parser::decrementNestingLevel
+        );
+    }
+
     /**
      * Creates a parser that parses an item that is part of the left side of
      *  a transformation rule.
