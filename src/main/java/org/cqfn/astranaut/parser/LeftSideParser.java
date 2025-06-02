@@ -45,6 +45,7 @@ final class LeftSideParser {
             .put(OpeningCurlyBracket.class, RepeatedItemParser.INSTANCE)
             .put(Identifier.class, PatternParser.INSTANCE)
             .put(Tilde.class, NegativeItemParser.INSTANCE)
+            .put(VerticalLine.class, OrExpressionParser.INSTANCE)
             .make();
 
     /**

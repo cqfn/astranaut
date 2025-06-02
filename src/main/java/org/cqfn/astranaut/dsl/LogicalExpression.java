@@ -52,6 +52,7 @@ public abstract class LogicalExpression implements LeftSideItem, PatternItem {
      */
     public LogicalExpression(final List<LeftSideItem> items) {
         this.items = LogicalExpression.checkItemsList(items);
+        this.mode = PatternMatchingMode.NORMAL;
     }
 
     @Override

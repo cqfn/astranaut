@@ -26,6 +26,7 @@ package org.cqfn.astranaut.parser;
 import java.util.List;
 import org.cqfn.astranaut.dsl.DataDescriptor;
 import org.cqfn.astranaut.dsl.LeftSideItem;
+import org.cqfn.astranaut.dsl.OrExpression;
 import org.cqfn.astranaut.dsl.PatternDescriptor;
 import org.cqfn.astranaut.dsl.PatternItem;
 import org.cqfn.astranaut.dsl.PatternMatchingMode;
@@ -661,6 +662,21 @@ class LeftSideParserTest {
     void badUnclosedDataInSymbolicDescriptor() {
         final LeftSideParser parser = this.createParser("'x'<#1 ");
         Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void orExpression() {
+        final String code = "|('a..z'<#1>, 'A..Z'<#1>)";
+        final LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof OrExpression);
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
     }
 
     /**
