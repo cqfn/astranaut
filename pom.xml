@@ -31,7 +31,7 @@ SOFTWARE.
   </parent>
   <groupId>org.cqfn</groupId>
   <artifactId>astranaut</artifactId>
-  <version>1.0.0</version>
+  <version>0.3.0</version>
   <packaging>jar</packaging>
   <developers>
     <developer>
