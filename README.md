@@ -1618,6 +1618,27 @@ Tilde plays nice with `[]` (optional) and `{}` (repeated) patterns:
 **Why does this exist?**  
 Honestly, we’re not sure yet 😅. We added `&` for future-proofing.  
 
+### Example: String Literals with Escapes  
+
+```dsl
+NewLine <- 'char';
+'\\', 'n' -> NewLine<'\n'>;
+
+EscapedQuote <- 'char';
+'\\', '"' -> EscapedQuote<'"'>;
+
+EscapedSymbol <- NewLine, EscapedQuote;
+
+StringLiteral <- 'String', '""';
+'"', {|(~'"'<#1>, EscapedSymbol<#1>)}, '"' -> StringLiteral<#1>;
+```  
+
+**Result**:  
+Input `"Hello\nWorld\"!"` →  
+```json
+{ "type": "StringLiteral", "data": "Hello\nWorld\"!" }
+```  
+
 # Example: Parsing Arithmetic Expressions from Raw Text
 
 Let’s put everything together.
@@ -1734,7 +1755,6 @@ A structured AST in `output.json`:
 ```
 
 A visual `.png` image of the parsed and transformed tree:
-
 ![VERY_SIMPLE_AST](src/main/documents/very_simple_ast.png)
 
 🎉 Congratulations — you just wrote a mini parser and tree rewriter using nothing but a DSL and a few dozen lines.
