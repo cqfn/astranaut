@@ -27,7 +27,7 @@ package org.cqfn.astranaut.parser;
  * Token representing a vertical line symbol |.
  * @since 1.0.0
  */
-public final class VerticalLine extends SingleCharToken {
+public final class VerticalLine extends SingleCharToken implements LogicalOperator {
     /**
      * The instance.
      */

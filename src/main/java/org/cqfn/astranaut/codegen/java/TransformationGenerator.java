@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import org.cqfn.astranaut.dsl.Null;
 import org.cqfn.astranaut.dsl.PatternMatchingMode;
 import org.cqfn.astranaut.dsl.ResultingSubtreeDescriptor;
 import org.cqfn.astranaut.dsl.Rule;
@@ -97,6 +98,7 @@ public final class TransformationGenerator extends RuleGenerator {
         ctor.makePrivate();
         final Set<String> matchers = this.createConvertMethod(context, klass);
         this.createGetMinConsumedMethod(klass);
+        this.createIsRightToLeftMethod(klass);
         final CompilationUnit unit = new CompilationUnit(
             context.getLicense(),
             context.getPackage(),
@@ -118,8 +120,11 @@ public final class TransformationGenerator extends RuleGenerator {
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Converter");
         unit.addImport("org.cqfn.astranaut.core.algorithms.conversion.Extracted");
         unit.addImport("org.cqfn.astranaut.core.base.Factory");
-        if (!(this.rule.getRight() instanceof UntypedHole)) {
+        if (this.rule.getRight() instanceof ResultingSubtreeDescriptor) {
             unit.addImport("org.cqfn.astranaut.core.base.Fragment");
+        }
+        if (this.rule.getRight() instanceof Null) {
+            unit.addImport("org.cqfn.astranaut.core.base.NullNode");
         }
         unit.addImport("org.cqfn.astranaut.core.base.Node");
         if (this.rule.getRight() instanceof ResultingSubtreeDescriptor) {
@@ -173,6 +178,54 @@ public final class TransformationGenerator extends RuleGenerator {
             cgen = new SimpleConditionGenerator(this.rule, context);
         }
         code.addAll(cgen.generate());
+        this.createNodeCreator(klass, code);
+        code.addAll(
+            Arrays.asList(
+                "} while (false);",
+                "return result;"
+            )
+        );
+        method.setBody(String.join("\n", code));
+        klass.addMethod(method);
+        return cgen.getMatchers();
+    }
+
+    /**
+     * Creates a "getMinConsumed" method.
+     * @param klass The class to which the method will be added
+     */
+    private void createGetMinConsumedMethod(final Klass klass) {
+        final Method method = new Method(
+            Strings.TYPE_INT,
+            "getMinConsumed"
+        );
+        method.makePublic();
+        method.setBody(String.format("return %d;", this.rule.getMinConsumed()));
+        klass.addMethod(method);
+    }
+
+    /**
+     * Creates a "isRightToLeft" method if needed.
+     * @param klass The class to which the method will be added
+     */
+    private void createIsRightToLeftMethod(final Klass klass) {
+        if (this.rule.isRightToLeft()) {
+            final Method method = new Method(
+                Strings.TYPE_BOOLEAN,
+                "isRightToLeft"
+            );
+            method.makePublic();
+            method.setBody("return true;");
+            klass.addMethod(method);
+        }
+    }
+
+    /**
+     * Creates code that creates the resulting node.
+     * @param klass The class to which the 'convert' method will be added
+     * @param code List with lines of generated source code
+     */
+    private void createNodeCreator(final Klass klass, final List<String> code) {
         final String consumed;
         if (this.rule.hasOptionalOrRepeated()) {
             consumed = "consumed";
@@ -190,6 +243,13 @@ public final class TransformationGenerator extends RuleGenerator {
                         "result = Optional.of(new ConversionResult(node, %s));",
                         consumed
                     )
+                )
+            );
+        } else if (this.rule.getRight() instanceof Null) {
+            code.add(
+                String.format(
+                    "result = Optional.of(new ConversionResult(NullNode.INSTANCE, %s));",
+                    consumed
                 )
             );
         } else {
@@ -228,28 +288,5 @@ public final class TransformationGenerator extends RuleGenerator {
                 )
             );
         }
-        code.addAll(
-            Arrays.asList(
-                "} while (false);",
-                "return result;"
-            )
-        );
-        method.setBody(String.join("\n", code));
-        klass.addMethod(method);
-        return cgen.getMatchers();
-    }
-
-    /**
-     * Creates a "getMinConsumed" method.
-     * @param klass The class to which the method will be added
-     */
-    private void createGetMinConsumedMethod(final Klass klass) {
-        final Method method = new Method(
-            Strings.TYPE_INT,
-            "getMinConsumed"
-        );
-        method.makePublic();
-        method.setBody(String.format("return %d;", this.rule.getMinConsumed()));
-        klass.addMethod(method);
     }
 }

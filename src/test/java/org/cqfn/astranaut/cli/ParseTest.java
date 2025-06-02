@@ -88,6 +88,83 @@ class ParseTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void nullOnTheRight(final @TempDir Path temp) {
+        final String actual = this.run(
+            "null_on_the_right.dsl",
+            "two_identifiers.txt",
+            temp
+        );
+        final String expected = this.loadStringResource("two_identifiers.json");
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void chainedAssignment(final @TempDir Path temp) {
+        final String actual = this.run(
+            "right_to_left_rule.dsl",
+            "chained_assignment.txt",
+            temp
+        );
+        final String expected = this.loadStringResource("chained_assignment.json");
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void repeatedAndInverted(final @TempDir Path temp) {
+        final String actual = this.run(
+            "repeated_and_inverted.dsl",
+            "identifiers_and_string.txt",
+            temp
+        );
+        final String expected = this.loadStringResource("identifiers_and_string.json");
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void optionalAndInverted(final @TempDir Path temp) {
+        final String actual = this.run(
+            "optional_and_inverted.dsl",
+            "identifiers_and_text.txt",
+            temp
+        );
+        final String expected = this.loadStringResource("identifiers_and_text.json");
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void regularAndInverted(final @TempDir Path temp) {
+        final String actual = this.run(
+            "regular_and_inverted.dsl",
+            "three_symbols.txt",
+            temp
+        );
+        final String expected = this.loadStringResource("three_symbols.json");
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void orExpression(final @TempDir Path temp) {
+        final String actual = this.run(
+            "or_expression.dsl",
+            "identifier_and_number.txt",
+            temp
+        );
+        final String expected = this.loadStringResource("letters_and_digits.json");
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void andExpression(final @TempDir Path temp) {
+        final String actual = this.run(
+            "and_expression.dsl",
+            "identifier_and_number.txt",
+            temp
+        );
+        final String expected = this.loadStringResource("letters_and_digits.json");
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in parsing mode and reads the generated file.
      * @param rules Name of the file containing the rules (DSL code)

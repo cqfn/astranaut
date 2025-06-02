@@ -67,9 +67,14 @@ public final class TypedHoleMatcherGenerator extends LeftSideItemGenerator {
         method.makePublic();
         method.addArgument("Node", "node");
         method.addArgument("Extracted", "extracted");
+        String negative = "";
+        if (this.item.isNegationFlagSet()) {
+            negative = "!";
+        }
         final List<String> code = Arrays.asList(
             String.format(
-                "final boolean matches = node.belongsToGroup(\"%s\");",
+                "final boolean matches = %snode.belongsToGroup(\"%s\");",
+                negative,
                 this.item.getType()
             ),
             "if (matches) {",

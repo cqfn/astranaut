@@ -52,6 +52,11 @@ public final class TypedHole implements Hole, LeftSideItem {
     private PatternMatchingMode mode;
 
     /**
+     * Negation flag.
+     */
+    private boolean negation;
+
+    /**
      * Constructor to create a typed hole.
      * @param type The type of the node that this hole can match.
      * @param number The unique number for this hole.
@@ -86,6 +91,16 @@ public final class TypedHole implements Hole, LeftSideItem {
     }
 
     @Override
+    public void setNegationFlag() {
+        this.negation = true;
+    }
+
+    @Override
+    public boolean isNegationFlagSet() {
+        return this.negation;
+    }
+
+    @Override
     public LeftSideItemGenerator createGenerator() {
         return new TypedHoleMatcherGenerator(this);
     }
@@ -95,6 +110,8 @@ public final class TypedHole implements Hole, LeftSideItem {
         final String result;
         if (full) {
             result = this.toString();
+        } else if (this.negation) {
+            result = String.format("~%s#%d", this.type, this.number);
         } else {
             result = String.format("%s#%d", this.type, this.number);
         }
@@ -109,6 +126,9 @@ public final class TypedHole implements Hole, LeftSideItem {
         } else if (this.mode == PatternMatchingMode.REPEATED) {
             builder.append('{');
         }
+        if (this.negation) {
+            builder.append('~');
+        }
         builder.append(this.type).append('#').append(this.number);
         if (this.mode == PatternMatchingMode.OPTIONAL) {
             builder.append(']');
@@ -120,7 +140,7 @@ public final class TypedHole implements Hole, LeftSideItem {
 
     @Override
     public boolean matchNode(final Node node, final Extracted extracted) {
-        final boolean matches = node.belongsToGroup(this.type);
+        final boolean matches = node.belongsToGroup(this.type) ^ this.negation;
         if (matches) {
             extracted.addNode(this.number, node);
         }

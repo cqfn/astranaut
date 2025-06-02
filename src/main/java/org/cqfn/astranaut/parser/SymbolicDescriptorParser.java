@@ -1,0 +1,75 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2025 Ivan Kniazkov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.cqfn.astranaut.parser;
+
+import org.cqfn.astranaut.dsl.LeftSideItem;
+import org.cqfn.astranaut.dsl.SymbolDescriptor;
+import org.cqfn.astranaut.dsl.UntypedHole;
+
+/**
+ * Parses a sequence of tokens as a symbolic descriptor.
+ * @since 1.0.0
+ */
+final class SymbolicDescriptorParser extends LeftSideItemParser {
+    /**
+     * Static instance.
+     */
+    public static final LeftSideItemParser INSTANCE = new SymbolicDescriptorParser();
+
+    /**
+     * Private constructor.
+     */
+    private SymbolicDescriptorParser() {
+    }
+
+    @Override
+    public LeftSideItem parse(final LeftSideParser context, final Token first)
+        throws ParsingException {
+        UntypedHole data = null;
+        Token next = context.getToken();
+        do {
+            if (!(next instanceof OpeningAngleBracket)) {
+                context.pushToken(next);
+                break;
+            }
+            next = context.getToken();
+            if (next instanceof HashSymbol) {
+                data = LeftSideItemParser.parseDataHole(context);
+            } else {
+                throw new CommonParsingException(
+                    context.getLocation(),
+                    "Data inside symbolic descriptors can only be holes"
+                );
+            }
+            next = context.getToken();
+            if (!(next instanceof ClosingAngleBracket)) {
+                throw new CommonParsingException(
+                    context.getLocation(),
+                    "Closing angle bracket '>' expected for data descriptor"
+                );
+            }
+        } while (false);
+        return new SymbolDescriptor((SymbolicToken) first, data);
+    }
+}

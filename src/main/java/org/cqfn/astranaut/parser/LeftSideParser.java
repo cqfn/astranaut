@@ -23,56 +23,128 @@
  */
 package org.cqfn.astranaut.parser;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import org.cqfn.astranaut.dsl.LeftDataDescriptor;
+import java.util.Map;
+import java.util.Stack;
+import org.cqfn.astranaut.core.utils.MapUtils;
 import org.cqfn.astranaut.dsl.LeftSideItem;
-import org.cqfn.astranaut.dsl.PatternDescriptor;
 import org.cqfn.astranaut.dsl.PatternItem;
-import org.cqfn.astranaut.dsl.PatternMatchingMode;
-import org.cqfn.astranaut.dsl.StaticString;
-import org.cqfn.astranaut.dsl.SymbolDescriptor;
-import org.cqfn.astranaut.dsl.TypedHole;
-import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
  * Parses an item that is part of the left side of a transformation rule.
  * @since 1.0.0
  */
-@SuppressWarnings("PMD.TooManyMethods")
-public final class LeftSideParser {
+final class LeftSideParser {
     /**
-     * Scanner that produces a sequence of tokens.
+     * Mapping token classes and parsers that fit them.
+     */
+    private static final Map<Class<? extends Token>, LeftSideItemParser> PARSERS =
+        new MapUtils<Class<? extends Token>, LeftSideItemParser>()
+            .put(SymbolRangeToken.class, SymbolicDescriptorParser.INSTANCE)
+            .put(SymbolToken.class, SymbolicDescriptorParser.INSTANCE)
+            .put(OpeningSquareBracket.class, OptionalItemParser.INSTANCE)
+            .put(OpeningCurlyBracket.class, RepeatedItemParser.INSTANCE)
+            .put(Identifier.class, PatternParser.INSTANCE)
+            .put(Tilde.class, NegativeItemParser.INSTANCE)
+            .put(VerticalLine.class, OrExpressionParser.INSTANCE)
+            .put(Ampersand.class, AndExpressionParser.INSTANCE)
+            .make();
+
+    /**
+     * Scanner that issues tokens.
      */
     private final Scanner scanner;
 
     /**
-     * Descriptor nesting level.
+     * Tokens that have been received from the scanner but not used.
      */
-    private final int nesting;
+    private final Stack<Token> tokens;
 
     /**
-     * Count of holes resulting from parsing.
+     * Pattern nesting level.
+     */
+    private int nesting;
+
+    /**
+     * Counter for tracking placeholders (holes).
      */
     private final HoleCounter holes;
 
     /**
-     * The last token received from the scanner but not accepted by the parser.
+     * Constructor.
+     * @param scanner Scanner that issues tokens
+     * @param holes Counter for tracking placeholders (holes)
      */
-    private Token last;
+    LeftSideParser(final Scanner scanner, final HoleCounter holes) {
+        this.scanner = scanner;
+        this.tokens = new Stack<>();
+        this.nesting = 0;
+        this.holes = holes;
+    }
 
     /**
-     * Constructor.
-     *
-     * @param scanner Scanner
-     * @param nesting Descriptor nesting level
-     * @param holes Count of holes resulting from parsing
+     * Returns the next token.
+     * @return A token or {@code null} if no more tokens
+     * @throws ParsingException If the scanner fails
      */
-    public LeftSideParser(final Scanner scanner, final int nesting, final HoleCounter holes) {
-        this.scanner = scanner;
-        this.nesting = nesting;
-        this.holes = holes;
+    Token getToken() throws ParsingException {
+        final Token token;
+        if (this.tokens.empty()) {
+            token = this.scanner.getToken();
+        } else {
+            token = this.tokens.pop();
+        }
+        return token;
+    }
+
+    /**
+     * Returns location of the DSL code.
+     * @return Location of the DSL code
+     */
+    Location getLocation() {
+        return this.scanner.getLocation();
+    }
+
+    /**
+     * Saves an unused token so that another parser can use it.
+     * @param token A token
+     */
+    void pushToken(final Token token) {
+        if (token != null) {
+            this.tokens.push(token);
+        }
+    }
+
+    /**
+     * Returns the current nesting level of patterns.
+     * @return Nesting level
+     */
+    int getNestingLevel() {
+        return this.nesting;
+    }
+
+    /**
+     * Increases the nesting level by 1.
+     */
+    void incrementNestingLevel() {
+        this.nesting = this.nesting + 1;
+    }
+
+    /**
+     * Decreases the nesting level by 1.
+     */
+    void decrementNestingLevel() {
+        if (this.nesting == 0) {
+            throw new UnsupportedOperationException();
+        }
+        this.nesting = this.nesting - 1;
+    }
+
+    /**
+     * Returns the counter for tracking placeholders (holes).
+     * @return Hole counter
+     */
+    HoleCounter getHoleCounter() {
+        return this.holes;
     }
 
     /**
@@ -81,27 +153,40 @@ public final class LeftSideParser {
      *  the scanner does not contain any more tokens
      * @throws ParsingException If the parse fails
      */
-    public LeftSideItem parseLeftSideItem() throws ParsingException {
-        final Token first = this.scanner.getToken();
+    LeftSideItem parseLeftSideItem() throws ParsingException {
+        final Token first = this.getToken();
+        return this.parseLeftSideItem(first);
+    }
+
+    /**
+     * Parses an item that is part of the left side of a transformation rule, provided that
+     *  the first token is known.
+     * @param first The first token in the token sequence
+     * @return Left item, that is, the pattern descriptor or typed hole; or {@code null} if
+     *  the scanner does not contain any more tokens
+     * @throws ParsingException If the parse fails
+     */
+    LeftSideItem parseLeftSideItem(final Token first) throws ParsingException {
         final LeftSideItem item;
-        if (first instanceof Identifier) {
-            item = this.parsePatternOrTypedHole(first.toString());
-        } else if (first instanceof OpeningSquareBracket) {
-            item = this.parseOptionalItem();
-        } else if (first instanceof OpeningCurlyBracket) {
-            item = this.parseRepeatedItem();
-        } else if (first instanceof SymbolicToken) {
-            item = this.parseSymbolDescriptor((SymbolicToken) first);
-        } else if (first == null) {
-            item = null;
-        } else if (first instanceof HashSymbol) {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                "The left part of the transformation descriptor cannot contain untyped holes"
-            );
-        } else {
-            throw new InappropriateToken(this.scanner.getLocation(), first);
-        }
+        do {
+            if (first == null) {
+                item = null;
+                break;
+            }
+            final LeftSideItemParser parser = LeftSideParser.PARSERS.get(first.getClass());
+            if (parser != null) {
+                item = parser.parse(this, first);
+                break;
+            }
+            if (first instanceof HashSymbol) {
+                throw new CommonParsingException(
+                    this.getLocation(),
+                    "The left part of the transformation descriptor, optional and repeated items cannot contain untyped holes"
+                );
+            } else {
+                throw new InappropriateToken(this.getLocation(), first);
+            }
+        } while (false);
         return item;
     }
 
@@ -111,311 +196,27 @@ public final class LeftSideParser {
      *  the scanner does not contain any more tokens
      * @throws ParsingException If the parse fails
      */
-    public PatternItem parsePatternItem() throws ParsingException {
-        final Token first = this.scanner.getToken();
+    PatternItem parsePatternItem() throws ParsingException {
         final PatternItem item;
-        if (first instanceof Identifier) {
-            item = (PatternItem) this.parsePatternOrTypedHole(first.toString());
-        } else if (first instanceof OpeningSquareBracket) {
-            item = (PatternItem) this.parseOptionalItem();
-        } else if (first instanceof OpeningCurlyBracket) {
-            item = (PatternItem) this.parseRepeatedItem();
-        } else if (first instanceof SymbolicToken) {
-            item = (PatternItem) this.parseSymbolDescriptor((SymbolicToken) first);
-        } else if (first == null || first instanceof ClosingRoundBracket && this.nesting > 0) {
-            item = null;
-        } else if (first instanceof HashSymbol) {
-            item = this.parseUntypedNodeHole();
-        } else {
-            throw new InappropriateToken(this.scanner.getLocation(), first);
-        }
-        return item;
-    }
-
-    /**
-     * Return the last token received from the scanner but not accepted by the parser.
-     * @return Last token or {@code null} if all tokens have been accepted.
-     */
-    public Token getLastToken() {
-        return this.last;
-    }
-
-    /**
-     * Parses a sequence of tokens as an untyped node hole.
-     * @return An untyped hole
-     * @throws ParsingException If the parse fails
-     */
-    private UntypedHole parseUntypedNodeHole() throws ParsingException {
-        final Token token = this.scanner.getToken();
-        if (!(token instanceof Number)) {
-            throw new BadHole(this.scanner.getLocation());
-        }
-        final int value = ((Number) token).getValue();
-        if (this.holes.hasNodeHole(value)) {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                String.format("Hole with number #%d replacing a node has already been used", value)
-            );
-        }
-        this.holes.addNodeHole(value);
-        return UntypedHole.getInstance(value);
-    }
-
-    /**
-     * Parses a sequence of tokens as an untyped data hole.
-     * @return An untyped hole
-     * @throws ParsingException If the parse fails
-     */
-    private UntypedHole parseUntypedDataHole() throws ParsingException {
-        final Token token = this.scanner.getToken();
-        if (!(token instanceof Number)) {
-            throw new BadHole(this.scanner.getLocation());
-        }
-        final int value = ((Number) token).getValue();
-        this.holes.addDataHole(value);
-        return UntypedHole.getInstance(value);
-    }
-
-    /**
-     * Parses a sequence of tokens as a typed hole.
-     * @param type Type of the hole
-     * @return A typed hole
-     * @throws ParsingException If the parse fails
-     */
-    private TypedHole parseTypedHole(final String type) throws ParsingException {
-        final Token token = this.scanner.getToken();
-        if (!(token instanceof Number)) {
-            throw new BadHole(this.scanner.getLocation());
-        }
-        final int value = ((Number) token).getValue();
-        if (this.holes.hasNodeHole(value)) {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                String.format("Hole with number #%d replacing a node has already been used", value)
-            );
-        }
-        this.holes.addNodeHole(value);
-        return new TypedHole(type, value);
-    }
-
-    /**
-     * Parses a sequence of tokens as a pattern descriptor or typed hole.
-     * @param type The type of the root node of the subtree
-     * @return Pattern descriptor or typed hole
-     * @throws ParsingException If the parse fails
-     */
-    private LeftSideItem parsePatternOrTypedHole(final String type) throws ParsingException {
-        final Token next = this.scanner.getToken();
-        final LeftSideItem result;
-        if (next instanceof HashSymbol) {
-            result = this.parseTypedHole(type);
-        } else {
-            result = this.parsePattern(type, next);
-        }
-        return result;
-    }
-
-    /**
-     * Parses a sequence of tokens as a pattern descriptor.
-     * @param type The type of the root node of the subtree
-     * @param first First token
-     * @return Subtree descriptor
-     * @throws ParsingException If the parse fails
-     */
-    private PatternDescriptor parsePattern(final String type, final Token first)
-        throws ParsingException {
-        Token next = first;
-        LeftDataDescriptor data = null;
-        if (next instanceof OpeningAngleBracket) {
-            data = this.parseData();
-            next = this.scanner.getToken();
-        }
-        List<PatternItem> children = Collections.emptyList();
-        if (next instanceof OpeningRoundBracket) {
-            children = this.parseChildren();
-            next = this.scanner.getToken();
-        }
-        if (next instanceof ClosingRoundBracket && this.nesting == 0) {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                "Unmatched closing parenthesis ')' found"
-            );
-        }
-        if (next == null && this.nesting > 0) {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                "Unmatched opening parenthesis '(' found"
-            );
-        }
-        this.last = next;
-        return new PatternDescriptor(type, data, children);
-    }
-
-    /**
-     * Parses a sequence of tokens as a data descriptor.
-     * @return A data descriptor
-     * @throws ParsingException If the parse fails
-     */
-    private LeftDataDescriptor parseData() throws ParsingException {
-        final LeftDataDescriptor data;
-        final Token first = this.scanner.getToken();
-        if (first instanceof HashSymbol) {
-            data = this.parseUntypedDataHole();
-        } else if (first instanceof CharSequenceToken) {
-            data = new StaticString((CharSequenceToken) first);
-        } else {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                "Invalid data inside data descriptor. Expected either a hole ('#...') or a string"
-            );
-        }
-        final Token next = this.scanner.getToken();
-        if (!(next instanceof ClosingAngleBracket)) {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                "Closing angle bracket '>' expected for data descriptor"
-            );
-        }
-        return data;
-    }
-
-    /**
-     * Parses a sequence of tokens as a list of pattern children.
-     * @return List of pattern children
-     * @throws ParsingException If the parse fails
-     */
-    private List<PatternItem> parseChildren() throws ParsingException {
-        final List<PatternItem> list = new ArrayList<>(0);
+        final Token first = this.getToken();
         do {
-            final LeftSideParser parser = new LeftSideParser(
-                this.scanner,
-                this.nesting + 1,
-                this.holes
-            );
-            final PatternItem child = parser.parsePatternItem();
-            if (child == null) {
+            if (first == null
+                || first instanceof ClosingRoundBracket && this.getNestingLevel() > 0) {
+                item = null;
                 break;
             }
-            list.add(child);
-            Token next = parser.getLastToken();
-            if (next == null) {
-                next = this.scanner.getToken();
-            }
-            if (next instanceof ClosingRoundBracket) {
+            final LeftSideItemParser parser = LeftSideParser.PARSERS.get(first.getClass());
+            if (parser != null) {
+                item = (PatternItem) parser.parse(this, first);
                 break;
             }
-            if (!(next instanceof Comma)) {
-                throw new CommonParsingException(
-                    this.scanner.getLocation(),
-                    "Child descriptors must be separated by commas"
-                );
-            }
-        } while (true);
-        return list;
-    }
-
-    /**
-     * Parses a sequence of tokens as an optional item.
-     * @return Left side item with {@link PatternMatchingMode#OPTIONAL} flag set
-     * @throws ParsingException If the parse fails
-     */
-    private LeftSideItem parseOptionalItem() throws ParsingException {
-        final Token first = this.scanner.getToken();
-        final LeftSideParser parser;
-        final LeftSideItem item;
-        if (first instanceof Identifier) {
-            parser = new LeftSideParser(this.scanner, 0, this.holes);
-            item = parser.parsePatternOrTypedHole(first.toString());
-        } else if (first instanceof SymbolicToken) {
-            parser = new LeftSideParser(this.scanner, 0, this.holes);
-            item = parser.parseSymbolDescriptor((SymbolicToken) first);
-        } else {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                "An identifier or symbol is expected after '['. Only patterns or typed holes can be optional"
-            );
-        }
-        item.setMatchingMode(PatternMatchingMode.OPTIONAL);
-        Token next = parser.getLastToken();
-        if (next == null) {
-            next = this.scanner.getToken();
-        }
-        if (!(next instanceof ClosingSquareBracket)) {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                "Missing square closing bracket ']'"
-            );
-        }
-        return item;
-    }
-
-    /**
-     * Parses a sequence of tokens as a repeated item.
-     * @return Left side item with {@link PatternMatchingMode#REPEATED} flag set
-     * @throws ParsingException If the parse fails
-     */
-    private LeftSideItem parseRepeatedItem() throws ParsingException {
-        final Token first = this.scanner.getToken();
-        final LeftSideParser parser;
-        final LeftSideItem item;
-        if (first instanceof Identifier) {
-            parser = new LeftSideParser(this.scanner, 0, this.holes);
-            item = parser.parsePatternOrTypedHole(first.toString());
-        } else if (first instanceof SymbolicToken) {
-            parser = new LeftSideParser(this.scanner, 0, this.holes);
-            item = parser.parseSymbolDescriptor((SymbolicToken) first);
-        } else {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                "An identifier or symbol is expected after '{'. Only patterns or typed holes can be repeated"
-            );
-        }
-        item.setMatchingMode(PatternMatchingMode.REPEATED);
-        Token next = parser.getLastToken();
-        if (next == null) {
-            next = this.scanner.getToken();
-        }
-        if (!(next instanceof ClosingCurlyBracket)) {
-            throw new CommonParsingException(
-                this.scanner.getLocation(),
-                "Missing curly closing bracket '}'"
-            );
-        }
-        return item;
-    }
-
-    /**
-     * Parses a sequence of tokens as a symbolic descriptor.
-     * @param first Symbolic token
-     * @return Symbolic descriptor
-     * @throws ParsingException If the parse fails
-     */
-    private LeftSideItem parseSymbolDescriptor(final SymbolicToken first)
-        throws ParsingException {
-        UntypedHole data = null;
-        Token next = this.scanner.getToken();
-        do {
-            if (!(next instanceof OpeningAngleBracket)) {
-                this.last = next;
+            if (first instanceof HashSymbol) {
+                item = LeftSideItemParser.parseUntypedNodeHole(this);
                 break;
-            }
-            next = this.scanner.getToken();
-            if (next instanceof HashSymbol) {
-                data = this.parseUntypedDataHole();
             } else {
-                throw new CommonParsingException(
-                    this.scanner.getLocation(),
-                    "Data inside symbolic descriptors can only be holes"
-                );
-            }
-            next = this.scanner.getToken();
-            if (!(next instanceof ClosingAngleBracket)) {
-                throw new CommonParsingException(
-                    this.scanner.getLocation(),
-                    "Closing angle bracket '>' expected for data descriptor"
-                );
+                throw new InappropriateToken(this.getLocation(), first);
             }
         } while (false);
-        return new SymbolDescriptor(first, data);
+        return item;
     }
 }

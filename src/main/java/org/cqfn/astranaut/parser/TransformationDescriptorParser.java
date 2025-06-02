@@ -45,6 +45,11 @@ public final class TransformationDescriptorParser {
     private final Statement stmt;
 
     /**
+     * Flag indicating that the rule is right-associative, search direction from right to left.
+     */
+    private boolean direction;
+
+    /**
      * Constructor.
      * @param language Name of the programming language whose entity this
      *  transformation descriptor cover
@@ -78,6 +83,9 @@ public final class TransformationDescriptorParser {
         try {
             final TransformationDescriptor result = new TransformationDescriptor(left, right);
             result.setLanguage(this.language);
+            if (this.direction) {
+                result.setRightToLeftDirection();
+            }
             return result;
         } catch (final IllegalArgumentException exception) {
             throw new CommonParsingException(
@@ -96,16 +104,35 @@ public final class TransformationDescriptorParser {
      */
     private List<LeftSideItem> parseLeftSide(final String code, final HoleCounter holes)
         throws ParsingException {
-        final List<LeftSideItem> list = new ArrayList<>(1);
         final Scanner scanner = new Scanner(this.stmt.getLocation(), code);
-        while (true) {
-            final LeftSideParser parser = new LeftSideParser(scanner, 0, holes);
-            final LeftSideItem item = parser.parseLeftSideItem();
-            list.add(item);
-            Token next = parser.getLastToken();
-            if (next == null) {
-                next = scanner.getToken();
+        Token first = scanner.getToken();
+        Token next;
+        do {
+            if (!(first instanceof Ellipsis)) {
+                break;
             }
+            this.direction = true;
+            next = scanner.getToken();
+            if (!(next instanceof Comma)) {
+                throw new CommonParsingException(
+                    this.stmt.getLocation(),
+                    "A comma after '...' is expected"
+                );
+            }
+            first = scanner.getToken();
+            if (first == null) {
+                throw new CommonParsingException(
+                    this.stmt.getLocation(),
+                    "You need at least one descriptor after '..., '"
+                );
+            }
+        } while (false);
+        final LeftSideParser parser = new LeftSideParser(scanner, holes);
+        final List<LeftSideItem> list = new ArrayList<>(1);
+        while (true) {
+            final LeftSideItem item = parser.parseLeftSideItem(first);
+            list.add(item);
+            next = parser.getToken();
             if (next == null) {
                 break;
             }
@@ -115,6 +142,7 @@ public final class TransformationDescriptorParser {
                     "Descriptors must be separated by commas"
                 );
             }
+            first = parser.getToken();
         }
         return list;
     }

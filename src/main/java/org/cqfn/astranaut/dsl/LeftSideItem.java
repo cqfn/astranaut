@@ -48,6 +48,17 @@ public interface LeftSideItem {
     PatternMatchingMode getMatchingMode();
 
     /**
+     * Sets a flag that says the pattern is only applied if it does NOT match.
+     */
+    void setNegationFlag();
+
+    /**
+     * Returns a flag that indicates that the pattern is only applied if it does NOT match.
+     * @return Negaton flag
+     */
+    boolean isNegationFlagSet();
+
+    /**
      * Creates a generator that generates a class that implements the left side
      *  of the transformation rule.
      * @return A generator for creating corresponding class

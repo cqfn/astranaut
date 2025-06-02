@@ -40,6 +40,7 @@ import org.cqfn.astranaut.core.base.DummyNode;
 import org.cqfn.astranaut.core.base.Factory;
 import org.cqfn.astranaut.core.base.Fragment;
 import org.cqfn.astranaut.core.base.Node;
+import org.cqfn.astranaut.core.base.NullNode;
 
 /**
  * Transformation descriptor describing the transformation of one or more subtrees into a single
@@ -62,6 +63,11 @@ public final class TransformationDescriptor implements Rule, Converter {
      * Name of the programming language for which this transformation descriptor is described.
      */
     private String language;
+
+    /**
+     * Flag indicating that the rule is right-associative, search direction from right to left.
+     */
+    private boolean direction;
 
     /**
      * Set of nodes on which this node depends. These can be child or base node types.
@@ -96,9 +102,20 @@ public final class TransformationDescriptor implements Rule, Converter {
         return this.right;
     }
 
-    @Override
-    public String getLanguage() {
-        return this.language;
+    /**
+     * Checks if the left side of this transformation rule contains
+     *  optional or repeated descriptors.
+     * @return Check result, {@code true} if any
+     */
+    public boolean hasOptionalOrRepeated() {
+        boolean found = false;
+        for (final LeftSideItem item : this.left) {
+            if (item.getMatchingMode() != PatternMatchingMode.NORMAL) {
+                found = true;
+                break;
+            }
+        }
+        return found;
     }
 
     /**
@@ -114,19 +131,15 @@ public final class TransformationDescriptor implements Rule, Converter {
     }
 
     /**
-     * Checks if the left side of this transformation rule contains
-     *  optional or repeated descriptors.
-     * @return Check result, {@code true} if any
+     * Sets a flag indicating that the rule is right-associative.
      */
-    public boolean hasOptionalOrRepeated() {
-        boolean found = false;
-        for (final LeftSideItem item : this.left) {
-            if (item.getMatchingMode() != PatternMatchingMode.NORMAL) {
-                found = true;
-                break;
-            }
-        }
-        return found;
+    public void setRightToLeftDirection() {
+        this.direction = true;
+    }
+
+    @Override
+    public String getLanguage() {
+        return this.language;
     }
 
     @Override
@@ -147,6 +160,9 @@ public final class TransformationDescriptor implements Rule, Converter {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
+        if (this.direction) {
+            builder.append("..., ");
+        }
         boolean flag = false;
         for (final LeftSideItem item : this.left) {
             if (flag) {
@@ -177,6 +193,8 @@ public final class TransformationDescriptor implements Rule, Converter {
             final Node node;
             if (this.right instanceof UntypedHole) {
                 node = extracted.getNodes(((UntypedHole) this.right).getNumber()).get(0);
+            } else if (this.right instanceof Null) {
+                node = NullNode.INSTANCE;
             } else {
                 final ResultingSubtreeDescriptor rsd = (ResultingSubtreeDescriptor) this.right;
                 final Fragment fragment = Fragment.fromNodes(list.subList(index, index + consumed));
@@ -197,7 +215,7 @@ public final class TransformationDescriptor implements Rule, Converter {
 
     @Override
     public boolean isRightToLeft() {
-        return false;
+        return this.direction;
     }
 
     /**

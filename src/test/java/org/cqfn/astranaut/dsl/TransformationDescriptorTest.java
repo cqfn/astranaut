@@ -56,6 +56,8 @@ class TransformationDescriptorTest {
             ),
             new ResultingSubtreeDescriptor("BBB", null, Collections.emptyList())
         );
+        transform.setRightToLeftDirection();
+        Assertions.assertEquals("..., AAA -> BBB", transform.toString());
         Assertions.assertTrue(transform.getDependencies().isEmpty());
         final NodeDescriptor node = new RegularNodeDescriptor("BBB", Collections.emptyList());
         transform.addDependency(node);

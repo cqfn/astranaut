@@ -82,7 +82,7 @@ final class LongLineBreaker {
             if (this.splitByAssignment(lines)) {
                 break;
             }
-            if (this.splitByAndOperator(lines)) {
+            if (this.splitByAndOrOperator(lines)) {
                 break;
             }
             if (this.splitByCallChain(lines)) {
@@ -117,15 +117,20 @@ final class LongLineBreaker {
     }
 
     /**
-     * Tries to split the line by logical AND (`&&`) operator.
+     * Tries to split the line by logical AND (`&&`) or OR (`||`) operator.
      * If successful, adds split parts and updates internal state accordingly.
      *
      * @param lines Output list of line parts with indentation
      * @return End of operation flag, if no further separation is no longer required
      */
-    private boolean splitByAndOperator(final List<Pair<String, Integer>> lines) {
+    private boolean splitByAndOrOperator(final List<Pair<String, Integer>> lines) {
         boolean result = false;
-        int index = this.tail.indexOf("&&");
+        String oper = "&&";
+        int index = this.tail.indexOf(oper);
+        if (index <= 0) {
+            oper = "||";
+            index = this.tail.indexOf(oper);
+        }
         while (!result && index > 0) {
             lines.add(
                 new Pair<>(
@@ -139,7 +144,7 @@ final class LongLineBreaker {
                 lines.add(new Pair<>(this.tail, this.offset + 1));
                 result = true;
             }
-            index = this.tail.indexOf("&&", 2);
+            index = this.tail.indexOf(oper, 2);
         }
         return result;
     }

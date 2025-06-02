@@ -1,0 +1,35 @@
+{
+  "root": {
+    "type": "Root",
+    "children": [
+      {
+        "type": "Letter",
+        "data": "T"
+      },
+      {
+        "type": "Letter",
+        "data": "e"
+      },
+      {
+        "type": "Letter",
+        "data": "s"
+      },
+      {
+        "type": "Letter",
+        "data": "t"
+      },
+      {
+        "type": "Digit",
+        "data": "1"
+      },
+      {
+        "type": "Digit",
+        "data": "2"
+      },
+      {
+        "type": "Digit",
+        "data": "3"
+      }
+    ]
+  }
+}

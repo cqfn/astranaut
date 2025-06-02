@@ -108,6 +108,20 @@ class ScannerTest {
     }
 
     @Test
+    void tilde() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " ~ ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof Tilde);
+            Assertions.assertEquals("~", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
     void verticalLine() {
         final Scanner scanner = new Scanner(ScannerTest.LOCATION, " | ");
         boolean oops = false;
@@ -115,6 +129,20 @@ class ScannerTest {
             final Token token = scanner.getToken();
             Assertions.assertTrue(token instanceof VerticalLine);
             Assertions.assertEquals("|", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void ampersand() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " & ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof Ampersand);
+            Assertions.assertEquals("&", token.toString());
         } catch (final BaseException ignored) {
             oops = true;
         }
@@ -413,5 +441,38 @@ class ScannerTest {
             oops = true;
         }
         Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void ellipsis() {
+        final Scanner scanner = new Scanner(ScannerTest.LOCATION, " ... ");
+        boolean oops = false;
+        try {
+            final Token token = scanner.getToken();
+            Assertions.assertTrue(token instanceof Ellipsis);
+            Assertions.assertEquals("...", token.toString());
+        } catch (final BaseException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void badEllipsis() {
+        Scanner scanner = new Scanner(ScannerTest.LOCATION, " .abc ");
+        boolean oops = false;
+        try {
+            scanner.getToken();
+        } catch (final BaseException exception) {
+            oops = true;
+            Assertions.assertEquals("Parser", exception.getInitiator());
+            Assertions.assertEquals(
+                "test.dsl, 1: Incorrect symbols after '.', perhaps you meant '...'?",
+                exception.getErrorMessage()
+            );
+        }
+        Assertions.assertTrue(oops);
+        scanner = new Scanner(ScannerTest.LOCATION, " ..bc ");
+        Assertions.assertThrows(ParsingException.class, scanner::getToken);
     }
 }

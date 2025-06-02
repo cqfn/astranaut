@@ -1284,6 +1284,51 @@ Literal<#1>(#1) -> Echo(#1);  // Data hole + node hole + same number = 👀
 | **Node hole** (untyped) | `#1` in `(...)` | ✅ (only inside children) | ✅           | Stores list of nodes          |
 | **Node hole** (typed)   | `Type#1`        | ✅                        | ❌           | Single match of specific type |
 
+## The Ballad of Right-Associative Operations  
+
+Some operators march to their own beat—they *start from the right* and work their way left.
+Take assignment, for example:  
+
+```java
+a = b = c + 1
+```  
+
+Here’s how the dance unfolds:  
+1. **`c + 1`** executes first (because math won’t wait).  
+2. The result **flows into `b`**.  
+3. Finally, it **lands in `a`**.  
+
+To teach Astranaut this *rightward shuffle*, we use `...` at the start of a rule:  
+
+*"Hey, check the right side first. Left can wait."*  
+
+### Syntax  
+```dsl
+   ..., Identifier#1, Assign, Expression#2 -> Assignment(#1, #2);
+// ^^^ - "Look right before left!"
+```  
+
+What `...` does: 
+- Forces the parser to **match right-associatively**—like solving the puzzle from the end backward.  
+- Ensures nested assignments (like `x = y = z`) fold correctly:  
+  ```text
+  z → y → x  // Instead of x → y → z (which would be wrong!)
+  ```  
+
+### Why it matters:  
+Without `...`, your parser might build `(x = y) = z` — a nonsensical structure that’d make compilers weep.  
+
+### Bonus: The Magic of `...` in Other Contexts  
+- Exponentiation: 
+  ```dsl
+  ..., Expression#1, Operator<'^'>, Expression#2 -> Power(#2, #1);
+  // Because 2^3^4 means 2^(3^4), not (2^3)^4!
+  ```  
+- Ternary operators:
+  ```dsl
+  ..., BinaryExpression#1, '?', Expression#2, ':', Expression#3 -> Ternary(#1, #2, #3);
+  ```  
+
 ## Optional Patterns — `[ ... ]`
 
 Sometimes you want to match a node **if it’s there**, but not require it. That’s where **optional patterns** come in.
@@ -1424,6 +1469,22 @@ This is especially handy when:
 - You're using someone else's grammar or parser — and you don’t want to rewrite all the rules,
 - You want to **flatten** or **normalize** the tree structure before applying deeper transformations.
 
+## Another Special Case: The Vanishing Act  
+When you write:
+```dsl
+AAA -> 0;
+```
+you’re not just transforming a node—you’re *erasing it from existence*. Poof! Gone.
+Like ANTLR’s `skip`, but with fewer tokens and more drama.
+
+It all works: everything on the left is consumed, and turns into nothing. No new node is created.
+
+Example:  
+```dsl
+// Delete all commas—because syntax trees don’t need punctuation drama.
+Comma -> 0;
+```  
+
 ## Special Pattern: Character Matching
 
 When working in `parse` mode — or manually building degenerate trees — you’ll often want to match individual
@@ -1490,6 +1551,93 @@ the character as data.
 - You can match and fold those into meaningful nodes using character patterns.
 - If you're not using `parse`, but still want to simulate a character stream, use `StringSource` or `FileSource` from
   `astranaut-core` — it’ll build a tree from text the same way.
+
+## The Power of _Not_: Tilde (`~`) for Negation  
+
+Sometimes you don’t want to match a pattern—you want to match **everything _except_** it.  
+Enter the **tilde (`~`)**—your AST’s built-in "**NOT**" operator.  
+
+### Basic Syntax
+```dsl
+~Pattern
+```
+
+- **What it does**:  
+  - Fails if `Pattern` matches.  
+  - Succeeds if `Pattern` **doesn’t** match.  
+- **Example**:  
+  ```dsl
+  '"', { ~'"'<#1> }, '"' -> StaticString<#1>;  
+  //     ^^^^^^^^  
+  // "Match any character except a quote (`"`),  
+  // Collect it into `#1`, and wrap as a string literal."
+  ```  
+  Parses `"hello"` → `StaticString<"hello">`, but skips the quotes.  
+
+### Advanced Use: Optional or Repeated Negation  
+Tilde plays nice with `[]` (optional) and `{}` (repeated) patterns:  
+
+1. **Optional Negation** → `[~Pattern]`  
+   - *"Match zero or one occurrence—but only if it’s **not** `Pattern`."*  
+   - Example: Skip optional **non**-whitespace:  
+     ```dsl
+     '[', [~Whitespace#1], ']' -> BracketedContent(#1);  
+     // Matches "[x]" or "[]", but not "[ ]".
+     ```  
+
+2. **Repeated Negation** → `{~Pattern}`  
+   - *"Match zero or more occurrences—**none** of which are `Pattern`."*  
+   - Example: Extract a comment until the next `*/`:  
+     ```dsl
+     '/', '*', { ~'*'<#1> }, '*', '/' -> Comment<#>;  
+     // Grabs all chars between /* and */, ignoring '*' alone.
+     ```  
+
+## Pattern Combinators: `|` (OR) and `&` (AND) — Mix and Match  
+
+### `|` (OR) — "First Match Wins"  
+**How it works:**  
+- Checks patterns **left to right**—stops at the **first successful match**.  
+- If none match, the rule **doesn’t fire**.  
+
+**Example:**  
+```dsl
+// Match either a lowercase letter, uppercase letter, or underscore  
+|('a..z'<#1>, 'A..Z'<#1>, '_'<#1>) -> Letter<#1>;  
+```  
+
+**Use cases:**  
+- Handling **alternative syntax** (e.g., `+` vs `plus`).  
+- Simplifying **heterogeneous rules** into one line.  
+
+### `&` (AND) — "All or Nothing"  
+**How it works:**  
+- **All patterns** inside `&(...)` must match **simultaneously**.  
+- Order-agnostic (but checked left-to-right for efficiency).  
+
+**Why does this exist?**  
+Honestly, we’re not sure yet 😅. We added `&` for future-proofing.  
+
+### Example: String Literals with Escapes  
+
+```dsl
+NewLine <- 'char';
+'\\', 'n' -> NewLine<'\n'>;
+
+EscapedQuote <- 'char';
+'\\', '"' -> EscapedQuote<'"'>;
+
+EscapedSymbol <- NewLine, EscapedQuote;
+
+StringLiteral <- 'String', '""';
+'"', {|(~'"'<#1>, EscapedSymbol<#1>)}, '"' -> StringLiteral<#1>;
+```  
+
+**Result**:  
+Input `"Hello\nWorld\"!"` →  
+```json
+{ "type": "StringLiteral", "data": "Hello\nWorld\"!" }
+```  
 
 # Example: Parsing Arithmetic Expressions from Raw Text
 
@@ -1607,7 +1755,6 @@ A structured AST in `output.json`:
 ```
 
 A visual `.png` image of the parsed and transformed tree:
-
 ![VERY_SIMPLE_AST](src/main/documents/very_simple_ast.png)
 
 🎉 Congratulations — you just wrote a mini parser and tree rewriter using nothing but a DSL and a few dozen lines.

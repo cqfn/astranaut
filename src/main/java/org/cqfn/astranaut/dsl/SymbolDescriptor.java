@@ -51,6 +51,11 @@ public final class SymbolDescriptor implements PatternItem, LeftSideItem {
     private PatternMatchingMode mode;
 
     /**
+     * Negation flag.
+     */
+    private boolean negation;
+
+    /**
      * Constructor.
      * @param token Token describing a character or range of characters
      * @param data Untyped hole for extracting the value of a symbol
@@ -88,6 +93,16 @@ public final class SymbolDescriptor implements PatternItem, LeftSideItem {
     }
 
     @Override
+    public void setNegationFlag() {
+        this.negation = true;
+    }
+
+    @Override
+    public boolean isNegationFlagSet() {
+        return this.negation;
+    }
+
+    @Override
     public LeftSideItemGenerator createGenerator() {
         return new SymbolMatcherGenerator(this);
     }
@@ -111,21 +126,24 @@ public final class SymbolDescriptor implements PatternItem, LeftSideItem {
     @Override
     public boolean matchNode(final Node node, final Extracted extracted) {
         boolean matches = false;
+        final String string = node.getData();
         do {
             if (!node.belongsToGroup("Char")) {
                 break;
             }
-            final String string = node.getData();
             if (string.length() != 1) {
                 break;
             }
             final char symbol = string.charAt(0);
             matches = symbol >= this.token.getFirstSymbol()
                 && symbol <= this.token.getLastSymbol();
-            if (matches && this.data != null) {
-                extracted.addData(this.data.getNumber(), string);
-            }
         } while (false);
+        if (this.negation) {
+            matches = !matches;
+        }
+        if (matches && this.data != null) {
+            extracted.addData(this.data.getNumber(), string);
+        }
         return matches;
     }
 
@@ -135,6 +153,9 @@ public final class SymbolDescriptor implements PatternItem, LeftSideItem {
      */
     private String toShortString() {
         final StringBuilder builder = new StringBuilder();
+        if (this.negation) {
+            builder.append('~');
+        }
         builder.append(this.token.toString());
         if (this.data != null) {
             builder.append('<').append(this.data.toString()).append('>');

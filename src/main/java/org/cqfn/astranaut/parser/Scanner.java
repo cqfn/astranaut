@@ -39,6 +39,7 @@ public final class Scanner {
             .put(',', Comma.INSTANCE)
             .put('@', AtSymbol.INSTANCE)
             .put('|', VerticalLine.INSTANCE)
+            .put('&', Ampersand.INSTANCE)
             .put('{', OpeningCurlyBracket.INSTANCE)
             .put('}', ClosingCurlyBracket.INSTANCE)
             .put('[', OpeningSquareBracket.INSTANCE)
@@ -48,6 +49,7 @@ public final class Scanner {
             .put('(', OpeningRoundBracket.INSTANCE)
             .put(')', ClosingRoundBracket.INSTANCE)
             .put('#', HashSymbol.INSTANCE)
+            .put('~', Tilde.INSTANCE)
             .make();
 
     /**
@@ -116,6 +118,10 @@ public final class Scanner {
             }
             if (chr == '\'' || chr == '"') {
                 token = this.parseString(chr);
+                break;
+            }
+            if (chr == '.') {
+                token = this.parseEllipsis();
                 break;
             }
             throw new UnknownSymbol(this.loc, chr);
@@ -248,6 +254,24 @@ public final class Scanner {
         }
         this.nextChar();
         return builder.toString();
+    }
+
+    /**
+     * Parses a sequence of characters as an ellipsis.
+     * @return A token
+     * @throws ParsingException If it's not an ellipsis
+     */
+    private Token parseEllipsis() throws ParsingException {
+        final char second = this.nextChar();
+        final char third = this.nextChar();
+        if (second != '.' || third != '.') {
+            throw new CommonParsingException(
+                this.loc,
+                "Incorrect symbols after '.', perhaps you meant '...'?"
+            );
+        }
+        this.nextChar();
+        return Ellipsis.INSTANCE;
     }
 
     /**

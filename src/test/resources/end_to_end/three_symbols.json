@@ -1,0 +1,31 @@
+{
+  "root": {
+    "type": "Root",
+    "children": [
+      {
+        "type": "CommonLiteral",
+        "children": [
+          {
+            "type": "Letter",
+            "data": "a"
+          }
+        ]
+      },
+      {
+        "type": "SpecialLiteral",
+        "children": [
+          {"type": "QuestionMark"}
+        ]
+      },
+      {
+        "type": "CommonLiteral",
+        "children": [
+          {
+            "type": "Letter",
+            "data": "c"
+          }
+        ]
+      }
+    ]
+  }
+}

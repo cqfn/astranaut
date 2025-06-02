@@ -394,6 +394,71 @@ class GenerateTest extends EndToEndTest {
         );
     }
 
+    @Test
+    void nullOnTheRight(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("two_identifiers.txt");
+        final String actual = this.run("null_on_the_right.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void rightToLeftRule(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("right_to_left_rule.txt");
+        final String actual = this.run("right_to_left_rule.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void repeatedAndInverted(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("repeated_and_inverted.txt");
+        final String actual = this.run("repeated_and_inverted.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void optionalAndInverted(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("optional_and_inverted.txt");
+        final String actual = this.run("optional_and_inverted.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void optionalAndInvertedComplexCase(final @TempDir Path temp) {
+        final String expected = this.loadStringResource(
+            "optional_and_inverted_complex_case.txt"
+        );
+        final String actual = this.run("optional_and_inverted_complex_case.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void regularAndInverted(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("regular_and_inverted.txt");
+        final String actual = this.run("regular_and_inverted.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void orExpression(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("or_expression.txt");
+        final String actual = this.run("or_expression.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void andExpression(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("and_expression.txt");
+        final String actual = this.run("and_expression.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void negativeLogical(final @TempDir Path temp) {
+        final String expected = this.loadStringResource("negative_logical.txt");
+        final String actual = this.run("negative_logical.dsl", temp);
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in code generation mode and compiles all generated files
      *  into a single listing.
