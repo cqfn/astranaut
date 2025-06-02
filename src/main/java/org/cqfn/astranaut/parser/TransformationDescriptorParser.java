@@ -127,15 +127,12 @@ public final class TransformationDescriptorParser {
                 );
             }
         } while (false);
+        final LeftSideParser parser = new LeftSideParser(scanner, holes);
         final List<LeftSideItem> list = new ArrayList<>(1);
         while (true) {
-            final LeftSideParser parser = new LeftSideParser(scanner, 0, holes);
             final LeftSideItem item = parser.parseLeftSideItem(first);
             list.add(item);
-            next = parser.getLastToken();
-            if (next == null) {
-                next = scanner.getToken();
-            }
+            next = parser.getToken();
             if (next == null) {
                 break;
             }
@@ -145,7 +142,7 @@ public final class TransformationDescriptorParser {
                     "Descriptors must be separated by commas"
                 );
             }
-            first = scanner.getToken();
+            first = parser.getToken();
         }
         return list;
     }

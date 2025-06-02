@@ -50,7 +50,7 @@ final class PatternParser extends LeftSideItemParser {
     }
 
     @Override
-    public LeftSideItem parse(final LeftSideParsing context, final Token first)
+    public LeftSideItem parse(final LeftSideParser context, final Token first)
         throws ParsingException {
         final String type = first.toString();
         final Token next = context.getToken();
@@ -70,7 +70,7 @@ final class PatternParser extends LeftSideItemParser {
      * @return A typed hole
      * @throws ParsingException If the parse fails
      */
-    private static TypedHole parseTypedHole(final LeftSideParsing context, final String type)
+    private static TypedHole parseTypedHole(final LeftSideParser context, final String type)
         throws ParsingException {
         final Token token = context.getToken();
         if (!(token instanceof Number)) {
@@ -96,7 +96,7 @@ final class PatternParser extends LeftSideItemParser {
      * @return Subtree descriptor
      * @throws ParsingException If the parse fails
      */
-    private static PatternDescriptor parsePattern(final LeftSideParsing context, final String type,
+    private static PatternDescriptor parsePattern(final LeftSideParser context, final String type,
         final Token first) throws ParsingException {
         Token next = first;
         LeftDataDescriptor data = null;
@@ -131,7 +131,7 @@ final class PatternParser extends LeftSideItemParser {
      * @return A data descriptor
      * @throws ParsingException If the parse fails
      */
-    private static LeftDataDescriptor parseData(final LeftSideParsing context)
+    private static LeftDataDescriptor parseData(final LeftSideParser context)
         throws ParsingException {
         final LeftDataDescriptor data;
         final Token first = context.getToken();
@@ -161,7 +161,7 @@ final class PatternParser extends LeftSideItemParser {
      * @return List of pattern children
      * @throws ParsingException If the parse fails
      */
-    private static List<PatternItem> parseChildren(final LeftSideParsing context)
+    private static List<PatternItem> parseChildren(final LeftSideParser context)
         throws ParsingException {
         final List<PatternItem> list = new ArrayList<>(0);
         do {

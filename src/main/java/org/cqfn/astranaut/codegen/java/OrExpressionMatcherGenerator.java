@@ -60,6 +60,7 @@ public final class OrExpressionMatcherGenerator extends LeftSideItemGenerator {
      * @param klass The class to which the {@code match} method will be added
      */
     private void generateMatchMethod(final Klass klass) {
+        this.getClass();
         final Method method = new Method("boolean", "match");
         klass.addMethod(method);
         method.makePublic();

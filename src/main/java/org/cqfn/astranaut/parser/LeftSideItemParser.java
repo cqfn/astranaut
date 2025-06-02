@@ -39,7 +39,7 @@ abstract class LeftSideItemParser {
      * @return Resulting item
      * @throws ParsingException If parsing fails
      */
-    public abstract LeftSideItem parse(LeftSideParsing context, Token first)
+    public abstract LeftSideItem parse(LeftSideParser context, Token first)
         throws ParsingException;
 
     /**
@@ -48,7 +48,7 @@ abstract class LeftSideItemParser {
      * @return An untyped hole
      * @throws ParsingException If the parse fails
      */
-    protected static UntypedHole parseDataHole(final LeftSideParsing context)
+    protected static UntypedHole parseDataHole(final LeftSideParser context)
         throws ParsingException {
         final Token token = context.getToken();
         if (!(token instanceof Number)) {
@@ -65,7 +65,7 @@ abstract class LeftSideItemParser {
      * @return An untyped hole
      * @throws ParsingException If the parse fails
      */
-    protected static UntypedHole parseUntypedNodeHole(final LeftSideParsing context)
+    protected static UntypedHole parseUntypedNodeHole(final LeftSideParser context)
         throws ParsingException {
         final Token token = context.getToken();
         if (!(token instanceof Number)) {

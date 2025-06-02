@@ -24,52 +24,34 @@
 package org.cqfn.astranaut.parser;
 
 import org.cqfn.astranaut.dsl.LeftSideItem;
-import org.cqfn.astranaut.dsl.SymbolDescriptor;
-import org.cqfn.astranaut.dsl.UntypedHole;
 
 /**
- * Parses a sequence of tokens as a symbolic descriptor.
+ * Parses a sequence of tokens as a negative item.
  * @since 1.0.0
  */
-final class SymbolicDescriptorParser extends LeftSideItemParser {
+final class NegativeItemParser extends LeftSideItemParser {
     /**
      * Static instance.
      */
-    public static final LeftSideItemParser INSTANCE = new SymbolicDescriptorParser();
+    public static final LeftSideItemParser INSTANCE = new NegativeItemParser();
 
     /**
      * Private constructor.
      */
-    private SymbolicDescriptorParser() {
+    private NegativeItemParser() {
     }
 
     @Override
     public LeftSideItem parse(final LeftSideParser context, final Token first)
         throws ParsingException {
-        UntypedHole data = null;
-        Token next = context.getToken();
-        do {
-            if (!(next instanceof OpeningAngleBracket)) {
-                context.pushToken(next);
-                break;
-            }
-            next = context.getToken();
-            if (next instanceof HashSymbol) {
-                data = LeftSideItemParser.parseDataHole(context);
-            } else {
-                throw new CommonParsingException(
-                    context.getLocation(),
-                    "Data inside symbolic descriptors can only be holes"
-                );
-            }
-            next = context.getToken();
-            if (!(next instanceof ClosingAngleBracket)) {
-                throw new CommonParsingException(
-                    context.getLocation(),
-                    "Closing angle bracket '>' expected for data descriptor"
-                );
-            }
-        } while (false);
-        return new SymbolDescriptor((SymbolicToken) first, data);
+        final LeftSideItem item = context.parseLeftSideItem();
+        if (item.isNegationFlagSet()) {
+            throw new CommonParsingException(
+                context.getLocation(),
+                "Item can't be 'double negative'"
+            );
+        }
+        item.setNegationFlag();
+        return item;
     }
 }

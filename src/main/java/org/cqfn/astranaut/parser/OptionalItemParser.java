@@ -43,7 +43,7 @@ final class OptionalItemParser extends LeftSideItemParser {
     }
 
     @Override
-    public LeftSideItem parse(final LeftSideParsing context, final Token first)
+    public LeftSideItem parse(final LeftSideParser context, final Token first)
         throws ParsingException {
         final LeftSideItem item = context.parseLeftSideItem();
         if (item.getMatchingMode() != PatternMatchingMode.NORMAL) {

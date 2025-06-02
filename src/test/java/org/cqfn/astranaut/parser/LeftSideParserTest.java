@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
  * @since 1.0.0
  */
 @SuppressWarnings("PMD.TooManyMethods")
-class LeftSideParsingTest {
+class LeftSideParserTest {
     /**
      * Fake location for testing purposes.
      */
@@ -670,7 +670,7 @@ class LeftSideParsingTest {
      * @return Left item parser
      */
     private LeftSideParser createParser(final String code) {
-        final Scanner scanner = new Scanner(LeftSideParsingTest.LOCATION, code);
-        return new LeftSideParser(scanner, 0, new HoleCounter());
+        final Scanner scanner = new Scanner(LeftSideParserTest.LOCATION, code);
+        return new LeftSideParser(scanner, new HoleCounter());
     }
 }
