@@ -80,7 +80,7 @@ public final class GeneratorArguments extends BaseArguments {
             switch (arg) {
                 case "--output":
                 case "-o":
-                    this.output = this.parseString(arg, iterator);
+                    this.setOutput(this.parseString(arg, iterator));
                     break;
                 case "--license":
                 case "-l":
@@ -101,11 +101,41 @@ public final class GeneratorArguments extends BaseArguments {
     }
 
     /**
+     * Sets the name of the folder or file where the result is placed.
+     * @param value Name of destination folder
+     */
+    public void setOutput(final String value) {
+        this.output = value;
+    }
+
+    /**
      * Returns the name of the folder or file where the result is placed.
      * @return The folder/file name
      */
     public String getOutput() {
         return this.output;
+    }
+
+    /**
+     * Sets the file containing license. The license will be read from this file.
+     * @param name File name
+     * @throws CliException If reading failed
+     */
+    public void setLicenseFile(final String name) throws CliException {
+        this.licence = new FilesReader(name)
+            .readAsString(
+                new FilesReader.CustomExceptionCreator<CliException>() {
+                    @Override
+                    public CliException create() {
+                        return new CommonCliException(
+                            String.format(
+                                "Can't read the license file '%s'",
+                                name
+                            )
+                        );
+                    }
+                }
+            );
     }
 
     /**
@@ -117,11 +147,47 @@ public final class GeneratorArguments extends BaseArguments {
     }
 
     /**
+     * Sets the package name and checks it for correctness.
+     * @param name Package name
+     * @throws CliException If checking failed
+     */
+    public void setPackage(final String name) throws CliException {
+        final String pattern = "^[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*$";
+        if (!name.matches(pattern)) {
+            throw new CommonCliException(
+                String.format(
+                    "The string '%s' is not a valid Java package name",
+                    name
+                )
+            );
+        }
+        this.pkg = name;
+    }
+
+    /**
      * Returns the name of the packet. This name will be used in the generated files.
      * @return Package name
      */
     public String getPackage() {
         return this.pkg;
+    }
+
+    /**
+     * Sets the version number and checks it for correctness.
+     * @param value Version number
+     * @throws CliException If checking failed
+     */
+    public void setVersion(final String value) throws CliException {
+        final String pattern = "^\\d+(\\.\\d+){1,2}(\\.[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$";
+        if (!value.matches(pattern)) {
+            throw new CommonCliException(
+                String.format(
+                    "The string '%s' is not a valid version number",
+                    value
+                )
+            );
+        }
+        this.version = value;
     }
 
     /**
@@ -142,20 +208,7 @@ public final class GeneratorArguments extends BaseArguments {
     private void parseLicense(final String arg, final Iterator<String> iterator)
         throws CliException {
         final String name = this.parseString(arg, iterator);
-        this.licence = new FilesReader(name)
-            .readAsString(
-                new FilesReader.CustomExceptionCreator<CliException>() {
-                    @Override
-                    public CliException create() {
-                        return new CommonCliException(
-                            String.format(
-                                "Can't read the license file '%s'",
-                                name
-                            )
-                        );
-                    }
-                }
-            );
+        this.setLicenseFile(name);
     }
 
     /**
@@ -167,16 +220,7 @@ public final class GeneratorArguments extends BaseArguments {
     private void parsePackageName(final String arg, final Iterator<String> iterator)
         throws CliException {
         final String name = this.parseString(arg, iterator);
-        final String pattern = "^[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*$";
-        if (!name.matches(pattern)) {
-            throw new CommonCliException(
-                String.format(
-                    "The string '%s' is not a valid Java package name",
-                    name
-                )
-            );
-        }
-        this.pkg = name;
+        this.setPackage(name);
     }
 
     /**
@@ -187,16 +231,7 @@ public final class GeneratorArguments extends BaseArguments {
      */
     private void parseVersion(final String arg, final Iterator<String> iterator)
         throws CliException {
-        final String name = this.parseString(arg, iterator);
-        final String pattern = "^\\d+(\\.\\d+){1,2}(\\.[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$";
-        if (!name.matches(pattern)) {
-            throw new CommonCliException(
-                String.format(
-                    "The string '%s' is not a valid version number",
-                    name
-                )
-            );
-        }
-        this.version = name;
+        final String value = this.parseString(arg, iterator);
+        this.setVersion(value);
     }
 }
