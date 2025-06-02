@@ -25,24 +25,24 @@ package org.cqfn.astranaut.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.cqfn.astranaut.dsl.AndExpression;
 import org.cqfn.astranaut.dsl.LeftSideItem;
-import org.cqfn.astranaut.dsl.OrExpression;
 import org.cqfn.astranaut.dsl.PatternMatchingMode;
 
 /**
- * Parses a sequence of tokens as OR expression.
+ * Parses a sequence of tokens as AND expression.
  * @since 1.0.0
  */
-final class OrExpressionParser extends LeftSideItemParser {
+final class AndExpressionParser extends LeftSideItemParser {
     /**
      * Static instance.
      */
-    public static final LeftSideItemParser INSTANCE = new OrExpressionParser();
+    public static final LeftSideItemParser INSTANCE = new AndExpressionParser();
 
     /**
      * Private constructor.
      */
-    private OrExpressionParser() {
+    private AndExpressionParser() {
     }
 
     @Override
@@ -52,7 +52,7 @@ final class OrExpressionParser extends LeftSideItemParser {
         if (!(next instanceof OpeningRoundBracket)) {
             throw new CommonParsingException(
                 context.getLocation(),
-                "Expected '(' after '|'"
+                "Expected '(' after '&'"
             );
         }
         final List<LeftSideItem> items = new ArrayList<>(1);
@@ -62,7 +62,7 @@ final class OrExpressionParser extends LeftSideItemParser {
             if (item.getMatchingMode() != PatternMatchingMode.NORMAL) {
                 throw new CommonParsingException(
                     context.getLocation(),
-                    "Elements within an OR expression cannot be optional or repetitive"
+                    "Elements within an AND expression cannot be optional or repetitive"
                 );
             }
             items.add(item);
@@ -75,10 +75,10 @@ final class OrExpressionParser extends LeftSideItemParser {
             }
             throw new CommonParsingException(
                 context.getLocation(),
-                "OR expression must be separated by commas and ends with ')'"
+                "AND expression must be separated by commas and ends with ')'"
             );
         }
         context.decrementNestingLevel();
-        return new OrExpression(items);
+        return new AndExpression(items);
     }
 }

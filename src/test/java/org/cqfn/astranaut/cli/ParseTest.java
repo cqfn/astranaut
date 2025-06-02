@@ -154,6 +154,17 @@ class ParseTest extends EndToEndTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void andExpression(final @TempDir Path temp) {
+        final String actual = this.run(
+            "and_expression.dsl",
+            "identifier_and_number.txt",
+            temp
+        );
+        final String expected = this.loadStringResource("letters_and_digits.json");
+        Assertions.assertEquals(expected, actual);
+    }
+
     /**
      * Runs the project in parsing mode and reads the generated file.
      * @param rules Name of the file containing the rules (DSL code)
