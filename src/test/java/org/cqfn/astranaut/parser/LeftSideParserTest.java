@@ -24,6 +24,7 @@
 package org.cqfn.astranaut.parser;
 
 import java.util.List;
+import org.cqfn.astranaut.dsl.AndExpression;
 import org.cqfn.astranaut.dsl.DataDescriptor;
 import org.cqfn.astranaut.dsl.LeftSideItem;
 import org.cqfn.astranaut.dsl.OrExpression;
@@ -665,6 +666,24 @@ class LeftSideParserTest {
     }
 
     @Test
+    void doubleOptional() {
+        final LeftSideParser parser = this.createParser("[[AAA]]");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void doubleRepeated() {
+        final LeftSideParser parser = this.createParser("{{AAA}}");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void doubleNegative() {
+        final LeftSideParser parser = this.createParser("~~AAA");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
     void orExpression() {
         final String code = "|('a..z'<#1>, 'A..Z'<#1>)";
         final LeftSideParser parser = this.createParser(code);
@@ -677,6 +696,81 @@ class LeftSideParserTest {
             oops = true;
         }
         Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void badOrDescriptor() {
+        final LeftSideParser parser = this.createParser("|{AAA, BBB}");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void emptyOrDescriptor() {
+        final LeftSideParser parser = this.createParser("|()");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void unclosedOrDescriptor() {
+        final LeftSideParser parser = this.createParser("|(AAA, BBB, ");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void orDescriptorWithoutSeparator() {
+        final LeftSideParser parser = this.createParser("|(AAA BBB)");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void optionalInsideOr() {
+        final LeftSideParser parser = this.createParser("|(AAA, [BBB])");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void andExpression() {
+        final String code = "&(|('a..z', 'A..Z'), Char<#1>)";
+        final LeftSideParser parser = this.createParser(code);
+        boolean oops = false;
+        try {
+            final LeftSideItem item = parser.parseLeftSideItem();
+            Assertions.assertTrue(item instanceof AndExpression);
+            Assertions.assertEquals(code, item.toString());
+        } catch (final ParsingException ignored) {
+            oops = true;
+        }
+        Assertions.assertFalse(oops);
+    }
+
+    @Test
+    void badAndDescriptor() {
+        final LeftSideParser parser = this.createParser("&{AAA, BBB}");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void emptyAndDescriptor() {
+        final LeftSideParser parser = this.createParser("&()");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void unclosedAndDescriptor() {
+        final LeftSideParser parser = this.createParser("&(AAA, BBB, ");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void andDescriptorWithoutSeparator() {
+        final LeftSideParser parser = this.createParser("&(AAA BBB)");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
+    }
+
+    @Test
+    void optionalInsideAnd() {
+        final LeftSideParser parser = this.createParser("&(AAA, [BBB])");
+        Assertions.assertThrows(ParsingException.class, parser::parseLeftSideItem);
     }
 
     /**

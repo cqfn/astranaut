@@ -59,6 +59,12 @@ final class AndExpressionParser extends LeftSideItemParser {
         context.incrementNestingLevel();
         while (true) {
             final LeftSideItem item = context.parseLeftSideItem();
+            if (item == null) {
+                throw new CommonParsingException(
+                    context.getLocation(),
+                    "Expected an item inside '&(' and ')'"
+                );
+            }
             if (item.getMatchingMode() != PatternMatchingMode.NORMAL) {
                 throw new CommonParsingException(
                     context.getLocation(),
