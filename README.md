@@ -23,12 +23,25 @@ In short, **Astranaut** lets you:
 Whether you're building a code linter, refactoring engine, domain-specific transpiler, or just a curious developer
 who loves playing with compilers — Astranaut is your friendly toolkit for working with trees like a pro.
 
+# Content
+
+- [Requirements](#requirements)
+- [How to download and build](#how-to-download-and-build)
+- [How It Works](#how-it-works)
+- [Syntax tree structure](#trees-glorious-trees)
+- [Command-Line Interface](#command-line-interface)
+- [Astranaut as a Maven Plugin](#astranaut-as-a-maven-plugin)
+- [The DSL Syntax](#the-dsl-syntax)
+- [Example](#example--parsing-arithmetic-expressions-from-raw-text)
+- [Astranaut vs. ANTLR](#astranaut-vs-antlr--tree-structure-comparison)
+- [Contributors](#contributors)
+
 # Requirements
 
 * Java 1.8
 * Maven 3.6.3+ (to build)
 
-## How to download and build 
+# How to download and build 
 
 You can download the latest release
 [here](https://repo.maven.apache.org/maven2/org/cqfn/astranaut).
@@ -76,7 +89,7 @@ or just getting a feel for your rules.
 Bonus: Astranaut can also draw pretty pictures of your trees — PNG or SVG — which is super handy when you’re trying
 to debug a pattern or just admire your beautifully structured code.
 
-# 🌳 Trees, Glorious Trees
+# Trees, Glorious Trees
 
 At the core of Astranaut lies a clean, minimalistic model for representing syntax trees.
 It’s all based around just **three interfaces** — elegant, extensible, and designed with transformation in mind.
@@ -227,8 +240,9 @@ Why bother with license headers and versioning? Because we’re perfectionists. 
 every linter, every checker (CodeStyle, PMD, whatever your build throws at it) without needing any exceptions
 or suppressions.
 
-Yes, the generated code is clean. Yes, it looks like something you'd proudly write by hand. Yes, you can trust it.
-Believe us. Or better yet — try it. 😎
+Yes, the generated code is clean. Yes, it looks like something you'd proudly write by hand. Find an example 
+[here](src/main/documents/generated_code_example.md).
+Yes, you can trust it. Believe us. Or better yet — try it. 😎
 
 ## Action: `transform`
 
@@ -295,6 +309,88 @@ java -jar generator.jar parse my.dsl \
 | `--image`, `-i`    | Path to an image file (SVG or PNG) that will visualize the final tree. Optional, but super cool. |
 
 This is your go-to action when you want to define your own parser using transformation rules alone.
+
+# Astranaut as a Maven Plugin  
+
+Tired of juggling `.jar` files and command-line flags?  
+Meet the **Astranaut Maven Plugin** — your shortcut to AST generation right inside your build process.  
+
+## Why Use the Plugin?  
+
+- **Seamless integration**: Runs during `mvn compile` — no manual steps.  
+- **Project-aware**: Automatically hooks into Maven’s source directories.  
+
+## Quick Setup  
+
+Add this to your `pom.xml`:
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>org.cqfn</groupId>
+    <artifactId>astranaut-core</artifactId>
+    <version><!-- latest version here --></version>
+  </dependency>
+</dependencies>
+```
+
+You can find the latest release number [here](https://github.com/cqfn/astranaut-core/tags). 
+
+```xml
+<plugin>
+  <groupId>org.cqfn</groupId>
+  <artifactId>astranaut-maven-plugin</artifactId>
+  <version><!-- latest version here --></version>
+  <executions>
+    <execution>
+      <goals>
+        <goal>generate</goal> <!-- Runs automatically -->
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+```
+
+You can find the latest release number [here](https://github.com/cqfn/astranaut-maven-plugin/tags). **Note that the
+plugin version may be different from the core version.**
+
+**Defaults**:  
+- Looks for DSL at `src/main/dsl/rules.dsl`.  
+- Package name is `ast`.
+- Outputs generated Java to `target/generated-sources/astranaut`.  
+- Uses your project’s version (or `1.0.0` if unspecified).  
+
+## Customize It  
+
+Override defaults with:
+```xml
+<plugin>
+    <groupId>org.cqfn</groupId>
+    <artifactId>astranaut-maven-plugin</artifactId>
+    <version>2.0.0</version>
+    <configuration>
+        <dsl>${basedir}/data/dsl.txt</dsl> <!-- Your DSL path -->
+        <license>${basedir}/licenses/LICENSE.txt</license> <!-- License file -->
+        <output>${basedir}/src/main/java</output>  <!-- Output dir -->
+        <version>1.2.3</version> <!-- Custom version tag -->
+        <pkg>org.uast.generated</pkg> <!-- Generated package -->
+    </configuration>
+    <executions>
+        <execution>
+            <goals>
+                <goal>generate</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
+## Workflow
+
+1. Write your DSL rules.  
+2. Run `mvn compile`.  
+3. **Boom** — your AST classes appear in the configured output, ready to use and also compiled!
+   You can immediately write algorithms using your generated classes!
 
 # The DSL Syntax
 
@@ -1755,6 +1851,7 @@ A structured AST in `output.json`:
 ```
 
 A visual `.png` image of the parsed and transformed tree:
+
 ![VERY_SIMPLE_AST](src/main/documents/very_simple_ast.png)
 
 🎉 Congratulations — you just wrote a mini parser and tree rewriter using nothing but a DSL and a few dozen lines.
